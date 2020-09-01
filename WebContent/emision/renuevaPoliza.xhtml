@@ -1,0 +1,262 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/templates/Template.xhtml">
+	<ui:define name="tituloPagina">Renovación de Pólizas</ui:define>
+	<ui:define name="contenido">
+		<p:ajaxStatus
+			style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+			<f:facet name="start">
+				<p:graphicImage value="/images/ajax-loadercircle.gif" />
+			</f:facet>
+			<f:facet name="complete">
+				<h:outputText value="" />
+			</f:facet>
+		</p:ajaxStatus>
+		<h:form id="frm_consultaPol">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<h:panelGrid columns="1" style="width:100%;text-align:center;">
+				<p:panelGrid columns="6">
+					<h:outputText value="Aseguradora " />
+					<p:selectOneMenu id="aseguradoras"
+						value="#{ControladorRenuevaPoliza.codAseguradora}"
+						style="width:125px" autoWidth="false">
+						<f:selectItem itemValue="%" itemLabel="-- Todos --" />
+						<f:selectItems var="aseguradoras"
+							value="#{ControladorRenuevaPoliza.listadoAseguradoras}"
+							itemLabel="#{aseguradoras.nombre_corto_aseguradora}"
+							itemValue="#{aseguradoras.cd_aseguradora}" />
+					</p:selectOneMenu>
+					<h:outputText value="Ramo " />
+					<p:selectCheckboxMenu id="listaRamos"
+						value="#{ControladorRenuevaPoliza.selectedRamos}" label="-- Todos --"
+						multiple="true" filter="true" filterMatchMode="startsWith"
+						panelStyle="width:250px">
+						<p:ajax event="itemUnselect"
+							listener="#{ControladorRenuevaPoliza.onItemUnselect}" />
+						<f:selectItems var="ramos"
+							value="#{ControladorRenuevaPoliza.listadoAsegRamo}"
+							itemLabel="#{ramos.desc_ramo}" itemValue="#{ramos.cd_ramo}" />
+					</p:selectCheckboxMenu>
+					<h:outputText value="Asegurado " />
+					<p:row>
+						<p:inputText readonly="true" id="txt_asegurado"
+							value="#{ControladorRenuevaPoliza.datosClienteSol.razon_social_cliente}"
+							disabled="true" />
+						<p:commandButton id="btnBuscaASegurado"
+							onclick="PF('wbuscaAsegurado').show();" icon="ui-icon-search" />
+					</p:row>
+					<h:outputText value="Grupo Contratante: " />
+					<p:selectOneMenu id="gCtrtBusc"
+						value="#{ControladorRenuevaPoliza.codGrupoContratante}"
+						style="width:125px" autoWidth="false">
+						<f:selectItem itemLabel="- Todos -" itemValue="%" />
+						<f:selectItems var="gcontratante"
+							value="#{ControladorRenuevaPoliza.listaGrupoContratante}"
+							itemLabel="#{gcontratante.nombre_corto_grupo_contratante}"
+							itemValue="#{gcontratante.cd_grupo_contratante}" />
+					</p:selectOneMenu>
+					<h:outputText value="Canal: " />
+					<p:selectOneMenu id="repCanal"
+						value="#{ControladorRenuevaPoliza.lscdSubagente}"
+						style="width:150px" autoWidth="false">
+						<f:selectItem itemLabel="- Todos -" itemValue="%" />
+						<f:selectItems value="#{ControladorRenuevaPoliza.lstSubagente}"
+							var="suba"
+							itemLabel="#{suba.primer_apellido_subagente} #{suba.segundo_apellido_subagente} #{suba.primer_nombre_subagente} #{suba.segundo_nombre_subagente}"
+							itemValue="#{suba.cd_subagente}" />
+					</p:selectOneMenu>
+					<h:outputText value="Ejecutivo: " />
+					<p:selectOneMenu id="repEjec"
+						value="#{ControladorRenuevaPoliza.lscdEjecutivo}"
+						style="width:150px" autoWidth="false">
+						<f:selectItem itemLabel="- Todos -" itemValue="%" />
+						<f:selectItems value="#{ControladorRenuevaPoliza.lstEjecutivos}"
+							var="eje"
+							itemLabel="#{eje.primer_apellido_ejecutivo} #{eje.segundo_apellido_ejecutivo} #{eje.primer_nombre_ejecutivo} #{eje.segundo_nombre_ejecutivo}"
+							itemValue="#{eje.cd_ejecutivo}" />
+					</p:selectOneMenu>
+					<p:outputLabel value="Fecha Desde:" />
+					<p:calendar id="fcDesde"
+						value="#{ControladorRenuevaPoliza.fcDesde}" style="width:150px"
+						autoWidth="false" />
+					<p:outputLabel value="Fecha Hasta:" />
+					<p:calendar id="fcHasta"
+						value="#{ControladorRenuevaPoliza.fcHasta}" style="width:150px"
+						autoWidth="false" />
+					<p:row></p:row>
+					<p:row></p:row>
+					<p:commandButton value="Buscar" styleClass="ui-priority-primary"
+						actionListener="#{ControladorRenuevaPoliza.consultar}"
+						update="@this,frm_consultaPol:listadoPolizaBusca"
+						icon="ui-icon-search"
+						process="@this,frm_consultaPol:gCtrtBusc,frm_consultaPol:repCanal,frm_consultaPol:repEjec,
+						frm_consultaPol:fcDesde,frm_consultaPol:fcHasta,
+						frm_consultaPol:aseguradoras,frm_consultaPol:listaRamos" />
+					<p:commandButton value="Renovar" styleClass="ui-priority-primary"
+						actionListener="#{ControladorRenuevaPoliza.renuevaPol}"
+						update="@this,frm_consultaPol:listadoPolizaBusca"
+						icon="ui-icon-transferthick-e-w"
+						process="@this,frm_consultaPol:listadoPolizaBusca" />
+					<p:commandButton value="No Renovar"
+						styleClass="ui-priority-primary"
+						action="#{ControladorRenuevaPoliza.noRenueva}"
+						update="@this,frm_consultaPol:listadoPolizaBusca"
+						icon="ui-icon-transferthick-e-w"
+						process="@this,frm_consultaPol:listadoPolizaBusca" />
+					<p:commandButton value="Salir" icon="ui-icon-cancel" update="@all"
+						action="/index.xhtml?faces-redirect=true"
+						styleClass="ui-priority-primary" />
+				</p:panelGrid>
+
+
+				<p:dataTable id="listadoPolizaBusca" var="pol" scrollable="true"
+					scrollHeight="400"
+					value="#{ControladorRenuevaPoliza.lstConsultaPoliza}"
+					selection="#{ControladorRenuevaPoliza.selectedLstConsultaPoliza}"
+					rowKey="#{pol.cd_ramo_cotizacion}"
+					style="font-family:Verdana; font-size: 10px;">
+					<f:facet name="header">
+					</f:facet>
+					<p:column selectionMode="multiple"
+						style="width:16px;text-align:center" />
+
+					<p:column headerText="Aseguradora">
+						<h:outputText value="#{pol.nombre_corto_aseguradora}" />
+					</p:column>
+					<p:column headerText="Cliente">
+						<h:outputText value="#{pol.cliente}" />
+					</p:column>
+					<p:column headerText="Grupo Contratante">
+						<h:outputText value="#{pol.nm_grupo_contratante}" />
+					</p:column>
+					<p:column headerText="Póliza">
+						<h:outputText value="#{pol.poliza}" />
+					</p:column>
+					<p:column headerText="Factura">
+						<h:outputText value="#{pol.factura_aseguradora}" />
+					</p:column>
+					<p:column headerText="Anexo">
+						<h:outputText value="#{pol.anexo}" />
+					</p:column>
+					<p:column headerText="Ramo">
+						<h:outputText value="#{pol.desc_ramo}" />
+					</p:column>
+
+					<p:column headerText="Vigencia Desde:">
+						<h:outputText value="#{pol.fc_ini_vig_date}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Vigencia Hasta:">
+						<h:outputText value="#{pol.fc_fin_vig_date}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Total Asegurado:">
+						<h:outputText value="#{pol.total_asegurado}">
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Tipo">
+						<h:outputText value="#{pol.desc_rubro}">
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Gestionado">
+						<h:outputText value="#{pol.gestiona_renovacion}">
+						</h:outputText>
+					</p:column>
+				</p:dataTable>
+				<h6>Nota: Usted puede renovar 30 días antes del fin de vigencia</h6>
+			</h:panelGrid>
+		</h:form>
+		<p:dialog header="Motivo para No Renovar" draggable="true"
+			widgetVar="noRenueva" showEffect="fade" hideEffect="fade"
+			closable="true">
+			<h:form id="frmDlgTxt">
+				<p:panelGrid columns="1">
+					<h:outputText
+						value="Ingrese el motivo por el cual no se renovará la póliza" />
+					<p:selectOneMenu id="txtMotivo"
+						value="#{ControladorRenuevaPoliza.motivoNoRenu}">
+						<f:selectItem itemLabel="VENTA DEL BIEN"
+							itemValue="VENTA DEL BIEN" />
+						<f:selectItem itemLabel="NO CONTACTADO" itemValue="NO CONTACTADO" />
+						<f:selectItem itemLabel="INCONFORMIDAD CON SERVICIO"
+							itemValue="INCONFORMIDAD CON SERVICIO" />
+						<f:selectItem itemLabel="CAMBIO PLAN" itemValue="CAMBIO PLAN" />
+						<f:selectItem itemLabel="NO RENOVABLE" itemValue="NO RENOVABLE" />
+						<f:selectItem itemLabel="NO DESEA CLIENTE"
+							itemValue="NO DESEA CLIENTE" />
+					</p:selectOneMenu>
+					<p:commandButton value="Guardar" styleClass="ui-priority-primary"
+						actionListener="#{ControladorRenuevaPoliza.procesaNoRenueva}"
+						update="@this,:frm_consultaPol:listadoPolizaBusca"
+						process="@this,:frmDlgTxt:txtMotivo"
+						icon="ui-icon-transferthick-e-w" />
+				</p:panelGrid>
+			</h:form>
+		</p:dialog>
+		<!-- busca y selecciona asegurado -->
+		<p:dialog header="Buscar asegurado" draggable="true"
+			widgetVar="wbuscaAsegurado" showEffect="fade" hideEffect="fade"
+			closable="true" modal="true">
+			<h:form id="frmDLgClie">
+				<h:panelGrid columns="1" style="width:100%;text-align:center;">
+					<p:row>
+						<p:inputText id="aseguradoBuscado"
+							value="#{ControladorRenuevaPoliza.str_cliente}"
+							style="text-transform:uppercase;"
+							onkeyup="javascript:this.value=this.value.toUpperCase();" />
+						<p:commandButton value="Buscar" update="@this,listadoAsegurados"
+							actionListener="#{ControladorRenuevaPoliza.buscarClientes}"
+							process="@this,frmDLgClie:aseguradoBuscado" icon="ui-icon-search" />
+					</p:row>
+				</h:panelGrid>
+				<p:dataTable id="listadoAsegurados" var="asegurado"
+					scrollable="true" scrollHeight="300"
+					value="#{ControladorRenuevaPoliza.listaClientes}" rows="10"
+					paginator="true" style="font-family:Verdana; font-size: 10px;"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+					<p:column headerText="CD" visible="false">
+						<h:outputText value="#{asegurado.cd_cliente}" />
+					</p:column>
+
+					<p:column headerText="Identificación">
+						<h:outputText value="#{asegurado.identificacion_cliente}" />
+					</p:column>
+
+					<p:column headerText="Cliente">
+						<h:outputText
+							value="#{asegurado.primer_nombre_cliente} #{asegurado.segundo_nombre_cliente} #{asegurado.primer_apellido_cliente} #{asegurado.segundo_apellido_cliente}" />
+					</p:column>
+
+					<p:column headerText="Razón Social">
+						<h:outputText value="#{asegurado.razon_social_cliente}" />
+					</p:column>
+
+					<p:column headerText="Tipo Cliente">
+						<h:outputText value="#{asegurado.tipo_cliente}" />
+					</p:column>
+
+					<p:column style="width:52px;text-align: center"
+						headerText="Selecciona" exportable="false">
+						<p:commandButton icon="ui-icon-check" title="Seleccionar"
+							process="frmDLgClie:listadoAsegurados"
+							actionListener="#{ControladorRenuevaPoliza.buscarAseguradosXId}"
+							update="frm_consultaPol:txt_asegurado,frmDLgClie:aseguradoBuscado"
+							onclick="PF('wbuscaAsegurado').hide();">
+							<f:param name="identificacion_asegurado"
+								value="#{asegurado.cd_cliente}" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+	<ui:define name="tituloFormulario">Renovación de Pólizas</ui:define>
+</ui:composition>
+</html>

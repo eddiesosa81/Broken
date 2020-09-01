@@ -1,0 +1,134 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+	<h:panelGrid columns="4">
+		<h:outputText value="Aseguradora:" />
+		<p:selectOneMenu id="aseg"
+			value="#{controladorDiferencialesPol.codAseg}">
+			<f:selectItem itemLabel="- Todos -" itemValue="%" />
+			<f:selectItems value="#{controladorDiferencialesPol.lstAseguradoras}"
+				var="asegu" itemLabel="#{asegu.nombre_corto_aseguradora}"
+				itemValue="#{asegu.cd_aseguradora}" />
+		</p:selectOneMenu>
+		<h:outputText value="Canal" />
+		<p:selectOneMenu id="subagenDif"
+			value="#{controladorDiferencialesPol.codSubagnete}"
+			style="width:160px" filter="true" effect="fade"
+			filterMatchMode="startsWith">
+			<f:selectItem itemLabel="- Todos -" itemValue="%" />
+			<f:selectItems value="#{controladorDiferencialesPol.listSubagentes}"
+				var="subagen"
+				itemLabel="#{subagen.razonSocial_subagente} - #{subagen.primer_nombre_subagente} #{subagen.segundo_nombre_subagente} #{subagen.primer_apellido_subagente} #{subagen.segundo_apellido_subagente}"
+				itemValue="#{subagen.cd_subagente}" />
+		</p:selectOneMenu>
+		<h:outputText value="Fc. Emisión Póliza Desde: " />
+		<p:calendar id="maskDesde"
+			value="#{controladorDiferencialesPol.fechaDesde}"
+			pattern="dd-MM-yyyy" mask="true" />
+		<h:outputText value="Fc. Emisión Póliza Hasta: " />
+		<p:calendar id="maskHasta"
+			value="#{controladorDiferencialesPol.fechaHasta}"
+			pattern="dd-MM-yyyy" mask="true" />
+	</h:panelGrid>
+	<h:panelGrid columns="4" cellpadding="6">
+		<p:commandButton value="Buscar" id="btnasegDif"
+			update="@this,frmDifPol:dtDifAsegComiPol"
+			styleClass="ui-priority-primary"
+			action="#{controladorDiferencialesPol.recuperaDatosDif}"
+			process="@this,frmDifPol:aseg,frmDifPol:subagenDif,frmDifPol:maskDesde,frmDifPol:maskHasta" />
+		<p:commandButton value="Salir" id="btnSalirDifAsegComi"
+			icon="ui-icon-cancel" styleClass="ui-priority-primary"
+			action="/index.xhtml?faces-redirect=true" process="@this"
+			update="@this" />
+		<p:commandButton value="Pagar" id="btnpagoDifAseg" update="@this"
+			styleClass="ui-priority-primary"
+			process="@this,frmDifPol:dtDifAsegComiPol"
+			action="#{controladorDiferencialesPol.guardarComiAsegPol}" />
+
+		<p:commandButton value="Imprimir" id="btnImprDifAseg"
+			action="#{controladorDiferencialesPol.execute()}" ajax="false"
+			styleClass="ui-priority-primary" icon="ui-icon-script"
+			style="width:100px; font-family:Verdana; font-size: 12px;" />
+		<p:commandButton value="Re Cálculo Diferencial" id="btnRecalcula"
+			styleClass="ui-priority-primary"
+			process="@this,frmDifPol:dtDifAsegComiPol"
+			update="frmDifPol:dtDifAsegComiPol"
+			action="#{controladorDiferencialesPol.recalculoDiferenciales}" />
+		<p:commandButton value="Total Diferencial Seleccionado" id="btnSuma"
+			styleClass="ui-priority-primary"
+			process="@this,frmDifPol:dtDifAsegComiPol"
+			action="#{controladorDiferencialesPol.sumaRegSel}" />
+
+	</h:panelGrid>
+
+	<p:dataTable id="dtDifAsegComiPol" var="acpv"
+		value="#{controladorDiferencialesPol.lstComisionAsegPolView}"
+		selection="#{controladorDiferencialesPol.selectedLstComisionPolView}"
+		style="width:1150px; font-family:Verdana; font-size: 10px;"
+		scrollable="true" scrollHeight="300"
+		rowKey="#{acpv.cd_comision_poliza}">
+
+		<f:facet name="header">
+		        Liquidación de Diferenciales
+		    </f:facet>
+
+		<p:column selectionMode="multiple"
+			style="width:16px;text-align:center" />
+
+		<p:column headerText="Aseguradora" style="width:80px">
+			<h:outputText value="#{acpv.nombre_corto_aseguradora}" />
+		</p:column>
+		<p:column headerText="Canal" style="width:80px">
+			<h:outputText value="#{acpv.nm_subagente}" />
+		</p:column>
+		<p:column headerText="Datos Cliente" style="width:100px">
+			<h:outputText value="#{acpv.informacion_cliente}" />
+		</p:column>
+		<p:column filterBy="#{acpv.poliza}" headerText="Poliza"
+			filterMatchMode="contains" style="width:80px">
+			<h:outputText value="#{acpv.poliza}" />
+		</p:column>
+		<p:column filterBy="#{acpv.factura_aseguradora}"
+			headerText="Factura aseguradora" filterMatchMode="contains"
+			style="width:130px">
+			<h:outputText value="#{acpv.factura_aseguradora}" />
+		</p:column>
+		<p:column headerText="Tasa Cliente" style="width:50px">
+			<h:outputText value="#{acpv.tasa_cliente}" />
+		</p:column>
+		<p:column headerText="Tasa Canal" style="width:50px">
+			<h:outputText value="#{acpv.tasa_canal}" />
+		</p:column>
+		<p:column headerText="Prima neta Canal" style="width:50px">
+			<h:outputText value="#{acpv.prima_neta_canal}" />
+		</p:column>
+		<p:column headerText="Tasa Confia" style="width:50px">
+			<h:outputText value="#{acpv.tasa_confia}" />
+		</p:column>
+		<p:column headerText="Prima neta Confia" style="width:50px">
+			<h:outputText value="#{acpv.prima_neta_confia}" />
+		</p:column>
+		<p:column headerText="Diferencial Canal" style="width:50px">
+			<h:outputText value="#{acpv.diferencial_canal}" />
+		</p:column>
+		<p:column headerText="Diferencial confia" style="width:50px">
+			<h:outputText value="#{acpv.diferencial_confia}" />
+		</p:column>
+		<p:column headerText="Fecha de Emisión" style="width:80px">
+			<h:outputText value="#{acpv.fc_emision_date}">
+				<f:convertDateTime pattern="dd/MM/yyyy" />
+			</h:outputText>
+		</p:column>
+		<p:column headerText="Factura Confia" style="width:150px">
+			<h:outputText value="#{acpv.factura_aseguradora}" />
+		</p:column>
+		<p:column headerText="Fecha de Facturación" style="width:80px">
+			<h:outputText value="#{acpv.fecha_factura_brk}">
+				<f:convertDateTime pattern="dd/MM/yyyy" />
+			</h:outputText>
+		</p:column>
+
+	</p:dataTable>
+</ui:composition>

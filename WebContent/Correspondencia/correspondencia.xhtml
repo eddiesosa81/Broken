@@ -1,0 +1,157 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+		<h:panelGrid columns="6">
+			<h:outputText value="Aseguradora: " />
+			<p:selectOneMenu id="corresponAseg"
+				value="#{ControladorCorrespondencia.lscdAseguradora}"
+				style="width:80px">
+				<f:selectItem itemLabel="Todos" itemValue="%" />
+				<f:selectItems
+					value="#{ControladorCorrespondencia.listAseguradoras}"
+					var="correspAseg"
+					itemLabel=" #{correspAseg.nombre_corto_aseguradora}"
+					itemValue="#{correspAseg.cd_aseguradora}" />
+			</p:selectOneMenu>
+
+			<h:outputText value="Usuario: " />
+			<p:selectOneMenu id="corresponUser"
+				value="#{ControladorCorrespondencia.lsusrid}" style="width:125px">
+				<f:selectItem itemLabel="Todos" itemValue="%" />
+				<f:selectItems value="#{ControladorCorrespondencia.listUsuarios}"
+					var="correspUser"
+					itemLabel="#{correspUser.usrnombres} #{correspUser.usrapellidos}"
+					itemValue="#{correspUser.usrid}" />
+			</p:selectOneMenu>
+
+			<h:outputText value="Cliente: " />
+			<p:selectOneMenu id="corresponCliente"
+				value="#{ControladorCorrespondencia.lscdCliente}" style="width:80px">
+				<f:selectItem itemLabel="Todos" itemValue="%" />
+				<f:selectItems value="#{ControladorCorrespondencia.listClientes}"
+					var="correspClie"
+					itemLabel=" #{correspClie.primer_nombre_cliente} #{correspClie.primer_apellido_cliente}"
+					itemValue="#{correspClie.cd_cliente}" />
+			</p:selectOneMenu>
+			<p:commandButton value="Salir" id="btnSalir" icon="ui-icon-cancel"
+						styleClass="ui-priority-primary"
+						action="/index.xhtml?faces-redirect=true" process="@this"
+						update="@this" />
+		</h:panelGrid>
+		<p:tabView id="tabDocu">
+			<p:tab title="Documentos">
+				<h:panelGrid columns="6">
+					<h:outputText value="Módulo: " />
+					<p:selectOneMenu id="corresponTipo"
+						value="#{ControladorCorrespondencia.lstipo}" style="width:125px">
+						<f:selectItem itemLabel="Todos" itemValue="%" />
+						<f:selectItems value="#{ControladorCorrespondencia.lstTipoCarta}"
+							var="correspTipo" itemLabel=" #{correspTipo.desc_general}"
+							itemValue="#{correspTipo.desc_general}" />
+					</p:selectOneMenu>
+					<h:outputText value="Número Documento: " />
+					<p:inputText id="iptxtNoDoc"
+						value="#{ControladorCorrespondencia.numDoc}"></p:inputText>
+				</h:panelGrid>
+				<h:panelGrid columns="3">
+					<p:commandButton value="Consultar" styleClass="ui-priority-primary"
+						action="#{ControladorCorrespondencia.cargarCorrespondencia}"
+						icon="ui-icon-search"
+						update="tabDocu:dtCorrespon" />
+					<p:commandButton value="Imprimir" id="btnPrint"
+						action="#{ControladorCorrespondencia.execute()}" ajax="false"
+						styleClass="ui-priority-primary" icon="ui-icon-print"
+						style="width:100px; font-family:Verdana; font-size: 12px;"
+						update="@all">
+					</p:commandButton>
+				</h:panelGrid>
+				<p:dataTable id="dtCorrespon" var="correspondencia"
+					value="#{ControladorCorrespondencia.listCorrespon}"
+					selectionMode="single"
+					selection="#{ControladorCorrespondencia.selectedCorrespond}"
+					rowKey="#{correspondencia.cd_correspondencia}" scrollable="true"
+					scrollHeight="150" style="font-family:Verdana; font-size: 10px;">
+					<f:facet name="header">
+		            	Documentos
+		        	</f:facet>
+					<p:column headerText="Año" sortBy="#{correspondencia.anio}">
+						<h:outputText value="#{correspondencia.anio}" />
+					</p:column>
+					<p:column headerText="# Carta"
+						sortBy="#{correspondencia.num_Carta}">
+						<h:outputText value="#{correspondencia.num_Carta}" />
+					</p:column>
+					<p:column headerText="# Fecha" sortBy="#{correspondencia.fecha}">
+						<h:outputText value="#{correspondencia.fecha}" />
+					</p:column>
+					<p:column headerText="Elaborado Por"
+						sortBy="#{correspondencia.elaboradorPor}">
+						<h:outputText value="#{correspondencia.elaboradorPor}" />
+					</p:column>
+					<p:column headerText="Módulo"
+						sortBy="#{correspondencia.moduloGenera}">
+						<h:outputText value="#{correspondencia.moduloGenera}" />
+					</p:column>
+					<p:column headerText="Tipo" sortBy="#{correspondencia.tipo}">
+						<h:outputText value="#{correspondencia.tipo}" />
+					</p:column>
+					<p:column headerText="Impreso"
+						sortBy="#{correspondencia.estado_impresion}">
+						<h:outputText value="#{correspondencia.estado_impresion}" />
+					</p:column>
+				</p:dataTable>
+			</p:tab>
+			<p:tab title="Recibos Pago">
+				<h:panelGrid columns="3">
+					<p:commandButton value="Consultar" styleClass="ui-priority-primary"
+						action="#{ControladorCorrespondencia.cargarRecibos}"
+						icon="ui-icon-search"
+						update="tabDocu:dtRecibos" />
+					<p:commandButton value="Imprimir" id="btnPrintRec"
+						action="#{ControladorCorrespondencia.executeRecibo()}" ajax="false"
+						styleClass="ui-priority-primary" icon="ui-icon-print"
+						style="width:100px; font-family:Verdana; font-size: 12px;"
+						update="@all">
+					</p:commandButton>
+				</h:panelGrid>
+				<p:dataTable id="dtRecibos" var="recibo"
+					value="#{ControladorCorrespondencia.lstPagosView}"
+					selectionMode="single"
+					selection="#{ControladorCorrespondencia.selectedPagosView}"
+					rowKey="#{recibo.cd_pago}" scrollable="true"
+					scrollHeight="150" style="font-family:Verdana; font-size: 10px;">
+					<f:facet name="header">
+		            	Recibos de Pago
+		        	</f:facet>
+					<p:column headerText="No." sortBy="#{recibo.cd_pago}">
+						<h:outputText value="#{recibo.cd_pago}" />
+					</p:column>
+					<p:column headerText="Fecha"
+						sortBy="#{recibo.fecha_pago}">
+						<h:outputText value="#{recibo.fecha_pago}" />
+					</p:column>
+					<p:column headerText="Cliente" sortBy="#{recibo.cliente}">
+						<h:outputText value="#{recibo.cliente}" />
+					</p:column>
+					<p:column headerText="Aseguradora" sortBy="#{recibo.razon_social_aseguradora}">
+						<h:outputText value="#{recibo.razon_social_aseguradora}" />
+					</p:column>
+					<p:column headerText="Forma Pago" sortBy="#{recibo.forma_pago}">
+						<h:outputText value="#{recibo.forma_pago}" />
+					</p:column>
+					<p:column headerText="Banco" sortBy="#{recibo.banco}">
+						<h:outputText value="#{recibo.banco}" />
+					</p:column>
+					<p:column headerText="Valor Pago" sortBy="#{recibo.valor_total_pago}">
+						<h:outputText value="#{recibo.valor_total_pago}" />
+					</p:column>
+					<p:column headerText="Elaborado Por"
+						sortBy="#{recibo.usuario}">
+						<h:outputText value="#{recibo.usuario}" />
+					</p:column>
+				</p:dataTable>
+			</p:tab>
+		</p:tabView>
+</ui:composition>

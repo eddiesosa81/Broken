@@ -1,0 +1,203 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+	<p:growl autoUpdate="true" showDetail="true" sticky="true"></p:growl>
+	<h:panelGrid columns="2" style="width:100%;">
+		<h:outputText value="Aseguradora: " />
+		<p:selectOneMenu id="somAseg"
+			value="#{ControladorPreLiquida.remiteAseguradora}">
+			<f:selectItem itemLabel="Seleccione" itemValue="0" />
+			<f:selectItems value="#{ControladorPreLiquida.listAseguradoras}"
+				var="ase" itemLabel="#{ase.razon_social_aseguradora}"
+				itemValue="#{ase.cd_aseguradora}" />
+		</p:selectOneMenu>
+		<p:row></p:row>
+		<p:row>
+			<h:panelGrid columns="5">
+				<p:inputText id="txtNumFactAseg"
+					value="#{ControladorPreLiquida.numFacturaAseg}"
+					placeholder="Número de Factura"
+					title="Busqueda en caso de Modificación de Comisión"></p:inputText>
+				<p:inputText id="txtNumPol"
+					value="#{ControladorPreLiquida.numPoliza}"
+					placeholder="Número de Póliza"
+					title="Busqueda en caso de Modificación de Comisión"></p:inputText>
+				<p:commandButton id="btnBuscaCobranza" icon="fa fa-fw fa-search"
+					title="Buscar Facturas"
+					update="frm_preFactura:dtCobranzaComisionPagos"
+					styleClass="ui-priority-primary"
+					action="#{ControladorPreLiquida.cargarListaPagoDetallePago}"
+					process="@this,frm_preFactura:somAseg,frm_preFactura:txtNumFactAseg,frm_preFactura:txtNumPol,frm_preFactura:fcHastaM,frm_preFactura:fcDesdeM" />
+				<p:commandButton id="btnSelecPreliq" icon="fa fa-fw fa-plus-circle"
+					title="Selecciona Factura" update="@this frmFactSelected:dtFacSel"
+					styleClass="ui-priority-primary"
+					action="#{ControladorPreLiquida.seleccionarFacturaLista}"
+					process="@this,frm_preFactura:dtCobranzaComisionPagos" />
+				<p:commandButton id="btnAgregaRamo" icon="fa fa-fw fa-list-ol"
+					title="Facturas Seleccionadas" styleClass="ui-priority-primary"
+					action="#{ControladorPreLiquida.visualizaFactSelec}" />
+			</h:panelGrid>
+		</p:row>
+		<!-- <h:outputText value="Pago realizado desde: " />
+			<p:calendar value="#{ControladorPreLiquida.remiteFechaDesde}"
+				pattern="dd-MM-yyyy" mask="true" id="calFcDesde"/>
+			<h:outputText value="Hasta: " />
+			<p:calendar value="#{ControladorPreLiquida.remiteFechaHasta}"
+				pattern="dd-MM-yyyy" mask="true" id="calFcHasta" /> -->
+
+	</h:panelGrid>
+	<p:panelGrid columns="5">
+		<h:outputText value="Edición de Comisiones: " />
+		<p:inputSwitch value="#{ControladorPreLiquida.flgEdita}"
+			id="switchAcc">
+			<p:ajax listener="#{ControladorPreLiquida.controlAcceso}"
+				update="@this frm_preFactura:txtNumFactAseg" />
+		</p:inputSwitch>
+		<h:outputText value="Saldar Saldo " />
+		<p:inputSwitch value="#{ControladorPreLiquida.flgSaldarCentavo}"
+			id="saldaCentChk" />
+		<h:panelGrid columns="5">
+			<p:selectBooleanCheckbox value="#{ControladorPreLiquida.flgMensualizado}"
+				itemLabel="Mensualizado" >
+				<p:ajax update="frm_preFactura:fcDesdeM,frm_preFactura:fcHastaM" listener="#{ControladorPreLiquida.activaMensualizado}" />
+			</p:selectBooleanCheckbox>
+			<p:outputLabel value="Fc Desde:" />
+			<p:calendar id="fcDesdeM" value="#{ControladorPreLiquida.fcDesdeMensualizado}" disabled="#{!ControladorPreLiquida.flgMensualizado}" />
+			<p:outputLabel value="Fc Hasta:" />
+			<p:calendar id="fcHastaM" value="#{ControladorPreLiquida.fcHstasMensualizado}"  disabled="#{!ControladorPreLiquida.flgMensualizado}" />
+		</h:panelGrid>
+	</p:panelGrid>
+	<h:panelGrid columns="2">
+		<h:panelGrid columns="4" cellpadding="5">
+			<p:commandButton value="Salir" id="btnSalir" icon="ui-icon-cancel"
+				styleClass="ui-priority-primary"
+				action="/index.xhtml?faces-redirect=true"
+				actionListener="#{ControladorPreLiquida.salir}" process="@this"
+				update="@this" />
+
+			<p:commandButton value="Remitir" id="btnprefacturar"
+				update="@this frm_preFactura:dtCobranzaComisionPagos frm_preFactura:btnPrint "
+				styleClass="ui-priority-primary"
+				process="@this,frm_preFactura:dtCobranzaComisionPagos,frm_preFactura:saldaCentChk"
+				action="#{ControladorPreLiquida.guardarPrefacturacion}" />
+			<p:commandButton value="Imprimir" id="btnPrint"
+				action="#{ControladorPreLiquida.execute()}" ajax="false"
+				styleClass="ui-priority-primary" icon="ui-icon-script"
+				disabled="#{ControladorPreLiquida.flgBotonImprime}"
+				style="width:100px; font-family:Verdana; font-size: 12px;"></p:commandButton>
+		</h:panelGrid>
+	</h:panelGrid>
+	<p:remoteCommand name="refrescarTabla"
+		update="frm_preFactura:dtCobranzaComisionPagos" />
+	<p:dataTable id="dtCobranzaComisionPagos" var="pdp"
+		value="#{ControladorPreLiquida.listPagoDetallePago}" scrollable="true"
+		scrollHeight="250" editable="true"
+		style="font-family:Verdana; font-size: 10px;" selectionMode="single"
+		selection="#{ControladorPreLiquida.selectedPagoDetallePago}"
+		rowKey="#{pdp.cd_comision_poliza}">
+		<f:facet name="header">
+		        Pólizas - Facturas
+		    </f:facet>
+
+		<p:ajax event="rowEdit" listener="#{ControladorPreLiquida.onRowEdit}"
+			style="font-family:Verdana; font-size: 10px;"
+			update="frm_preFactura:dtCobranzaComisionPagos"
+			process="@this,frm_preFactura:switchAcc" />
+
+		<p:column headerText="Cliente">
+			<h:outputText value="#{pdp.cliente}" />
+		</p:column>
+
+		<p:column headerText="Póliza" style="width:150px">
+			<h:outputText value="#{pdp.poliza}" />
+		</p:column>
+
+		<p:column headerText="Factura" style="width:150px">
+			<h:outputText value="#{pdp.factura_aseg}" />
+		</p:column>
+
+		<p:column headerText="Ramo">
+			<h:outputText value="#{pdp.desc_ramo}" />
+		</p:column>
+
+		<p:column headerText="Prima">
+			<h:outputText value="#{pdp.total_prima}" />
+		</p:column>
+		<p:column headerText="% Comisión">
+			<p:cellEditor>
+				<f:facet name="output">
+					<h:outputText value="#{pdp.pct_com_brk}" />
+				</f:facet>
+				<f:facet name="input">
+					<p:inputText value="#{pdp.pct_com_brk}" style="width:100%" />
+				</f:facet>
+			</p:cellEditor>
+		</p:column>
+		<p:column headerText="Valor Comisión">
+			<p:cellEditor>
+				<f:facet name="output">
+					<h:outputText value="#{pdp.val_com_brk}" />
+				</f:facet>
+				<f:facet name="input">
+					<p:inputText value="#{pdp.val_com_brk}" style="width:100%" />
+				</f:facet>
+			</p:cellEditor>
+		</p:column>
+		<p:column headerText="Valor a Liquidar">
+			<h:outputText value="#{pdp.sal_com_brk}" />
+		</p:column>
+		<p:column headerText="Observaciones">
+			<p:cellEditor>
+				<f:facet name="output">
+					<h:outputText value="#{pdp.observaciones}" />
+				</f:facet>
+				<f:facet name="input">
+					<p:inputText value="#{pdp.observaciones}" style="width:100%" />
+				</f:facet>
+			</p:cellEditor>
+		</p:column>
+
+		<p:column headerText="Fc Desde Mensualizado">
+			<h:outputText value="#{pdp.fc_ini_vigencia_mensual}">
+				<f:convertDateTime pattern="dd/MM/yyyy" />
+			</h:outputText>
+		</p:column>
+		<p:column headerText="Fc Hasta Mensualizado">
+			<h:outputText value="#{pdp.fc_fin_vigencia_mensual}">
+				<f:convertDateTime pattern="dd/MM/yyyy" />
+			</h:outputText>
+		</p:column>
+
+		<p:column style="width:32px">
+			<p:rowEditor />
+		</p:column>
+	</p:dataTable>
+	<!-- COntraseña de Edición-->
+	<p:dialog header="" draggable="true" widgetVar="wControlAcceso"
+		showEffect="fade" hideEffect="fade" closable="false">
+		<h3>Ingrese su Contraseña de Acceso</h3>
+		<p:password id="password" value="#{ControladorPreLiquida.passwd}"
+			style="width:265px" />
+		<h:outputText value="" />
+		<h:outputText value="" />
+		<p:panelGrid columns="1">
+			<p:row>
+				<p:panelGrid columns="2">
+					<p:commandButton value="Aceptar" id="btnAceptaClave"
+						update="@this frm_preFactura:switchAcc"
+						styleClass="ui-priority-primary"
+						process="@this,frm_preFactura:switchAcc,frm_preFactura:password"
+						icon="ui-icon-key" action="#{ControladorPreLiquida.aceptaAcceso}" />
+					<p:commandButton value="Cancelar" id="btnCancelClave"
+						update="@this frm_preFactura:switchAcc"
+						styleClass="ui-priority-primary" process="@this"
+						icon="ui-icon-closethick"
+						action="#{ControladorPreLiquida.cancelarAcceso}" />
+				</p:panelGrid>
+			</p:row>
+		</p:panelGrid>
+	</p:dialog>
+
+</ui:composition>

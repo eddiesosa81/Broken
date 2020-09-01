@@ -1,0 +1,412 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+	<h:panelGrid columns="2">
+		<p:row>
+			<p:panel header="Datos">
+				<h:panelGrid columns="4" style="width:100%;text-align:center;">
+					<h:outputText value="*No.Identificación" />
+					<p:inputText id="clienteIdentif"
+						value="#{ControladorCotizacionComercial.consCed}"
+						style="text-transform: uppercase">
+						<p:ajax event="change"
+							update=":frm_cotComercial:clienteIdentif,:frm_cotComercial:clienteTipID,
+							:frm_cotComercial:clienteApePrimer,:frm_cotComercial:clienteApeSeg,:frm_cotComercial:clienteNomPrimer,
+							:frm_cotComercial:clienteNomSeg,:frm_cotComercial:clienteRazSoc,:frm_cotComercial:clienteEstCiv,
+							:frm_cotComercial:clienteFecNaci,:frm_cotComercial:clienteDir,:frm_cotComercial:clienteCiudad,
+							:frm_cotComercial:clienteSector,:frm_cotComercial:clienteProvincia,:frm_cotComercial:clienteProvincia,
+							:frm_cotComercial:clienteRef,:frm_cotComercial:clienteCiudadTelf,:frm_cotComercial:impNumTelf,
+							:frm_cotComercial:impNumTelfOfi,:frm_cotComercial:impExtTelf,:frm_cotComercial:impNumTelfCel,
+							:frm_cotComercial:impCorreoP,:frm_cotComercial:impNmConta,:frm_cotComercial:impNumTelfCont,
+							:frm_cotComercial:impNumCelCont,:frm_cotComercial:impCorreoPCont,:frm_cotComercial:impCargoCont,
+							:frm_cotComercial:impDepCont,frm_cotComercial:tab:dtArchExiste"
+							listener="#{ControladorCotizacionComercial.buscarClientes}"
+							process="@this,:frm_cotComercial:clienteIdentif" />
+					</p:inputText>
+					<h:outputText value="Tipo de Identificacion" />
+					<p:selectOneMenu id="clienteTipID"
+						value="#{ControladorCotizacionComercial.tpPresona}"
+						style="width:125px">
+						<f:selectItem itemLabel="CEDULA" itemValue="CED" />
+						<f:selectItem itemLabel="RUC" itemValue="RUC" />
+						<f:selectItem itemLabel="PASAPORTE" itemValue="PAS" />
+					</p:selectOneMenu>
+					<h:outputText value="Primer Apellido" />
+					<p:inputText id="clienteApePrimer"
+						value="#{ControladorCotizacionComercial.cliente.primer_apellido_cliente}"
+						style="text-transform:uppercase;"
+						onkeyup="javascript:this.value=this.value.toUpperCase();" />
+					<h:outputText value="Segundo Apellido" />
+					<p:inputText id="clienteApeSeg"
+						value="#{ControladorCotizacionComercial.cliente.segundo_apellido_cliente}"
+						style="text-transform:uppercase;"
+						onkeyup="javascript:this.value=this.value.toUpperCase();" />
+					<h:outputText value="Primer Nombre" />
+					<p:inputText id="clienteNomPrimer"
+						value="#{ControladorCotizacionComercial.cliente.primer_nombre_cliente}"
+						style="text-transform:uppercase;"
+						onkeyup="javascript:this.value=this.value.toUpperCase();" />
+					<h:outputText value="Segundo Nombre" />
+					<p:inputText id="clienteNomSeg"
+						value="#{ControladorCotizacionComercial.cliente.segundo_nombre_cliente}"
+						style="text-transform:uppercase;"
+						onkeyup="javascript:this.value=this.value.toUpperCase();" />
+					<h:outputText value="Razon Social" />
+					<p:inputText id="clienteRazSoc"
+						value="#{ControladorCotizacionComercial.cliente.razon_social_cliente}"
+						style="text-transform:uppercase;"
+						onkeyup="javascript:this.value=this.value.toUpperCase();" />
+					<h:outputText value="Estado Civil" />
+					<p:selectOneMenu id="clienteEstCiv"
+						value="#{ControladorCotizacionComercial.cliente.estado_civil_cliente}"
+						style="width:125px">
+						<f:selectItem itemLabel="NINGUNO" itemValue="NON" />
+						<f:selectItem itemLabel="CASADO" itemValue="CAS" />
+						<f:selectItem itemLabel="DIVORCIADO" itemValue="DIV" />
+						<f:selectItem itemLabel="SOLTERO" itemValue="SOL" />
+						<f:selectItem itemLabel="VIUDO" itemValue="VIU" />
+					</p:selectOneMenu>
+					<h:outputText value="Fecha Nacimiento" />
+					<p:calendar id="clienteFecNaci"
+						value="#{ControladorCotizacionComercial.cliente.fecha_nacimiento_cliente}" />
+					<h:outputText value="Tipo:" />
+					<p:selectOneMenu id="clienteTipo"
+						value="#{ControladorCotizacionComercial.cliente.tipo_cliente}"
+						style="width:125px">
+						<p:ajax
+							listener="#{ControladorCotizacionComercial.gestionDocumental}"
+							update="frm_cotComercial:tab:sloTpDocClie" />
+						<f:selectItem itemLabel="INDIVIDUAL" itemValue="IND" />
+						<f:selectItem itemLabel="CORPORATIVO" itemValue="COR" />
+					</p:selectOneMenu>
+				</h:panelGrid>
+			</p:panel>
+			<p:panel header="Direccion">
+				<h:panelGrid columns="4" style="width:100%;text-align:center;">
+					<h:outputText value="Direccion" />
+					<p:inputText id="clienteDir"
+						value="#{ControladorCotizacionComercial.dirClie}"
+						style="text-transform:uppercase;"
+						onkeyup="javascript:this.value=this.value.toUpperCase();" />
+					<h:outputText value="Ciudad" />
+					<p:selectOneMenu id="clienteCiudad"
+						value="#{ControladorCotizacionComercial.codciudad}"
+						style="width:125px" autoWidth="false">
+						<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+						<f:selectItems var="ciudad"
+							value="#{ControladorCotizacionComercial.lstCiudad}"
+							itemLabel="#{ciudad.nm_ciudad}" itemValue="#{ciudad.cd_ciudad}" />
+					</p:selectOneMenu>
+					<h:outputText value="Sector" />
+					<p:selectOneMenu id="clienteSector"
+						value="#{ControladorCotizacionComercial.codSector}"
+						style="width:125px" autoWidth="false">
+						<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+						<f:selectItems var="sect"
+							value="#{ControladorCotizacionComercial.lsrRubroSectorDirec}"
+							itemLabel="#{sect.desc_rubro}" itemValue="#{sect.cd_rubro}" />
+					</p:selectOneMenu>
+					<h:outputText value="Provincia" />
+					<p:selectOneMenu id="clienteProvincia"
+						value="#{ControladorCotizacionComercial.codProvincia}"
+						style="width:125px" autoWidth="false">
+						<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+						<f:selectItems var="prov"
+							value="#{ControladorCotizacionComercial.lstProvincias}"
+							itemLabel="#{prov.desc_provincia}"
+							itemValue="#{prov.cd_provincia}" />
+					</p:selectOneMenu>
+					<h:outputText value="Referencia" />
+					<p:inputText id="clienteRef"
+						value="#{ControladorCotizacionComercial.refClie}"
+						style="text-transform:uppercase;"
+						onkeyup="javascript:this.value=this.value.toUpperCase();" />
+				</h:panelGrid>
+			</p:panel>
+			<p:panel header="Teléfonos">
+				<h:panelGrid columns="4" style="width:100%;text-align:center;">
+					<h:outputText value="Ciudad" />
+					<p:selectOneMenu id="clienteCiudadTelf"
+						value="#{ControladorCotizacionComercial.codCiudadTelf}"
+						style="width:125px" autoWidth="false">
+						<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+						<f:selectItems var="ciu"
+							value="#{ControladorCotizacionComercial.lstCiudad}"
+							itemLabel="#{ciu.nm_ciudad}" itemValue="#{ciu.cd_ciudad}" />
+					</p:selectOneMenu>
+					<h:outputText value="Número Particular" />
+					<p:inputText id="impNumTelf"
+						value="#{ControladorCotizacionComercial.numPa}"></p:inputText>
+					<h:outputText value="Número Oficina" />
+					<p:inputText id="impNumTelfOfi"
+						value="#{ControladorCotizacionComercial.numOfi}"></p:inputText>
+					<h:outputText value="Extensión " />
+					<p:inputText id="impExtTelf"
+						value="#{ControladorCotizacionComercial.extClie}"></p:inputText>
+					<h:outputText value="Número Celular" />
+					<p:inputText id="impNumTelfCel"
+						value="#{ControladorCotizacionComercial.numCelClie}"></p:inputText>
+					<h:outputText value="Correo Personal " />
+					<p:inputText id="impCorreoP"
+						value="#{ControladorCotizacionComercial.correoClie}"></p:inputText>
+				</h:panelGrid>
+			</p:panel>
+			<p:panel header="Contactos">
+				<h:panelGrid columns="4" style="width:100%;text-align:center;">
+					<h:outputText value="Nombre Contacto" />
+					<p:inputText id="impNmConta"
+						value="#{ControladorCotizacionComercial.nmContac}"></p:inputText>
+					<h:outputText value="Número Teléfono" />
+					<p:inputText id="impNumTelfCont"
+						value="#{ControladorCotizacionComercial.numTelCon}"></p:inputText>
+					<h:outputText value="Número Celular" />
+					<p:inputText id="impNumCelCont"
+						value="#{ControladorCotizacionComercial.numCel}"></p:inputText>
+					<h:outputText value="Correo  " />
+					<p:inputText id="impCorreoPCont"
+						value="#{ControladorCotizacionComercial.correo}"></p:inputText>
+					<h:outputText value="Cargo" />
+					<p:inputText id="impCargoCont"
+						value="#{ControladorCotizacionComercial.cargoCont}"></p:inputText>
+					<h:outputText value="Departamento  " />
+					<p:inputText id="impDepCont"
+						value="#{ControladorCotizacionComercial.depaCpmta}"></p:inputText>
+					<h:outputText value="Dirección  " />
+					<p:inputText id="impDireccCont"
+						value="#{ControladorCotizacionComercial.direccionConta}"></p:inputText>
+				</h:panelGrid>
+			</p:panel>
+		</p:row>
+		<p:row>
+			<p:panel header="Datos de Ingreso">
+				<h:panelGrid columns="4" style="width:100%;text-align:center;">
+					<h:outputText value="Aseguradora " />
+					<p:selectOneMenu id="aseguradoras"
+						value="#{ControladorCotizacionComercial.codAseguradora}"
+						style="width:125px" autoWidth="false">
+						<p:ajax event="change"
+							listener="#{ControladorCotizacionComercial.listarRamosAseguradora}"
+							update=":frm_cotComercial:listaRamos" process="@this" />
+						<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+						<f:selectItems var="aseguradoras"
+							value="#{ControladorCotizacionComercial.listadoAseguradoras}"
+							itemLabel="#{aseguradoras.nombre_corto_aseguradora}"
+							itemValue="#{aseguradoras.cd_aseguradora}" />
+					</p:selectOneMenu>
+					<h:outputText value="Ramo " />
+					<p:selectOneMenu id="listaRamos"
+						value="#{ControladorCotizacionComercial.codRamo}"
+						style="width:125px" autoWidth="false">
+						<p:ajax event="change"
+							listener="#{ControladorCotizacionComercial.listarPlanes}"
+							update=":frm_cotComercial:listPlanes,:frm_cotComercial:listCanal"
+							process="@this,:frm_cotComercial:aseguradoras,:frm_cotComercial:listaRamos" />
+						<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+						<f:selectItems var="ramos"
+							value="#{ControladorCotizacionComercial.listadoAsegRamo}"
+							itemLabel="#{ramos.desc_ramo}" itemValue="#{ramos.cd_ramo}" />
+					</p:selectOneMenu>
+					<h:outputText value="Plan " />
+					<p:selectOneMenu id="listPlanes"
+						value="#{ControladorCotizacionComercial.codPlan}"
+						style="width:125px" autoWidth="false">
+						<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+						<f:selectItems var="planes"
+							value="#{ControladorCotizacionComercial.listaPlan}"
+							itemLabel="#{planes.descripcion_plan}"
+							itemValue="#{planes.cd_plan}" />
+					</p:selectOneMenu>
+					<h:outputText value="Canal " />
+					<p:selectOneMenu id="listCanal"
+						value="#{ControladorCotizacionComercial.codCanal}"
+						style="width:125px" autoWidth="false">
+						<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+						<f:selectItems var="suba"
+							value="#{ControladorCotizacionComercial.lstSubagentes}"
+							itemLabel="#{suba.razonSocial_subagente} #{suba.primer_apellido_subagente} #{suba.primer_nombre_subagente}"
+							itemValue="#{suba.cd_subagente}" />
+					</p:selectOneMenu>
+					<h:outputText value="Grupo Económico " />
+					<p:selectOneMenu id="geconomico"
+						value="#{ControladorCotizacionComercial.codGrupoEconomico}"
+						style="width:125px" autoWidth="false">
+						<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+						<f:selectItems var="gcontratante"
+							value="#{ControladorCotizacionComercial.listaGrupoContratante}"
+							itemLabel="#{gcontratante.nombre_corto_grupo_contratante}"
+							itemValue="#{gcontratante.cd_grupo_contratante}" />
+					</p:selectOneMenu>
+					<h:outputText value="Ejecutivo " />
+					<p:selectOneMenu id="listaEjecutivos"
+						value="#{ControladorCotizacionComercial.codEjecutivo}"
+						style="width:125px" autoWidth="false">
+						<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+						<f:selectItems var="ejecutivos"
+							value="#{ControladorCotizacionComercial.listaEjecutivos}"
+							itemLabel="#{ejecutivos.primer_apellido_ejecutivo} #{ejecutivos.primer_nombre_ejecutivo}"
+							itemValue="#{ejecutivos.cd_ejecutivo}" />
+					</p:selectOneMenu>
+				</h:panelGrid>
+				<h:panelGrid columns="4">
+					<h:outputText value="Vigencia desde " />
+					<p:calendar id="vDesde"
+						value="#{ControladorCotizacionComercial.fcDesde}"
+						pattern="dd/MM/yyyy" mask="true" mode="inline" locale="de"
+						navigator="true">
+					</p:calendar>
+					<h:outputText value="Vigencia hasta " />
+					<p:calendar id="vHasta"
+						value="#{ControladorCotizacionComercial.fcHasta}"
+						pattern="dd/MM/yyyy" mask="true" mode="inline" locale="de"
+						navigator="true">
+					</p:calendar>
+				</h:panelGrid>
+			</p:panel>
+			<p:tabView id="tab">
+				<p:tab title="Datos Adicionales">
+					<h:panelGrid columns="4">
+						<h:outputText value="Asunto" />
+						<p:inputText id="txtAsunto"
+							value="#{ControladorCotizacionComercial.asunto}"></p:inputText>
+						<h:outputText value="Destinatario Correo:" />
+						<p:selectOneMenu id="scmUsr"
+							value="#{ControladorCotizacionComercial.selectedUsuarios}"
+							style="width:125px" autoWidth="false">
+							<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+							<f:selectItems var="usr"
+								value="#{ControladorCotizacionComercial.lstUsuarios}"
+								itemLabel="#{usr.usrapellidos} #{usr.usrnombres}"
+								itemValue="#{usr.usrid}" />
+						</p:selectOneMenu>
+						<h:outputText value="Observaciones" />
+						<p:inputTextarea id="intxtDescGes" rows="5" cols="30"
+							value="#{ControladorCotizacionComercial.observaciones}" />
+					</h:panelGrid>
+				</p:tab>
+				<p:tab title="Archivos Adjuntos">
+					<h:panelGrid columns="2">
+						<p:row>
+							<p:row>
+								<h:panelGrid columns="2">
+									<h:outputText value="Documento:" />
+									<p:selectOneMenu id="sloTpDocClie"
+										value="#{ControladorCotizacionComercial.tipoArchivoDoc}"
+										editable="true"
+										style="width:150px; font-family:Verdana; font-size: 12px;text-transform: uppercase">
+										<p:ajax
+											listener="#{ControladorCotizacionComercial.verificaDocuGest}"
+											process="frm_cotComercial:tab:sloTpDocClie,:frm_cotComercial:clienteIdentif,:frm_cotComercial:clienteTipID,
+							:frm_cotComercial:clienteApePrimer,:frm_cotComercial:clienteApeSeg,:frm_cotComercial:clienteNomPrimer,
+							:frm_cotComercial:clienteNomSeg,:frm_cotComercial:clienteRazSoc,:frm_cotComercial:clienteEstCiv,
+							:frm_cotComercial:clienteFecNaci,:frm_cotComercial:clienteDir,:frm_cotComercial:clienteCiudad,
+							:frm_cotComercial:clienteSector,:frm_cotComercial:clienteProvincia,:frm_cotComercial:clienteProvincia,
+							:frm_cotComercial:clienteRef,:frm_cotComercial:clienteCiudadTelf,:frm_cotComercial:impNumTelf,
+							:frm_cotComercial:impNumTelfOfi,:frm_cotComercial:impExtTelf,:frm_cotComercial:impNumTelfCel,
+							:frm_cotComercial:impCorreoP,:frm_cotComercial:impNmConta,:frm_cotComercial:impNumTelfCont,
+							:frm_cotComercial:impNumCelCont,:frm_cotComercial:impCorreoPCont,:frm_cotComercial:impCargoCont,
+							:frm_cotComercial:impDepCont
+											" />
+										<f:selectItem itemLabel="Seleccione..." itemValue="%" />
+										<f:selectItems
+											value="#{ControladorCotizacionComercial.lstRubroGestDoc}"
+											var="tp" itemLabel="#{tp.desc_rubro}"
+											itemValue="#{tp.cd_rubro}" />
+									</p:selectOneMenu>
+								</h:panelGrid>
+
+							</p:row>
+							<p:fileUpload
+								listener="#{ControladorCotizacionComercial.handleFileUpload}"
+								mode="advanced" dragDropSupport="true" fileLimit="3"
+								allowTypes="/(\.|\/)(pdf|gif|jpe?g|png)$/"
+								update="@this,frm_cotComercial:tab:dtArch" />
+							<p:panel id="photo">
+								<p:dataTable var="docu" id="dtArch"
+									value="#{ControladorCotizacionComercial.lstArchivos}" rows="3"
+									paginator="true"
+									paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+									<p:column headerText="Documentos">
+										<h:outputText value="#{docu.ubicacion}" escape="false" />
+									</p:column>
+									<p:column headerText="Descripción">
+										<h:outputText value="#{docu.desc_docu}" />
+									</p:column>
+									<p:column style="width:22px">
+										<p:commandButton title="Borrar Archivo"
+											actionListener="#{ControladorCotizacionComercial.onRowDelete(docu)}"
+											update=":frm_cotComercial:tab:dtArch"
+											icon="ui-icon-circle-minus" style="width:19px"
+											process="@this,:frm_cotComercial:tab:dtArch">
+										</p:commandButton>
+									</p:column>
+								</p:dataTable>
+							</p:panel>
+						</p:row>
+						<p:row>
+							<p:photoCam widgetVar="pc"
+								listener="#{ControladorCotizacionComercial.oncapture}"
+								update=":frm_cotComercial:tab:dtArch" />
+							<p:commandButton type="button" value="Agregar"
+								styleClass="ui-priority-primary" icon="ui-icon-lightbulb"
+								onclick="PF('pc').capture()" />
+						</p:row>
+					</h:panelGrid>
+				</p:tab>
+				<p:tab title="Documentos Existentes">
+					<p:dataTable var="docu" id="dtArchExiste"
+						value="#{ControladorCotizacionComercial.lstArchivosEx}" rows="3"
+						paginator="true"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+						<p:column headerText="Documentos">
+							<h:outputText value="#{docu.ubicacion}" escape="false" />
+						</p:column>
+						<p:column headerText="Descripción">
+							<h:outputText value="#{docu.desc_docu}" />
+						</p:column>
+					</p:dataTable>
+				</p:tab>
+			</p:tabView>
+			<h:panelGrid columns="2">
+				<p:commandButton value="Procesar" id="btnCotiza" icon="ui-icon-plus"
+					styleClass="ui-priority-primary"
+					actionListener="#{ControladorCotizacionComercial.guardaCotizacion}"
+					update="@this,:frm_cotComercial:clienteIdentif,:frm_cotComercial:clienteTipID,
+							:frm_cotComercial:clienteApePrimer,:frm_cotComercial:clienteApeSeg,:frm_cotComercial:clienteNomPrimer,
+							:frm_cotComercial:clienteNomSeg,:frm_cotComercial:clienteRazSoc,:frm_cotComercial:clienteEstCiv,
+							:frm_cotComercial:clienteFecNaci,:frm_cotComercial:clienteDir,:frm_cotComercial:clienteCiudad,
+							:frm_cotComercial:clienteSector,:frm_cotComercial:clienteProvincia,:frm_cotComercial:clienteProvincia,
+							:frm_cotComercial:clienteRef,:frm_cotComercial:clienteCiudadTelf,:frm_cotComercial:impNumTelf,
+							:frm_cotComercial:impNumTelfOfi,:frm_cotComercial:impExtTelf,:frm_cotComercial:impNumTelfCel,
+							:frm_cotComercial:impCorreoP,:frm_cotComercial:impNmConta,:frm_cotComercial:impNumTelfCont,
+							:frm_cotComercial:impNumCelCont,:frm_cotComercial:impCorreoPCont,:frm_cotComercial:impCargoCont,
+							:frm_cotComercial:impDepCont
+							:frm_cotComercial:aseguradoras,:frm_cotComercial:listaRamos,:frm_cotComercial:listPlanes,
+							:frm_cotComercial:listCanal,:frm_cotComercial:geconomico,:frm_cotComercial:listaEjecutivos,
+							:frm_cotComercial:vDesde,:frm_cotComercial:vHasta,:frm_cotComercial:tab:txtAsunto,
+							:frm_cotComercial:tab:intxtDescGes,:frm_cotComercial:tab:scmUsr,:frm_cotComercial:btnCotiza2"
+					process="@this,:frm_cotComercial:clienteIdentif,:frm_cotComercial:clienteTipID,
+							:frm_cotComercial:clienteApePrimer,:frm_cotComercial:clienteApeSeg,:frm_cotComercial:clienteNomPrimer,
+							:frm_cotComercial:clienteNomSeg,:frm_cotComercial:clienteRazSoc,:frm_cotComercial:clienteEstCiv,
+							:frm_cotComercial:clienteFecNaci,:frm_cotComercial:clienteDir,:frm_cotComercial:clienteCiudad,
+							:frm_cotComercial:clienteSector,:frm_cotComercial:clienteProvincia,:frm_cotComercial:clienteProvincia,
+							:frm_cotComercial:clienteRef,:frm_cotComercial:clienteCiudadTelf,:frm_cotComercial:impNumTelf,
+							:frm_cotComercial:impNumTelfOfi,:frm_cotComercial:impExtTelf,:frm_cotComercial:impNumTelfCel,
+							:frm_cotComercial:impCorreoP,:frm_cotComercial:impNmConta,:frm_cotComercial:impNumTelfCont,
+							:frm_cotComercial:impNumCelCont,:frm_cotComercial:impCorreoPCont,:frm_cotComercial:impCargoCont,
+							:frm_cotComercial:impDepCont
+							:frm_cotComercial:aseguradoras,:frm_cotComercial:listaRamos,:frm_cotComercial:listPlanes,
+							:frm_cotComercial:listCanal,:frm_cotComercial:geconomico,:frm_cotComercial:listaEjecutivos,
+							:frm_cotComercial:vDesde,:frm_cotComercial:vHasta,:frm_cotComercial:tab:txtAsunto,
+							:frm_cotComercial:tab:intxtDescGes,:frm_cotComercial:tab:scmUsr,frm_cotComercial:clienteTipo
+							" />
+				<p:commandButton value="Guardar" id="btnCotiza2" icon="ui-icon-disk"
+					styleClass="ui-priority-primary"
+					disabled="#{ControladorCotizacionComercial.lbbtn}" process="@this"
+					action="/index.xhtml?faces-redirect=true" />
+			</h:panelGrid>
+		</p:row>
+	</h:panelGrid>
+</ui:composition>

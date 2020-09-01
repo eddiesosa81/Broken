@@ -1,0 +1,337 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/templates/MSTemplateMensual.xhtml">
+	<ui:define name="tituloPagina">Módulo Comercial Mensualizado</ui:define>
+	<ui:define name="contenido">
+		<p:ajaxStatus
+			style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+			<f:facet name="start">
+				<p:graphicImage value="/images/ajax-loadercircle.gif" />
+			</f:facet>
+			<f:facet name="complete">
+				<h:outputText value="" />
+			</f:facet>
+		</p:ajaxStatus>
+		<ui:include src="/sessionTimeOut.xhtml" />
+		<h:form id="frm_mensComercial">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<p:menubar>
+				<p:submenu label="Menú" icon="ui-icon-gear">
+					<p:menuitem value="Nuevo Certificado" icon="ui-icon-pencil"
+						url="/Broken/emisionMensualizado/comercial.jsf"></p:menuitem>
+					<p:menuitem value="Certificados Emitidos" icon="ui-icon-clipboard"
+						url="/Broken/emisionMensualizado/consultaCertificados.jsf"></p:menuitem>
+
+					<p:separator />
+					<p:menuitem value="Salir" icon="ui-icon-cancel"
+						url="/Broken/login.jsf"></p:menuitem>
+				</p:submenu>
+			</p:menubar>
+			<p:panel header="Datos">
+				<h:panelGrid columns="8" style="width:100%;text-align:center;">
+					<h:outputText value="*No.Identificación" />
+					<p:inputText id="clienteIdentif"
+						disabled="#{ControladorMensualizadoComercial.lbHabilita}"
+						value="#{ControladorMensualizadoComercial.consCed}"
+						style="text-transform: uppercase">
+						<p:ajax event="change"
+							update=":frm_mensComercial:clienteIdentif,:frm_mensComercial:clienteTipID,
+							:frm_mensComercial:clienteApePrimer,:frm_mensComercial:clienteApeSeg,:frm_mensComercial:clienteNomPrimer,
+							:frm_mensComercial:clienteNomSeg,:frm_mensComercial:clienteRazSoc,:frm_mensComercial:clienteEstCiv,
+							:frm_mensComercial:clienteFecNaci,:frm_mensComercial:clienteDir,:frm_mensComercial:clienteCiudad,
+							:frm_mensComercial:clienteSector,:frm_mensComercial:clienteProvincia,:frm_mensComercial:clienteProvincia,
+							:frm_mensComercial:clienteRef,:frm_mensComercial:clienteCiudadTelf,:frm_mensComercial:impNumTelf,
+							:frm_mensComercial:impNumTelfOfi,:frm_mensComercial:impExtTelf,:frm_mensComercial:impNumTelfCel,
+							:frm_mensComercial:impCorreoP,frm_mensComercial:clienteDir"
+							listener="#{ControladorMensualizadoComercial.buscarClientes}"
+							process="@this,:frm_mensComercial:clienteIdentif" />
+					</p:inputText>
+					<h:outputText value="Tipo de Identificacion" />
+					<p:selectOneMenu id="clienteTipID"
+						value="#{ControladorMensualizadoComercial.tpPresona}"
+						style="width:125px">
+						<f:selectItem itemLabel="CEDULA" itemValue="CED" />
+						<f:selectItem itemLabel="RUC" itemValue="RUC" />
+						<f:selectItem itemLabel="PASAPORTE" itemValue="PAS" />
+					</p:selectOneMenu>
+					<h:outputText value="Primer Apellido" />
+					<p:inputText id="clienteApePrimer"
+						value="#{ControladorMensualizadoComercial.cliente.primer_apellido_cliente}"
+						style="text-transform:uppercase;"
+						onkeyup="javascript:this.value=this.value.toUpperCase();" />
+					<h:outputText value="Segundo Apellido" />
+					<p:inputText id="clienteApeSeg"
+						value="#{ControladorMensualizadoComercial.cliente.segundo_apellido_cliente}"
+						style="text-transform:uppercase;"
+						onkeyup="javascript:this.value=this.value.toUpperCase();" />
+					<h:outputText value="Primer Nombre" />
+					<p:inputText id="clienteNomPrimer"
+						value="#{ControladorMensualizadoComercial.cliente.primer_nombre_cliente}"
+						style="text-transform:uppercase;"
+						onkeyup="javascript:this.value=this.value.toUpperCase();" />
+					<h:outputText value="Segundo Nombre" />
+					<p:inputText id="clienteNomSeg"
+						value="#{ControladorMensualizadoComercial.cliente.segundo_nombre_cliente}"
+						style="text-transform:uppercase;"
+						onkeyup="javascript:this.value=this.value.toUpperCase();" />
+					<h:outputText value="Razon Social" />
+					<p:inputText id="clienteRazSoc"
+						value="#{ControladorMensualizadoComercial.cliente.razon_social_cliente}"
+						style="text-transform:uppercase;"
+						onkeyup="javascript:this.value=this.value.toUpperCase();" />
+					<h:outputText value="Estado Civil" />
+					<p:selectOneMenu id="clienteEstCiv"
+						value="#{ControladorMensualizadoComercial.cliente.estado_civil_cliente}"
+						style="width:125px">
+						<f:selectItem itemLabel="NINGUNO" itemValue="NON" />
+						<f:selectItem itemLabel="CASADO" itemValue="CAS" />
+						<f:selectItem itemLabel="DIVORCIADO" itemValue="DIV" />
+						<f:selectItem itemLabel="SOLTERO" itemValue="SOL" />
+						<f:selectItem itemLabel="VIUDO" itemValue="VIU" />
+					</p:selectOneMenu>
+					<h:outputText value="Fecha Nacimiento" />
+					<p:calendar id="clienteFecNaci"
+						value="#{ControladorMensualizadoComercial.cliente.fecha_nacimiento_cliente}" />
+				</h:panelGrid>
+			</p:panel>
+			<h:panelGrid columns="2">
+				<p:panel header="Direccion">
+					<h:panelGrid columns="6" style="width:100%;text-align:center;">
+						<h:outputText value="Direccion" />
+						<p:inputText id="clienteDir"
+							value="#{ControladorMensualizadoComercial.dirClie}"
+							style="text-transform:uppercase;"
+							onkeyup="javascript:this.value=this.value.toUpperCase();" />
+						<h:outputText value="Ciudad" />
+						<p:selectOneMenu id="clienteCiudad"
+							value="#{ControladorMensualizadoComercial.codciudad}"
+							style="width:125px" autoWidth="false">
+							<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+							<f:selectItems var="ciudad"
+								value="#{ControladorMensualizadoComercial.lstCiudad}"
+								itemLabel="#{ciudad.nm_ciudad}" itemValue="#{ciudad.cd_ciudad}" />
+						</p:selectOneMenu>
+						<h:outputText value="Sector" />
+						<p:selectOneMenu id="clienteSector"
+							value="#{ControladorMensualizadoComercial.codSector}"
+							style="width:125px" autoWidth="false">
+							<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+							<f:selectItems var="sect"
+								value="#{ControladorMensualizadoComercial.lsrRubroSectorDirec}"
+								itemLabel="#{sect.desc_rubro}" itemValue="#{sect.cd_rubro}" />
+						</p:selectOneMenu>
+						<h:outputText value="Provincia" />
+						<p:selectOneMenu id="clienteProvincia"
+							value="#{ControladorMensualizadoComercial.codProvincia}"
+							style="width:125px" autoWidth="false">
+							<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+							<f:selectItems var="prov"
+								value="#{ControladorMensualizadoComercial.lstProvincias}"
+								itemLabel="#{prov.desc_provincia}"
+								itemValue="#{prov.cd_provincia}" />
+						</p:selectOneMenu>
+						<h:outputText value="Referencia" />
+						<p:inputText id="clienteRef"
+							value="#{ControladorMensualizadoComercial.refClie}"
+							style="text-transform:uppercase;"
+							onkeyup="javascript:this.value=this.value.toUpperCase();" />
+					</h:panelGrid>
+				</p:panel>
+				<p:panel header="Teléfonos">
+					<h:panelGrid columns="6" style="width:100%;text-align:center;">
+						<h:outputText value="Ciudad" />
+						<p:selectOneMenu id="clienteCiudadTelf"
+							value="#{ControladorMensualizadoComercial.codCiudadTelf}"
+							style="width:125px" autoWidth="false">
+							<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+							<f:selectItems var="ciu"
+								value="#{ControladorMensualizadoComercial.lstCiudad}"
+								itemLabel="#{ciu.nm_ciudad}" itemValue="#{ciu.cd_ciudad}" />
+						</p:selectOneMenu>
+						<h:outputText value="Número Particular" />
+						<p:inputText id="impNumTelf"
+							value="#{ControladorMensualizadoComercial.numPa}"></p:inputText>
+						<h:outputText value="Número Oficina" />
+						<p:inputText id="impNumTelfOfi"
+							value="#{ControladorMensualizadoComercial.numOfi}"></p:inputText>
+						<h:outputText value="Extensión " />
+						<p:inputText id="impExtTelf"
+							value="#{ControladorMensualizadoComercial.extClie}"></p:inputText>
+						<h:outputText value="Número Celular" />
+						<p:inputText id="impNumTelfCel"
+							value="#{ControladorMensualizadoComercial.numCelClie}"></p:inputText>
+						<h:outputText value="Correo Personal " />
+						<p:inputText id="impCorreoP"
+							value="#{ControladorMensualizadoComercial.correoClie}"></p:inputText>
+					</h:panelGrid>
+				</p:panel>
+				<p:row>
+					<p:panel header="Datos Póliza">
+						<h:panelGrid columns="6" style="width:100%;text-align:center;">
+							<h:outputText value="Aseguradora " />
+							<p:selectOneMenu id="aseguradoras" disabled="true"
+								value="#{ControladorMensualizadoComercial.codAseguradora}"
+								style="width:125px" autoWidth="false">
+								<p:ajax event="change"
+									listener="#{ControladorMensualizadoComercial.listarRamosAseguradora}"
+									update=":frm_mensComercial:listaRamos" process="@this" />
+								<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+								<f:selectItems var="aseguradoras"
+									value="#{ControladorMensualizadoComercial.listadoAseguradoras}"
+									itemLabel="#{aseguradoras.nombre_corto_aseguradora}"
+									itemValue="#{aseguradoras.cd_aseguradora}" />
+							</p:selectOneMenu>
+							<h:outputText value="Ramo " />
+							<p:selectOneMenu id="listaRamos" disabled="true"
+								value="#{ControladorMensualizadoComercial.codRamo}"
+								style="width:125px" autoWidth="false">
+								<p:ajax event="change"
+									listener="#{ControladorMensualizadoComercial.listarPlanes}"
+									update=":frm_mensComercial:listPlanes"
+									process="@this,:frm_mensComercial:aseguradoras,:frm_mensComercial:listaRamos" />
+								<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+								<f:selectItems var="ramos"
+									value="#{ControladorMensualizadoComercial.listadoAsegRamo}"
+									itemLabel="#{ramos.desc_ramo}" itemValue="#{ramos.cd_ramo}" />
+							</p:selectOneMenu>
+							<h:outputText value="Plan " />
+							<p:selectOneMenu id="listPlanes"
+								value="#{ControladorMensualizadoComercial.codPlan}"
+								style="width:125px" autoWidth="false">
+								<p:ajax event="change"
+									listener="#{ControladorMensualizadoComercial.validaInfoClie}"
+									process="@this,frm_mensComercial:clienteCiudad,frm_mensComercial:clienteSector,
+									frm_mensComercial:clienteProvincia,frm_mensComercial:clienteCiudadTelf,
+									frm_mensComercial:clienteDir" />
+								<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+								<f:selectItems var="planes"
+									value="#{ControladorMensualizadoComercial.listaPlan}"
+									itemLabel="#{planes.descripcion_plan}"
+									itemValue="#{planes.cd_plan}" />
+							</p:selectOneMenu>
+						</h:panelGrid>
+						<h:panelGrid columns="4">
+							<h:outputText value="Vigencia desde " />
+							<p:calendar id="vDesde"
+								value="#{ControladorMensualizadoComercial.fcDesde}"
+								pattern="dd/MM/yyyy" mask="true" mode="inline" locale="de"
+								navigator="true">
+							</p:calendar>
+							<h:outputText value="Vigencia hasta " />
+							<p:calendar id="vHasta"
+								value="#{ControladorMensualizadoComercial.fcHasta}"
+								pattern="dd/MM/yyyy" mask="true" mode="inline" locale="de"
+								navigator="true">
+							</p:calendar>
+						</h:panelGrid>
+					</p:panel>
+				</p:row>
+				<p:row>
+					<p:panel header="Datos Objeto Asegurado">
+						<h:panelGrid columns="2">
+							<p:row>
+								<h:panelGrid columns="2">
+									<h:outputText value="Valor Asegurado " />
+									<p:inputNumber id="imptvalAse"
+										value="#{ControladorMensualizadoComercial.valAseg}" />
+									<p:row></p:row>
+									<p:row></p:row>
+									<h:outputText value="Marca/Modelo " />
+									<p:inputText id="imptMarc"
+										value="#{ControladorMensualizadoComercial.modeloMarca}"
+										style="text-transform:uppercase;"
+										onkeyup="javascript:this.value=this.value.toUpperCase();"></p:inputText>
+									<p:row></p:row>
+									<p:row></p:row>
+									<h:outputText value="Año" />
+									<p:spinner id="imptAnio"
+										value="#{ControladorMensualizadoComercial.anio}" />
+									<p:row></p:row>
+									<p:row></p:row>
+									<h:outputText value="Color" />
+									<p:inputText id="imptCl"
+										value="#{ControladorMensualizadoComercial.color}"
+										style="text-transform:uppercase;"
+										onkeyup="javascript:this.value=this.value.toUpperCase();"></p:inputText>
+									<p:row></p:row>
+									<p:row></p:row>
+									<h:outputText value="Placa o Ram" />
+									<p:inputText id="imptPac"
+										value="#{ControladorMensualizadoComercial.placaRam}"
+										style="text-transform:uppercase;"
+										onkeyup="javascript:this.value=this.value.toUpperCase();"></p:inputText>
+								</h:panelGrid>
+							</p:row>
+							<p:row>
+								<h:panelGrid columns="1">
+									<p:commandButton value="Emitir" id="btnEmite"
+										action="#{ControladorMensualizadoComercial.guardaCotizacion}"
+										styleClass="ui-priority-primary" icon="ui-icon-disk"
+										style="font-family:Verdana; font-size: 12px;"
+										disabled="#{ControladorMensualizadoComercial.lbHabilita}"
+										update="@this,:frm_mensComercial:clienteIdentif,:frm_mensComercial:clienteTipID,
+											:frm_mensComercial:clienteApePrimer,:frm_mensComercial:clienteApeSeg,:frm_mensComercial:clienteNomPrimer,
+											:frm_mensComercial:clienteNomSeg,:frm_mensComercial:clienteRazSoc,:frm_mensComercial:clienteEstCiv,
+											:frm_mensComercial:clienteFecNaci,:frm_mensComercial:clienteDir,:frm_mensComercial:clienteProvincia,
+											:frm_mensComercial:clienteRef,:frm_mensComercial:impNumTelf,
+											:frm_mensComercial:impNumTelfOfi,:frm_mensComercial:impExtTelf,:frm_mensComercial:impNumTelfCel,
+											:frm_mensComercial:impCorreoP,
+											:frm_mensComercial:aseguradoras,:frm_mensComercial:listaRamos,:frm_mensComercial:listPlanes,
+											:frm_mensComercial:vDesde,:frm_mensComercial:vHasta,frm_mensComercial:imptvalAse,
+											frm_mensComercial:imptMarc,frm_mensComercial:imptAnio,frm_mensComercial:imptCl,frm_mensComercial:imptPac,
+											frm_mensComercial:btnPrint,,frm_mensComercial:clienteIdentif,frm_mensComercial:imptvalAse,frm_mensComercial:imptMarc,frm_mensComercial:imptCl,frm_mensComercial:imptPac"
+										process="@this,:frm_mensComercial:clienteIdentif,:frm_mensComercial:clienteTipID,
+											:frm_mensComercial:clienteApePrimer,:frm_mensComercial:clienteApeSeg,:frm_mensComercial:clienteNomPrimer,
+											:frm_mensComercial:clienteNomSeg,:frm_mensComercial:clienteRazSoc,:frm_mensComercial:clienteEstCiv,
+											:frm_mensComercial:clienteFecNaci,:frm_mensComercial:clienteDir,:frm_mensComercial:clienteProvincia,
+											:frm_mensComercial:clienteRef,:frm_mensComercial:impNumTelf,
+											:frm_mensComercial:impNumTelfOfi,:frm_mensComercial:impExtTelf,:frm_mensComercial:impNumTelfCel,
+											:frm_mensComercial:impCorreoP,
+											:frm_mensComercial:aseguradoras,:frm_mensComercial:listaRamos,:frm_mensComercial:listPlanes,
+											:frm_mensComercial:vDesde,:frm_mensComercial:vHasta,frm_mensComercial:imptvalAse,
+											frm_mensComercial:imptMarc,frm_mensComercial:imptAnio,frm_mensComercial:imptCl,frm_mensComercial:imptPac">
+									</p:commandButton>
+									<p:commandButton value="Certificado" id="btnPrint"
+										action="#{ControladorMensualizadoComercial.execute()}"
+										actionListener="consultaCertificados.xhmtl?faces-redirect=true"
+										ajax="false" styleClass="ui-priority-primary"
+										icon="ui-icon-print"
+										disabled="#{ControladorMensualizadoComercial.lbbtn}"
+										style="font-family:Verdana; font-size: 12px;"
+										update=":frm_mensComercial:clienteIdentif,:frm_mensComercial:clienteTipID,
+											:frm_mensComercial:clienteApePrimer,:frm_mensComercial:clienteApeSeg,:frm_mensComercial:clienteNomPrimer,
+											:frm_mensComercial:clienteNomSeg,:frm_mensComercial:clienteRazSoc,:frm_mensComercial:clienteEstCiv,
+											:frm_mensComercial:clienteFecNaci,:frm_mensComercial:clienteDir,:frm_mensComercial:clienteProvincia,
+											:frm_mensComercial:clienteRef,:frm_mensComercial:impNumTelf,
+											:frm_mensComercial:impNumTelfOfi,:frm_mensComercial:impExtTelf,:frm_mensComercial:impNumTelfCel,
+											:frm_mensComercial:impCorreoP,
+											:frm_mensComercial:aseguradoras,:frm_mensComercial:listaRamos,:frm_mensComercial:listPlanes,
+											:frm_mensComercial:vDesde,:frm_mensComercial:vHasta,frm_mensComercial:imptvalAse,
+											frm_mensComercial:imptMarc,frm_mensComercial:imptAnio,frm_mensComercial:imptCl,frm_mensComercial:imptPac,
+											frm_mensComercial:btnPrint,,frm_mensComercial:clienteIdentif,frm_mensComercial:imptvalAse,frm_mensComercial:imptMarc,frm_mensComercial:imptCl,frm_mensComercial:imptPac">
+
+									</p:commandButton>
+
+
+								</h:panelGrid>
+
+
+
+							</p:row>
+
+						</h:panelGrid>
+
+					</p:panel>
+				</p:row>
+			</h:panelGrid>
+		</h:form>
+	</ui:define>
+	<ui:define name="tituloFormulario">Módulo Comercial Mensualizado</ui:define>
+</ui:composition>
+</html>
+

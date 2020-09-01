@@ -1,0 +1,38 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/templates/Template.xhtml">
+	<ui:define name="tituloPagina">Facturación</ui:define>
+	<ui:define name="contenido">
+		<!-- FACTURAS -->
+		<h:form id="frm_Factura">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<ui:include src="/cobranzas/facturacion.xhtml" />
+		</h:form>
+		<p:dialog header="No. Factura Confia" widgetVar="numFactConfia"
+			appendTo="@(body)" modal="true" showEffect="fade" hideEffect="fade"
+			resizable="false">
+			<h:form id="frmNumFact">
+				<p:panelGrid columns="1">
+					<p:inputMask value="#{ControladorFacturas.numFactura}"
+						mask="999-999-999999999" style="width:100%" id="numFactConpt" />
+					<p:calendar id="fcFacCom"
+						value="#{ControladorFacturas.fcFacturaCom}" />
+					<p:commandButton value="Facturar" id="btnNumfact"
+						update="@this,frm_Factura:btnPrint,frm_Factura:dtCobranzaComisionFactura"
+						process="@this,frmNumFact:numFactConpt,frmNumFact:fcFacCom,
+					frm_Factura:dtCobranzaComisionFactura"
+						styleClass="ui-priority-primary" icon="ui-icon-clipboard"
+						action="#{ControladorFacturas.facturar}" />
+				</p:panelGrid>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+	<ui:define name="tituloFormulario">Facturación</ui:define>
+</ui:composition>
+</html>
+

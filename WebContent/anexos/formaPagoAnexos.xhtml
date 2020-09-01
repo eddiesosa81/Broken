@@ -1,0 +1,230 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+	<h:panelGrid columns="1" cellpadding="5">
+		<p:commandButton value="Forma de Pago" id="btnFrmPago"
+			icon="ui-icon-plus" styleClass="ui-priority-primary"
+			action="#{ControladorAnexos.agregaFormaPago}"
+			process="@this,frm_anexos:frmEmitePendAnexo:dtCabAnexo"
+			update="frm_anexos:tbViewInclUbc:dtFrmpFinal  
+				frm_anexos:tbViewInclUbc:dtDetFrmpFinal  
+				frm_anexos:tbViewInclUbc:iptFrmPrimTot  
+				frm_anexos:tbViewInclUbc:iptFrmPDerEmi  
+				frm_anexos:tbViewInclUbc:iptFrmSupBanco 
+				frm_anexos:tbViewInclUbc:iptFrmSegCamp 
+				frm_anexos:tbViewInclUbc:iptFrmOtroVal 
+				frm_anexos:tbViewInclUbc:iptFrmIva 
+				frm_anexos:tbViewInclUbc:iptFrmCuotaIni  
+				frm_anexos:tbViewInclUbc:iptFrmNumPago 
+				frm_anexos:tbViewInclUbc:iptFrmTotla 
+				" />
+
+		<p:dataTable var="frmPg" value="#{ControladorAnexos.lstFrmPago}"
+			id="dtFrmpFinal" style="font-family:Verdana; font-size: 10px;">
+			<f:facet name="header">
+		            Forma de Pago
+		        </f:facet>
+			<p:column headerText="Prima Neta" style="width:60px;">
+				<h:outputText value="#{frmPg.total_prima_frmPago}" />
+			</p:column>
+			<p:column headerText="Super de Bancos" style="width:60px;">
+				<h:outputText value="#{frmPg.superBanco_forma_Pago}" />
+			</p:column>
+			<p:column headerText="Derechos de Emisión" style="width:60px;">
+				<h:outputText value="#{frmPg.derecho_Emision_formaPago}" />
+			</p:column>
+			<p:column headerText="Seguro Campesino" style="width:60px;">
+				<h:outputText value="#{frmPg.seguroCampesion_forma_Pago}" />
+			</p:column>
+			<p:column headerText="Otros" style="width:60px;">
+				<h:outputText value="#{frmPg.otro_valor_forma_Pago}" />
+			</p:column>
+			<p:column headerText="IVA" style="width:60px;">
+				<h:outputText value="#{frmPg.iva_Forma_Pago}" />
+			</p:column>
+			<p:column headerText="% Cuota Inicial" style="width:60px;">
+				<h:outputText value="#{frmPg.pct_cuota_Inicial_frmPago}" />
+			</p:column>
+			<p:column headerText="No.Cuotas" style="width:60px;">
+				<h:outputText value="#{frmPg.num_pago_formaPago}" />
+			</p:column>
+			<p:column headerText="Prima Total" style="width:60px;">
+				<h:outputText value="#{frmPg.total_Pago_FormaPago}" />
+			</p:column>
+			<p:column style="width:22px">
+				<p:commandButton title="Borrar Forma Pago"
+					actionListener="#{ControladorAnexos.onRowDeleteFrmPag(frmPg)}"
+					update=":frm_anexos:tbViewInclUbc:dtFrmpFinal frm_anexos:tbViewInclUbc:dtDetFrmpFinal"
+					icon="ui-icon-circle-minus" style="width:19px"
+					process="@this frm_anexos:tbViewInclUbc:dtFrmpFinal">
+					<p:confirm header="Confirmación"
+						message="Desea eliminar el registro?" icon="ui-icon-alert" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+		<p:dataTable var="DetfrmPg" value="#{ControladorAnexos.lstDetFrmPago}"
+			id="dtDetFrmpFinal" scrollable="true" scrollHeight="150"
+			style="font-family:Verdana; font-size: 10px;" editable="true">
+			<p:ajax event="rowEdit"
+				listener="#{ControladorAnexos.onRowEditDetFin}" update="@this" />
+			<f:facet name="header">
+		            Cuotas
+		        </f:facet>
+			<p:column headerText="Tipo">
+				<h:outputText value="#{DetfrmPg.tipo}" />
+			</p:column>
+			<p:column headerText="Valor">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{DetfrmPg.VALOR}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputNumber value="#{DetfrmPg.VALOR}"></p:inputNumber>
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column headerText="Num.Documento">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{DetfrmPg.FACTURA_ASEGURADORA}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{DetfrmPg.FACTURA_ASEGURADORA}"
+							style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column headerText="Fecha Vencimiento">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{DetfrmPg.FECHA_VENCIMIENTO_DATE}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</f:facet>
+					<f:facet name="input">
+						<p:calendar value="#{DetfrmPg.FECHA_VENCIMIENTO_DATE}"
+							style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column style="width:32px">
+				<p:rowEditor />
+			</p:column>
+		</p:dataTable>
+	</h:panelGrid>
+	<p:confirmDialog id="confirmDelete" global="true" showEffect="fade"
+		hideEffect="fade">
+		<p:commandButton value="Si" type="button"
+			styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+		<p:commandButton value="No" type="button"
+			styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+	</p:confirmDialog>
+
+	<!-- nueva Forma de Pago -->
+	<p:dialog header="Forma de Pago" draggable="true"
+		widgetVar="nuevaFormaPago" showEffect="fade" hideEffect="fade"
+		closable="true">
+		<h:panelGrid id="pgridRamo" columns="4" cellpadding="5">
+			<h:outputText value="Forma de Pago: " />
+			<p:selectOneMenu id="slomFrmPago"
+				value="#{ControladorAnexos.tpFromaPago}" style="width:125px" >
+				<f:ajax event="change"
+					listener="#{ControladorAnexos.tpFormaPagoSel}"
+					render="frm_anexos:tbViewInclUbc:iptFrmPDerEmi frm_anexos:tbViewInclUbc:iptFrmSupBanco 
+					frm_anexos:tbViewInclUbc:iptFrmSegCamp frm_anexos:tbViewInclUbc:iptFrmOtroVal 
+					frm_anexos:tbViewInclUbc:iptFrmSegCamp frm_anexos:tbViewInclUbc:iptFrmIva frm_anexos:tbViewInclUbc:iptFrmOtroVal 
+					frm_anexos:tbViewInclUbc:iptFrmTotla" />
+				<f:selectItem itemLabel="Contado" itemValue="CONTADO" />
+				<f:selectItem itemLabel="Tarjeta Crédito" itemValue="TARJETA" />
+				<f:selectItem itemLabel="Crédito" itemValue="CREDITO" />
+				<f:selectItem itemLabel="Débito Bancario" itemValue="DEBITO" />
+				<f:selectItem itemLabel="Pago Factura" itemValue="PAGO FACTURA" />
+				<f:selectItem itemLabel="Provisional" itemValue="PROVISIONAL" />
+			</p:selectOneMenu>
+			<h:outputText value="Prima Neta: " />
+			<p:inputText value="#{ControladorAnexos.frmPagoPrimaTot}"
+				id="iptFrmPrimTot" />
+			<h:outputText value="Derecho de Emisión: " />
+			<p:inputText value="#{ControladorAnexos.frmPagoDerechoEmision}"
+				id="iptFrmPDerEmi" />
+			<h:outputText value="Super de Bancos: " />
+			<p:inputText value="#{ControladorAnexos.frmPagoSuperBancos}"
+				id="iptFrmSupBanco" />
+			<h:outputText value="Seguro Campesino: " />
+			<p:inputText value="#{ControladorAnexos.frmPagoSegCampesino}"
+				id="iptFrmSegCamp" />
+			<h:outputText value="Otro Valor: " />
+			<p:inputText value="#{ControladorAnexos.frmPagoOtroValor}"
+				id="iptFrmOtroVal" />
+			<h:outputText value="IVA: " />
+			<p:inputText value="#{ControladorAnexos.frmPagoIva}" id="iptFrmIva" />
+
+			<h:outputText value="Aplica IVA: " />
+			<p:selectBooleanCheckbox value="#{ControladorAnexos.aplicaIva}"
+				id="sbmAplicaIva" />
+			<h:outputText value="Sin IVA: " />
+			<p:selectBooleanCheckbox value="#{ControladorAnexos.calculaIva}"
+				id="sbmCalculaIva" />
+
+			<h:outputText value="TOTAL: " />
+			<p:row>
+				<h:outputText value="#{ControladorAnexos.frmPagoTotal}"
+					id="iptFrmTotla" />
+				<p:commandButton icon="ui-icon-refresh"
+					action="#{ControladorAnexos.calculaPagoTotal}" id="btnfrmPagAct"
+					update="@this frm_anexos:tbViewInclUbc:iptFrmTotla 
+					frm_anexos:tbViewInclUbc:iptFrmIva"
+					title="Calcular"
+					process="@this frm_anexos:tbViewInclUbc:iptFrmPrimTot  
+				frm_anexos:tbViewInclUbc:iptFrmPDerEmi  
+				frm_anexos:tbViewInclUbc:iptFrmSupBanco 
+				frm_anexos:tbViewInclUbc:iptFrmSegCamp 
+				frm_anexos:tbViewInclUbc:iptFrmOtroVal 
+				frm_anexos:tbViewInclUbc:iptFrmIva 
+				frm_anexos:tbViewInclUbc:iptFrmCuotaIni  
+				frm_anexos:tbViewInclUbc:iptFrmNumPago 
+				frm_anexos:tbViewInclUbc:sbmAplicaIva 
+				frm_anexos:tbViewInclUbc:sbmCalculaIva" />
+			</p:row>
+			<h:outputText value="%Cuota Inicial: " />
+			<p:inputText value="#{ControladorAnexos.frmPagoCuotaIni}"
+				id="iptFrmCuotaIni" />
+			<h:outputText value="Num. Pagos: " />
+			<p:inputText value="#{ControladorAnexos.frmPagoNumPago}"
+				id="iptFrmNumPago" />
+
+
+		</h:panelGrid>
+		<p:commandButton value="Aceptar" id="btnFrmPagoSave"
+			icon="ui-icon-plus" styleClass="ui-priority-primary"
+			action="#{ControladorAnexos.guardaFormaPago}"
+			process="@this frm_anexos:tbViewInclUbc:iptFrmPrimTot  
+				frm_anexos:tbViewInclUbc:iptFrmPDerEmi  
+				frm_anexos:tbViewInclUbc:iptFrmSupBanco 
+				frm_anexos:tbViewInclUbc:iptFrmSegCamp 
+				frm_anexos:tbViewInclUbc:iptFrmOtroVal 
+				frm_anexos:tbViewInclUbc:iptFrmIva 
+				frm_anexos:tbViewInclUbc:iptFrmCuotaIni  
+				frm_anexos:tbViewInclUbc:iptFrmNumPago 
+				frm_anexos:tbViewInclUbc:iptFrmTotla 
+				frm_anexos:tbViewInclUbc:slomFrmPago"
+			update="frm_anexos:tbViewInclUbc:dtFrmpFinal,
+				frm_anexos:tbViewInclUbc:dtDetFrmpFinal,
+				frm_anexos:tbViewInclUbc:iptFrmPrimTot  ,
+				frm_anexos:tbViewInclUbc:iptFrmPDerEmi  ,
+				frm_anexos:tbViewInclUbc:iptFrmSupBanco ,
+				frm_anexos:tbViewInclUbc:iptFrmSegCamp ,
+				frm_anexos:tbViewInclUbc:iptFrmOtroVal ,
+				frm_anexos:tbViewInclUbc:iptFrmIva ,
+				frm_anexos:tbViewInclUbc:iptFrmCuotaIni,  
+				frm_anexos:tbViewInclUbc:iptFrmNumPago ,
+				frm_anexos:tbViewInclUbc:iptFrmTotla ,
+				frm_anexos:tbViewInclUbc:slomFrmPago ,
+				frm_anexos:tbViewInclUbc:sbmAplicaIva ,
+				frm_anexos:tbViewInclUbc:sbmCalculaIva" />
+	</p:dialog>
+</ui:composition>

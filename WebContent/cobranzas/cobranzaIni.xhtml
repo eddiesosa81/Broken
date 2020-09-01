@@ -1,0 +1,41 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/templates/Template.xhtml">
+	<ui:define name="tituloPagina">Cobranzas</ui:define>
+	<ui:define name="contenido">
+		<p:ajaxStatus
+			style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+			<f:facet name="start">
+				<p:graphicImage value="/images/ajax-loadercircle.gif" />
+			</f:facet>
+			<f:facet name="complete">
+				<h:outputText value="" />
+			</f:facet>
+		</p:ajaxStatus>
+		<h:form id="frm_cobranza">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<p:menubar>
+				<p:menuitem value="Inicio" icon="ui-icon-home" url="/index.jsf"></p:menuitem>
+				<p:submenu label="Proceso" icon="ui-icon-wrench">
+					<p:menuitem value="Mensualizado"
+						url="/Broken/cobranzas/cobranzaMensualizado.jsf"
+						icon="ui-icon-gear" />
+					<p:menuitem value="Expedición Pagos"
+						url="/Broken/cobranzas/expedicionPago.jsf"
+						icon="ui-icon-locked" />
+				</p:submenu>
+
+			</p:menubar>
+			<!-- COBRANZAS -->
+			<ui:include src="/cobranzas/cobranza.xhtml" />
+		</h:form>
+	</ui:define>
+	<ui:define name="tituloFormulario">Cobranzas</ui:define>
+</ui:composition>
+</html>
+

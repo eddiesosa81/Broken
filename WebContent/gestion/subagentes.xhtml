@@ -1,0 +1,307 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+	<h:panelGrid columns="2" cellpadding="5">
+		<p:dataTable id="dtSubagen" var="agen"
+			value="#{controladorSubagentes.lstSubagentes}" editable="true"
+			scrollable="true" scrollHeight="150"
+			style="width:1150px; font-family:Verdana; font-size: 10px;"
+			selectionMode="single"
+			selection="#{controladorSubagentes.selectedSuagente}"
+			rowKey="#{agen.cd_subagente}">
+
+			<f:facet name="header">
+		           Canal
+		       </f:facet>
+
+			<p:ajax event="rowEdit" listener="#{controladorSubagentes.onEdit}"
+				update="@this" />
+
+			<p:column headerText="Identificación">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{agen.identificacion_subagente}" />
+					</f:facet>
+					<f:facet name="input">
+						<h:inputText value="#{agen.identificacion_subagente}" />
+
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column headerText="Razón Social">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{agen.razonSocial_subagente}" />
+					</f:facet>
+					<f:facet name="input">
+						<h:inputText value="#{agen.razonSocial_subagente}" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column headerText="Primer Nombre">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{agen.primer_nombre_subagente}" />
+					</f:facet>
+					<f:facet name="input">
+						<h:inputText value="#{agen.primer_nombre_subagente}" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Segundo Nombre">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{agen.segundo_nombre_subagente}" />
+					</f:facet>
+					<f:facet name="input">
+						<h:inputText value="#{agen.segundo_nombre_subagente}" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column headerText="Primer Apellido">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{agen.primer_apellido_subagente}" />
+					</f:facet>
+					<f:facet name="input">
+						<h:inputText value="#{agen.primer_apellido_subagente}" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column headerText="Segundo Apellido">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{agen.segundo_apellido_subagente}" />
+					</f:facet>
+					<f:facet name="input">
+						<h:inputText value="#{agen.segundo_apellido_subagente}" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column headerText="Fecha Nacimiento">
+				<h:outputText value="#{agen.fecha_nacimiento_subagente}" />
+			</p:column>
+
+			<p:column headerText="Ciudad Canal">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{agen.ciudad_canal}" />
+					</f:facet>
+					<f:facet name="input">
+						<h:inputText value="#{agen.ciudad_canal}"
+							style="text-transform:uppercase;"
+							onkeyup="javascript:this.value=this.value.toUpperCase();" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+
+			<p:column style="width:32px">
+				<p:rowEditor />
+			</p:column>
+		</p:dataTable>
+	</h:panelGrid>
+	<p:commandButton value="Agregar" id="btnAgregar"
+		icon="ui-icon-plusthick"
+		actionListener="#{controladorSubagentes.AgregarSubagente}"
+		process="@this" styleClass="ui-priority-primary" />
+	<p:commandButton value="Eliminar" id="btnEliminSubage"
+		icon="ui-icon-cancel" styleClass="ui-priority-primary"
+		action="#{controladorSubagentes.EliminaSubagente}"
+		process="@this,frm_subagentes:dtSubagen" update="@this,frm_subagentes:dtSubagen" />
+	<p:commandButton value="Comisiones" id="btnComision"
+		icon="ui-icon-script" styleClass="ui-priority-primary"
+		action="#{controladorSubagentes.AgregarComSuba}"
+		process="@this,frm_subagentes:dtSubagen"
+		update="@this frm_subagentes:dtRamCC frm_subagentes:somAseg 
+			frm_subagentes:somGContrat frm_subagentes:somPlan frm_subagentes:valComision 
+			frm_subagentes:dtSubagenCom" />
+	<p:commandButton value="Salir" id="btnSalir" icon="ui-icon-cancel"
+		styleClass="ui-priority-primary"
+		action="#{controladorSubagentes.salirSubagente}" process="@this"
+		update="@this" />
+	<!-- Incia Dialogo Subagente tbl -->
+	<p:dialog header="Canal" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgSubagen" closable="true">
+		<h:panelGrid columns="4" style="width:100%;text-align:center;">
+			<h:outputText value="Identificación" />
+			<p:inputText id="Subagenidentificacion"
+				value="#{controladorSubagentes.identificacion_subagente}" />
+			<h:outputText value="Primer Nombre" />
+			<p:inputText id="subagenNomPrimer"
+				value="#{controladorSubagentes.primer_nombre_subagente}"
+				style="text-transform:uppercase;"
+				onkeyup="javascript:this.value=this.value.toUpperCase();" />
+			<h:outputText value="Segundo Nombre" />
+			<p:inputText id="subagenNomSegundo"
+				value="#{controladorSubagentes.segundo_nombre_subagente}"
+				style="text-transform:uppercase;"
+				onkeyup="javascript:this.value=this.value.toUpperCase();" />
+			<h:outputText value="Primer Apellido" />
+			<p:inputText id="subagenApePrimer"
+				value="#{controladorSubagentes.primer_apellido_subagente}"
+				style="text-transform:uppercase;"
+				onkeyup="javascript:this.value=this.value.toUpperCase();" />
+			<h:outputText value="Segundo Apellido" />
+			<p:inputText id="subagenApeSegundo"
+				value="#{controladorSubagentes.segundo_apellido_subagente}"
+				style="text-transform:uppercase;"
+				onkeyup="javascript:this.value=this.value.toUpperCase();" />
+			<h:outputText value="Tipo Persona" />
+			<p:selectOneMenu id="tipoPer"
+				value="#{controladorSubagentes.tipo_persona_subagente}"
+				style="width:125px">
+				<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+				<f:selectItem itemLabel="NATURAL" itemValue="NAT" />
+				<f:selectItem itemLabel="JURIDICA" itemValue="JUR" />
+			</p:selectOneMenu>
+			<h:outputText value="Tipo Identificación" />
+			<p:selectOneMenu id="tipoIden"
+				value="#{controladorSubagentes.tipo_identificacion_subagente}"
+				style="width:125px">
+				<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+				<f:selectItem itemLabel="CEDULA" itemValue="CED" />
+				<f:selectItem itemLabel="RUC" itemValue="RUC" />
+				<f:selectItem itemLabel="PASAPORTE" itemValue="PAS" />
+			</p:selectOneMenu>
+			<h:outputText value="Razón Social" />
+			<p:inputText id="SubagenRazonSoc"
+				value="#{controladorSubagentes.razonsocial_subagente}" />
+			<h:outputText value="Fecha de Nacimiento" />
+			<p:calendar id="SubagenFecNac"
+				value="#{controladorSubagentes.fecha_nacimiento_subagente}" />
+			<h:outputText value="CIUDAD CANAL" />
+			<h:inputText value="#{controladorSubagentes.canalCiudad}"
+				style="text-transform:uppercase;"
+				onkeyup="javascript:this.value=this.value.toUpperCase();" />
+		</h:panelGrid>
+		<p:commandButton value="Guardar"
+			actionListener="#{controladorSubagentes.guardaSubagente}"
+			process="@this,frm_subagentes:Subagenidentificacion,frm_subagentes:subagenNomPrimer,
+					frm_subagentes:subagenNomSegundo,frm_subagentes:subagenApePrimer,frm_subagentes:subagenApeSegundo,
+					frm_subagentes:tipoPer,tipoIden,frm_subagentes:SubagenRazonSoc,
+					frm_subagentes:SubagenFecNac"
+			icon="ui-icon-disk" update="@this,dtSubagen">
+		</p:commandButton>
+	</p:dialog>
+	<!-- Incia Dialogo Comision Subagente tbl -->
+	<p:dialog header="Comisión Canal" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgComSuba" closable="true">
+		<h:panelGrid columns="2" cellpadding="5">
+
+			<p:dataTable id="dtRamCC" var="ram"
+				value="#{controladorSubagentes.lstRamo}" scrollable="true"
+				selection="#{controladorSubagentes.selectedLstRamo}"
+				rowKey="#{ram.cd_ramo}" scrollHeight="150"
+				style="width:500px; font-family:Verdana; font-size: 12px;">
+				<f:facet name="header">
+				            Ramo
+				        </f:facet>
+				<p:column selectionMode="multiple"
+					style="width:16px;text-align:center" />
+				<p:column headerText="Descripción Ramo">
+					<h:outputText value="#{ram.desc_ramo}" />
+				</p:column>
+			</p:dataTable>
+			<p:row>
+				<h:panelGrid columns="1">
+					<p:outputLabel value="Aseguradora:" />
+					<p:selectOneMenu id="somAseg"
+						value="#{controladorSubagentes.selectedAseg}"
+						style="width:350px; font-family:Verdana; font-size: 12px;"
+						autoWidth="false">
+						<f:selectItem itemLabel=" - Todas -" itemValue="%" />
+						<f:selectItems var="aseg"
+							value="#{controladorSubagentes.lstAseguradoras}"
+							itemLabel="#{aseg.nombre_corto_aseguradora}"
+							itemValue="#{aseg.cd_aseguradora}" />
+					</p:selectOneMenu>
+					<p:outputLabel value="Grupo Contratante:" />
+					<p:selectOneMenu id="somGContrat"
+						value="#{controladorSubagentes.selectedGrpContr}"
+						style="width:350px; font-family:Verdana; font-size: 12px;"
+						autoWidth="false">
+						<f:selectItem itemLabel=" - Todas -" itemValue="%" />
+						<f:selectItems var="gcon"
+							value="#{controladorSubagentes.lstGrupoContra}"
+							itemLabel="#{gcon.razon_social_grupo_contratante}"
+							itemValue="#{gcon.cd_grupo_contratante}" />
+					</p:selectOneMenu>
+					<p:outputLabel value="Planes:" />
+					<p:selectOneMenu id="somPlan"
+						value="#{controladorSubagentes.selectedPlan}"
+						style="width:350px; font-family:Verdana; font-size: 12px;"
+						autoWidth="false">
+						<f:selectItem itemLabel=" - Todas -" itemValue="%" />
+						<f:selectItems var="plan" value="#{controladorSubagentes.lstPlan}"
+							itemLabel="#{plan.descripcion_plan}" itemValue="#{plan.cd_plan}" />
+					</p:selectOneMenu>
+
+					<h:panelGrid columns="2" cellpadding="5">
+						<h:outputText value="Porcentaje Comisión(Prima Neta): " />
+						<p:inputNumber id="valComision"
+							value="#{controladorSubagentes.valComi}"></p:inputNumber>
+						<p:commandButton icon="ui-icon-check" value="Guardar"
+							process="@this,frm_subagentes:dtRamCC,frm_subagentes:somAseg
+								frm_subagentes:somGContrat,frm_subagentes:somPlan,
+								frm_subagentes:valComision"
+							update="@this dtSubagenCom"
+							action="#{controladorSubagentes.guardaComSuba}" />
+						<p:commandButton icon="ui-icon-check" value="Eliminar"
+							process="@this,frm_subagentes:dtSubagenCom"
+							update="@this frm_subagentes:dtSubagenCom"
+							action="#{controladorSubagentes.eliminaComision}">
+							<p:confirm header="Confirmation"
+								message="Desea eliminar el registro?" icon="ui-icon-alert" />
+						</p:commandButton>
+					</h:panelGrid>
+				</h:panelGrid>
+			</p:row>
+		</h:panelGrid>
+		<p:dataTable id="dtSubagenCom" var="agenCom"
+			value="#{controladorSubagentes.lstComisionesSubagenteView}"
+			scrollable="true" scrollHeight="150"
+			style="width:1150px; font-family:Verdana; font-size: 10px;"
+			selectionMode="single"
+			selection="#{controladorSubagentes.selecterComisionSubaView}"
+			rowKey="#{agenCom.cd_comisionsubagente}">
+
+			<f:facet name="header">
+		           Comisiones Canal 
+		       </f:facet>
+
+			<p:column headerText="Canal">
+				<h:outputText value="#{agenCom.nmsubagente}" />
+			</p:column>
+			<p:column headerText="Ramo">
+				<h:outputText value="#{agenCom.desc_ramo}" />
+			</p:column>
+			<p:column headerText="Aseguradora">
+				<h:outputText value="#{agenCom.nombre_corto_aseguradora}" />
+			</p:column>
+			<p:column headerText="Grupo Contratante">
+				<h:outputText value="#{agenCom.razon_social_grupo_contratante}" />
+			</p:column>
+			<p:column headerText="Plan">
+				<h:outputText value="#{agenCom.descripcion_plan}" />
+			</p:column>
+			<p:column headerText="Porcentaje Comisión">
+				<h:outputText value="#{agenCom.porc_comision}" />
+			</p:column>
+		</p:dataTable>
+		<p:confirmDialog id="confirmDelete" global="true" showEffect="fade"
+			hideEffect="fade">
+			<p:commandButton value="Si" type="button"
+				styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+			<p:commandButton value="No" type="button"
+				styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+		</p:confirmDialog>
+	</p:dialog>
+</ui:composition>

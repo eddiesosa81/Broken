@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/templates/MSTemplate.xhtml">
+	<ui:define name="tituloPagina">Evaluación de Desempeño</ui:define>
+	<ui:define name="contenido">
+
+		<h:form id="formulario2">
+			<p:wizard flowListener="#{ControladoWizar.onFlowProcess}">
+				<p:tab id="personal" title="Personal">
+					<p:panel header="Personal Details">
+						<p:messages />
+						<h:outputText value="Conocimiento del puesto" />
+					</p:panel>
+				</p:tab>
+				<p:tab id="address" title="adress">
+					<p:panel header="Personal Details">
+						<p:messages />
+						<h:outputText value="dis" />
+					</p:panel>
+				</p:tab>
+			</p:wizard>
+		</h:form>
+
+	</ui:define>
+	<ui:define name="tituloFormulario">EVALUACION DE DESEMPEÑO Y COMPETENCIAS ORGANIZACIONALES #{controladorEvaluaDesempeno.anioEvalua}</ui:define>
+	<ui:define name="autor">ETSE</ui:define>
+</ui:composition>
+</html>

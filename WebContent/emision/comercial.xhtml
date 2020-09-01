@@ -1,0 +1,32 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/templates/Template.xhtml">
+	<ui:define name="tituloPagina">Módulo Comercial</ui:define>
+	<ui:define name="contenido">
+		<h:form id="frm_cotComercial">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<p:menubar>
+				<p:menuitem value="Inicio" icon="ui-icon-home"
+					url="/Broken/index.jsf"></p:menuitem>
+				<p:menuitem value="Salir" icon="ui-icon-cancel"
+					url="/Broken/index.jsf"></p:menuitem>
+					
+			</p:menubar>
+			<!-- CABECERA COTIZACION -->
+			<h:panelGroup layout="block">
+				<ui:fragment rendered="true">
+					<ui:include src="/emision/procesoComercial.xhtml" />
+				</ui:fragment>
+			</h:panelGroup>
+			<!-- Fin CABECERA COTIZACION -->
+		</h:form>
+	</ui:define>
+	<ui:define name="tituloFormulario">Módulo Comercial</ui:define>
+</ui:composition>
+</html>
+

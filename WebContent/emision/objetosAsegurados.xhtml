@@ -1,0 +1,1813 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+	<h:panelGrid columns="2" cellpadding="5">
+		<p:row>
+			<p:commandButton value="Agregar Ramo" id="btnAgregaRamo"
+				icon="ui-icon-plus" styleClass="ui-priority-primary"
+				action="#{ControladorEmision.agregaRamo}"
+				update="frm_emision:tab_emision:txt_subagente frm_emision:tab_emision:listaRamos 
+				frm_emision:tab_emision:listPlanes frm_emision:tab_emision:geconomico frm_emision:tab_emision:dtUbcTot"
+				process="@this,frm_emision:tab_emision:dTRamo,frm_emision:tab_emision:numRenov,frm_emision:tab_emision:codTpClie" />
+			<p:dataTable id="dTRamo" var="ramCot"
+				value="#{ControladorEmision.lstCotizacionPendienteSelec}"
+				tableStyle="width:auto" selectionMode="single"
+				selection="#{ControladorEmision.cotizacionPendienteSelected}"
+				rowKey="#{ramCot.cd_ramo_cotizacion}"
+				style="font-family:Verdana; font-size: 10px;" rows="4"
+				paginator="true"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="4,8,16,24">
+
+				<f:facet name="header">
+					  Seleccione el Ramo para Agregar la Ubicación
+					</f:facet>
+				<p:ajax event="rowSelect"
+					listener="#{ControladorEmision.onRowSelectRamCot}"
+					update="@this frm_emision:tab_emision:dtUbcTot frm_emision:tab_emision:dtUbcTot 
+						frm_emision:tab_emision:dtObjTot,frm_emision:tab_emision:dtSubObjTot,
+						frmUbcRamoCot:listPlanesUbc" />
+				<p:column headerText="CD" visible="false">
+					<h:outputText value="#{ramCot.cd_ramo_cotizacion}" />
+				</p:column>
+				<p:column headerText="Ramo">
+					<h:outputText value="#{ramCot.desc_ramo}" />
+				</p:column>
+				<p:column headerText="Plan">
+					<h:outputText value="#{ramCot.descripcion_plan}" />
+				</p:column>
+				<p:column headerText="Grupo Contratante">
+					<h:outputText value="#{ramCot.nm_grupo_contratante}" />
+				</p:column>
+				<p:column headerText="Canal">
+					<h:outputText value="#{ramCot.nm_subagente}" />
+				</p:column>
+				<p:column headerText="Total Asegurado">
+					<h:outputText value="#{ramCot.total_asegurado}">
+						<f:convertNumber type="currency" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Total Prima">
+					<h:outputText value="#{ramCot.total_prima}">
+						<f:convertNumber type="currency" />
+					</h:outputText>
+				</p:column>
+				<p:column style="width:22px">
+					<p:commandButton title="Edita Plan"
+						actionListener="#{ControladorEmision.onRowPlanRamCot(ramCot)}"
+						update="@this,frm_emision:tab_emision:dtCobertura,frm_emision:tab_emision:dtDeducible,
+						frm_emision:tab_emision:dtClausulas"
+						icon="ui-icon-suitcase" style="width:19px" process="@this">
+					</p:commandButton>
+				</p:column>
+				<p:column style="width:22px">
+					<p:commandButton title="Edita Grupo Contratante - Canal"
+						actionListener="#{ControladorEmision.onRowGrpContRamCot(ramCot)}"
+						update="@this,frm_emision:tab_emision:dtCobertura,frm_emision:tab_emision:dtDeducible,
+						frm_emision:tab_emision:dtClausulas,frm_emision:tab_emision:listCanalEdt"
+						icon="ui-icon-person" style="width:19px"
+						process="@this,frm_emision:tab_emision:dTRamo">
+					</p:commandButton>
+				</p:column>
+				<p:column style="width:22px">
+					<p:commandButton title="Borrar Ramo"
+						actionListener="#{ControladorEmision.onRowDeleteRamoCot(ramCot)}"
+						update="frm_emision:tab_emision:dTRamo"
+						icon="ui-icon-circle-minus" style="width:19px" process="@this">
+						<p:confirm header="Confirmation"
+							message="Desea eliminar el registro?" icon="ui-icon-alert" />
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+		</p:row>
+		<p:row>
+
+			<p:commandButton value="Agregar Ubicación" id="btnAgregaUbicacion"
+				icon="ui-icon-plus" styleClass="ui-priority-primary"
+				action="#{ControladorEmision.agregaUbicacion}"
+				process="@this, frm_emision:tab_emision:dTRamo,frmUbcRamoCot:nombreUbicacion"
+				update="frmUbcRamoCot:objectUbc frmUbcRamoCot:nombreUbicacion 
+					frmUbcRamoCot:objSubObj frmUbcRamoCot:listPlanesUbc" />
+
+			<p:commandButton value="Agregar Objeto" id="btnAgregaObj"
+				icon="ui-icon-plus" styleClass="ui-priority-primary"
+				action="#{ControladorEmision.grabaUbicacion}"
+				update="@this,frm_emision:tab_emision:tbViewObjAseg:vhModelo,frm_emision:tab_emision:tbViewObjAseg:vhMarca"
+				process="@this,frm_emision:tab_emision:dtUbcTot" />
+
+			<p:dataTable id="dtUbcTot" var="ubicaTot"
+				value="#{ControladorEmision.listadoUbicaciones}" scrollable="true"
+				scrollHeight="150" selectionMode="single"
+				style="font-family:Verdana; font-size: 9px;"
+				selection="#{ControladorEmision.selectedDatosUbicacion}"
+				rowKey="#{ubicaTot.cd_ubicacion}">
+
+				<f:facet name="header">
+				  Ubicaciones
+				</f:facet>
+				<p:ajax event="rowSelect"
+					listener="#{ControladorEmision.onRowSelectUbc}"
+					update="@this frm_emision:tab_emision:dtCoberAdcUbc,frm_emision:tab_emision:dtObjTot,
+						frm_emision:tab_emision:dtSubObjTot"
+					process="@this" />
+
+				<p:column headerText="id" visible="false">
+					<h:outputText value="#{ubicaTot.cd_ubicacion}" />
+				</p:column>
+				<p:column headerText="Descripción">
+					<h:outputText value="#{ubicaTot.dsc_ubicacion}" />
+				</p:column>
+				<p:column headerText="Valor">
+					<h:outputText value="#{ubicaTot.valor_asegurado_ubicacion}">
+						<f:convertNumber type="currency" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Prima">
+					<h:outputText value="#{ubicaTot.valor_prima_ubicacion}">
+						<f:convertNumber type="currency" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Plan">
+					<h:outputText value="#{ubicaTot.descripcion_plan}">
+						<f:convertNumber type="currency" />
+					</h:outputText>
+				</p:column>
+				<p:column style="width:22px">
+					<p:commandButton title="Editar Ubicación"
+						actionListener="#{ControladorEmision.onRowEditUbc(ubicaTot)}"
+						update="frmUbcRamoCot:nombreUbicacion frmUbcRamoCot:objectUbc 
+						frmUbcRamoCot:listPlanesUbc"
+						process="@this,frm_emision:tab_emision:dtUbcTot"
+						icon="ui-icon-pencil" style="width:19px">
+					</p:commandButton>
+				</p:column>
+				<p:column style="width:22px">
+					<p:commandButton title="Borrar Ubicación"
+						actionListener="#{ControladorEmision.onRowDeleteUbc(ubicaTot)}"
+						update="frm_emision:tab_emision:dtUbcTot,frm_emision:tab_emision:dTRamo"
+						icon="ui-icon-circle-minus" style="width:19px" process="@this">
+						<p:confirm header="Confirmation"
+							message="Desea eliminar el registro?" icon="ui-icon-alert" />
+					</p:commandButton>
+				</p:column>
+				<f:facet name="footer">
+					<p:commandButton value="Coberturas Adicionales Ubicación"
+						id="btnUbicacionCob" icon="ui-icon-plus"
+						styleClass="ui-priority-primary"
+						action="#{ControladorEmision.agregaCoberturaUbc}" process="@this"
+						update="frm_emision:tab_emision:dtCobAdcUbc,frm_emision:tab_emision:dtCobAdcUbc,frm_emision:tab_emision:cobValLimUbc,
+						frm_emision:tab_emision:cobTasaUbc,frm_emision:tab_emision:cobfactUbc,frm_emision:tab_emision:cobPrimaUbc,
+						frm_emision:tab_emision:sbcAfecValAsegCobUbc,frm_emision:tab_emision:sbcAfecPrimaCobUbc,
+						frm_emision:tab_emision:sbcAfecAdicionalCobUbc,frm_emision:tab_emision:dtDelCoberAdcUbc,frm_emision:tab_emision:dtCoberAdcUbc" />
+				</f:facet>
+			</p:dataTable>
+		</p:row>
+		<p:row>
+			<p:dataTable id="dtObjTot" var="objTot"
+				value="#{ControladorEmision.lstObjetoConsulta}" scrollable="true"
+				scrollHeight="150" selectionMode="single"
+				style="font-family:Verdana; font-size: 10px;"
+				selection="#{ControladorEmision.selectedObjetoConsulta}"
+				rowKey="#{objTot.cd_obj_cotizacion}">
+
+				<f:facet name="header">
+					  Objetos Asegurados
+					</f:facet>
+				<p:ajax event="rowSelect"
+					listener="#{ControladorEmision.onRowSelectObj}"
+					update="@this frm_emision:tab_emision:dtSubObjTot" process="@this" />
+
+				<p:column headerText="Descripción">
+					<h:outputText value="#{objTot.descripcion_objeto}" />
+				</p:column>
+				<p:column headerText="Valor Asegurado">
+					<h:outputText value="#{objTot.valor_asegurador_objeto}">
+						<f:convertNumber type="currency" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Total Asegurado">
+					<h:outputText value="#{objTot.total_asegurado_objeto}">
+						<f:convertNumber type="currency" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Prima">
+					<h:outputText value="#{objTot.prima_objeto}">
+						<f:convertNumber type="currency" />
+					</h:outputText>
+				</p:column>
+				<f:facet name="footer">
+					<p:commandButton value="Coberturas Adicionales Objeto"
+						id="btnSubojExtras" icon="ui-icon-plus"
+						styleClass="ui-priority-primary"
+						action="#{ControladorEmision.agregaCoberturaObj}" process="@this"
+						update="frm_emision:tab_emision:dtObjTot,
+						frm_emision:tab_emision:dtUbcTot,
+						frm_emision:tab_emision:dTRamo,
+						frm_emision:tab_emision:dtCobAdcObj,frm_emision:tab_emision:cobValLimObj,
+						frm_emision:tab_emision:cobTasaObj,frm_emision:tab_emision:cobPrimaObj,
+						frm_emision:tab_emision:dtCoberAdcObj,frm_emision:tab_emision:dtCoberAdcDlgObj" />
+				</f:facet>
+			</p:dataTable>
+
+		</p:row>
+		<p:row>
+			<p:dataTable id="dtSubObjTot" var="subObjTot"
+				value="#{ControladorEmision.lstSubObjetoConsulta}" scrollable="true"
+				scrollHeight="150" style="font-family:Verdana; font-size: 10px;">
+
+				<f:facet name="header">
+					  Extras
+					</f:facet>
+				<p:ajax event="rowSelect"
+					listener="#{ControladorEmision.onRowSelectUbc}" update="@this"
+					process="@this" />
+
+				<p:column headerText="Descripción">
+					<h:outputText value="#{subObjTot.descripcion_subobjeto}" />
+				</p:column>
+				<p:column headerText="Valor">
+					<h:outputText value="#{subObjTot.valor_asegurador_subobjeto}">
+						<f:convertNumber type="currency" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Prima">
+					<h:outputText value="#{subObjTot.prima_subobjeto}">
+						<f:convertNumber type="currency" />
+					</h:outputText>
+				</p:column>
+			</p:dataTable>
+		</p:row>
+	</h:panelGrid>
+
+	<!-- nuevo Ramo -->
+	<p:dialog header="Ramo" draggable="true" widgetVar="nuevoRamo"
+		showEffect="fade" hideEffect="fade" closable="true">
+		<h:panelGrid id="pgridRamo" columns="4" cellpadding="5">
+			<h:outputText value="Ramo " />
+			<p:selectOneMenu id="listaRamos"
+				value="#{ControladorEmision.codRamo}" style="width:197px"
+				autoWidth="false">
+				<p:ajax event="change" listener="#{ControladorEmision.listarPlanes}"
+					update="listPlanes" />
+				<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+				<f:selectItems var="ramos"
+					value="#{ControladorEmision.listadoAsegRamo}"
+					itemLabel="#{ramos.desc_ramo}" itemValue="#{ramos.cd_ramo}" />
+			</p:selectOneMenu>
+			<h:outputText value="Plan " />
+			<p:row>
+				<p:selectOneMenu id="listPlanes"
+					value="#{ControladorEmision.codPlan}" style="width:125px"
+					autoWidth="false" disabled="#{ControladorEmision.flgActivaPlan}">
+					<p:ajax event="change"
+						listener="#{ControladorEmision.asignaRamoCotizacion}"
+						update="listPlanes" />
+					<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+					<f:selectItems var="planes" value="#{ControladorEmision.listaPlan}"
+						itemLabel="#{planes.descripcion_plan}"
+						itemValue="#{planes.cd_plan}" />
+				</p:selectOneMenu>
+			</p:row>
+			<h:outputText value="Canal " />
+			<p:row>
+				<p:inputText readonly="true" id="txt_subagente"
+					value="#{ControladorEmision.datosSubagente.razonSocial_subagente}" />
+				<p:commandButton id="btnBuscaSubagente"
+					onclick="PF('wbuscaSubagente').show();" icon="ui-icon-search" />
+			</p:row>
+			<h:outputText value="Grupo Contratante " />
+			<p:selectOneMenu id="geconomico"
+				value="#{ControladorEmision.codGrupoEconomico}" style="width:125px"
+				autoWidth="false">
+				<p:ajax event="change"
+					listener="#{ControladorEmision.asignaRamoCotizacion}"
+					update="listPlanes" />
+				<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+				<f:selectItems var="gcontratante"
+					value="#{ControladorEmision.listaGrupoContratante}"
+					itemLabel="#{gcontratante.nombre_corto_grupo_contratante}"
+					itemValue="#{gcontratante.cd_grupo_contratante}" />
+			</p:selectOneMenu>
+		</h:panelGrid>
+		<p:commandButton value="Aceptar" id="btnAceptaRamo"
+			icon="ui-icon-disk"
+			action="#{ControladorEmision.guardaRamoCotizacion}"
+			styleClass="ui-priority-primary"
+			update="frm_emision:tab_emision:dTRamo frm_emision:tab_emision:otxtNumCot"
+			process="@this,frm_emision:tab_emision,frm_emision:tab_emision:vDesde,frm_emision:tab_emision:listaRamos,
+				frm_emision:tab_emision:listPlanes,frm_emision:tab_emision:txt_subagente,
+				frm_emision:tab_emision:geconomico,frm_emision:tab_emision:numRenov"
+			onclick="PF('nuevoRamo').hide();" />
+	</p:dialog>
+	<!-- nuevo TASA -->
+	<p:dialog header="Modifica Objeto Asegurado" draggable="true"
+		widgetVar="editaTasaObj" showEffect="fade" hideEffect="fade"
+		closable="true">
+		<h:panelGrid id="pgFrmEdtGrp" columns="4" cellpadding="5">
+			<h:outputText value="Objeto Asegurado" />
+			<p:inputText id="imptObjAsegEdt"
+				value="#{ControladorEmision.exDetalleEdit}"></p:inputText>
+			<h:outputText value="Monto Asegurado" />
+			<p:inputNumber id="vhMonAsegEdt"
+				value="#{ControladorEmision.exValAsegEdit}">
+			</p:inputNumber>
+			<h:outputText value="Tasa" />
+			<p:inputNumber id="vhTasaEdt"
+				value="#{ControladorEmision.exTasaEdit}">
+			</p:inputNumber>
+			<h:outputText value="Factor" />
+			<p:selectOneRadio id="vhFactorEdt"
+				value="#{ControladorEmision.exFactorEdit}">
+				<f:selectItem itemLabel="100%" itemValue="100" />
+				<f:selectItem itemLabel="1000%" itemValue="1000" />
+			</p:selectOneRadio>
+			<h:outputText value="Prima" />
+			<p:inputNumber id="vhPrimaEdt"
+				value="#{ControladorEmision.exPrimaEdit}">
+			</p:inputNumber>
+			<h:outputText value="Deducible Mínimo" />
+			<p:inputNumber id="vhDedEdt" value="#{ControladorEmision.exDedMin}">
+			</p:inputNumber>
+			<h:outputText value="Observaciones" />
+			<p:inputText id="imptObsvEdt"
+				value="#{ControladorEmision.observacionesEdith}"></p:inputText>
+		</h:panelGrid>
+
+		<h3>SubObjetos</h3>
+		<div class="ui-g">
+			<div class="ui-g-12">
+				<p:commandButton value="Añadir" styleClass="ui-priority-primary"
+					process="@this" update="@this,frm_emision:tab_emision:objSubObjEdt"
+					action="#{ControladorEmision.onAddNewSubObj}" />
+			</div>
+		</div>
+		<p:dataTable id="objSubObjEdt" var="subObjsEdt"
+			value="#{ControladorEmision.lstSubObjetoEdit}" scrollable="true"
+			scrollHeight="150" editable="true"
+			style="font-family:Verdana; font-size: 10px;" rows="5"
+			paginator="true"
+			paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+			<p:ajax event="rowEdit"
+				listener="#{ControladorEmision.onRowEditSuboj}" update="@this"
+				process="@this" />
+			<p:column headerText="Item Aseg">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{subObjsEdt.item_aseguradora_subobjeto}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{subObjsEdt.item_aseguradora_subobjeto}"
+							style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Descripción">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{subObjsEdt.descripcion_subobjeto}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{subObjsEdt.descripcion_subobjeto}"
+							style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Valor">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{subObjsEdt.valor_asegurador_subobjeto}">
+							<f:convertNumber type="currency" />
+						</h:outputText>
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{subObjsEdt.valor_asegurador_subobjeto}"
+							style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Tasa">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{subObjsEdt.tasa_subobjeto}">
+							<f:convertNumber type="currency" />
+						</h:outputText>
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{subObjsEdt.tasa_subobjeto}"
+							style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Prima">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{subObjsEdt.prima_subobjeto}">
+							<f:convertNumber type="currency" />
+						</h:outputText>
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{subObjsEdt.prima_subobjeto}"
+							style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Fecha Nacimiento">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{subObjsEdt.fecha_nacimiento_subobj}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</f:facet>
+					<f:facet name="input">
+						<p:calendar value="#{subObjsEdt.fecha_nacimiento_subobj}" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Edad">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{subObjsEdt.edad_subobj}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{subObjsEdt.edad_subobj}" style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Cédula">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{subObjsEdt.cedula_subobj}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{subObjsEdt.cedula_subobj}"
+							style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Parentesco">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{subObjsEdt.parentesco}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{subObjsEdt.parentesco}" style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column style="width:35px">
+				<p:rowEditor />
+			</p:column>
+			<p:column style="width:22px">
+				<p:commandButton title="Borrar Objeto Asegurado"
+					actionListener="#{ControladorEmision.onRowDeleteSubObj(subObjsEdt)}"
+					update="@this,frm_emision:tab_emision:objSubObjEdt"
+					icon="ui-icon-circle-minus" style="width:19px"
+					process="@this,frm_emision:tab_emision:objSubObjEdt">
+					<p:confirm header="Confirmación"
+						message="Desea eliminar el registro?" icon="ui-icon-alert" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+
+		<p:dataTable var="carac" value="#{ControladorEmision.lstCaractVeh}"
+			editable="true" style="margin-bottom:20px" id="vhCaracEdt">
+			<f:facet name="header">
+		            Caracteristicas
+		        </f:facet>
+
+			<p:ajax event="rowEdit"
+				listener="#{ControladorEmision.onRowEditCaract}" update="@this" />
+
+			<p:column headerText="Placa">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{carac.placa}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{carac.placa}" style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="RAMV">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{carac.ranv_cpn}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{carac.ranv_cpn}" style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="MARCA">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{carac.marca}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{carac.marca}" style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="MODELO">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{carac.modelo}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{carac.modelo}" style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="COLOR">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{carac.color}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{carac.color}" style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="MOTOR">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{carac.no_de_motor}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{carac.no_de_motor}" style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="CHASIS">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{carac.no_de_chasis}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{carac.no_de_chasis}" style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="AÑO">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{carac.anio_de_fabricacion}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{carac.anio_de_fabricacion}"
+							style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="DISPOSITIVO">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{carac.dispositivo}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{carac.dispositivo}" style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="ENDOSO">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{carac.endoso}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{carac.endoso}" style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="FECHA ENDOSO">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{carac.fecha_endoso}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:calendar value="#{carac.fecha_endoso}" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="USO DEL VEHICULO">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{carac.uso_vehiculo}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{carac.uso_vehiculo}" style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Propietario">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{carac.propietario}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{carac.propietario}" style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column style="width:35px">
+				<p:rowEditor />
+			</p:column>
+		</p:dataTable>
+		<p:commandButton value="Procesar Cambio" id="btnEdtTasa"
+			icon="ui-icon-disk" action="#{ControladorEmision.saveEditTasaObj}"
+			styleClass="ui-priority-primary"
+			update="@this,frmUbcRamoCot:objectUbc,
+				frm_emision:tab_emision:imptObjAsegEdt,frm_emision:tab_emision:vhMonAsegEdt,
+				frm_emision:tab_emision:vhPrimaEdt,frm_emision:tab_emision:imptObsvEdt,
+				frmUbcRamoCot:objSubObj"
+			process="@this,frm_emision:tab_emision:vhTasaEdt,frm_emision:tab_emision:vhFactorEdt,
+				frm_emision:tab_emision:imptObjAsegEdt,frm_emision:tab_emision:vhMonAsegEdt,
+				frm_emision:tab_emision:vhPrimaEdt,frm_emision:tab_emision:imptObsvEdt,
+				frm_emision:tab_emision:vhDedEdt"
+			onclick="PF('editaTasaObj').hide();" />
+	</p:dialog>
+	<!-- nuevo Grupo Contratante -->
+	<p:dialog header="Grupo Contratante - Canal" draggable="true"
+		widgetVar="editaGrupoContratante" showEffect="fade" hideEffect="fade"
+		closable="true">
+		<h:panelGrid id="pgFrmEdtGrpDlg" columns="4" cellpadding="5">
+			<h:outputText value="Grupo Contratante " />
+			<p:selectOneMenu id="gcontratEdt"
+				value="#{ControladorEmision.codGrupoEconomico}" style="width:125px"
+				autoWidth="false">
+				<f:selectItems var="gcontratante"
+					value="#{ControladorEmision.listaGrupoContratante}"
+					itemLabel="#{gcontratante.nombre_corto_grupo_contratante}"
+					itemValue="#{gcontratante.cd_grupo_contratante}" />
+			</p:selectOneMenu>
+			<h:outputText value="Canal " />
+			<p:selectOneMenu id="listCanalEdt"
+				value="#{ControladorEmision.codCanalEdt}" style="width:125px"
+				autoWidth="false">
+				<f:selectItems var="subaEdt"
+					value="#{ControladorEmision.lstSubagentesEdit}"
+					itemLabel="#{subaEdt.razonSocial_subagente} #{subaEdt.primer_apellido_subagente} #{subaEdt.primer_nombre_subagente}"
+					itemValue="#{subaEdt.cd_subagente}" />
+			</p:selectOneMenu>
+		</h:panelGrid>
+		<p:commandButton value="Aceptar" id="btnEdtGrpRamo"
+			icon="ui-icon-disk"
+			action="#{ControladorEmision.saveEditGrpContratante}"
+			styleClass="ui-priority-primary"
+			update="@this,frm_emision:tab_emision:dTRamo,frm_emision:tab_emision:listCanalEdt"
+			process="@this,frm_emision:tab_emision:gcontratEdt,frm_emision:tab_emision:listCanalEdt"
+			onclick="PF('editaGrupoContratante').hide();" />
+	</p:dialog>
+	<!-- Planes Coberturas Clausulas Deducibles -->
+	<p:dialog header="Planes" draggable="true" widgetVar="wvPlanesRamCot"
+		showEffect="fade" hideEffect="fade" closable="true">
+		<h:panelGrid columns="2" cellpadding="5">
+			<p:row>
+				<p:dataTable id="dtCobertura" var="cob"
+					value="#{ControladorEmision.lstCoberturasEmitidas}"
+					scrollable="true" scrollHeight="150"
+					style="width:500px; font-family:Verdana; font-size: 12px;"
+					selectionMode="single"
+					selection="#{ControladorEmision.selectedCoberturasEmitidas}"
+					rowKey="#{cob.cd_cobertura}"
+					emptyMessage="No se encuentra en la busqueda"
+					filteredValue="#{ControladorEmision.lstFilteredCoberturasEmitidas}"
+					editable="true">
+					<f:facet name="header">
+				            Coberturas
+				        </f:facet>
+					<p:ajax event="rowEdit"
+						listener="#{ControladorEmision.onRowEditCobertura}" update="@this" />
+					<p:column headerText="Descripción Cobertura"
+						filterBy="#{cob.desc_cobertura}" sortBy="#{cob.desc_cobertura}"
+						filterMatchMode="contains">
+						<h:outputText value="#{cob.desc_cobertura}" />
+					</p:column>
+					<p:column headerText="Porcentaje">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{cob.porcentajeplancobertura}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputNumber value="#{cob.porcentajeplancobertura}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Valor">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{cob.valor_plancobertura}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputNumber value="#{cob.valor_plancobertura}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column style="width:32px">
+						<p:rowEditor />
+					</p:column>
+				</p:dataTable>
+				<p:commandButton value="Agregar" icon="ui-icon-plusthick"
+					id="btnNuevoaCobertura"
+					update="@this frm_emision:tab_emision:checkboxDTCob frm_emision:tab_emision:inptNumPor
+						 frm_emision:tab_emision:inptNumVal"
+					styleClass="ui-priority-primary"
+					actionListener="#{ControladorEmision.nuevaCobertura}"
+					process="@this" />
+				<p:commandButton value="Desactivar" icon="ui-icon-minusthick"
+					id="btnEliminaCobertura"
+					update="@this,frm_emision:tab_emision:dtCobertura"
+					styleClass="ui-priority-primary"
+					actionListener="#{ControladorEmision.eliminaCobertura}"
+					process="@this,frm_emision:tab_emision:dtCobertura">
+				</p:commandButton>
+			</p:row>
+			<p:row>
+				<p:dataTable id="dtDeducible" var="ded"
+					value="#{ControladorEmision.lstDeducibleEmitida}" scrollable="true"
+					scrollHeight="150"
+					style="width:500px; font-family:Verdana; font-size: 12px;"
+					selectionMode="single"
+					selection="#{ControladorEmision.selectedDeducibleEmitida}"
+					rowKey="#{ded.cd_deducible}"
+					emptyMessage="No se encuentra en la busqueda"
+					filteredValue="#{ControladorEmision.lstFilteredDeducibleEmitida}"
+					editable="true">
+					<f:facet name="header">
+				            Deducibles
+				        </f:facet>
+					<p:ajax event="rowEdit"
+						listener="#{ControladorEmision.onRowEditDeducible}" update="@this" />
+					<p:column headerText="Descripción Deducible"
+						filterBy="#{ded.desc_deducible}" sortBy="#{ded.desc_deducible}"
+						filterMatchMode="contains">
+						<h:outputText value="#{ded.desc_deducible}" />
+					</p:column>
+					<p:column headerText="% Valor Siniestro">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{ded.porcentaje_valor_siniestro}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputNumber value="#{ded.porcentaje_valor_siniestro}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="% Valor Asegurado">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{ded.porcentaje_valor_asegurado}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputNumber value="#{ded.porcentaje_valor_asegurado}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Valor Mínimo">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{ded.valor_minimo}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputNumber value="#{ded.valor_minimo}" style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Valor Fijo">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{ded.valor_fijo}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputNumber value="#{ded.valor_fijo}" style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column style="width:32px">
+						<p:rowEditor />
+					</p:column>
+				</p:dataTable>
+				<p:commandButton value="Agregar" icon="ui-icon-plusthick"
+					id="btnNuevoDeducible"
+					update="@this frm_emision:tab_emision:checkboxDTded 
+						frm_emision:tab_emision:inptNumPorValSin frm_emision:tab_emision:inptNumPorValAseg 
+						frm_emision:tab_emision:inptNumValMin frm_emision:tab_emision:inptNumValFijo"
+					styleClass="ui-priority-primary"
+					actionListener="#{ControladorEmision.nuevoDeducible}"
+					process="@this" />
+				<p:commandButton value="Desactivar" icon="ui-icon-minusthick"
+					id="btnEliminaDeducible"
+					update="@this,frm_emision:tab_emision:dtDeducible"
+					styleClass="ui-priority-primary"
+					actionListener="#{ControladorEmision.eliminaDeducible}"
+					process="@this,frm_emision:tab_emision:dtDeducible">
+				</p:commandButton>
+			</p:row>
+			<p:row>
+				<p:dataTable id="dtClausulas" var="cla"
+					value="#{ControladorEmision.lstCalusulaEmitida}" scrollable="true"
+					scrollHeight="150"
+					style="width:500px; font-family:Verdana; font-size: 12px;"
+					selectionMode="single"
+					selection="#{ControladorEmision.selectedClausulaEmitida}"
+					rowKey="#{cla.cd_clausula}"
+					emptyMessage="No se encuentra en la busqueda"
+					filteredValue="#{ControladorEmision.lstFilteredCalusulaEmitida}"
+					editable="true">
+					<f:facet name="header">
+				            Clausulas
+				        </f:facet>
+					<p:ajax event="rowEdit"
+						listener="#{ControladorEmision.onRowEditClausula}" update="@this" />
+					<p:column headerText="Descripción Clausula"
+						filterBy="#{cla.desc_clausula}" sortBy="#{cla.desc_clausula}"
+						filterMatchMode="contains">
+						<h:outputText value="#{cla.desc_clausula}" />
+					</p:column>
+					<p:column headerText="Porcentaje">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{cla.porcentaje_planclausula}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputNumber value="#{cla.porcentaje_planclausula}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Valor">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{cla.valor_planclausula}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputNumber value="#{cla.valor_planclausula}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column style="width:32px">
+						<p:rowEditor />
+					</p:column>
+				</p:dataTable>
+				<p:commandButton value="Agregar" icon="ui-icon-plusthick"
+					id="btnNuevaClausula"
+					update="@this,frm_emision:tab_emision:checkboxDTclau,frm_emision:tab_emision:inptNumPorCla,frm_emision:tab_emision:inptNumValCla"
+					styleClass="ui-priority-primary"
+					actionListener="#{ControladorEmision.nuevaClausula}"
+					process="@this" />
+				<p:commandButton value="Desactivar" icon="ui-icon-minusthick"
+					id="btnEliminaClausula"
+					update="@this,frm_emision:tab_emision:dtClausulas"
+					styleClass="ui-priority-primary"
+					actionListener="#{ControladorEmision.eliminaClausula}"
+					process="@this,frm_emision:tab_emision:dtClausulas">
+				</p:commandButton>
+			</p:row>
+		</h:panelGrid>
+	</p:dialog>
+	<!-- fin nueva ubicacion -->
+
+	<!-- Agregar objeto asegurado y caracteristicas-->
+	<p:dialog header="Agregar Objeto Asegurado" draggable="true"
+		widgetVar="addObjtASISM" showEffect="fade" hideEffect="fade"
+		closable="true" maximizable="true">
+		<h:panelGrid columns="2" cellpadding="5">
+			<h:panelGrid columns="4" cellpadding="5">
+				<h:outputText value="Apellidos Nombre" />
+				<p:inputText id="selOmItemAsegAsisMed"
+					value="#{ControladorEmision.datosObjetoCotizacion.descripcion_objeto}"
+					style="text-transform:uppercase;"
+					onkeyup="javascript:this.value=this.value.toUpperCase();" />
+				<h:outputText value="Cédula Identidad" />
+				<p:inputText id="sleCedIdeObj"
+					value="#{ControladorEmision.datosObjetoCotizacion.cedula_obj}"></p:inputText>
+				<h:outputText value="Fecha de Nacimiento" />
+				<p:calendar id="fecNacAsisMed"
+					value="#{ControladorEmision.datosObjetoCotizacion.fecha_nacimiento_obj}" />
+				<h:outputText value="Tasa" />
+				<p:inputNumber id="vhTasaAsisMed"
+					value="#{ControladorEmision.datosObjetoCotizacion.tasa_objeto}">
+				</p:inputNumber>
+				<h:outputText value="Factor" />
+				<p:selectOneRadio id="vhFactorAsisMed"
+					value="#{ControladorEmision.factorObjeto}">
+					<f:selectItem itemLabel="100%" itemValue="100" />
+					<f:selectItem itemLabel="1000%" itemValue="1000" />
+				</p:selectOneRadio>
+				<h:outputText value="Prima" />
+				<p:inputNumber id="vhPrimaAsisMed"
+					value="#{ControladorEmision.datosObjetoCotizacion.prima_objeto}">
+				</p:inputNumber>
+				<h:outputText value="Observaciones" />
+				<p:inputTextarea id="vhtxtObservAsisMed" rows="5"
+					style="width: 98%;text-transform:uppercase;"
+					value="#{ControladorEmision.datosObjetoCotizacion.observaciones_objeto}"
+					onkeyup="javascript:this.value=this.value.toUpperCase();"></p:inputTextarea>
+
+			</h:panelGrid>
+			<h:panelGrid columns="1" cellpadding="5">
+				<h:panelGrid columns="4">
+					<h:outputText value="item" />
+					<p:inputNumber id="exCantidadAsisMed"
+						value="#{ControladorEmision.exCantidad}" style="width:50px;" />
+					<h:outputText value="Dependiente" />
+					<p:inputText id="exDetalleAsisMed"
+						value="#{ControladorEmision.exDetalle}"
+						style="text-transform:uppercase;"
+						onkeyup="javascript:this.value=this.value.toUpperCase();" />
+					<h:outputText value="Fecha de Nacimiento" />
+					<p:calendar id="exDFcNac"
+						value="#{ControladorEmision.exFechaNacSubObj}" />
+					<h:outputText value="Parentesco" />
+					<p:selectOneMenu id="exPArentescoAsisMed"
+						value="#{ControladorEmision.exParentesco}" style="width:125px">
+						<f:selectItem itemLabel="-- Seleccione --" itemValue="" />
+						<f:selectItem itemLabel="HIJO" itemValue="HIJO" />
+						<f:selectItem itemLabel="HIJA" itemValue="HIJA" />
+						<f:selectItem itemLabel="CONYUGUE" itemValue="CONYUGUE" />
+					</p:selectOneMenu>
+					<h:outputText value="Cédula Identidad" />
+					<p:inputText id="exCedIdAsisMed"
+						value="#{ControladorEmision.exCedulaIdent}"></p:inputText>
+
+					<h:outputText value="Tasa" />
+					<p:inputNumber id="exTasaSubObjAsisMed"
+						value="#{ControladorEmision.exTasa}" style="width:50px;">
+						<p:ajax event="change"
+							listener="#{ControladorEmision.calculaPrimaSubObjeto}"
+							update="@this" process="@this" />
+					</p:inputNumber>
+					<h:outputText value="Factor" />
+					<p:selectOneRadio id="exFactorSubObjAsisMed"
+						value="#{ControladorEmision.exFactos}" style="width:50px;">
+						<f:selectItem itemLabel="100%" itemValue="100" />
+						<f:selectItem itemLabel="1000%" itemValue="1000" />
+					</p:selectOneRadio>
+					<h:outputText value="Prima" />
+					<p:inputNumber id="exPrimaSubObjAsisMed"
+						value="#{ControladorEmision.exPrima}" style="width:50px;">
+					</p:inputNumber>
+				</h:panelGrid>
+				<h:panelGrid columns="2">
+					<p:commandButton value="Agregar Dependiente"
+						actionListener="#{ControladorEmision.agregarExtrasAsisMed}"
+						icon="ui-icon-disk" id="btnAgregaSubObjetosAsisMed"
+						update="@this,frm_emision:tab_emision:tblSubObjAsisMed,frm_emision:tab_emision:exCantidadAsisMed,frm_emision:tab_emision:exDetalleAsisMed,
+							frm_emision:tab_emision:exTasaSubObjAsisMed,frm_emision:tab_emision:exFactorSubObjAsisMed,
+							frm_emision:tab_emision:exPrimaSubObjAsisMed,frm_emision:tab_emision:exDFcNac,
+							frm_emision:tab_emision:exPArentescoAsisMed,frm_emision:tab_emision:exCedIdAsisMed"
+						styleClass="ui-priority-primary"
+						process="@this,frm_emision:tab_emision:exCantidadAsisMed,frm_emision:tab_emision:exDetalleAsisMed,
+							frm_emision:tab_emision:exTasaSubObjAsisMed,frm_emision:tab_emision:exFactorSubObjAsisMed,
+							frm_emision:tab_emision:exPrimaSubObjAsisMed,frm_emision:tab_emision:exDFcNac,
+							frm_emision:tab_emision:exPArentescoAsisMed,frm_emision:tab_emision:exCedIdAsisMed" />
+					<p:commandButton value="Borrar Dependiente"
+						actionListener="#{ControladorEmision.DeleteLstExtraAsisMed}"
+						icon="ui-icon-trash" id="btnBorraSubObjetosAsisMed"
+						update="@this,frm_emision:tab_emision:tblSubObjAsisMed,frm_emision:tab_emision:exCantidadAsisMed,frm_emision:tab_emision:exDetalleAsisMed,
+							frm_emision:tab_emision:exTasaSubObjAsisMed,frm_emision:tab_emision:exFactorSubObjAsisMed,
+							frm_emision:tab_emision:exPrimaSubObjAsisMed,frm_emision:tab_emision:exDFcNac,
+							frm_emision:tab_emision:exPArentescoAsisMed,frm_emision:tab_emision:exCedIdAsisMed"
+						styleClass="ui-priority-primary" process="@this" />
+				</h:panelGrid>
+				<p:dataTable id="tblSubObjAsisMed" var="extras"
+					value="#{ControladorEmision.lstSubObjetoCot}" scrollable="true"
+					scrollHeight="150" style="font-family:Verdana; font-size: 10px;">
+					<p:column headerText="Item">
+						<h:outputText value="#{extras.item_aseguradora_subobjeto}" />
+					</p:column>
+					<p:column headerText="Detalle">
+						<h:outputText value="#{extras.descripcion_subobjeto}" />
+					</p:column>
+					<p:column headerText="Fecha Nacimiento">
+						<h:outputText value="#{extras.fecha_nacimiento_subobj}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Parentesco">
+						<h:outputText value="#{extras.parentesco}" />
+					</p:column>
+					<p:column headerText="Cédula de Identidad">
+						<h:outputText value="#{extras.cedula_subobj}" />
+					</p:column>
+					<p:column headerText="Tasa">
+						<h:outputText value="#{extras.tasa_subobjeto}" />
+					</p:column>
+					<p:column headerText="Factor">
+						<h:outputText value="#{extras.factor_subobjeto}" />
+					</p:column>
+					<p:column headerText="Prima">
+						<h:outputText value="#{extras.prima_subobjeto}" />
+					</p:column>
+
+				</p:dataTable>
+			</h:panelGrid>
+		</h:panelGrid>
+		<p:commandButton value="Agregar" icon="ui-icon-disk"
+			id="btnAgregaObjetosAsisMed"
+			update="@this,frmUbcRamoCot:objectUbc,
+				,frm_emision:tab_emision:selOmItemAsegAsisMed,
+				frm_emision:tab_emision:sleCedIdeObj,frm_emision:tab_emision:fecNacAsisMed,
+				frm_emision:tab_emision:vhTasaAsisMed,frm_emision:tab_emision:vhFactorAsisMed,
+				frm_emision:tab_emision:vhPrimaAsisMed,frm_emision:tab_emision:vhtxtObservAsisMed"
+			styleClass="ui-priority-primary"
+			actionListener="#{ControladorEmision.grabaObjetoAseguradoAsisMed}"
+			process="@this,frm_emision:tab_emision:selOmItemAsegAsisMed,
+				frm_emision:tab_emision:sleCedIdeObj,frm_emision:tab_emision:fecNacAsisMed,
+				frm_emision:tab_emision:vhTasaAsisMed,frm_emision:tab_emision:vhFactorAsisMed,
+				frm_emision:tab_emision:vhPrimaAsisMed,frm_emision:tab_emision:vhtxtObservAsisMed" />
+		<p:commandButton value="Cancelar" icon="ui-icon-closethick"
+			id="btnCancelaObjetosAsisMed" update="@this" type="reset"
+			onclick="PF('addObjtASISM').hide();" />
+
+	</p:dialog>
+	<!-- Fin Agregar ubicacion -->
+	<!-- Agregar objeto asegurado y caracteristicas-->
+	<p:dialog header="Agregar Objeto Asegurado" widgetVar="addObjt"
+		showEffect="fade" hideEffect="fade" maximizable="true">
+		<p:tabView orientation="left" id="tbViewObjAseg">
+			<p:tab title="Objeto Asegurado">
+				<h:panelGrid columns="6" cellpadding="5">
+					<h:outputText value="Descripción" />
+					<p:inputText id="selOmItemAseg"
+						value="#{ControladorEmision.datosObjetoCotizacion.descripcion_objeto}"
+						style="text-transform:uppercase;"
+						onkeyup="javascript:this.value=this.value.toUpperCase();" />
+					<h:outputText value="Monto Asegurado " />
+					<p:inputNumber id="vhMonto"
+						value="#{ControladorEmision.datosObjetoCotizacion.valor_asegurador_objeto}">
+						<p:ajax event="change"
+							listener="#{ControladorEmision.calculaPrimaObjeto}"
+							update="frm_emision:tab_emision:tbViewObjAseg:vhPrima"
+							process="@this, frm_emision:tab_emision:tbViewObjAseg:vhMonto, frm_emision:tab_emision:tbViewObjAseg:vhTasa, frm_emision:tab_emision:tbViewObjAseg:vhFactor" />
+
+					</p:inputNumber>
+					<h:outputText value="Tasa" />
+					<p:inputNumber id="vhTasa"
+						value="#{ControladorEmision.datosObjetoCotizacion.tasa_objeto}">
+						<p:ajax event="change"
+							listener="#{ControladorEmision.calculaPrimaObjeto}"
+							update="frm_emision:tab_emision:tbViewObjAseg:vhPrima"
+							process="@this,frm_emision:tab_emision:tbViewObjAseg:vhMonto,frm_emision:tab_emision:tbViewObjAseg:vhTasa,frm_emision:tab_emision:tbViewObjAseg:vhFactor" />
+					</p:inputNumber>
+					<h:outputText value="Factor" />
+					<p:selectOneRadio id="vhFactor"
+						value="#{ControladorEmision.factorObjeto}">
+						<f:selectItem itemLabel="100%" itemValue="100" />
+						<f:selectItem itemLabel="1000%" itemValue="1000" />
+						<p:ajax event="change"
+							listener="#{ControladorEmision.calculaPrimaObjeto}"
+							update="frm_emision:tab_emision:tbViewObjAseg:vhPrima"
+							process="@this, frm_emision:tab_emision:tbViewObjAseg:vhMonto, frm_emision:tab_emision:tbViewObjAseg:vhTasa, frm_emision:tab_emision:tbViewObjAseg:vhFactor" />
+					</p:selectOneRadio>
+					<h:outputText value="Prima" />
+					<p:row>
+						<p:inputNumber id="vhPrima"
+							value="#{ControladorEmision.datosObjetoCotizacion.prima_objeto}">
+						</p:inputNumber>
+						<p:commandButton icon="ui-icon-refresh"
+							action="#{ControladorEmision.calculaPrimaObjeto}" id="btnActDato"
+							update="@this, frm_emision:tab_emision:tbViewObjAseg:vhPrima"
+							title="Calcular"
+							process="@this, frm_emision:tab_emision:tbViewObjAseg:vhMonto, frm_emision:tab_emision:tbViewObjAseg:vhTasa, frm_emision:tab_emision:tbViewObjAseg:vhFactor" />
+					</p:row>
+					<h:outputText value="Deducible Mínimo" />
+					<p:inputNumber id="vhDedMin"
+						value="#{ControladorEmision.datosObjetoCotizacion.deducibleMinimo}">
+					</p:inputNumber>
+					<h:outputText value="Observaciones" />
+					<p:inputTextarea id="vhtxtObserv" rows="5"
+						style="width: 98%;text-transform:uppercase;"
+						value="#{ControladorEmision.datosObjetoCotizacion.observaciones_objeto}"
+						onkeyup="javascript:this.value=this.value.toUpperCase();"></p:inputTextarea>
+					<h:outputText value="Placa " />
+					<p:inputText id="vhPlaca"
+						value="#{ControladorEmision.datosCaracteristicasVehiculos.placa}" />
+					<h:outputText value="RAMV " />
+					<p:inputText id="vhramv"
+						value="#{ControladorEmision.datosCaracteristicasVehiculos.ranv_cpn}" />
+					<h:outputText value="Marca " />
+					<p:selectOneMenu id="vhMarca"
+						value="#{ControladorEmision.datosCaracteristicasVehiculos.cd_marca}"
+						style="width:125px" autoWidth="false">
+						<p:ajax event="change"
+							listener="#{ControladorEmision.listaModelos}"
+							update="frm_emision:tab_emision:tbViewObjAseg:vhModelo" />
+						<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+						<f:selectItems var="marcas"
+							value="#{ControladorEmision.listadoMarcas}"
+							itemLabel="#{marcas.desc_marca}" itemValue="#{marcas.cd_marca}" />
+					</p:selectOneMenu>
+					<h:outputText value="Modelo " />
+					<p:selectOneMenu id="vhModelo"
+						value="#{ControladorEmision.datosCaracteristicasVehiculos.cd_modelo}"
+						style="width:125px" autoWidth="false">
+						<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+						<f:selectItems var="modelo"
+							value="#{ControladorEmision.listadoModelos}"
+							itemLabel="#{modelo.desc_modelo}" itemValue="#{modelo.cd_modelo}" />
+					</p:selectOneMenu>
+					<h:outputText value="Color " />
+					<p:inputText id="vhColor"
+						value="#{ControladorEmision.datosCaracteristicasVehiculos.color}" />
+					<h:outputText value="Motor " />
+					<p:inputText id="vhMotor"
+						value="#{ControladorEmision.datosCaracteristicasVehiculos.no_de_motor}" />
+					<h:outputText value="Chasis " />
+					<p:inputText id="vhChasis"
+						value="#{ControladorEmision.datosCaracteristicasVehiculos.no_de_chasis}" />
+					<h:outputText value="Año " />
+					<p:inputNumber id="vhAnio"
+						value="#{ControladorEmision.datosCaracteristicasVehiculos.anio_de_fabricacion}" />
+					<h:outputText value="Dispositivo " />
+					<p:selectOneMenu id="vhDispositivo"
+						value="#{ControladorEmision.datosCaracteristicasVehiculos.cd_dispositivo}"
+						style="width:125px" autoWidth="false">
+						<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+						<f:selectItems var="dispositivos"
+							value="#{ControladorEmision.listaDispositivos}"
+							itemLabel="#{dispositivos.descripcion_dispositivo}"
+							itemValue="#{dispositivos.cd_dispositivo}" />
+					</p:selectOneMenu>
+					<h:outputText value="Información " />
+					<p:inputText id="vhinformacion"
+						value="#{ControladorEmision.datosCaracteristicasVehiculos.observaciones}" />
+					<h:outputText value="Endoso " />
+					<p:inputText id="vhEndoso"
+						value="#{ControladorEmision.datosCaracteristicasVehiculos.endoso}" />
+					<h:outputText value="Fecha Endoso " />
+					<p:calendar id="vhFcEndoso"
+						value="#{ControladorEmision.datosCaracteristicasVehiculos.fecha_endoso}" />
+					<h:outputText value="Uso Vehículo" />
+					<p:inputText id="vhUsoVh"
+						value="#{ControladorEmision.datosCaracteristicasVehiculos.uso_vehiculo}" />
+					<h:outputText value="Propietario" />
+					<p:inputText id="vhPropie"
+						value="#{ControladorEmision.datosCaracteristicasVehiculos.propietario}" />
+				</h:panelGrid>
+			</p:tab>
+			<p:tab title="Extra">
+				<h:panelGrid columns="6" cellpadding="5">
+					<h:outputText value="Item Aseg." />
+					<p:inputNumber id="exCantidad"
+						value="#{ControladorEmision.exCantidad}" style="width:50px;" />
+					<h:outputText value="Detalle" />
+					<p:inputText id="exDetalle" value="#{ControladorEmision.exDetalle}"
+						style="text-transform:uppercase;"
+						onkeyup="javascript:this.value=this.value.toUpperCase();" />
+					<h:outputText value="Valor " />
+					<p:inputNumber id="exValorSubobjeto"
+						value="#{ControladorEmision.exValorSubobjeto}" style="width:50px;" />
+					<h:outputText value="Tasa" />
+					<p:inputNumber id="exTasaSubObj"
+						value="#{ControladorEmision.exTasa}" style="width:50px;">
+						<p:ajax event="change"
+							listener="#{ControladorEmision.calculaPrimaSubObjeto}"
+							update="frm_emision:tab_emision:tbViewObjAseg:exPrimaSubObj"
+							process="@this, frm_emision:tab_emision:tbViewObjAseg:exCantidad, frm_emision:tab_emision:tbViewObjAseg:exDetalle, frm_emision:tab_emision:tbViewObjAseg:exValorSubobjeto, 
+							frm_emision:tab_emision:tbViewObjAseg:exTasaSubObj, frm_emision:tab_emision:tbViewObjAseg:exFactorSubObj, frm_emision:tab_emision:tbViewObjAseg:exPrimaSubObj" />
+					</p:inputNumber>
+					<h:outputText value="Factor" />
+					<p:selectOneRadio id="exFactorSubObj"
+						value="#{ControladorEmision.exFactos}" style="width:50px;">
+						<f:selectItem itemLabel="100%" itemValue="100" />
+						<f:selectItem itemLabel="1000%" itemValue="1000" />
+						<p:ajax event="change"
+							listener="#{ControladorEmision.calculaPrimaSubObjeto}"
+							update="frm_emision:tab_emision:tbViewObjAseg:exPrimaSubObj"
+							process="@this, frm_emision:tab_emision:tbViewObjAseg:exCantidad, frm_emision:tab_emision:tbViewObjAseg:exDetalle,
+							frm_emision:tab_emision:tbViewObjAseg:exValorSubobjeto,frm_emision:tab_emision:tbViewObjAseg:exTasaSubObj,
+							frm_emision:tab_emision:tbViewObjAseg:exFactorSubObj, frm_emision:tab_emision:tbViewObjAseg:exPrimaSubObj" />
+					</p:selectOneRadio>
+					<h:outputText value="Prima" />
+					<p:inputNumber id="exPrimaSubObj"
+						value="#{ControladorEmision.exPrima}" style="width:50px;">
+					</p:inputNumber>
+				</h:panelGrid>
+				<p:commandButton value="Agregar Extra"
+					actionListener="#{ControladorEmision.agregarExtras}"
+					icon="ui-icon-disk" id="btnAgregaSubObjetos"
+					update="frm_emision:tab_emision:tbViewObjAseg:tblSubObj frm_emision:tab_emision:tbViewObjAseg:exCantidad 
+							frm_emision:tab_emision:tbViewObjAseg:exDetalle frm_emision:tab_emision:tbViewObjAseg:exValorSubobjeto 
+							frm_emision:tab_emision:tbViewObjAseg:exTasaSubObj frm_emision:tab_emision:tbViewObjAseg:exFactorSubObj 
+							frm_emision:tab_emision:tbViewObjAseg:exPrimaSubObj"
+					styleClass="ui-priority-primary"
+					process="@this, frm_emision:tab_emision:tbViewObjAseg:exCantidad,
+							frm_emision:tab_emision:tbViewObjAseg:exDetalle,frm_emision:tab_emision:tbViewObjAseg:exValorSubobjeto
+							frm_emision:tab_emision:tbViewObjAseg:exTasaSubObj frm_emision:tab_emision:tbViewObjAseg:exFactorSubObj 
+							frm_emision:tab_emision:tbViewObjAseg:exPrimaSubObj " />
+				<p:commandButton value="Borrar Extras"
+					actionListener="#{ControladorEmision.DeleteLstExtra}"
+					icon="ui-icon-trash" id="btnBorraSubObjetos"
+					update="frm_emision:tab_emision:tbViewObjAseg:tblSubObj frm_emision:tab_emision:tbViewObjAseg:exCantidad 
+							frm_emision:tab_emision:tbViewObjAseg:exDetalle frm_emision:tab_emision:tbViewObjAseg:exValorSubobjeto 
+							frm_emision:tab_emision:tbViewObjAseg:exTasaSubObj frm_emision:tab_emision:tbViewObjAseg:exFactorSubObj 
+							frm_emision:tab_emision:tbViewObjAseg:exPrimaSubObj"
+					styleClass="ui-priority-primary"
+					process="@this, frm_emision:tab_emision:tbViewObjAseg:exCantidad,
+							frm_emision:tab_emision:tbViewObjAseg:exDetalle,frm_emision:tab_emision:tbViewObjAseg:exValorSubobjeto,
+							frm_emision:tab_emision:tbViewObjAseg:exTasaSubObj, frm_emision:tab_emision:tbViewObjAseg:exFactorSubObj 
+							frm_emision:tab_emision:tbViewObjAseg:exPrimaSubObj" />
+				<p:dataTable id="tblSubObj" var="extras"
+					value="#{ControladorEmision.lstSubObjetoCot}" scrollable="true"
+					scrollHeight="150" style="font-family:Verdana; font-size: 10px;">
+					<p:column headerText="Item">
+						<h:outputText value="#{extras.item_aseguradora_subobjeto}" />
+					</p:column>
+					<p:column headerText="Detalle">
+						<h:outputText value="#{extras.descripcion_subobjeto}" />
+					</p:column>
+					<p:column headerText="Valor">
+						<h:outputText value="#{extras.valor_asegurador_subobjeto}" />
+					</p:column>
+					<p:column headerText="Tasa">
+						<h:outputText value="#{extras.tasa_subobjeto}" />
+					</p:column>
+					<p:column headerText="Factor">
+						<h:outputText value="#{extras.factor_subobjeto}" />
+					</p:column>
+					<p:column headerText="Prima">
+						<h:outputText value="#{extras.prima_subobjeto}" />
+					</p:column>
+				</p:dataTable>
+			</p:tab>
+		</p:tabView>
+		<p:commandButton value="Agregar" icon="ui-icon-disk"
+			id="btnAgregaObjetos"
+			update="frmUbcRamoCot:objectUbc frm_emision:tab_emision:tbViewObjAseg:tblSubObj 
+				frm_emision:tab_emision:tbViewObjAseg:selOmItemAseg frm_emision:tab_emision:tbViewObjAseg:vhMonto
+				frm_emision:tab_emision:tbViewObjAseg:vhTasa frm_emision:tab_emision:tbViewObjAseg:vhFactor 
+				frm_emision:tab_emision:tbViewObjAseg:vhPrima frm_emision:tab_emision:tbViewObjAseg:vhDedMin
+				frm_emision:tab_emision:tbViewObjAseg:vhramv frm_emision:tab_emision:tbViewObjAseg:vhPlaca 
+				frm_emision:tab_emision:tbViewObjAseg:vhMarca frm_emision:tab_emision:tbViewObjAseg:vhModelo 
+				frm_emision:tab_emision:tbViewObjAseg:vhColor frm_emision:tab_emision:tbViewObjAseg:vhMotor 
+				frm_emision:tab_emision:tbViewObjAseg:vhChasis frm_emision:tab_emision:tbViewObjAseg:vhAnio frm_emision:tab_emision:tbViewObjAseg:vhPropie 
+				frm_emision:tab_emision:tbViewObjAseg:vhDispositivo frm_emision:tab_emision:tbViewObjAseg:vhinformacion 
+				frm_emision:tab_emision:dTRamo frm_emision:tab_emision:dtUbcTot"
+			styleClass="ui-priority-primary"
+			actionListener="#{ControladorEmision.grabaObjetoAsegurado}"
+			process="@this frm_emision:tab_emision:tbViewObjAseg:vhMonto
+				frm_emision:tab_emision:tbViewObjAseg:selOmItemAseg,frm_emision:tab_emision:tbViewObjAseg:vhTasa,
+				frm_emision:tab_emision:tbViewObjAseg:vhFactor,frm_emision:tab_emision:tbViewObjAseg:vhPrima,
+				frm_emision:tab_emision:tbViewObjAseg:vhDedMin,
+				frm_emision:tab_emision:tbViewObjAseg:vhramv,frm_emision:tab_emision:tbViewObjAseg:vhPlaca,
+				frm_emision:tab_emision:tbViewObjAseg:vhMarca,frm_emision:tab_emision:tbViewObjAseg:vhModelo,
+				frm_emision:tab_emision:tbViewObjAseg:vhColor,frm_emision:tab_emision:tbViewObjAseg:vhMotor,
+				frm_emision:tab_emision:tbViewObjAseg:vhChasis,frm_emision:tab_emision:tbViewObjAseg:vhAnio,
+				frm_emision:tab_emision:tbViewObjAseg:vhDispositivo,frm_emision:tab_emision:tbViewObjAseg:vhinformacion,
+				frm_emision:tab_emision:tbViewObjAseg:vhtxtObserv,frm_emision:tab_emision:tbViewObjAseg:vhUsoVh,frm_emision:tab_emision:tbViewObjAseg:vhPropie,
+				frm_emision:tab_emision:tbViewObjAseg:vhFcEndoso,frm_emision:tab_emision:tbViewObjAseg:vhEndoso" />
+		<p:commandButton value="Cancelar" icon="ui-icon-closethick"
+			id="btnCancelaObjetos" update="@this" type="reset"
+			onclick="PF('addObjt').hide();" />
+	</p:dialog>
+	<!-- Fin Agregar objeto asegurado -->
+	<!-- busca y selecciona subagente -->
+	<p:dialog header="Buscar SubAgente" draggable="true"
+		widgetVar="wbuscaSubagente" showEffect="fade" hideEffect="fade"
+		closable="true">
+		<h:panelGrid columns="1" style="width:100%;text-align:center;">
+			<p:row>
+				<p:inputText id="subagenteBuscado"
+					value="#{ControladorEmision.str_subagente}" />
+				<p:commandButton value="Buscar" async="true"
+					update="frm_emision:tab_emision:listadoSubagentes"
+					actionListener="#{ControladorEmision.buscarSubagente}"
+					icon="ui-icon-search"
+					process="@this,frm_emision:tab_emision:subagenteBuscado" />
+			</p:row>
+		</h:panelGrid>
+		<p:dataTable id="listadoSubagentes" var="subagentes"
+			value="#{ControladorEmision.listaSubagentes}" tableStyle="width:auto"
+			rows="4" paginator="true"
+			style="font-family:Verdana; font-size: 10px;"
+			paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+			<p:column headerText="CD" visible="false">
+				<h:outputText value="#{subagentes.cd_subagente}" />
+			</p:column>
+
+			<p:column headerText="Identificación">
+				<h:outputText value="#{subagentes.identificacion_subagente}" />
+			</p:column>
+
+			<p:column headerText="Subagente">
+				<h:outputText
+					value="#{subagentes.primer_nombre_subagente} #{subagentes.segundo_nombre_subagente} #{subagentes.primer_apellido_subagente} #{subagentes.segundo_apellido_subagente}" />
+			</p:column>
+
+			<p:column headerText="Razón Social">
+				<h:outputText value="#{subagentes.razonSocial_subagente}" />
+			</p:column>
+
+			<p:column headerText="Tipo subagentes">
+				<h:outputText value="#{subagentes.tipo_persona_subagente}" />
+			</p:column>
+
+			<p:column style="width:32px;text-align: center"
+				headerText="Seleccionar" exportable="false">
+				<p:commandButton icon="ui-icon-check" title="Seleccionar"
+					process="@this,frm_emision:tab_emision:listadoSubagentes"
+					actionListener="#{ControladorEmision.buscarSubagenteXId}"
+					update="@this,frm_emision:tab_emision:txt_subagente"
+					onclick="PF('wbuscaSubagente').hide();">
+					<f:param name="identificacion_subagente"
+						value="#{subagentes.cd_subagente}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+	</p:dialog>
+	<!-- fin busca y selecciona subagente -->
+
+	<!-- Coberturas Adicionales del Negocio -->
+	<p:dialog header="Coberturas Adicionales del Negocio" draggable="true"
+		widgetVar="wCoberturasAdc" showEffect="fade" hideEffect="fade"
+		closable="true">
+		<h:panelGrid columns="1">
+			<p:row>
+				<p:dataTable id="dtCobAdcObj" var="objA"
+					value="#{ControladorEmision.lstCaoberturas_adc}"
+					selectionMode="single"
+					selection="#{ControladorEmision.selectedLstCobAdc}"
+					rowKey="#{objA.cd_cobertura}"
+					style="width:600px;font-family:Verdana; font-size: 12px;"
+					scrollable="true" scrollHeight="100">
+					<f:facet name="header">
+						            Seleccione la Cobertura 
+						        </f:facet>
+					<p:column headerText="Cobertura">
+						<h:outputText value="#{objA.desc_cobertura}" />
+					</p:column>
+				</p:dataTable>
+			</p:row>
+		</h:panelGrid>
+		<h:panelGrid columns="1" style="width:50px;text-align:center;">
+			<p:row>
+				<h:panelGrid columns="9" style="text-align:center;">
+					<h:outputText value="Valor Límite" />
+					<p:inputNumber id="cobValLimObj"
+						value="#{ControladorEmision.valorLimiteCob}" style="width:20px;" />
+					<h:outputText value="Tasa" />
+					<p:inputNumber id="cobTasaObj"
+						value="#{ControladorEmision.tasaCob}" style="width:20px;" />
+					<h:outputText value="Factor" />
+					<p:selectOneRadio id="cobfactObj"
+						value="#{ControladorEmision.factorCob}">
+						<f:selectItem itemLabel="100%" itemValue="100" />
+						<f:selectItem itemLabel="1000%" itemValue="1000" />
+					</p:selectOneRadio>
+					<h:outputText value="Valor Prima" />
+					<p:inputNumber id="cobPrimaObj"
+						value="#{ControladorEmision.valorPrimaCob}" style="width:20px;" />
+				</h:panelGrid>
+			</p:row>
+			<p:row>
+				<h:panelGrid columns="6" style="text-align:center;">
+					<h:outputText value="Afecta Valor Asegurado: " />
+					<p:selectBooleanCheckbox
+						value="#{ControladorEmision.afecValAsegCob}"
+						id="sbcAfecValAsegCobObj" />
+					<h:outputText value="         Afecta Prima: " />
+					<p:selectBooleanCheckbox value="#{ControladorEmision.afecPrimaCob}"
+						id="sbcAfecPrimaCobObj" />
+					<h:outputText value="         Adicional: " />
+					<p:selectBooleanCheckbox
+						value="#{ControladorEmision.afecAdicionalCob}"
+						id="sbcAfecAdicionalCobObj" />
+				</h:panelGrid>
+			</p:row>
+			<p:row>
+				<h:panelGrid columns="3">
+					<p:commandButton value="Consultar" icon="ui-icon-search"
+						id="btnVerCobUbcObj"
+						update="@this,frm_emision:tab_emision:dtCoberAdcObj,frm_emision:tab_emision:dtCoberAdcDlgObj"
+						action="#{ControladorEmision.verCoberturasAdcObjeto}"
+						process="@this" />
+					<p:commandButton value="Añadir" icon="ui-icon-plus"
+						id="btnAgregaCobUbcObj"
+						action="#{ControladorEmision.aceptaCoberturasAdcObjeto}"
+						update="@this,frm_emision:tab_emision:dtCoberAdcObj,frm_emision:tab_emision:dtCoberAdcDlgObj"
+						process="@this,frm_emision:tab_emision:dtCobAdcObj,frm_emision:tab_emision:cobValLimObj,
+							frm_emision:tab_emision:cobTasaObj,frm_emision:tab_emision:cobfactObj,frm_emision:tab_emision:cobPrimaObj,
+							frm_emision:tab_emision:sbcAfecValAsegCobObj,frm_emision:tab_emision:sbcAfecPrimaCobObj,
+							frm_emision:tab_emision:sbcAfecAdicionalCobObj,frm_emision:tab_emision:dtObjTot" />
+					<p:commandButton value="Eliminar" id="btnEliminaCobNegObj"
+						icon="ui-icon-minus"
+						action="#{ControladorEmision.delCobAdcObjIng}"
+						process="@this,frm_emision:tab_emision:dtCoberAdcObj"
+						update="frm_emision:tab_emision:dtCoberAdcObj,frm_emision:tab_emision:dtCoberAdcDlgObj" />
+				</h:panelGrid>
+			</p:row>
+			<p:panel header="Coberturas Adicionales Ingresadas">
+				<p:dataTable var="dtCoberNegAdc"
+					value="#{ControladorEmision.lstCobAdc}" id="dtCoberAdcObj"
+					scrollable="true" scrollHeight="150"
+					style="font-family:Verdana; font-size: 10px;" rows="3"
+					paginator="true"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+
+					<p:column headerText="Cobertura">
+						<h:outputText value="#{dtCoberNegAdc.descCobertura}" />
+					</p:column>
+					<p:column headerText="Valor Límite">
+						<h:outputText value="#{dtCoberNegAdc.val_limite}" />
+					</p:column>
+					<p:column headerText="Tasa">
+						<h:outputText value="#{dtCoberNegAdc.tasa}" />
+					</p:column>
+					<p:column headerText="Factor">
+						<h:outputText value="#{dtCoberNegAdc.factor}" />
+					</p:column>
+					<p:column headerText="Valor Prima">
+						<h:outputText value="#{dtCoberNegAdc.val_prima}" />
+					</p:column>
+					<p:column headerText="Afecta Valor Asegurado">
+						<h:outputText value="#{dtCoberNegAdc.afecta_va}" />
+					</p:column>
+					<p:column headerText="Afecta Prima">
+						<h:outputText value="#{dtCoberNegAdc.afecta_prima}" />
+					</p:column>
+					<p:column headerText="Adicional">
+						<h:outputText value="#{dtCoberNegAdc.adicional}" />
+					</p:column>
+				</p:dataTable>
+				<p:commandButton value="Guardar" id="btnAceptaCobNegUbcAddObj"
+					icon="ui-icon-plus" styleClass="ui-priority-primary"
+					actionListener="#{ControladorEmision.guardaCoberturaNegocioObjeto}"
+					process="@this,frm_emision:tab_emision:dtCoberAdcObj"
+					update="@this,frm_emision:tab_emision:dtCoberAdcObj,frm_emision:tab_emision:dtCoberAdcDlgObj,
+						frm_emision:tab_emision:dtObjTot,frm_emision:tab_emision:dtUbcTot,frm_emision:tab_emision:dTRamo" />
+			</p:panel>
+		</h:panelGrid>
+		<p:panel header="Elimina Coberturas Adicionales Ingresadas">
+			<p:dataTable var="dtCoberNegAdc"
+				value="#{ControladorEmision.lstCobAdcObj}" id="dtCoberAdcDlgObj"
+				scrollable="true" scrollHeight="150"
+				style="font-family:Verdana; font-size: 10px;" selectionMode="single"
+				selection="#{ControladorEmision.selectedlstCobAdcObj}"
+				rowKey="#{dtCoberNegAdc.cd_cob_adc}" rows="3" paginator="true"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+
+				<p:column headerText="Cobertura">
+					<h:outputText value="#{dtCoberNegAdc.descCobertura}" />
+				</p:column>
+				<p:column headerText="Valor Límite">
+					<h:outputText value="#{dtCoberNegAdc.val_limite}" />
+				</p:column>
+				<p:column headerText="Tasa">
+					<h:outputText value="#{dtCoberNegAdc.tasa}" />
+				</p:column>
+				<p:column headerText="Factor">
+					<h:outputText value="#{dtCoberNegAdc.factor}" />
+				</p:column>
+				<p:column headerText="Valor Prima">
+					<h:outputText value="#{dtCoberNegAdc.val_prima}" />
+				</p:column>
+				<p:column headerText="Afecta Valor Asegurado">
+					<h:outputText value="#{dtCoberNegAdc.afecta_va}" />
+				</p:column>
+				<p:column headerText="Afecta Prima">
+					<h:outputText value="#{dtCoberNegAdc.afecta_prima}" />
+				</p:column>
+				<p:column headerText="Adicional">
+					<h:outputText value="#{dtCoberNegAdc.adicional}" />
+				</p:column>
+			</p:dataTable>
+			<p:commandButton value="Eliminar" id="btnDelCobNegObjDlg"
+				icon="ui-icon-minusthick" styleClass="ui-priority-primary"
+				action="#{ControladorEmision.eliminaCobAdcObj}"
+				process="@this,frm_emision:tab_emision:dtCoberAdcDlgObj"
+				update="frm_emision:tab_emision:dtCoberAdcDlgObj,frm_emision:tab_emision:dtUbcTot,frm_emision:tab_emision:dTRamo,
+					frm_emision:tab_emision:dtObjTot" />
+		</p:panel>
+	</p:dialog>
+
+	<!-- busca y selecciona Coberturas adicionales del negocio UBICACION-->
+	<p:dialog header="Coberturas Adicionales del Negocio" draggable="true"
+		widgetVar="wCoberturasAdcUbc" showEffect="fade" hideEffect="fade"
+		closable="true">
+		<h:panelGrid columns="1">
+			<p:row>
+				<p:dataTable id="dtCobAdcUbc" var="objObj"
+					value="#{ControladorEmision.lstCaoberturas_adcUbc}"
+					selectionMode="single" rowKey="#{objObj.cd_cobertura}"
+					style="width:600px;font-family:Verdana; font-size: 12px;"
+					scrollable="true" scrollHeight="100">
+					<f:facet name="header">
+			            Seleccione la Cobertura 
+			        </f:facet>
+					<p:ajax event="rowSelect"
+						listener="#{ControladorEmision.onRowSelectUbcCobAdc}"
+						process="@this" />
+					<p:column headerText="Cobertura">
+						<h:outputText value="#{objObj.desc_cobertura}" />
+					</p:column>
+				</p:dataTable>
+
+			</p:row>
+		</h:panelGrid>
+		<h:panelGrid columns="1" style="width:50px;text-align:center;">
+			<p:row>
+				<h:panelGrid columns="9" style="text-align:center;">
+					<h:outputText value="Valor Límite" />
+					<p:inputNumber id="cobValLimUbc"
+						value="#{ControladorEmision.valorLimiteCobUbc}">
+						<p:ajax update="@this" process="@this"
+							listener="#{ControladorEmision.validaValorUbcCobAdc}" />
+					</p:inputNumber>
+					<h:outputText value="Tasa" />
+					<p:inputNumber id="cobTasaUbc"
+						value="#{ControladorEmision.tasaCobUbc}">
+						<p:ajax update="@this" process="@this"
+							listener="#{ControladorEmision.tasaCobUbc}" />
+					</p:inputNumber>
+					<h:outputText value="Factor" />
+					<p:selectOneRadio id="cobfactUbc"
+						value="#{ControladorEmision.factorCobUbc}">
+						<p:ajax update="@this" process="@this"
+							listener="#{ControladorEmision.factorCobUbc}" />
+						<f:selectItem itemLabel="100%" itemValue="100" />
+						<f:selectItem itemLabel="1000%" itemValue="1000" />
+					</p:selectOneRadio>
+					<h:outputText value="Valor Prima" />
+					<p:inputNumber id="cobPrimaUbc"
+						value="#{ControladorEmision.valorPrimaCobUbc}">
+						<p:ajax update="@this" process="@this"
+							listener="#{ControladorEmision.valorPrimaCobUbc}" />
+					</p:inputNumber>
+				</h:panelGrid>
+			</p:row>
+			<p:row>
+				<h:panelGrid columns="6" style="text-align:center;">
+					<h:outputText value="Afecta Valor Asegurado: " />
+					<p:selectBooleanCheckbox
+						value="#{ControladorEmision.afecValAsegCobUbc}"
+						id="sbcAfecValAsegCobUbc" />
+					<h:outputText value="         Afecta Prima: " />
+					<p:selectBooleanCheckbox
+						value="#{ControladorEmision.afecPrimaCobUbc}"
+						id="sbcAfecPrimaCobUbc" />
+					<h:outputText value="         Adicional: " />
+					<p:selectBooleanCheckbox
+						value="#{ControladorEmision.afecAdicionalCobUbc}"
+						id="sbcAfecAdicionalCobUbc" />
+				</h:panelGrid>
+			</p:row>
+			<p:row>
+				<h:panelGrid columns="3">
+					<p:commandButton value="Consultar" icon="ui-icon-search"
+						id="btnVerCobUbc"
+						update="@this,frm_emision:tab_emision:dtCoberAdcUbc,frm_emision:tab_emision:panelUbc1"
+						action="#{ControladorEmision.verCoberturasAdcUbicacion}"
+						process="@this" />
+					<p:commandButton value="Añadir" icon="ui-icon-plus"
+						id="btnAgregaCobUbcAdd" update="frm_emision:tab_emision:panelUbc1"
+						action="#{ControladorEmision.aceptaCoberturasAdcUbicacion}"
+						process="@this,frm_emision:tab_emision:dtCobAdcUbc,frm_emision:tab_emision:cobValLimUbc,
+						frm_emision:tab_emision:cobTasaUbc,frm_emision:tab_emision:cobPrimaUbc,frm_emision:tab_emision:cobfactUbc,
+						frm_emision:tab_emision:sbcAfecValAsegCobUbc,frm_emision:tab_emision:sbcAfecPrimaCobUbc,frm_emision:tab_emision:sbcAfecAdicionalCobUbc" />
+					<p:commandButton value="Eliminar" id="btnEliminaCobNegUbcAdd"
+						icon="ui-icon-minus" action="#{ControladorEmision.eliminaCobList}"
+						process="@this" update="frm_emision:tab_emision:dtCoberAdcUbc" />
+
+				</h:panelGrid>
+			</p:row>
+			<p:panel header="Coberturas Adicionales" id="panelUbc1">
+				<p:dataTable var="dtCoberNegAdcUbc"
+					value="#{ControladorEmision.lstCobAdcUbc}" id="dtCoberAdcUbc"
+					scrollable="true" scrollHeight="150">
+					<p:column headerText="Cobertura">
+						<h:outputText value="#{dtCoberNegAdcUbc.descCobertura}" />
+					</p:column>
+					<p:column headerText="Valor Límite">
+						<h:outputText value="#{dtCoberNegAdcUbc.val_limite}" />
+					</p:column>
+					<p:column headerText="Tasa">
+						<h:outputText value="#{dtCoberNegAdcUbc.tasa}" />
+					</p:column>
+					<p:column headerText="Factor">
+						<h:outputText value="#{dtCoberNegAdcUbc.factor}" />
+					</p:column>
+					<p:column headerText="Valor Prima">
+						<h:outputText value="#{dtCoberNegAdcUbc.val_prima}" />
+					</p:column>
+					<p:column headerText="Afecta Valor Asegurado">
+						<h:outputText value="#{dtCoberNegAdcUbc.afecta_va}" />
+					</p:column>
+					<p:column headerText="Afecta Prima">
+						<h:outputText value="#{dtCoberNegAdcUbc.afecta_prima}" />
+					</p:column>
+					<p:column headerText="Adicional">
+						<h:outputText value="#{dtCoberNegAdcUbc.adicional}" />
+					</p:column>
+				</p:dataTable>
+				<p:panelGrid columns="2">
+					<p:commandButton value="Guardar" id="btnAceptaCobNegUbc"
+						icon="ui-icon-plus" styleClass="ui-priority-primary"
+						action="#{ControladorEmision.guardaCoberturaNegocioUbicacion}"
+						process="@this,frm_emision:tab_emision:dtCoberAdcUbc"
+						update="frm_emision:tab_emision:dtUbcTot,frm_emision:tab_emision:dTRamo,frm_emision:tab_emision:dtDelCoberAdcUbc" />
+				</p:panelGrid>
+			</p:panel>
+			<p:panel header="Selecciones la Cobertura Adicionale Ingresadas"
+				id="panelUbc2">
+
+				<p:dataTable var="dtCoberNegAdcUbc"
+					value="#{ControladorEmision.lstCobAdcUbcDel}" id="dtDelCoberAdcUbc"
+					scrollable="true" scrollHeight="150" selectionMode="single"
+					selection="#{ControladorEmision.selectedCobAdcUbc}"
+					rowKey="#{dtCoberNegAdcUbc.cd_cob_adc}">
+					<p:column headerText="Cobertura">
+						<h:outputText value="#{dtCoberNegAdcUbc.descCobertura}" />
+					</p:column>
+					<p:column headerText="Valor Límite">
+						<h:outputText value="#{dtCoberNegAdcUbc.val_limite}" />
+					</p:column>
+					<p:column headerText="Tasa">
+						<h:outputText value="#{dtCoberNegAdcUbc.tasa}" />
+					</p:column>
+					<p:column headerText="Factor">
+						<h:outputText value="#{dtCoberNegAdcUbc.factor}" />
+					</p:column>
+					<p:column headerText="Valor Prima">
+						<h:outputText value="#{dtCoberNegAdcUbc.val_prima}" />
+					</p:column>
+					<p:column headerText="Afecta Valor Asegurado">
+						<h:outputText value="#{dtCoberNegAdcUbc.afecta_va}" />
+					</p:column>
+					<p:column headerText="Afecta Prima">
+						<h:outputText value="#{dtCoberNegAdcUbc.afecta_prima}" />
+					</p:column>
+					<p:column headerText="Adicional">
+						<h:outputText value="#{dtCoberNegAdcUbc.adicional}" />
+					</p:column>
+				</p:dataTable>
+				<p:commandButton value="Eliminar" id="btnDelCobNegUbc"
+					icon="ui-icon-minus" styleClass="ui-priority-primary"
+					action="#{ControladorEmision.eliminaCoberturaNegocioUbicacion}"
+					process="@this,frm_emision:tab_emision:dtDelCoberAdcUbc"
+					update="frm_emision:tab_emision:dtUbcTot,frm_emision:tab_emision:dtDelCoberAdcUbc,
+					frm_emision:tab_emision:dTRamo" />
+
+			</p:panel>
+		</h:panelGrid>
+	</p:dialog>
+	<!-- Inicia Dialogo Coberturas -->
+	<p:dialog header="Coberturas" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgNuevaCobertura" closable="true">
+		<h:panelGrid columns="2">
+			<p:row>
+				<p:dataTable id="checkboxDTCob" var="cob"
+					value="#{ControladorEmision.lstCoberturas}"
+					selection="#{ControladorEmision.selectedLstCoberturas}"
+					rowKey="#{cob.cd_cobertura}" style="width:500px;" scrollable="true"
+					scrollHeight="150" emptyMessage="No hay registros en la busqueda"
+					filteredValue="#{ControladorEmision.lstFilteredCoberturas}">
+
+					<f:facet name="header">
+				            Coberturas
+				        </f:facet>
+					<p:column selectionMode="multiple"
+						style="width:16px;text-align:center" />
+
+					<p:column headerText="Descripción" filterBy="#{cob.desc_cobertura}"
+						sortBy="#{cob.desc_cobertura}" filterMatchMode="contains">
+						<h:outputText value="#{cob.desc_cobertura}" />
+					</p:column>
+				</p:dataTable>
+			</p:row>
+			<p:row>
+				<h:panelGrid columns="2">
+					<h:outputText value="Porcentaje" />
+					<p:inputNumber value="#{ControladorEmision.porcCob}"
+						id="inptNumPor"></p:inputNumber>
+					<h:outputText value="Valor" />
+					<p:inputNumber value="#{ControladorEmision.valorCob}"
+						id="inptNumVal"></p:inputNumber>
+				</h:panelGrid>
+			</p:row>
+		</h:panelGrid>
+		<p:commandButton icon="ui-icon-check" value="Guardar"
+			process="@this,frm_emision:tab_emision:checkboxDTCob,frm_emision:tab_emision:inptNumPor,frm_emision:tab_emision:inptNumVal"
+			update="@this,frm_emision:tab_emision:dtCobertura"
+			action="#{ControladorEmision.guardaCobertura}">
+		</p:commandButton>
+	</p:dialog>
+	<!-- fin Dialogo Coberturas -->
+	<!-- Inicia Dialogo Deducible -->
+	<p:dialog header="Deducibles" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgNuevoDeducible" closable="true">
+		<h:panelGrid columns="2">
+			<p:row>
+
+				<p:dataTable id="checkboxDTded" var="dedu"
+					value="#{ControladorEmision.lstDeducibles}"
+					selection="#{ControladorEmision.selectedlstDeducibles}"
+					rowKey="#{dedu.cd_deducible}" style="width:500px;"
+					scrollable="true" scrollHeight="150"
+					emptyMessage="No hay registros en la busqueda"
+					filteredValue="#{ControladorEmision.lstFilteredDeducibles}">
+
+					<f:facet name="header">
+				            Deducibles
+				        </f:facet>
+					<p:column selectionMode="multiple"
+						style="width:16px;text-align:center" />
+
+					<p:column headerText="Descripción"
+						filterBy="#{dedu.desc_deducible}" sortBy="#{dedu.desc_deducible}"
+						filterMatchMode="contains">
+						<h:outputText value="#{dedu.desc_deducible}" />
+					</p:column>
+				</p:dataTable>
+			</p:row>
+			<p:row>
+				<h:panelGrid columns="2">
+					<h:outputText value="% Valor Siniestro" />
+					<p:inputNumber value="#{ControladorEmision.porcDedValSin}"
+						id="inptNumPorValSin"></p:inputNumber>
+					<h:outputText value="% Valor Asegurado" />
+					<p:inputNumber value="#{ControladorEmision.porcDedValAseg}"
+						id="inptNumPorValAseg"></p:inputNumber>
+					<h:outputText value="Valor Mínimo" />
+					<p:inputNumber value="#{ControladorEmision.valorDedMin}"
+						id="inptNumValMin"></p:inputNumber>
+					<h:outputText value="Valor Fijo" />
+					<p:inputNumber value="#{ControladorEmision.valorDedFijo}"
+						id="inptNumValFijo"></p:inputNumber>
+				</h:panelGrid>
+			</p:row>
+		</h:panelGrid>
+		<p:commandButton icon="ui-icon-check" value="Guardar"
+			process="@this,frm_emision:tab_emision:checkboxDTded, 
+						frm_emision:tab_emision:inptNumPorValSin,frm_emision:tab_emision:inptNumPorValAseg, 
+						frm_emision:tab_emision:inptNumValMin,frm_emision:tab_emision:inptNumValFijo"
+			update="@this frm_emision:tab_emision:dtDeducible"
+			action="#{ControladorEmision.guardaDeducible}">
+		</p:commandButton>
+	</p:dialog>
+	<!-- fin Dialogo Deducible -->
+	<!-- Inicia Dialogo Clausulas -->
+	<p:dialog header="Cláusulas" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgNuevaClausula" closable="true">
+		<h:panelGrid columns="2">
+			<p:row>
+
+				<p:dataTable id="checkboxDTclau" var="clausu"
+					value="#{ControladorEmision.lstClausulas}"
+					selection="#{ControladorEmision.selectedlstClausulas}"
+					rowKey="#{clausu.cd_clausula}" style="width:500px;"
+					scrollable="true" scrollHeight="150"
+					emptyMessage="No hay registros en la busqueda"
+					filteredValue="#{ControladorEmision.lstFilteredClausulas}">
+
+					<f:facet name="header">
+				            Cláusula
+				        </f:facet>
+					<p:column selectionMode="multiple"
+						style="width:16px;text-align:center" />
+
+					<p:column headerText="Descripción"
+						filterBy="#{clausu.desc_clausula}"
+						sortBy="#{clausu.desc_clausula}" filterMatchMode="contains">
+						<h:outputText value="#{clausu.desc_clausula}" />
+					</p:column>
+				</p:dataTable>
+			</p:row>
+			<p:row>
+				<h:panelGrid columns="2">
+					<h:outputText value="Porcentaje" />
+					<p:inputNumber value="#{ControladorEmision.porcClau}"
+						id="inptNumPorCla"></p:inputNumber>
+					<h:outputText value="Valor" />
+					<p:inputNumber value="#{ControladorEmision.valorClau}"
+						id="inptNumValCla"></p:inputNumber>
+				</h:panelGrid>
+			</p:row>
+		</h:panelGrid>
+		<p:commandButton icon="ui-icon-check" value="Guardar"
+			process="@this,frm_emision:tab_emision:checkboxDTclau,frm_emision:tab_emision:inptNumPorCla,frm_emision:tab_emision:inptNumValCla"
+			update="@this frm_emision:tab_emision:dtClausulas"
+			action="#{ControladorEmision.guardaClausula}">
+		</p:commandButton>
+	</p:dialog>
+
+	<!-- Inicia Carga Archivo Objeto -->
+	<p:dialog header="Carga de Archivos" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgCargaArchivoPrin" closable="true"
+		appendTo="@(body)" modal="true">
+		<p:fileUpload listener="#{ControladorEmision.subirArchivos}"
+			label="Seleccionar" uploadLabel="Adjuntar" cancelLabel="Cancelar"
+			mode="advanced" dragDropSupport="true"
+			update="@this,frmUbcRamoCot:objectUbc" sizeLimit="9000000"
+			fileLimit="1" allowTypes="/(\.|\/)(xls)$/">
+		</p:fileUpload>
+	</p:dialog>
+
+</ui:composition>

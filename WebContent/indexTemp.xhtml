@@ -1,0 +1,293 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<title>CONFIA S.A.</title>
+	<style type="text/css">
+body {
+	background: url("http://35.237.152.6:8081/images/macosx/macback.png");
+	/*background-color:#83AED4;         */
+	margin: 0;
+	padding: 0;
+	font-family: geneva, arial, helvetica, sans-serif;
+	font-size: 80%;
+}
+
+.ui-menuitem-icon.ui-icon.appleIcon {
+	background: url("http://35.237.152.6:8081/images/macosx/apple.png"); )
+	no-repeat;
+	width: 16px;
+	height: 16px;
+	border-radius: 0px;
+}
+
+.ui-dialog .ui-terminal {
+	border: 0;
+}
+
+.ui-dialog.terminalDialog .ui-dialog-content {
+	padding: 0;
+}
+</style>
+</h:head>
+<body>
+	<!-- Imagen de carga de actividad de pagina -->
+	<p:ajaxStatus
+		style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+		<f:facet name="start">
+			<p:graphicImage
+				value="http://35.237.152.6:8081/images/ajax-loadercircle.gif" />
+		</f:facet>
+
+		<f:facet name="complete">
+			<h:outputText value="" />
+		</f:facet>
+	</p:ajaxStatus>
+	<p:growl id="growl" showDetail="true" life="1500" />
+	<!-- acerca de -->
+	<p:dialog header="Acerca de" draggable="true" widgetVar="info"
+		showEffect="fade" hideEffect="fade">
+		<h:form>
+			<h:panelGrid columns="1" style="width:100%;text-align:center;">
+				<p:graphicImage
+					value="http://35.237.152.6:8081/images/macosx/apple_logo.png" />
+				<h:outputText value="MOCK OS X" style="font-size:16px" />
+				<h:outputText value="Version 10.5.7" />
+				<p:commandButton value="Historia Actualizaciones" async="true"
+					onclick="return false;" />
+			</h:panelGrid>
+		</h:form>
+	</p:dialog>
+	<!-- fin acerca de -->
+
+	<!-- EMISION -->
+	<p:dialog header="Emisión" widgetVar="emision" showEffect="fade"
+		hideEffect="fade" resizable="true" closable="false" maximizable="true"
+		height="700" width="1200">
+		<h:form id="frm_emision">
+			<p:growl autoUpdate="true" showDetail="true" sticky="true"></p:growl>
+			<p:tabView id="tab_emision">
+				<p:tab title="Datos Informativos">
+					<!-- CABECERA COTIZACION -->
+					<ui:include src="/emision/datosInformativos.xhtml" />
+					<!-- Fin CABECERA COTIZACION -->
+				</p:tab>
+				<p:tab title="Objetos Asegurados / Rubros">
+					<!-- CABECERA RAMO- UBICACION-OBJETO -->
+					<ui:include src="/emision/objetosAsegurados.xhtml" />
+					<!-- Fin RAMO- UBICACION-OBJETO -->
+				</p:tab>
+				<p:tab title="Forma de Pago / Poliza">
+					<h:panelGrid columns="4" cellpadding="5">
+						<!-- CABECERA RAMO- UBICACION-OBJETO -->
+						<ui:include src="/emision/formaPago.xhtml" />
+						<!-- Fin RAMO- UBICACION-OBJETO -->
+					</h:panelGrid>
+				</p:tab>
+				<p:tab title="Documentos">
+					<!-- Emitir Carta -->
+					<ui:include src="/emision/cartaEmision.xhtml" />
+					<!-- Fin Emitir Carta -->
+				</p:tab>
+			</p:tabView>
+		</h:form>
+	</p:dialog>
+	<!-- fin emision -->
+
+	<!-- Anexos -->
+	<p:dialog widgetVar="anexos" header="Anexos" resizable="true"
+		showEffect="fade" hideEffect="fade" closable="false"
+		maximizable="true" height="700" width="1200">
+		<h:form id="frm_anexos">
+			<p:growl autoUpdate="true" showDetail="true" sticky="true"></p:growl>
+			<!-- CABECERA COTIZACION -->
+			<ui:include src="/anexos/datosAnexos.xhtml" />
+			<!-- Fin CABECERA COTIZACION -->
+		</h:form>
+	</p:dialog>
+	<!-- fin Anexos -->
+
+	<!-- Siniestros -->
+	<p:dialog widgetVar="siniestros" header="Siniestros" resizable="true"
+		showEffect="fade" hideEffect="fade" closable="false"
+		maximizable="true" height="700" width="1500">
+		<h:form id="frm_siniestros">
+			<p:growl autoUpdate="true" showDetail="true" sticky="true"></p:growl>
+			<!-- CABECERA COTIZACION -->
+			<ui:include src="/siniestros/datosSiniestros.xhtml" />
+			<!-- Fin CABECERA COTIZACION -->
+		</h:form>
+	</p:dialog>
+	<!-- fin Siniestros -->
+
+	<!-- COBRANZAS -->
+	<p:dialog widgetVar="cobranzas" header="Cobranzas" resizable="true"
+		showEffect="fade" hideEffect="fade" closable="false"
+		maximizable="true">
+		<h:form id="frm_cobranza">
+			<p:growl autoUpdate="true" showDetail="true" sticky="true"></p:growl>
+			<!-- CABECERA COTIZACION -->
+			<ui:include src="/cobranzas/cobranza.xhtml" />
+			<!-- Fin CABECERA COTIZACION -->
+		</h:form>
+	</p:dialog>
+	<!-- fin cobranzas -->
+	<!-- PRE FACTURAS -->
+	<p:dialog widgetVar="preFacturacion" header="Pre Liquida Comisiones"
+		resizable="true" showEffect="fade" hideEffect="fade" closable="false"
+		maximizable="true">
+		<h:form id="frm_preFactura">
+			<p:growl autoUpdate="true" showDetail="true" sticky="true"></p:growl>
+			<ui:include src="/cobranzas/preLiquida.xhtml" />
+		</h:form>
+	</p:dialog>
+	<!-- PRE FACTURAS -->
+	<!-- Comision Subagente -->
+	<p:dialog widgetVar="comisionSubagen" header="Comisión Canal"
+		resizable="true" showEffect="fade" hideEffect="fade" closable="false"
+		maximizable="true" height="500" width="1200">
+		<h:form id="frm_comiSubagen">
+			<p:growl autoUpdate="true" showDetail="true" sticky="true"></p:growl>
+			<ui:include src="/cobranzas/comisionSubagen.xhtml" />
+		</h:form>
+	</p:dialog>
+	<!-- Comision Subagente -->
+	<!-- FACTURAS -->
+	<p:dialog widgetVar="facturacion" header="Factura Comisiones"
+		resizable="true" showEffect="fade" hideEffect="fade" closable="false"
+		maximizable="true">
+		<h:form id="frm_Factura">
+			<p:growl autoUpdate="true" showDetail="true" sticky="true"></p:growl>
+			<ui:include src="/cobranzas/facturacion.xhtml" />
+		</h:form>
+	</p:dialog>
+	<!-- FACTURAS -->
+	<!-- diferenciales -->
+	<p:dialog widgetVar="liquidaDiferencialPol"
+		header="Liquidación de Diferenciales" resizable="true"
+		showEffect="fade" hideEffect="fade" closable="false"
+		maximizable="true" height="600" width="1200">
+		<h:form id="frmDifPol">
+			<p:growl autoUpdate="true" showDetail="true" sticky="true"></p:growl>
+			<ui:include src="/cobranzas/comisionDiferenciales.xhtml" />
+		</h:form>
+	</p:dialog>
+	<!-- Aseguradora -->
+	<!-- Correspondencia -->
+	<p:dialog widgetVar="correspon" header="Correspondencia"
+		resizable="true" showEffect="fade" hideEffect="fade" closable="false"
+		maximizable="true">
+		<h:form id="frm_correspondencia">
+			<p:growl autoUpdate="true" showDetail="true" sticky="true"></p:growl>
+			<ui:include src="/Correspondencia/correspondencia.xhtml" />
+		</h:form>
+	</p:dialog>
+	<!-- Consulta de Pólizas-->
+	<p:dialog widgetVar="consultar" header="Consulta Pólizas"
+		resizable="true" showEffect="fade" hideEffect="fade" closable="false"
+		maximizable="true">
+		<h:form id="frm_consultas">
+			<p:growl autoUpdate="true" showDetail="true" sticky="true"></p:growl>
+			<p:panel header="Exportar Transacciones Póliza" id="panelTranPol"
+				visible="#{ControladorConsultaPoliza.lbTransaccion}"
+				toggleable="true">
+				<h:commandLink>
+					<p:graphicImage value="/images/excel.png" width="24" />
+					<p:dataExporter type="xls"
+						target="frm_consultas:tab_consulta:frm_consultaPol:dtExcel"
+						fileName="transaccion" />
+				</h:commandLink>
+			</p:panel>
+			<p:tabView id="tab_consulta">
+				<p:tab title="Consulta Pólizas">
+					<ui:include src="/Correspondencia/consultaPoliza.xhtml" />
+				</p:tab>
+				<p:tab title="Documentos">
+					<ui:include src="/Correspondencia/cartaPolizas.xhtml" />
+				</p:tab>
+			</p:tabView>
+
+		</h:form>
+
+
+
+	</p:dialog>
+
+	<!-- facturacion periódica -->
+	<p:dialog widgetVar="facturaPeriodica" header="Facturación Periódica"
+		resizable="true" showEffect="fade" hideEffect="fade" closable="false"
+		maximizable="true" height="700" width="1300">
+		<h:form id="frmFactPeri">
+			<p:growl autoUpdate="true" showDetail="true" sticky="true"></p:growl>
+			<!-- CABECERA COTIZACION -->
+			<ui:include src="/anexos/facturacionPeriodica.xhtml" />
+			<!-- Fin CABECERA COTIZACION -->
+		</h:form>
+	</p:dialog>
+	<!-- fin facturacion periódica -->
+
+	<!-- Reportería
+	<p:dialog widgetVar="reporteria" header="Reportería" resizable="true"
+		showEffect="fade" hideEffect="fade" closable="false"
+		maximizable="true" height="600" width="1200">
+		<h:form id="frm_reporteria">
+			<p:growl autoUpdate="true" showDetail="true" sticky="true"></p:growl>
+			<ui:include src="/Correspondencia/reporteria.xhtml" />
+		</h:form>
+	</p:dialog> -->
+	<p:dock>
+		<p:menuitem value="Emision"
+			icon="http://35.237.152.6:8081/images/macosx/user.png" url="#"
+			onclick="PF('emision').show();" />
+		<p:menuitem value="Anexos"
+			icon="http://35.237.152.6:8081/images/macosx/terminal.png" url="#"
+			onclick="PF('anexos').show();" />
+		<p:menuitem value="Factura Periódica"
+			icon="http://35.237.152.6:8081/images/macosx/factPeriodica.png"
+			url="#" onclick="PF('facturaPeriodica').show();" />
+		
+		<p:menuitem value="Siniestro"
+			icon="http://35.237.152.6:8081/images/macosx/reporte.png"
+			url="http://localhost:8081/Broken/siniestros/siniestros.jsf" />
+
+		<p:menuitem value="Cobranzas"
+			icon="http://35.237.152.6:8081/images/macosx/itunes.png" url="#"
+			onclick="PF('cobranzas').show();" />
+		<p:menuitem value="PreLiquida Comisiones"
+			icon="http://35.237.152.6:8081/images/macosx/preliquida.png" url="#"
+			onclick="PF('preFacturacion').show();" />
+		<p:menuitem value="Factura Comisiones"
+			icon="http://35.237.152.6:8081/images/macosx/ichat.png" url="#"
+			onclick="PF('facturacion').show();" />
+		<p:menuitem value="Liquida Diferencial"
+			icon="http://35.237.152.6:8081/images/macosx/diferencial.png" url="#"
+			onclick="PF('liquidaDiferencialPol').show();" />
+		<p:menuitem value="Gestión App"
+			icon="http://35.237.152.6:8081/images/macosx/mant.png"
+			url="http://35.237.152.6:8081/Broken/gestion/indexGestion.jsf" />
+		<p:menuitem value="Comisión Canal"
+			icon="http://35.237.152.6:8081/images/macosx/finder.png" url="#"
+			onclick="PF('comisionSubagen').show();" />
+		<p:menuitem value="Documentos"
+			icon="http://35.237.152.6:8081/images/macosx/documentos.png" url="#"
+			onclick="PF('correspon').show();" />
+		<p:menuitem value="Consultas"
+			icon="http://35.237.152.6:8081/images/macosx/buscar.png" url="#"
+			onclick="PF('consultar').show();" />
+		<p:menuitem value="Reportes"
+			icon="http://35.237.152.6:8081/images/macosx/reporte.png"
+			url="http://35.237.152.6:8081/Broken/reporteria.jsf" />
+		<p:menuitem value="Póliza Mensualizada"
+			icon="http://35.237.152.6:8081/images/macosx/aseguradora.png"
+			url="http://35.237.152.6:8081/Broken/emisionMensualizado/indexMensualizado.jsf" />
+		<p:menuitem value="Salir"
+			icon="http://35.237.152.6:8081/images/macosx/salir.png"
+			url="./index.html" />
+
+	</p:dock>
+</body>
+</html>

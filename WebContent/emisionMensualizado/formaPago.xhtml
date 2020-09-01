@@ -1,0 +1,125 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+	<h:panelGrid columns="1" cellpadding="5">
+		<p:commandButton value="Forma de Pago" id="btnFrmPago"
+			action="#{ControladorEmisionMensualizado.agregaFormaPago}"
+			styleClass="ui-priority-primary" process="@this,frmMensualizado:tab_emision:dTRamo"
+			icon="ui-icon-plusthick"
+			update="@this,frmMensualizado:tab_emision:dtDetFrmpFinal" />
+
+		<p:dataTable var="DetfrmPg"
+			value="#{ControladorEmisionMensualizado.lstDetFrmPago}"
+			id="dtDetFrmpFinal" scrollable="true" scrollHeight="150"
+			editable="false" style="font-family:Verdana; font-size: 10px;">
+			<f:facet name="header">
+		            Cuotas
+		        </f:facet>
+			<p:ajax event="rowEdit"
+				listener="#{ControladorEmisionMensualizado.onRowEditDetFin}"
+				update="@this" />
+
+			<p:column headerText="Tipo">
+				<h:outputText value="#{DetfrmPg.tipo}" />
+			</p:column>
+			<p:column headerText="Valor">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{DetfrmPg.VALOR}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputNumber value="#{DetfrmPg.VALOR}"></p:inputNumber>
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column headerText="Num.Documento">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{DetfrmPg.FACTURA_ASEGURADORA}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{DetfrmPg.FACTURA_ASEGURADORA}"
+							style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column headerText="Fc Vencimiento Pago">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{DetfrmPg.FECHA_VENCIMIENTO_DATE}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</f:facet>
+					<f:facet name="input">
+						<p:calendar value="#{DetfrmPg.FECHA_VENCIMIENTO_DATE}"
+							style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Fc Inicio Vigencia">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{DetfrmPg.fc_inicio_vigencia}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</f:facet>
+					<f:facet name="input">
+						<p:calendar value="#{DetfrmPg.fc_inicio_vigencia}"
+							style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Fc Fin Vigencia">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{DetfrmPg.fc_fin_vigencia}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</f:facet>
+					<f:facet name="input">
+						<p:calendar value="#{DetfrmPg.fc_fin_vigencia}" style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column style="width:32px">
+				<p:rowEditor />
+			</p:column>
+		</p:dataTable>
+	</h:panelGrid>
+	<p:confirmDialog id="confirmDeleteFrm" global="true" showEffect="fade"
+		hideEffect="fade">
+		<p:commandButton value="Si" type="button"
+			styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+		<p:commandButton value="No" type="button"
+			styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+	</p:confirmDialog>
+
+	<!-- nueva Forma de Pago -->
+	<p:dialog header="Pago Mensualizado" draggable="true"
+		widgetVar="wfrmPago" showEffect="fade" hideEffect="fade"
+		closable="true">
+			<h:panelGrid columns="4" cellpadding="5">
+				<h:outputText value="Derecho de Emisión: " />
+				<p:inputText
+					value="#{ControladorEmisionMensualizado.frmPagoDerechoEmision}"
+					id="iptFrmPDerEmi" />
+				<h:outputText value="Super de Bancos: " />
+				<p:inputText
+					value="#{ControladorEmisionMensualizado.frmPagoSuperBancos}"
+					id="iptFrmSupBanco" />
+				<h:outputText value="Seguro Campesino: " />
+				<p:inputText
+					value="#{ControladorEmisionMensualizado.frmPagoSegCampesino}"
+					id="iptFrmSegCamp" />
+			</h:panelGrid>
+			<p:commandButton value="Generar" id="btnFrmPagoSave"
+				icon="ui-icon-plus" styleClass="ui-priority-primary"
+				action="#{ControladorEmisionMensualizado.guardaFormaPago}"
+				process="@this frmMensualizado:tab_emision:iptFrmPDerEmi frmMensualizado:tab_emision:iptFrmSupBanco frmMensualizado:tab_emision:iptFrmSegCamp"
+				update="@this" />
+	</p:dialog>
+</ui:composition>

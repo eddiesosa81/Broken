@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/templates/MSTemplate.xhtml">
+	<ui:define name="tituloPagina">Pagos Cash - Archivo Plano</ui:define>
+	<ui:define name="contenido">
+		<!-- Imagen de carga de actividad de pagina -->
+		<p:ajaxStatus
+			style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+			<f:facet name="start">
+				<p:graphicImage value="/imagenes/ajax-loadercircle.gif" />
+			</f:facet>
+			<f:facet name="complete">
+				<h:outputText value="" />
+			</f:facet>
+		</p:ajaxStatus>
+		<h:form id="formCash">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<p:fileUpload
+				listener="#{ControladorSubeArchivo.ingreso}"
+				mode="advanced" dragDropSupport="true" sizeLimit="100000"
+				fileLimit="3" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" />
+
+
+		</h:form>
+	</ui:define>
+	<ui:define name="tituloFormulario">Pagos Cash</ui:define>
+	<ui:define name="autor">ETSE</ui:define>
+</ui:composition>
+</html>

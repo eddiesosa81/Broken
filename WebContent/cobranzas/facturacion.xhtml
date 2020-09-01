@@ -1,0 +1,106 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+	<h:panelGrid columns="2" cellpadding="5">
+		<h:outputText value="Aseguradora: " />
+		<p:selectOneMenu id="somAseg"
+			value="#{ControladorFacturas.remiteAseguradora}">
+			<f:selectItem itemLabel="Seleccione" itemValue="0" />
+			<f:selectItems value="#{ControladorFacturas.listAseguradoras}"
+				var="ase" itemLabel="#{ase.razon_social_aseguradora}"
+				itemValue="#{ase.cd_aseguradora}" />
+		</p:selectOneMenu>
+
+		<p:commandButton value="Consultar" id="btnprefacturarAseg"
+			update="@this frm_Factura:dtCobranzaComisionFactura"
+			styleClass="ui-priority-primary" process="@this,frm_Factura:somAseg"
+			action="#{ControladorFacturas.consultaPreFactura}" />
+		<p:commandButton value="Total Comisiones Seleccionadas" id="btnprefactSum"
+			styleClass="ui-priority-primary" process="@this,frm_Factura:dtCobranzaComisionFactura"
+			action="#{ControladorFacturas.sumaPreFacturaSel}" />
+		<p:commandButton value="Imprimir" id="btnPrint"
+			action="#{ControladorFacturas.execute()}" ajax="false"
+			styleClass="ui-priority-primary" icon="ui-icon-script"
+			disabled="#{ControladorFacturas.flgBotonImprime}"
+			style="width:100px; font-family:Verdana; font-size: 12px;"></p:commandButton>
+	</h:panelGrid>
+	<p:dataTable id="dtCobranzaComisionFactura" var="pdp"
+		value="#{ControladorFacturas.lstPreFactView}" tableStyle="width:auto"
+		rows="5" scrollable="true" scrollHeight="150"
+		selection="#{ControladorFacturas.selectedlstPreFactView}"
+		rowKey="#{pdp.cd_pre_factura}" paginator="true"
+		style="font-family:Verdana; font-size: 10px;"
+		paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+
+		<p:column selectionMode="multiple"
+			style="width:16px;text-align:center" />
+		<p:column headerText="No. Pre Liquidación">
+			<h:outputText value="#{pdp.cd_pre_factura}" />
+		</p:column>
+
+		<p:column headerText="Aseguradora">
+			<h:outputText value="#{pdp.nombre_corto_aseguradora}" />
+		</p:column>
+
+		<p:column headerText="Fecha Prefactura">
+			<h:outputText value="#{pdp.fc_pre_factura}" />
+		</p:column>
+
+		<p:column headerText="Valor Prefactura">
+			<h:outputText value="#{pdp.val_pre_factura}" />
+		</p:column>
+		<p:column style="width:32px;text-align: center">
+			<p:commandButton update="@this frm_Factura:preLiqDetail"
+				action="#{ControladorFacturas.recuperaDetallePreFact}"
+				icon="ui-icon-search" title="Detalle Pre Liquidación">
+				<f:setPropertyActionListener value="#{pdp}"
+					target="#{ControladorFacturas.selectedPreFactView}" />
+			</p:commandButton>
+		</p:column>
+	</p:dataTable>
+
+	<h:panelGrid columns="4" cellpadding="5">
+		<p:commandButton value="Facturar" id="btnfacturar" update="@this"
+			process="@this,frmNumFact:numFactConpt,frm_Factura:dtCobranzaComisionFactura"
+			styleClass="ui-priority-primary"
+			action="#{ControladorFacturas.validaFactura}" />
+		<p:commandButton value="Salir" id="btnSalir" icon="ui-icon-cancel"
+			styleClass="ui-priority-primary"
+			action="/index.xhtml?faces-redirect=true" process="@this"
+			update="@this" />
+	</h:panelGrid>
+
+	<p:dialog header="Detalle Pre Liquidación" widgetVar="detallePreFact"
+		appendTo="@(body)" modal="true" showEffect="fade" hideEffect="fade"
+		resizable="false">
+		<p:outputPanel id="preLiqDetail" style="text-align:center;">
+			<p:dataTable var="deta"
+				value="#{ControladorFacturas.lstPreFactDetaView}" scrollable="true"
+				scrollHeight="150" style="font-family:Verdana; font-size: 10px;">
+				<p:column headerText="Cliente">
+					<h:outputText value="#{deta.cliente}" />
+				</p:column>
+				<p:column headerText="Ramo">
+					<h:outputText value="#{deta.cd_ramo}" />
+				</p:column>
+				<p:column headerText="Póliza">
+					<h:outputText value="#{deta.poliza}" />
+				</p:column>
+				<p:column headerText="Factura">
+					<h:outputText value="#{deta.factura}" />
+				</p:column>
+				<p:column headerText="Prima">
+					<h:outputText value="#{deta.tot_prima}" />
+				</p:column>
+				<p:column headerText="% Comisión">
+					<h:outputText value="#{deta.pct_com_broker}" />
+				</p:column>
+				<p:column headerText="Valor Comisión">
+					<h:outputText value="#{deta.val_com_broker}" />
+				</p:column>
+			</p:dataTable>
+		</p:outputPanel>
+	</p:dialog>
+</ui:composition>

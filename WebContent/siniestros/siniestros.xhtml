@@ -1,0 +1,1874 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/templates/Template.xhtml">
+	<ui:define name="tituloPagina">Siniestros</ui:define>
+	<ui:define name="contenido">
+		<p:ajaxStatus
+			style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+			<f:facet name="start">
+				<p:graphicImage value="/images/ajax-loadercircle.gif" />
+			</f:facet>
+			<f:facet name="complete">
+				<h:outputText value="" />
+			</f:facet>
+		</p:ajaxStatus>
+		<h:form id="frm_siniestros">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<!-- CABECERA COTIZACION -->
+			<ui:include src="/siniestros/datosSiniestros.xhtml" />
+			<!-- Fin CABECERA COTIZACION -->
+			<!-- busca y selecciona Poliza -->
+			<p:dialog header="Buscar Póliza" draggable="true"
+				widgetVar="wbuscaPoliza" showEffect="fade" hideEffect="fade"
+				closable="true" maximizable="true">
+				<h:form id="frmDlgPoliza">
+					<h:panelGrid columns="2" style="width:100%;text-align:center;">
+						<p:row>
+							<p:panelGrid columns="3">
+								<p:panelGrid columns="3">
+									<p:inputText id="polizaBuscado"
+										value="#{ControladorSiniestros.poliza}"
+										placeholder="Número de Póliza" />
+									<p:inputText id="cotizaBuscado"
+										value="#{ControladorSiniestros.nmCliente}"
+										placeholder="Apellido / Razon Social" />
+									<p:selectOneMenu id="gContratante"
+										value="#{ControladorSiniestros.codGrupoContratante}"
+										style="width:125px" autoWidth="false">
+										<f:selectItem itemValue="0" itemLabel="Grupo Contratante" />
+										<f:selectItems var="gcontratante"
+											value="#{ControladorSiniestros.listaGrupoContratante}"
+											itemLabel="#{gcontratante.nombre_corto_grupo_contratante}"
+											itemValue="#{gcontratante.cd_grupo_contratante}" />
+									</p:selectOneMenu>
+								</p:panelGrid>
+								<p:row>
+									<p:panelGrid columns="2">
+										<p:inputText value="#{ControladorSiniestros.placa}"
+											placeholder="Placa" id="intxtbuscaPlaca"></p:inputText>
+										<p:inputText value="#{ControladorSiniestros.motor}"
+											placeholder="No.Motor" id="intxtbuscaMotor"></p:inputText>
+										<p:inputText value="#{ControladorSiniestros.nmTitular}"
+											placeholder="Titular" id="intxtbuscaTitular"></p:inputText>
+									</p:panelGrid>
+								</p:row>
+								<p:row>
+									<p:commandButton value="Buscar"
+										actionListener="#{ControladorSiniestros.buscaPoliza}"
+										update="@this frm_siniestros:frmDlgPoliza:listadoPoliza"
+										icon="ui-icon-search"
+										process="@this,frm_siniestros:frmDlgPoliza:cotizaBuscado,
+							frm_siniestros:frmDlgPoliza:polizaBuscado,
+						frm_siniestros:frmDlgPoliza:intxtbuscaPlaca,
+						frm_siniestros:frmDlgPoliza:intxtbuscaMotor,
+						frm_siniestros:frmDlgPoliza:intxtbuscaTitular,
+						frm_siniestros:frmDlgPoliza:gContratante" />
+									<p:commandButton value="Aceptar"
+										actionListener="#{ControladorSiniestros.aceptaNuevoSiniestro}"
+										update="@this frm_siniestros:ingresoSiniestro:otxtcdSini frm_siniestros:ingresoSiniestro:otxtcdano frm_siniestros:ingresoSiniestro:otxtClie frm_siniestros:ingresoSiniestro:otxtCedClie frm_siniestros:ingresoSiniestro:otxtnmAseg frm_siniestros:ingresoSiniestro:otxtSuba frm_siniestros:ingresoSiniestro:otxtPol frm_siniestros:ingresoSiniestro:otxtNmRamo frm_siniestros:ingresoSiniestro:otxtfcIni frm_siniestros:ingresoSiniestro:otxtfcFin frm_siniestros:ingresoSiniestro:otxtDscObj 
+							frm_siniestros:ingresoSiniestro:otxtValAsegObj frm_siniestros:ingresoSiniestro:otxtDeducibleMin 
+							frm_siniestros:ingresoSiniestro:otxtDscSubObj frm_siniestros:ingresoSiniestro:otxtValAsegSubObj
+							frm_siniestros:ingresoSiniestro:tabSiniestro:dtCobPol frm_siniestros:ingresoSiniestro:tabSiniestro:dtCobDed 
+							frm_siniestros:ingresoSiniestro:tabSiniestro:dtRubDocSinies frm_siniestros:ingresoSiniestro:tabSiniestro:somTaller 
+							frm_siniestros:ingresoSiniestro:tblCarVhCabNew"
+										icon="ui-icon-transferthick-e-w" process="@this" />
+								</p:row>
+							</p:panelGrid>
+						</p:row>
+					</h:panelGrid>
+					<p:panelGrid id="idPGridPoliza" columns="2">
+						<p:row>
+							<p:dataTable id="listadoPoliza" var="pol" scrollable="true"
+								scrollHeight="80"
+								value="#{ControladorSiniestros.lstConsultaPoliza}"
+								selectionMode="single"
+								selection="#{ControladorSiniestros.selectedConsultaPoliza}"
+								rowKey="#{pol.cd_ramo_cotizacion}"
+								style="width:500px; font-family:Verdana; font-size: 10px;">
+								<f:facet name="header">
+								  Seleccione la Póliza
+								</f:facet>
+								<p:ajax event="rowSelect"
+									listener="#{ControladorSiniestros.onRowSelectPol}"
+									update="@this,frm_siniestros:frmDlgPoliza:dtSiniesUbc,frm_siniestros:frmDlgPoliza:dtSiniesUbc,frm_siniestros:frmDlgPoliza:dtSiniesObjeto,frm_siniestros:frmDlgPoliza:dtSiniesCaract" />
+
+								<p:column headerText="Cliente">
+									<h:outputText value="#{pol.cliente}" />
+								</p:column>
+								<p:column headerText="Grupo Contratante">
+									<h:outputText value="#{pol.nm_grupo_contratante}" />
+								</p:column>
+								<p:column headerText="Póliza">
+									<h:outputText value="#{pol.poliza}" />
+								</p:column>
+
+								<p:column headerText="Ramo">
+									<h:outputText value="#{pol.desc_ramo}" />
+								</p:column>
+
+								<p:column headerText="Vigencia Desde:">
+									<h:outputText value="#{pol.fc_ini_vig_date}">
+										<f:convertDateTime pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</p:column>
+								<p:column headerText="Vigencia Hasta:">
+									<h:outputText value="#{pol.fc_fin_vig_date}">
+										<f:convertDateTime pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</p:column>
+								<p:column headerText="Mensualiza:">
+									<h:outputText
+										value="#{pol.fact_periodica_cot == 1 ? 'SI' : 'NO'}">
+									</h:outputText>
+								</p:column>
+								<f:facet name="footer">
+									<p:commandButton update="@this,frm_siniestros:idConsPago"
+										action="#{ControladorSiniestros.onRowSelectPago}"
+										value="Pagos" icon="ui-icon-suitcase"
+										process="@this,frm_siniestros:frmDlgPoliza:listadoPoliza">
+									</p:commandButton>
+								</f:facet>
+							</p:dataTable>
+						</p:row>
+						<p:row>
+							<p:dataTable id="dtSiniesUbc" var="ubc" scrollable="true"
+								scrollHeight="80"
+								value="#{ControladorSiniestros.lstUbicacionPoliza}"
+								selectionMode="single"
+								selection="#{ControladorSiniestros.selectedUbicacionPoliza}"
+								rowKey="#{ubc.cd_ubicacion}"
+								style="width:500px; font-family:Verdana; font-size: 12px;">
+								<f:facet name="header">
+						            Seleccione la Ubicación
+						        </f:facet>
+								<p:ajax event="rowSelect"
+									listener="#{ControladorSiniestros.onRowSelectUbicacion}"
+									update="@this,frm_siniestros:frmDlgPoliza:dtSiniesObjeto,frm_siniestros:frmDlgPoliza:dtSiniesCaract" />
+								<p:column headerText="Cod." style="width:40px;text-align:center">
+									<h:outputText value="#{ubc.cd_ubicacion}" />
+								</p:column>
+								<p:column headerText="Descripción">
+									<h:outputText value="#{ubc.dsc_ubicacion}" />
+								</p:column>
+								<p:column headerText="Plan">
+									<h:outputText value="#{ubc.descripcion_plan}" />
+								</p:column>
+							</p:dataTable>
+						</p:row>
+					</p:panelGrid>
+					<p:panelGrid id="idPGridCaract" columns="2">
+						<p:row>
+							<p:dataTable id="dtSiniesObjeto" var="obj" scrollable="true"
+								scrollHeight="80"
+								value="#{ControladorSiniestros.lstObjetosPoliza}"
+								selectionMode="single"
+								selection="#{ControladorSiniestros.selectedObjetosPoliza}"
+								rowKey="#{obj.cd_obj_cotizacion}"
+								style="width:500px; font-family:Verdana; font-size: 12px;"
+								emptyMessage="No found with given criteria"
+								filteredValue="#{ControladorSiniestros.filteredLstObjetosPoliza}">
+								<f:facet name="header">
+						            Seleccione el Objeto
+						        </f:facet>
+								<p:ajax event="rowSelect"
+									listener="#{ControladorSiniestros.onRowSelectObjeto}"
+									update="@this,frm_siniestros:frmDlgPoliza:dtSiniesCaract,frm_siniestros:frmDlgPoliza:dtSiniesSubObjeto" />
+								<p:column headerText="Cod." style="width:40px;text-align:center">
+									<h:outputText value="#{obj.cd_obj_cotizacion}" />
+								</p:column>
+								<p:column filterBy="#{obj.descripcion_objeto}"
+									headerText="Descripción" filterMatchMode="contains"
+									style="width:150px;">
+									<h:outputText value="#{obj.descripcion_objeto}" />
+								</p:column>
+								<p:column headerText="Fecha Nacimiento">
+									<h:outputText value="#{obj.fecha_nacimiento_obj}">
+										<f:convertDateTime pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</p:column>
+								<p:column headerText="Cédula">
+									<h:outputText value="#{obj.cedula_obj}" />
+								</p:column>
+								<p:column headerText="Fecha Ingreso">
+									<h:outputText value="#{obj.fc_ini_obj_cot_date}">
+										<f:convertDateTime pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</p:column>
+								<p:column headerText="Estado">
+									<h:outputText value="#{obj.estado_Objeto}" />
+								</p:column>
+							</p:dataTable>
+						</p:row>
+						<p:row>
+							<p:dataTable id="dtSiniesCaract" var="caract" scrollable="true"
+								scrollHeight="80"
+								value="#{ControladorSiniestros.lstCaracteristicas}"
+								style="width:500px; font-family:Verdana; font-size: 12px;">
+								<p:column headerText="Cod." style="width:40px;text-align:center">
+									<h:outputText value="#{caract.cd_carac_vh}" />
+								</p:column>
+								<p:column headerText="Placa">
+									<h:outputText value="#{caract.placa}" />
+								</p:column>
+								<p:column headerText="Motor">
+									<h:outputText value="#{caract.no_de_motor}" />
+								</p:column>
+								<p:column headerText="Chasis">
+									<h:outputText value="#{caract.no_de_chasis}" />
+								</p:column>
+								<p:column headerText="Marca">
+									<h:outputText value="#{caract.marca}" />
+								</p:column>
+							</p:dataTable>
+						</p:row>
+						<p:row>
+							<p:dataTable id="dtSiniesSubObjeto" var="subObj"
+								scrollable="true" scrollHeight="80"
+								value="#{ControladorSiniestros.lstSubObjetosPoliza}"
+								selectionMode="single" rowKey="#{subObj.cd_subobj_cotizacion}"
+								style="width:500px; font-family:Verdana; font-size: 10px;">
+								<f:facet name="header">
+				            Seleccione el Sub Objetos
+				        </f:facet>
+								<p:ajax event="rowSelect"
+									listener="#{ControladorSiniestros.onRowSelectSubObjeto}"
+									update="@this" />
+								<p:column headerText="Cod." style="width:40px;text-align:center">
+									<h:outputText value="#{subObj.cd_subobj_cotizacion}" />
+								</p:column>
+								<p:column headerText="Descripción">
+									<h:outputText value="#{subObj.descripcion_subobjeto}" />
+								</p:column>
+								<p:column headerText="Parentesco">
+									<h:outputText value="#{subObj.parentesco}" />
+								</p:column>
+								<p:column headerText="Fecha de Nacimiento">
+									<h:outputText value="#{subObj.fecha_nacimiento_subobj}">
+										<f:convertDateTime pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</p:column>
+								<p:column headerText="Cédula">
+									<h:outputText value="#{subObj.cedula_subobj}" />
+								</p:column>
+								<p:column headerText="Edad">
+									<h:outputText value="#{subObj.edad_subobj}" />
+								</p:column>
+								<p:column headerText="Fecha de Ingreso">
+									<h:outputText value="#{subObj.fc_ini_subobj_cot_date}">
+										<f:convertDateTime pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</p:column>
+							</p:dataTable>
+						</p:row>
+					</p:panelGrid>
+				</h:form>
+			</p:dialog>
+
+			<!-- Registro de siniestros -->
+			<p:dialog header="Siniestro" draggable="false"
+				widgetVar="dlgSiniestro" showEffect="fade" hideEffect="fade"
+				closable="false" maximizable="true">
+				<h:form id="ingresoSiniestro">
+					<p:outputPanel id="carDetail" style="text-align:left;">
+						<p:panel header=" Datos Póliza" style="margin-bottom:20px">
+							<p:panelGrid columns="3">
+								<p:row>
+									<p:panelGrid columns="4">
+										<h:outputText value="No.Siniestro:" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.siniestro.cdSiniestro}"
+											id="otxtcdSini" />
+										<h:outputText value="Año:" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.siniestro.anoSiniestro}"
+											id="otxtcdano" />
+										<h:outputText value="Cliente" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.siniestro.nm_cliente}"
+											id="otxtClie" />
+										<h:outputText value="Cédula/Ruc" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.siniestro.identificacion_cliente}"
+											id="otxtCedClie" />
+										<h:outputText value="Aseguradora:" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.siniestro.nm_aseguradora}"
+											id="otxtnmAseg" />
+										<h:outputText value="Subagente:" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.siniestro.nm_subagente}"
+											id="otxtSuba" />
+									</p:panelGrid>
+								</p:row>
+								<p:row>
+									<p:panelGrid columns="4">
+										<h:outputText value="Póliza:" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.siniestro.poliza}"
+											id="otxtPol" />
+										<h:outputText value="Ramo:" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.siniestro.nm_Ramo}"
+											id="otxtNmRamo" />
+										<h:outputText value="Inicio:" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.siniestro.fc_vig_pol_desde}"
+											id="otxtfcIni">
+											<f:convertDateTime pattern="dd/MM/yyyy" />
+										</h:outputText>
+										<h:outputText value="Fin:" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.siniestro.fc_vig_pol_hasta}"
+											id="otxtfcFin">
+											<f:convertDateTime pattern="dd/MM/yyyy" />
+										</h:outputText>
+										<h:outputText value="Objeto Asegurado:"
+											style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.detalleSiniestros.dsc_objeto}"
+											id="otxtDscObj" />
+										<h:outputText value="Val.Aseg.Obj.:" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.detalleSiniestros.val_asegurado}"
+											id="otxtValAsegObj" />
+										<h:outputText value="Deducible:" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.detalleSiniestros.deducibleMinimo}"
+											id="otxtDeducibleMin" />
+										<h:outputText value="SubObjeto Asegurado:"
+											style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.detalleSiniestros.descripcion_subobjeto}"
+											id="otxtDscSubObj" />
+										<h:outputText value="Val.Aseg.SubObj:"
+											style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.detalleSiniestros.valor_asegurador_subobjeto}"
+											id="otxtValAsegSubObj" />
+										<p:commandButton update="@all" process="@this"
+											action="#{ControladorSiniestros.guardaSiniestro}"
+											value="Salir" id="btnSaveSinies" icon="ui-icon-cancel"
+											styleClass="ui-priority-primary" />
+									</p:panelGrid>
+								</p:row>
+							</p:panelGrid>
+						</p:panel>
+						<p:panel header=" Caracteristicas Objeto"
+							style="margin-bottom:20px"
+							visible="#{ControladorSiniestros.panelCaracteristica}">
+							<p:dataTable var="car" id="tblCarVhCabNew"
+								style="font-family:Verdana; font-size: 10px;"
+								value="#{ControladorSiniestros.lstCaracteristicasCab}">
+								<p:column headerText="Placa">
+									<h:outputText value="#{car.placa}" />
+								</p:column>
+
+								<p:column headerText="Motor">
+									<h:outputText value="#{car.no_de_motor}" />
+								</p:column>
+
+								<p:column headerText="Chasis">
+									<h:outputText value="#{car.no_de_chasis}" />
+								</p:column>
+
+								<p:column headerText="Marca">
+									<h:outputText value="#{car.marca}" />
+								</p:column>
+								<p:column headerText="Modelo">
+									<h:outputText value="#{car.modelo}" />
+								</p:column>
+							</p:dataTable>
+						</p:panel>
+						<p:tabView id="tabSiniestro">
+							<p:tab title="Datos Siniestro">
+								<p:fieldset legend="Datos" toggleable="true" toggleSpeed="500">
+									<p:panelGrid columns="6">
+										<h:outputText value="No. Siniestro Aseguradora:" />
+										<p:inputText id="inptxtNoSinies"
+											value="#{ControladorSiniestros.siniestro.numeroSiniestroAseg}" />
+										<h:outputText value="Fecha Ocurrencia:" />
+										<p:calendar
+											value="#{ControladorSiniestros.siniestro.fcSiniestro}"
+											id="caldFcOcu" />
+										<h:outputText value="Fecha Autorización:" />
+										<p:calendar
+											value="#{ControladorSiniestros.siniestro.fechaAutorizacion}"
+											id="caldFcAut" />
+										<h:outputText value="Observaciones:" />
+										<p:inputTextarea rows="3" style="width: 98%"
+											value="#{ControladorSiniestros.siniestro.referencias}"
+											id="inptxtRef">
+										</p:inputTextarea>
+										<h:outputText value="Ciudad:" />
+										<p:selectOneMenu id="siniesCiudad"
+											value="#{ControladorSiniestros.cdCiudad}">
+											<f:selectItem itemLabel="Select One" itemValue="0" />
+											<f:selectItems value="#{ControladorSiniestros.lstCiudad}"
+												var="ciudadSin" itemValue="#{ciudadSin.cd_ciudad}"
+												itemLabel="#{ciudadSin.nm_ciudad}" />
+										</p:selectOneMenu>
+										<h:outputText value="Correo:" />
+										<p:inputText id="inptxtCorreo"
+											value="#{ControladorSiniestros.siniestro.correo}" />
+										<h:outputText value="Fecha Recepción:" />
+										<p:calendar
+											value="#{ControladorSiniestros.siniestro.fechaRecepcion}"
+											id="caldFcRecp" />
+										<h:outputText value="Caso:" />
+										<p:selectOneMenu id="casoSin"
+											value="#{ControladorSiniestros.siniestro.caso}"
+											style="width:125px">
+											<f:selectItem itemLabel="NORMAL" itemValue="NORMAL" />
+											<f:selectItem itemLabel="CRITICO" itemValue="CRITICO" />
+											<f:selectItem itemLabel="COMERCIAL" itemValue="COMERCIAL" />
+										</p:selectOneMenu>
+										<p:commandButton value="Guardar" id="btnGuardaAux"
+											icon="ui-icon-disk" styleClass="ui-priority-primary"
+											action="#{ControladorSiniestros.guardaDatosSiniestro}"
+											process="@this,frm_siniestros:ingresoSiniestro:tabSiniestro:siniesCiudad,frm_siniestros:ingresoSiniestro:tabSiniestro:inptxtNoSinies,frm_siniestros:ingresoSiniestro:tabSiniestro:caldFcOcu,frm_siniestros:ingresoSiniestro:tabSiniestro:inptxtRef,
+									frm_siniestros:ingresoSiniestro:tabSiniestro:inptxtCorreo,
+									frm_siniestros:ingresoSiniestro:tabSiniestro:caldFcAut,
+									frm_siniestros:ingresoSiniestro:tabSiniestro:caldFcRecp
+									frm_siniestros:ingresoSiniestro:tabSiniestro:casoSin"
+											update="@this" />
+									</p:panelGrid>
+								</p:fieldset>
+								<p:fieldset legend="Deducibles/Coberturas Afectadas"
+									toggleable="true" toggleSpeed="500" collapsed="true">
+									<p:panelGrid columns="3">
+										<p:row>
+											<p:dataTable id="dtCobPol" var="cobPol" scrollable="true"
+												scrollHeight="80"
+												value="#{ControladorSiniestros.lstCoberturasPlan}"
+												selectionMode="single"
+												selection="#{ControladorSiniestros.selectedCoberturasPlan}"
+												rowKey="#{cobPol.cd_cobertura}"
+												style="font-family:Verdana; font-size: 10px;">
+												<f:facet name="header">
+								            Coberturas Póliza
+								        </f:facet>
+												<p:column headerText="Cobertura">
+													<h:outputText value="#{cobPol.desc_cobertura}" />
+												</p:column>
+												<p:column headerText="Porcentaje"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{cobPol.porcentajeplancobertura}" />
+												</p:column>
+												<p:column headerText="Valor"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{cobPol.valor_plancobertura}" />
+												</p:column>
+												<f:facet name="footer">
+													<p:commandButton
+														update="@this frm_siniestros:ingresoSiniestro:tabSiniestro:dtCobDedSinies"
+														action="#{ControladorSiniestros.agregaCoberturaSiniestro}"
+														value="Añadir" icon="ui-icon-plus"
+														process="@this,frm_siniestros:ingresoSiniestro:tabSiniestro:dtCobPol">
+													</p:commandButton>
+												</f:facet>
+											</p:dataTable>
+										</p:row>
+										<p:row>
+											<p:dataTable id="dtCobDed" var="cobDed" scrollable="true"
+												scrollHeight="80"
+												value="#{ControladorSiniestros.lstDeduciblesPlan}"
+												selectionMode="single"
+												selection="#{ControladorSiniestros.selectedDeduciblesPlan}"
+												rowKey="#{cobDed.cd_deducible}"
+												style="font-family:Verdana; font-size: 10px;">
+												<f:facet name="header">
+								            Deducibles Póliza
+								        </f:facet>
+												<p:column headerText="Deducible">
+													<h:outputText value="#{cobDed.desc_deducible}" />
+												</p:column>
+												<p:column headerText="Porc. Valor Siniestro"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{cobDed.porcentaje_valor_siniestro}" />
+												</p:column>
+												<p:column headerText="Porc. Valor Aseguradro"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{cobDed.porcentaje_valor_asegurado}" />
+												</p:column>
+												<p:column headerText="Valor Mínimo"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{cobDed.valor_minimo}" />
+												</p:column>
+												<p:column headerText="Valor Fijo"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{cobDed.valor_fijo}" />
+												</p:column>
+												<f:facet name="footer">
+													<p:commandButton
+														update="@this frm_siniestros:ingresoSiniestro:tabSiniestro:dtCobDedSinies"
+														action="#{ControladorSiniestros.agregaDeducibleSiniestro}"
+														value="Añadir" icon="ui-icon-plus"
+														process="@this,frm_siniestros:ingresoSiniestro:tabSiniestro:dtCobDed">
+													</p:commandButton>
+												</f:facet>
+											</p:dataTable>
+										</p:row>
+										<p:row>
+											<p:dataTable id="dtCobDedSinies" var="cobDedDinies"
+												scrollable="true" scrollHeight="80"
+												value="#{ControladorSiniestros.lstCoberturasSiniestro}"
+												selectionMode="single"
+												selection="#{ControladorSiniestros.selectedCoberturasSiniestro}"
+												rowKey="#{cobDedDinies.cd_cob_siniestro}"
+												style="font-family:Verdana; font-size: 10px;">
+												<f:facet name="header">
+								            Coberturas/Deducibles - Siniestro
+								        </f:facet>
+												<p:column headerText="Descripción"
+													style="width:80px;text-align:center">
+													<h:outputText value="#{cobDedDinies.nm_cobertura}" />
+												</p:column>
+												<p:column headerText="Porc. Cob."
+													style="width:40px;text-align:center">
+													<h:outputText value="#{cobDedDinies.pct_v_aseg}" />
+												</p:column>
+												<p:column headerText="Valor Cob."
+													style="width:40px;text-align:center">
+													<h:outputText value="#{cobDedDinies.val_limite}" />
+												</p:column>
+
+												<p:column headerText="Porc. Valor Siniestro"
+													style="width:40px;text-align:center">
+													<h:outputText
+														value="#{cobDedDinies.porcentaje_valor_siniestro}" />
+												</p:column>
+												<p:column headerText="Porc. Valor Aseguradro"
+													style="width:40px;text-align:center">
+													<h:outputText
+														value="#{cobDedDinies.porcentaje_valor_asegurado}" />
+												</p:column>
+												<p:column headerText="Valor Mínimo"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{cobDedDinies.val_minimo}" />
+												</p:column>
+												<p:column headerText="Valor Fijo"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{cobDedDinies.val_fijo}" />
+												</p:column>
+												<f:facet name="footer">
+													<p:commandButton
+														update="@this frm_siniestros:ingresoSiniestro:tabSiniestro:dtCobDedSinies"
+														action="#{ControladorSiniestros.eliminaCobDedSiniestro}"
+														value="Eliminar" icon="ui-icon-minusthick"
+														process="@this,frm_siniestros:ingresoSiniestro:tabSiniestro:dtCobDedSinies">
+													</p:commandButton>
+												</f:facet>
+											</p:dataTable>
+										</p:row>
+
+									</p:panelGrid>
+								</p:fieldset>
+								<p:fieldset legend="Documentos" toggleable="true"
+									toggleSpeed="500" collapsed="true">
+									<p:panelGrid columns="2">
+										<p:row>
+											<p:dataTable id="dtRubDocSinies" var="rubDocSin"
+												scrollable="true" scrollHeight="80"
+												value="#{ControladorSiniestros.lsRubrosDocumentos}"
+												style="font-family:Verdana; font-size: 10px;"
+												selection="#{ControladorSiniestros.selectedLstRubDoc}"
+												rowKey="#{rubDocSin.cd_rubro}" widgetVar="carsTable"
+												emptyMessage="No se encuentra registro"
+												filteredValue="#{ControladorSiniestros.filteredRubrosDocumentos}">
+
+												<f:facet name="header">
+								            Seleccione los documentos para Gestionar el Siniestro
+								        </f:facet>
+												<p:column selectionMode="multiple"
+													style="width:16px;text-align:left" />
+												<p:column filterBy="#{rubDocSin.desc_rubro}"
+													headerText="Descripción" filterMatchMode="contains">
+													<h:outputText value="#{rubDocSin.desc_rubro}" />
+												</p:column>
+												<f:facet name="footer">
+													<p:panelGrid columns="2">
+
+														<p:commandButton
+															update="@this frm_siniestros:ingresoSiniestro:tabSiniestro:dtDocuSinies"
+															action="#{ControladorSiniestros.agregaDocumentoSinies}"
+															value="Agregar Documento del Listado" icon="ui-icon-plus"
+															process="@this,frm_siniestros:ingresoSiniestro:tabSiniestro:dtRubDocSinies">
+														</p:commandButton>
+														<p:commandButton
+															update="@this frm_siniestros:ingresoSiniestro:tabSiniestro:dtDocuSinies"
+															action="#{ControladorSiniestros.agregaDocAdic}"
+															value="Agrega Documento Adicional" icon="ui-icon-plus"
+															process="@this,frm_siniestros:ingresoSiniestro:tabSiniestro:dtRubDocSinies">
+														</p:commandButton>
+													</p:panelGrid>
+												</f:facet>
+											</p:dataTable>
+										</p:row>
+										<p:row>
+											<p:dataTable id="dtDocuSinies" var="docuSinies"
+												scrollable="true" scrollHeight="80"
+												value="#{ControladorSiniestros.lstDocumentosSiniestro}"
+												selectionMode="single"
+												selection="#{ControladorSiniestros.selectedDocumentoSiniestro}"
+												rowKey="#{docuSinies.cd_doc_siniestro}"
+												style="font-family:Verdana; font-size: 10px;"
+												editable="true">
+												<f:facet name="header">
+								            Documentos - Siniestro
+								        </f:facet>
+												<p:ajax event="rowEdit"
+													listener="#{ControladorSiniestros.onRowEditDocSinies}"
+													update="@this" />
+												<p:column headerText="Descripción"
+													style="width:80px;text-align:center">
+													<h:outputText value="#{docuSinies.tp_doc_siniestro}" />
+												</p:column>
+												<p:column headerText="Fc Recibe Brk"
+													style="width:40px;text-align:center">
+													<p:cellEditor>
+														<f:facet name="output">
+															<h:outputText value="#{docuSinies.fc_recibo_brk}">
+																<f:convertDateTime pattern="dd/MM/yyyy" />
+															</h:outputText>
+														</f:facet>
+														<f:facet name="input">
+															<p:calendar value="#{docuSinies.fc_recibo_brk}" />
+														</f:facet>
+													</p:cellEditor>
+												</p:column>
+												<p:column headerText="Fc Envío Aseg"
+													style="width:40px;text-align:center">
+													<p:cellEditor>
+														<f:facet name="output">
+															<h:outputText value="#{docuSinies.fc_envio_aseg}">
+																<f:convertDateTime pattern="dd/MM/yyyy" />
+															</h:outputText>
+														</f:facet>
+														<f:facet name="input">
+															<p:calendar value="#{docuSinies.fc_envio_aseg}" />
+														</f:facet>
+													</p:cellEditor>
+												</p:column>
+												<p:column headerText="Fc Envío Mail Clie"
+													style="width:40px;text-align:center">
+													<p:cellEditor>
+														<f:facet name="output">
+															<h:outputText value="#{docuSinies.fc_rec_cli_correo}">
+																<f:convertDateTime pattern="dd/MM/yyyy" />
+															</h:outputText>
+														</f:facet>
+														<f:facet name="input">
+															<p:calendar value="#{docuSinies.fc_rec_cli_correo}" />
+														</f:facet>
+													</p:cellEditor>
+												</p:column>
+												<p:column headerText="Fc Recordat Clie"
+													style="width:40px;text-align:center">
+													<p:cellEditor>
+														<f:facet name="output">
+															<h:outputText value="#{docuSinies.fc_recuerda_cli}">
+																<f:convertDateTime pattern="dd/MM/yyyy" />
+															</h:outputText>
+														</f:facet>
+														<f:facet name="input">
+															<p:calendar value="#{docuSinies.fc_recuerda_cli}" />
+														</f:facet>
+													</p:cellEditor>
+												</p:column>
+												<p:column headerText="Observaciones"
+													style="width:80px;text-align:center">
+													<p:cellEditor>
+														<f:facet name="output">
+															<h:outputText value="#{docuSinies.obs_doc_siniestro}" />
+														</f:facet>
+														<f:facet name="input">
+															<p:inputText value="#{docuSinies.obs_doc_siniestro}" />
+														</f:facet>
+													</p:cellEditor>
+												</p:column>
+												<p:column style="width:32px">
+													<p:rowEditor />
+												</p:column>
+												<f:facet name="footer">
+													<p:commandButton
+														update="@this frm_siniestros:ingresoSiniestro:tabSiniestro:dtDocuSinies"
+														action="#{ControladorSiniestros.eliminaDocumentoSinies}"
+														value="Eliminar" icon="ui-icon-minusthick"
+														process="@this,frm_siniestros:ingresoSiniestro:tabSiniestro:dtDocuSinies">
+													</p:commandButton>
+												</f:facet>
+											</p:dataTable>
+										</p:row>
+									</p:panelGrid>
+								</p:fieldset>
+							</p:tab>
+							<p:tab title="Liquidación">
+								<p:fieldset legend="Facturas - Siniestro" toggleable="true"
+									toggleSpeed="500" collapsed="true">
+									<p:panelGrid columns="2">
+										<p:row>
+											<p:panelGrid columns="4">
+												<h:outputText value="Taller:" />
+												<h:selectOneMenu
+													value="#{ControladorSiniestros.codRubroTaller}"
+													id="somTaller">
+													<f:selectItem itemLabel="Seleccione...." itemValue="0" />
+													<f:selectItems
+														value="#{ControladorSiniestros.lsRubrosTalleres}"
+														var="taller" itemValue="#{taller.cd_rubro}"
+														itemLabel="#{taller.desc_rubro}">
+													</f:selectItems>
+												</h:selectOneMenu>
+												<h:outputText value="Diagnostico:" />
+												<h:selectOneMenu
+													value="#{ControladorSiniestros.diagnosticoSlm}"
+													id="somDiag" style="width:150px" autoWidth="false">
+													<f:selectItem itemLabel="Seleccione...." itemValue="0" />
+													<f:selectItems
+														value="#{ControladorSiniestros.lstDiagnostico}" var="diag"
+														itemValue="#{diag.diagnistico}"
+														itemLabel="#{diag.diagnistico}">
+													</f:selectItems>
+												</h:selectOneMenu>
+												<h:outputText value="No.Factura:" />
+												<p:inputText
+													value="#{ControladorSiniestros.proformaSinies.numero_factura}"
+													id="iptxtnumFacliq"></p:inputText>
+
+												<h:outputText value="Proveedor:" />
+												<p:inputText style="text-transform:uppercase;"
+													onkeyup="javascript:this.value=this.value.toUpperCase();"
+													value="#{ControladorSiniestros.proformaSinies.descripcion_Proveedor}"
+													id="inptxtDescripProvliq" />
+												<h:outputText value="Valor:" />
+												<p:inputNumber
+													value="#{ControladorSiniestros.proformaSinies.valor_presentado}"
+													id="inptxtvalPresliq"></p:inputNumber>
+												<p:commandButton
+													update="@this frm_siniestros:ingresoSiniestro:tabSiniestro:dtProformaSinies frm_siniestros:ingresoSiniestro:tabSiniestro:inptxtvalPresliq frm_siniestros:ingresoSiniestro:tabSiniestro:iptxtnumFacliq frm_siniestros:ingresoSiniestro:tabSiniestro:inptxtDescripProvliq"
+													action="#{ControladorSiniestros.agregarProforma}"
+													value="Agregar" icon="ui-icon-plusthick"
+													process="@this,frm_siniestros:ingresoSiniestro:tabSiniestro:somTaller,
+											frm_siniestros:ingresoSiniestro:tabSiniestro:somDiag,
+											frm_siniestros:ingresoSiniestro:tabSiniestro:inptxtvalPresliq,
+											frm_siniestros:ingresoSiniestro:tabSiniestro:iptxtnumFacliq,
+											frm_siniestros:ingresoSiniestro:tabSiniestro:inptxtDescripProvliq
+											frm_siniestros:editaSiniestro:tabSiniestro:inptxtDescripProvliq">
+												</p:commandButton>
+											</p:panelGrid>
+										</p:row>
+										<p:row>
+											<p:dataTable id="dtProformaSinies" var="profSinies"
+												scrollable="true" scrollHeight="80"
+												value="#{ControladorSiniestros.lstProformaSinies}"
+												selectionMode="single"
+												selection="#{ControladorSiniestros.selectedProformaSinies}"
+												rowKey="#{profSinies.cd_proforma}"
+												style="font-family:Verdana; font-size: 10px;">
+												<f:facet name="header">
+								            Facturas - Siniestro
+								        </f:facet>
+												<p:column headerText="Proveedor/Taller"
+													style="width:80px;text-align:center">
+													<h:outputText value="#{profSinies.descripcion_Proveedor}" />
+												</p:column>
+												<p:column headerText="No.Factura"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{profSinies.numero_factura}" />
+												</p:column>
+												<p:column headerText="Fc.Ingreso"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{profSinies.fecha_emision}">
+														<f:convertDateTime pattern="dd/MM/yyyy" />
+													</h:outputText>
+												</p:column>
+												<p:column headerText="Valor"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{profSinies.valor_presentado}" />
+												</p:column>
+												<f:facet name="footer">
+													<p:commandButton
+														update="@this frm_siniestros:ingresoSiniestro:tabSiniestro:dtProformaSinies"
+														action="#{ControladorSiniestros.eliminaProforma}"
+														value="Eliminar" icon="ui-icon-minusthick"
+														process="@this,frm_siniestros:ingresoSiniestro:tabSiniestro:dtProformaSinies">
+													</p:commandButton>
+												</f:facet>
+											</p:dataTable>
+										</p:row>
+									</p:panelGrid>
+								</p:fieldset>
+								<p:fieldset legend="Liquidación Siniestro" toggleable="true"
+									toggleSpeed="500" collapsed="true">
+									<p:dataTable id="dtLiquidacion" var="reservaLst"
+										scrollable="true" scrollHeight="80"
+										value="#{ControladorSiniestros.lstReservas}"
+										selectionMode="single"
+										selection="#{ControladorSiniestros.selectedReservas}"
+										rowKey="#{reservaLst.cd_reserva}"
+										style="font-family:Verdana; font-size: 10px;">
+										<f:facet name="header">
+							        Liquidaciones - Siniestro
+							    </f:facet>
+										<p:column headerText="Valor Siniestro"
+											style="width:80px;text-align:center">
+											<h:outputText value="#{reservaLst.valor_perdida}" />
+										</p:column>
+										<p:column headerText="Deducible"
+											style="width:40px;text-align:center">
+											<h:outputText value="#{reservaLst.val_deducible}" />
+										</p:column>
+										<p:column headerText="Rasa"
+											style="width:40px;text-align:center">
+											<h:outputText value="#{reservaLst.val_rasa}">
+											</h:outputText>
+										</p:column>
+										<p:column headerText="Indemnización"
+											style="width:40px;text-align:center">
+											<h:outputText value="#{reservaLst.val_indemnizacion}" />
+										</p:column>
+										<f:facet name="footer">
+											<p:commandButton
+												update="@this frm_siniestros:ingresoSiniestro:tabSiniestro:dtLiquidacion"
+												action="#{ControladorSiniestros.eliminaReserva}"
+												value="Eliminar" icon="ui-icon-minusthick"
+												process="@this,frm_siniestros:ingresoSiniestro:tabSiniestro:dtLiquidacion">
+											</p:commandButton>
+											<p:commandButton
+												update="@this frm_siniestros:ingresoSiniestro:tabSiniestro:dtLiquidacion frm_siniestros:frmLiqSiniestro:inptxLiqValor frm_siniestros:frmLiqSiniestro:inptxLiqDep
+										frm_siniestros:frmLiqSiniestro:inptxLiqDed frm_siniestros:frmLiqSiniestro:inptxLiqInd frm_siniestros:frmLiqSiniestro:inptxLiqRasa
+										frm_siniestros:frmLiqSiniestro:inptxLiqOtros frm_siniestros:frmLiqSiniestro:inptxLiqTot frm_siniestros:frmLiqSiniestro:inptxLiqFrmPag 
+										frm_siniestros:frmLiqSiniestro:inptxLiqFecFac frm_siniestros:frmLiqSiniestro:inptxLiqBanco frm_siniestros:frmLiqSiniestro:inptxLiqCheq 
+										frm_siniestros:frmLiqSiniestro:inptxLiqCta frm_siniestros:frmLiqSiniestro:inptxLiqEstado frm_siniestros:frmLiqSiniestro:sbChkFiniq 
+										frm_siniestros:frmLiqSiniestroEdit:sbChkFiniq  "
+												action="#{ControladorSiniestros.nuevaLiquidacion}"
+												value="Nuevo" icon="ui-icon-plusthick" process="@this">
+											</p:commandButton>
+										</f:facet>
+									</p:dataTable>
+								</p:fieldset>
+							</p:tab>
+							<p:tab title="Documentos">
+								<p:panelGrid columns="5">
+									<h:outputText value="Tipo de Carta:" />
+									<p:selectOneMenu id="somTpCarta"
+										value="#{ControladorSiniestros.nmCarta}">
+										<f:selectItem itemLabel="-- Seleccione --" itemValue="0" />
+										<f:selectItems value="#{ControladorSiniestros.lstRubrosCarta}"
+											var="cartaTp" itemValue="#{cartaTp.objeto_rubro}"
+											itemLabel="#{cartaTp.desc_rubro}">
+										</f:selectItems>
+										<p:ajax event="change"
+											update="frm_siniestros:ingresoSiniestro:tabSiniestro:cartaDt"
+											listener="#{ControladorSiniestros.recuperaContactosCarta}"
+											process="frm_siniestros:ingresoSiniestro:tabSiniestro:somTpCarta" />
+									</p:selectOneMenu>
+									<h:outputText value="Notas:" />
+									<p:inputTextarea rows="3" cols="60" maxlength="2000"
+										autoResize="false" id="notAdeTxt"
+										value="#{ControladorSiniestros.notasAdicionalesCarta}" />
+									<p:commandButton value="Generar Documento" id="btnSaveCarta"
+										update="@this" icon="ui-icon-document"
+										styleClass="ui-priority-primary"
+										process="@this,frm_siniestros:ingresoSiniestro:tabSiniestro:cartaDt,frm_siniestros:ingresoSiniestro:tabSiniestro:somTpCarta,frm_siniestros:ingresoSiniestro:tabSiniestro:notAdeTxt"
+										action="#{ControladorSiniestros.guardaCarta}" />
+								</p:panelGrid>
+								<p:panel>
+									<p:dataTable id="cartaDt" var="contacto"
+										value="#{ControladorSiniestros.lstContactoCarta}"
+										paginator="true" rows="5"
+										paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+										rowsPerPageTemplate="5,10,15" widgetVar="marcaTable"
+										emptyMessage="No se encuentra datos relacionados"
+										selectionMode="single"
+										selection="#{ControladorSiniestros.selectedContactoCarta}"
+										rowKey="#{contacto.cd_contacto}">
+										<f:facet name="header">
+								            Seleccione el Contacto para Generación del Documento
+								        </f:facet>
+										<p:column headerText="Nombre">
+											<h:outputText value="#{contacto.nombre_contacto}" />
+										</p:column>
+										<p:column headerText="Departamento">
+											<h:outputText value="#{contacto.departamento_contacto}" />
+										</p:column>
+										<p:column headerText="Cargo">
+											<h:outputText value="#{contacto.cargo_contacto}" />
+										</p:column>
+										<p:column headerText="Teléfono">
+											<h:outputText value="#{contacto.telefono_contacto}" />
+										</p:column>
+										<p:column headerText="Celular">
+											<h:outputText value="#{contacto.celular_contacto}" />
+										</p:column>
+										<p:column headerText="Correo">
+											<h:outputText value="#{contacto.mail_contacto}" />
+										</p:column>
+									</p:dataTable>
+								</p:panel>
+							</p:tab>
+						</p:tabView>
+					</p:outputPanel>
+				</h:form>
+			</p:dialog>
+			<p:dialog header="Liquidación Siniestros" draggable="true"
+				showEffect="fade" hideEffect="fade" widgetVar="wDlgLiquidaSiniestro"
+				appendTo="@(body)" modal="true">
+				<h:form id="frmLiqSiniestro">
+					<p:panelGrid columns="4">
+						<h:outputText value="Valor:" />
+						<p:inputNumber
+							value="#{ControladorSiniestros.reservas.valor_perdida}"
+							id="inptxLiqValor"></p:inputNumber>
+						<h:outputText value="Depreciación:" />
+						<p:inputNumber
+							value="#{ControladorSiniestros.reservas.val_depreciacion}"
+							id="inptxLiqDep"></p:inputNumber>
+						<h:outputText value="Deducible:" />
+						<p:inputNumber
+							value="#{ControladorSiniestros.reservas.val_deducible}"
+							id="inptxLiqDed"></p:inputNumber>
+						<h:outputText value="RASA:" />
+						<p:inputNumber value="#{ControladorSiniestros.reservas.val_rasa}"
+							id="inptxLiqRasa"></p:inputNumber>
+						<h:outputText value="Otros Cargos:" />
+						<p:inputNumber value="#{ControladorSiniestros.reservas.val_otros}"
+							id="inptxLiqOtros"></p:inputNumber>
+						<h:outputText value="Gastos No Cubiertos:" />
+						<p:inputNumber
+							value="#{ControladorSiniestros.reservas.gastos_no_cubiertos}"
+							id="inptxGastNoCub"></p:inputNumber>
+						<h:outputText value="%Co-Pago:" />
+						<p:selectOneMenu id="pctCoPago"
+							value="#{ControladorSiniestros.reservas.copago_pct}">
+							<f:selectItem itemLabel="0%" itemValue="0" />
+							<f:selectItem itemLabel="10%" itemValue="0.1" />
+							<f:selectItem itemLabel="20%" itemValue="0.2" />
+							<f:selectItem itemLabel="30%" itemValue="0.3" />
+						</p:selectOneMenu>
+						<h:outputText value="Co-Pago:" />
+						<p:inputNumber
+							value="#{ControladorSiniestros.reservas.copago_val}"
+							id="inptxCopagoVal"></p:inputNumber>
+						<h:outputText value="Valor Liquidado:" />
+						<p:inputNumber
+							value="#{ControladorSiniestros.reservas.val_indemnizacion}"
+							id="inptxLiqInd"></p:inputNumber>
+						<h:outputText value="Total:" />
+						<p:row>
+							<p:inputNumber
+								value="#{ControladorSiniestros.pagoSiniesttro.val_pago}"
+								id="inptxLiqTot" style="width:40px"></p:inputNumber>
+							<p:commandButton
+								update="@this frm_siniestros:frmLiqSiniestro:inptxLiqValor frm_siniestros:frmLiqSiniestro:inptxLiqDep 
+						frm_siniestros:frmLiqSiniestro:inptxLiqDed frm_siniestros:frmLiqSiniestro:inptxLiqInd 
+						frm_siniestros:frmLiqSiniestro:inptxLiqRasa frm_siniestros:frmLiqSiniestro:inptxLiqOtros 
+						frm_siniestros:frmLiqSiniestro:inptxGastNoCub 
+						frm_siniestros:frmLiqSiniestro:inptxLiqTot 
+						frm_siniestros:frmLiqSiniestro:inptxCopagoVal 
+						frm_siniestros:frmLiqSiniestro:pctCoPago "
+								action="#{ControladorSiniestros.calculaPagoLiq}"
+								icon="ui-icon-gear"
+								process="@this,frm_siniestros:frmLiqSiniestro:inptxLiqValor,frm_siniestros:frmLiqSiniestro:inptxLiqDep,
+						frm_siniestros:frmLiqSiniestro:inptxLiqDed,frm_siniestros:frmLiqSiniestro:inptxLiqInd,
+						frm_siniestros:frmLiqSiniestro:inptxLiqRasa,frm_siniestros:frmLiqSiniestro:inptxLiqOtros,
+						frm_siniestros:frmLiqSiniestro:inptxGastNoCub,
+						frm_siniestros:frmLiqSiniestro:inptxCopagoVal,
+						frm_siniestros:frmLiqSiniestro:pctCoPago,
+						frm_siniestros:frmLiqSiniestro:inptxLiqTot"
+								title="Calcular">
+							</p:commandButton>
+						</p:row>
+						<h:outputText value="Forma Pago:" />
+						<p:selectOneMenu id="inptxLiqFrmPag"
+							value="#{ControladorSiniestros.formaPago}" style="width:60px">
+							<f:selectItem itemLabel="- Seleccione -" itemValue="0" />
+							<f:selectItem itemLabel="APLICA DEDUCIBLE"
+								itemValue="APLICA DEDUCIBLE" />
+							<f:selectItem itemLabel="CHEQUE" itemValue="CHEQUE" />
+							<f:selectItem itemLabel="DIRECTO TALLER"
+								itemValue="DIRECTO TALLER" />
+							<f:selectItem itemLabel="EFECTIVO" itemValue="EFECTIVO" />
+							<f:selectItem itemLabel="TRANSFERENCIA" itemValue="TRANSFERENCIA" />
+							<f:selectItem itemLabel="SINIESTRO NEGADO"
+								itemValue="SINIESTRO NEGADO" />
+						</p:selectOneMenu>
+						<h:outputText value="Fecha de Liquidación" />
+						<p:calendar
+							value="#{ControladorSiniestros.pagoSiniesttro.fc_pago}"
+							id="inptxLiqFecFac" style="width:40px" />
+						<h:outputText value="Banco:" />
+						<p:inputText value="#{ControladorSiniestros.pagoSiniesttro.banco}"
+							id="inptxLiqBanco"></p:inputText>
+						<h:outputText value="Cheque:" />
+						<p:inputText
+							value="#{ControladorSiniestros.pagoSiniesttro.cheque}"
+							id="inptxLiqCheq"></p:inputText>
+						<h:outputText value="Cta:" />
+						<p:inputText
+							value="#{ControladorSiniestros.pagoSiniesttro.cta_cte}"
+							id="inptxLiqCta"></p:inputText>
+						<h:outputText value="Estado:" />
+						<p:selectOneMenu id="inptxLiqEstado"
+							value="#{ControladorSiniestros.estado}" style="width:60px">
+							<f:selectItem itemLabel="- Selecciones -" itemValue="0" />
+							<f:selectItem itemLabel="CERRADO SIN PAGO"
+								itemValue="CERRADO SIN PAGO" />
+							<f:selectItem itemLabel="PAGO PARCIAL SINIESTRO"
+								itemValue="PAGO PARCIAL SINIESTRO" />
+							<f:selectItem itemLabel="PAGO TOTAL SINIESTRO"
+								itemValue="PAGO TOTAL SINIESTRO" />
+							<f:selectItem itemLabel="PERDIDA TOTAL" itemValue="PERDIDA TOTAL" />
+							<f:selectItem itemLabel="NEGADO" itemValue="NEGADO" />
+							<f:selectItem itemLabel="NO SUPERA DEDUCIBLE"
+								itemValue="NO SUPERA DEDUCIBLE" />
+							<f:selectItem itemLabel="AUTORIZADO TALLER"
+								itemValue="AUTORIZADO TALLER" />
+						</p:selectOneMenu>
+						<h:outputText value="Finiquito:" />
+						<p:selectBooleanCheckbox value="#{ControladorSiniestros.finiq}"
+							id="sbChkFiniq" />
+						<h:outputText value="Fecha Estado Siniestro:" />
+						<p:calendar id="fcEstSin"
+							value="#{ControladorSiniestros.fcEstadoSiniestro}" />
+						<p:commandButton
+							update="@this frm_siniestros:ingresoSiniestro:tabSiniestro:dtLiquidacion frm_siniestros:frmLiqSiniestro:inptxLiqValor frm_siniestros:frmLiqSiniestro:inptxLiqDep
+					frm_siniestros:frmLiqSiniestro:inptxLiqDed frm_siniestros:frmLiqSiniestro:inptxLiqInd frm_siniestros:frmLiqSiniestro:inptxLiqRasa
+					frm_siniestros:frmLiqSiniestro:inptxLiqOtros frm_siniestros:frmLiqSiniestro:inptxLiqTot frm_siniestros:frmLiqSiniestro:inptxLiqFrmPag 
+					frm_siniestros:frmLiqSiniestro:inptxLiqFecFac frm_siniestros:frmLiqSiniestro:inptxLiqBanco frm_siniestros:frmLiqSiniestro:inptxLiqCheq 
+					frm_siniestros:frmLiqSiniestro:inptxLiqCta frm_siniestros:frmLiqSiniestro:inptxLiqEstado frm_siniestros:frmLiqSiniestro:sbChkFiniq"
+							action="#{ControladorSiniestros.agregaLiquidacio}"
+							value="Guardar" icon="ui-icon-disk"
+							process="@this,frm_siniestros:frmLiqSiniestro:inptxLiqValor,frm_siniestros:frmLiqSiniestro:inptxLiqDep,
+					frm_siniestros:frmLiqSiniestro:inptxLiqDed,frm_siniestros:frmLiqSiniestro:inptxLiqInd,frm_siniestros:frmLiqSiniestro:inptxLiqRasa,
+					frm_siniestros:frmLiqSiniestro:inptxLiqOtros,frm_siniestros:frmLiqSiniestro:inptxLiqTot,frm_siniestros:frmLiqSiniestro:inptxLiqFrmPag,
+					frm_siniestros:frmLiqSiniestro:inptxLiqFecFac,frm_siniestros:frmLiqSiniestro:inptxLiqBanco,frm_siniestros:frmLiqSiniestro:inptxLiqCheq,
+					frm_siniestros:frmLiqSiniestro:inptxLiqCta,frm_siniestros:frmLiqSiniestro:inptxLiqEstado,frm_siniestros:frmLiqSiniestro:sbChkFiniq,
+					frm_siniestros:frmLiqSiniestro:fcEstSin">
+						</p:commandButton>
+						<p:commandButton
+							update="@this frm_siniestros:ingresoSiniestro:tabSiniestro:dtLiquidacion frm_siniestros:frmLiqSiniestro:inptxLiqValor frm_siniestros:frmLiqSiniestro:inptxLiqDep
+					frm_siniestros:frmLiqSiniestro:inptxLiqDed frm_siniestros:frmLiqSiniestro:inptxLiqInd frm_siniestros:frmLiqSiniestro:inptxLiqRasa
+					frm_siniestros:frmLiqSiniestro:inptxLiqOtros frm_siniestros:frmLiqSiniestro:inptxLiqTot frm_siniestros:frmLiqSiniestro:inptxLiqFrmPag 
+					frm_siniestros:frmLiqSiniestro:inptxLiqFecFac frm_siniestros:frmLiqSiniestro:inptxLiqBanco frm_siniestros:frmLiqSiniestro:inptxLiqCheq 
+					frm_siniestros:frmLiqSiniestro:inptxLiqCta frm_siniestros:frmLiqSiniestro:inptxLiqEstado frm_siniestros:frmLiqSiniestro:sbChkFiniq"
+							action="#{ControladorSiniestros.cierraLiquidacionIni}"
+							value="Salir" icon="ui-icon-power"
+							process="@this,frm_siniestros:frmLiqSiniestro:inptxLiqValor,frm_siniestros:frmLiqSiniestro:inptxLiqDep,
+					frm_siniestros:frmLiqSiniestro:inptxLiqDed,frm_siniestros:frmLiqSiniestro:inptxLiqInd,frm_siniestros:frmLiqSiniestro:inptxLiqRasa,
+					frm_siniestros:frmLiqSiniestro:inptxLiqOtros,frm_siniestros:frmLiqSiniestro:inptxLiqTot,frm_siniestros:frmLiqSiniestro:inptxLiqFrmPag,
+					frm_siniestros:frmLiqSiniestro:inptxLiqFecFac,frm_siniestros:frmLiqSiniestro:inptxLiqBanco,frm_siniestros:frmLiqSiniestro:inptxLiqCheq,
+					frm_siniestros:frmLiqSiniestro:inptxLiqCta,frm_siniestros:frmLiqSiniestro:inptxLiqEstado,frm_siniestros:frmLiqSiniestro:sbChkFiniq">
+						</p:commandButton>
+					</p:panelGrid>
+				</h:form>
+			</p:dialog>
+
+			<!-- Editoa siniestros -->
+			<p:dialog header="Siniestro" draggable="false"
+				widgetVar="dlgEditaSiniestro" showEffect="fade" hideEffect="fade"
+				closable="false" maximizable="true">
+				<h:form id="editaSiniestro">
+					<p:outputPanel id="carDetail" style="text-align:left;">
+						<p:panel header=" Datos Póliza" style="margin-bottom:20px">
+							<p:panelGrid columns="3">
+								<p:row>
+									<p:panelGrid columns="4">
+										<h:outputText value="No.Siniestro:" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.siniestro.cdSiniestro}"
+											id="otxtcdSini" />
+										<h:outputText value="Año:" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.siniestro.anoSiniestro}"
+											id="otxtcdano" />
+										<h:outputText value="Cliente" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.siniestro.nm_cliente}"
+											id="otxtClie" />
+										<h:outputText value="Cédula/Ruc" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.siniestro.identificacion_cliente}"
+											id="otxtCedClie" />
+										<h:outputText value="Aseguradora:" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.siniestro.nm_aseguradora}"
+											id="otxtnmAseg" />
+										<h:outputText value="Subagente:" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.siniestro.nm_subagente}"
+											id="otxtSuba" />
+									</p:panelGrid>
+								</p:row>
+								<p:row>
+									<p:panelGrid columns="4">
+										<h:outputText value="Póliza:" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.siniestro.poliza}"
+											id="otxtPol" />
+										<h:outputText value="Ramo:" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.siniestro.nm_Ramo}"
+											id="otxtNmRamo" />
+										<h:outputText value="Inicio:" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.siniestro.fc_vig_pol_desde}"
+											id="otxtfcIni">
+											<f:convertDateTime pattern="dd/MM/yyyy" />
+										</h:outputText>
+										<h:outputText value="Fin:" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.siniestro.fc_vig_pol_hasta}"
+											id="otxtfcFin">
+											<f:convertDateTime pattern="dd/MM/yyyy" />
+										</h:outputText>
+										<h:outputText value="Objeto Asegurado:"
+											style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.detalleSiniestros.dsc_objeto}"
+											id="otxtDscObj" />
+										<h:outputText value="Valor Asegurado:"
+											style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.detalleSiniestros.val_asegurado}"
+											id="otxtValAsegObj" />
+										<h:outputText value="Deducible:" style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.detalleSiniestros.deducibleMinimo}"
+											id="otxtDeducibleMin" />
+										<h:outputText value="SubObjeto Asegurado:"
+											style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.detalleSiniestros.descripcion_subobjeto}"
+											id="otxtDscSubObj" />
+										<h:outputText value="Val.Aseg.SubObj.:"
+											style="font-weight:bold" />
+										<h:outputText
+											value="#{ControladorSiniestros.detalleSiniestros.valor_asegurador_subobjeto}"
+											id="otxtValAsegSubObj" />
+										<p:commandButton update="@all" process="@this"
+											action="#{ControladorSiniestros.guardaSiniestro}"
+											value="Salir" id="btnSaveSinies" icon="ui-icon-cancel"
+											styleClass="ui-priority-primary" />
+									</p:panelGrid>
+								</p:row>
+							</p:panelGrid>
+						</p:panel>
+						<p:panel header=" Caracteristicas Objeto"
+							style="margin-bottom:20px"
+							visible="#{ControladorSiniestros.panelCaracteristica}">
+							<p:dataTable var="car" id="tblCarVhCab"
+								style="font-family:Verdana; font-size: 10px;"
+								value="#{ControladorSiniestros.lstCaracteristicasCab}">
+								<p:column headerText="Placa">
+									<h:outputText value="#{car.placa}" />
+								</p:column>
+
+								<p:column headerText="Motor">
+									<h:outputText value="#{car.no_de_motor}" />
+								</p:column>
+
+								<p:column headerText="Chasis">
+									<h:outputText value="#{car.no_de_chasis}" />
+								</p:column>
+
+								<p:column headerText="Marca">
+									<h:outputText value="#{car.marca}" />
+								</p:column>
+								<p:column headerText="Modelo">
+									<h:outputText value="#{car.modelo}" />
+								</p:column>
+							</p:dataTable>
+						</p:panel>
+						<p:tabView id="tabSiniestro">
+							<p:tab title="Datos Siniestro">
+								<p:fieldset legend="Datos" toggleable="true" toggleSpeed="500">
+									<p:panelGrid columns="6">
+										<h:outputText value="No. Siniestro Aseguradora:" />
+										<p:inputText id="inptxtNoSinies"
+											value="#{ControladorSiniestros.siniestro.numeroSiniestroAseg}" />
+										<h:outputText value="Fecha Ocurrencia:" />
+										<p:calendar
+											value="#{ControladorSiniestros.siniestro.fcSiniestro}"
+											id="caldFcOcu" />
+										<h:outputText value="Fecha Autorización:" />
+										<p:calendar
+											value="#{ControladorSiniestros.siniestro.fechaAutorizacion}"
+											id="caldFcAut" />
+										<h:outputText value="Observaciones:" />
+										<p:inputTextarea rows="3" style="width: 98%"
+											value="#{ControladorSiniestros.siniestro.referencias}"
+											id="inptxtRef">
+										</p:inputTextarea>
+										<h:outputText
+											value="Ciudad: #{ControladorSiniestros.siniestro.nm_ciudad}"
+											id="otxtNmCiudadEdit" />
+										<p:selectOneMenu id="siniesCiudad"
+											value="#{ControladorSiniestros.cdCiudad}">
+											<f:selectItem itemLabel="Select One" itemValue="0" />
+											<f:selectItems value="#{ControladorSiniestros.lstCiudad}"
+												var="ciudadSin" itemValue="#{ciudadSin.cd_ciudad}"
+												itemLabel="#{ciudadSin.nm_ciudad}" />
+										</p:selectOneMenu>
+										<h:outputText value="Correo:" />
+										<p:inputText id="inptxtCorreoEdit"
+											value="#{ControladorSiniestros.siniestro.correo}" />
+										<h:outputText value="Fecha Recepción" />
+										<p:calendar
+											value="#{ControladorSiniestros.siniestro.fechaRecepcion}"
+											id="caldFcRecpEdit" />
+										<h:outputText value="Caso:" />
+										<p:selectOneMenu id="casoSinEdt"
+											value="#{ControladorSiniestros.siniestro.caso}"
+											style="width:125px">
+											<f:selectItem itemLabel="NORMAL" itemValue="NORMAL" />
+											<f:selectItem itemLabel="CRITICO" itemValue="CRITICO" />
+											<f:selectItem itemLabel="COMERCIAL" itemValue="COMERCIAL" />
+										</p:selectOneMenu>
+										<p:commandButton value="Guardar" id="btnGuardaAux"
+											icon="ui-icon-disk" styleClass="ui-priority-primary"
+											action="#{ControladorSiniestros.guardaDatosSiniestro}"
+											process="@this,frm_siniestros:editaSiniestro:tabSiniestro:siniesCiudad,frm_siniestros:editaSiniestro:tabSiniestro:inptxtNoSinies,frm_siniestros:editaSiniestro:tabSiniestro:caldFcOcu,frm_siniestros:editaSiniestro:tabSiniestro:inptxtRef,
+									frm_siniestros:editaSiniestro:tabSiniestro:inptxtCorreoEdit,
+									frm_siniestros:editaSiniestro:tabSiniestro:caldFcAut,
+									frm_siniestros:editaSiniestro:tabSiniestro:caldFcRecpEdit,
+									frm_siniestros:editaSiniestro:tabSiniestro:casoSinEdt"
+											update="@this" />
+									</p:panelGrid>
+								</p:fieldset>
+								<p:fieldset legend="Deducibles/Coberturas Afectadas"
+									toggleable="true" toggleSpeed="500" collapsed="true">
+									<p:panelGrid columns="3">
+										<p:row>
+											<p:dataTable id="dtCobPol" var="cobPol" scrollable="true"
+												scrollHeight="80"
+												value="#{ControladorSiniestros.lstCoberturasPlan}"
+												selectionMode="single"
+												selection="#{ControladorSiniestros.selectedCoberturasPlan}"
+												rowKey="#{cobPol.cd_cobertura}"
+												style="font-family:Verdana; font-size: 10px;">
+												<f:facet name="header">
+								            Coberturas Póliza
+								        </f:facet>
+												<p:column headerText="Cobertura">
+													<h:outputText value="#{cobPol.desc_cobertura}" />
+												</p:column>
+												<p:column headerText="Porcentaje"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{cobPol.porcentajeplancobertura}" />
+												</p:column>
+												<p:column headerText="Valor"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{cobPol.valor_plancobertura}" />
+												</p:column>
+												<f:facet name="footer">
+													<p:commandButton
+														update="@this frm_siniestros:editaSiniestro:tabSiniestro:dtCobDedSinies"
+														action="#{ControladorSiniestros.agregaCoberturaSiniestro}"
+														value="Añadir" icon="ui-icon-plus"
+														process="@this,frm_siniestros:editaSiniestro:tabSiniestro:dtCobPol">
+													</p:commandButton>
+												</f:facet>
+											</p:dataTable>
+										</p:row>
+										<p:row>
+											<p:dataTable id="dtCobDed" var="cobDed" scrollable="true"
+												scrollHeight="80"
+												value="#{ControladorSiniestros.lstDeduciblesPlan}"
+												selectionMode="single"
+												selection="#{ControladorSiniestros.selectedDeduciblesPlan}"
+												rowKey="#{cobDed.cd_deducible}"
+												style="font-family:Verdana; font-size: 10px;">
+												<f:facet name="header">
+								            Deducibles Póliza
+								        </f:facet>
+												<p:column headerText="Deducible">
+													<h:outputText value="#{cobDed.desc_deducible}" />
+												</p:column>
+												<p:column headerText="Porc. Valor Siniestro"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{cobDed.porcentaje_valor_siniestro}" />
+												</p:column>
+												<p:column headerText="Porc. Valor Asegurado"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{cobDed.porcentaje_valor_asegurado}" />
+												</p:column>
+												<p:column headerText="Valor Mínimo"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{cobDed.valor_minimo}" />
+												</p:column>
+												<p:column headerText="Valor Fijo"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{cobDed.valor_fijo}" />
+												</p:column>
+												<f:facet name="footer">
+													<p:commandButton
+														update="@this frm_siniestros:editaSiniestro:tabSiniestro:dtCobDedSinies"
+														action="#{ControladorSiniestros.agregaDeducibleSiniestro}"
+														value="Añadir" icon="ui-icon-plus"
+														process="@this,frm_siniestros:editaSiniestro:tabSiniestro:dtCobDed">
+													</p:commandButton>
+												</f:facet>
+											</p:dataTable>
+										</p:row>
+										<p:row>
+											<p:dataTable id="dtCobDedSinies" var="cobDedDinies"
+												scrollable="true" scrollHeight="80"
+												value="#{ControladorSiniestros.lstCoberturasSiniestro}"
+												selectionMode="single"
+												selection="#{ControladorSiniestros.selectedCoberturasSiniestro}"
+												rowKey="#{cobDedDinies.cd_cob_siniestro}"
+												style="font-family:Verdana; font-size: 10px;">
+												<f:facet name="header">
+							            Coberturas/Deducibles - Siniestro
+							        </f:facet>
+												<p:column headerText="Descripción"
+													style="width:80px;text-align:center">
+													<h:outputText value="#{cobDedDinies.nm_cobertura}" />
+												</p:column>
+												<p:column headerText="Porc. Cob."
+													style="width:40px;text-align:center">
+													<h:outputText value="#{cobDedDinies.pct_v_aseg}" />
+												</p:column>
+												<p:column headerText="Valor Cob."
+													style="width:40px;text-align:center">
+													<h:outputText value="#{cobDedDinies.val_limite}" />
+												</p:column>
+
+												<p:column headerText="Porc. Valor Siniestro"
+													style="width:40px;text-align:center">
+													<h:outputText
+														value="#{cobDedDinies.porcentaje_valor_siniestro}" />
+												</p:column>
+												<p:column headerText="Porc. Valor Aseguradro"
+													style="width:40px;text-align:center">
+													<h:outputText
+														value="#{cobDedDinies.porcentaje_valor_asegurado}" />
+												</p:column>
+												<p:column headerText="Valor Mínimo"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{cobDedDinies.val_minimo}" />
+												</p:column>
+												<p:column headerText="Valor Fijo"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{cobDedDinies.val_fijo}" />
+												</p:column>
+												<f:facet name="footer">
+													<p:commandButton
+														update="@this frm_siniestros:editaSiniestro:tabSiniestro:dtCobDedSinies"
+														action="#{ControladorSiniestros.eliminaCobDedSiniestro}"
+														value="Eliminar" icon="ui-icon-minusthick"
+														process="@this,frm_siniestros:editaSiniestro:tabSiniestro:dtCobDedSinies">
+													</p:commandButton>
+												</f:facet>
+											</p:dataTable>
+										</p:row>
+
+									</p:panelGrid>
+								</p:fieldset>
+								<p:fieldset legend="Documentos" toggleable="true"
+									toggleSpeed="500" collapsed="true">
+									<p:panelGrid columns="2">
+										<p:row>
+											<p:dataTable id="dtRubDocSinies" var="rubDocSin"
+												scrollable="true" scrollHeight="80"
+												value="#{ControladorSiniestros.lsRubrosDocumentos}"
+												style="font-family:Verdana; font-size: 10px;"
+												selection="#{ControladorSiniestros.selectedLstRubDoc}"
+												rowKey="#{rubDocSin.cd_rubro}" widgetVar="carsTable"
+												emptyMessage="No se encuentra registro"
+												filteredValue="#{ControladorSiniestros.filteredRubrosDocumentos}">
+
+												<f:facet name="header">
+								            Seleccione los documentos para Gestionar el Siniestro
+								        </f:facet>
+												<p:column selectionMode="multiple"
+													style="width:16px;text-align:left" />
+												<p:column filterBy="#{rubDocSin.desc_rubro}"
+													headerText="Descripción" filterMatchMode="contains">
+													<h:outputText value="#{rubDocSin.desc_rubro}" />
+												</p:column>
+												<f:facet name="footer">
+													<p:panelGrid columns="2">
+														<p:commandButton
+															update="@this frm_siniestros:editaSiniestro:tabSiniestro:dtDocuSinies"
+															action="#{ControladorSiniestros.agregaDocumentoSinies}"
+															value="Agregar Documento del Listado" icon="ui-icon-plus"
+															process="@this,frm_siniestros:editaSiniestro:tabSiniestro:dtRubDocSinies">
+														</p:commandButton>
+														<p:commandButton
+															update="@this frm_siniestros:frmDocAdiSinies:txtDocAdcSin"
+															action="#{ControladorSiniestros.agregaDocAdic}"
+															value="Agrega Documento Adicional" icon="ui-icon-plus"
+															process="@this">
+														</p:commandButton>
+													</p:panelGrid>
+												</f:facet>
+											</p:dataTable>
+										</p:row>
+										<p:row>
+											<p:dataTable id="dtDocuSinies" var="docuSinies"
+												scrollable="true" scrollHeight="80"
+												value="#{ControladorSiniestros.lstDocumentosSiniestro}"
+												selectionMode="single"
+												selection="#{ControladorSiniestros.selectedDocumentoSiniestro}"
+												rowKey="#{docuSinies.cd_doc_siniestro}"
+												style="font-family:Verdana; font-size: 10px;"
+												editable="true">
+												<f:facet name="header">
+								            Documentos - Siniestro
+								        </f:facet>
+												<p:ajax event="rowEdit"
+													listener="#{ControladorSiniestros.onRowEditDocSinies}"
+													update="@this" />
+												<p:column headerText="Descripción"
+													style="width:80px;text-align:center">
+													<h:outputText value="#{docuSinies.tp_doc_siniestro}" />
+												</p:column>
+												<p:column headerText="Fc Recibe Brk"
+													style="width:40px;text-align:center">
+													<p:cellEditor>
+														<f:facet name="output">
+															<h:outputText value="#{docuSinies.fc_recibo_brk}">
+																<f:convertDateTime pattern="dd/MM/yyyy" />
+															</h:outputText>
+														</f:facet>
+														<f:facet name="input">
+															<p:calendar value="#{docuSinies.fc_recibo_brk}" />
+														</f:facet>
+													</p:cellEditor>
+												</p:column>
+												<p:column headerText="Fc Envío Aseg"
+													style="width:40px;text-align:center">
+													<p:cellEditor>
+														<f:facet name="output">
+															<h:outputText value="#{docuSinies.fc_envio_aseg}">
+																<f:convertDateTime pattern="dd/MM/yyyy" />
+															</h:outputText>
+														</f:facet>
+														<f:facet name="input">
+															<p:calendar value="#{docuSinies.fc_envio_aseg}" />
+														</f:facet>
+													</p:cellEditor>
+												</p:column>
+												<p:column headerText="Fc Envío Mail Clie"
+													style="width:40px;text-align:center">
+													<p:cellEditor>
+														<f:facet name="output">
+															<h:outputText value="#{docuSinies.fc_rec_cli_correo}">
+																<f:convertDateTime pattern="dd/MM/yyyy" />
+															</h:outputText>
+														</f:facet>
+														<f:facet name="input">
+															<p:calendar value="#{docuSinies.fc_rec_cli_correo}" />
+														</f:facet>
+													</p:cellEditor>
+												</p:column>
+												<p:column headerText="Fc Recordat Clie"
+													style="width:40px;text-align:center">
+													<p:cellEditor>
+														<f:facet name="output">
+															<h:outputText value="#{docuSinies.fc_recuerda_cli}">
+																<f:convertDateTime pattern="dd/MM/yyyy" />
+															</h:outputText>
+														</f:facet>
+														<f:facet name="input">
+															<p:calendar value="#{docuSinies.fc_recuerda_cli}" />
+														</f:facet>
+													</p:cellEditor>
+												</p:column>
+												<p:column headerText="Observaciones"
+													style="width:80px;text-align:center">
+													<p:cellEditor>
+														<f:facet name="output">
+															<h:outputText value="#{docuSinies.obs_doc_siniestro}" />
+														</f:facet>
+														<f:facet name="input">
+															<p:inputText value="#{docuSinies.obs_doc_siniestro}" />
+														</f:facet>
+													</p:cellEditor>
+												</p:column>
+												<p:column style="width:32px">
+													<p:rowEditor />
+												</p:column>
+												<f:facet name="footer">
+													<p:commandButton
+														update="@this frm_siniestros:editaSiniestro:tabSiniestro:dtDocuSinies"
+														action="#{ControladorSiniestros.eliminaDocumentoSinies}"
+														value="Eliminar" icon="ui-icon-minusthick"
+														process="@this,frm_siniestros:editaSiniestro:tabSiniestro:dtDocuSinies">
+													</p:commandButton>
+												</f:facet>
+											</p:dataTable>
+										</p:row>
+									</p:panelGrid>
+								</p:fieldset>
+							</p:tab>
+							<p:tab title="Liquidación">
+								<p:fieldset legend="Facturas - Siniestro" toggleable="true"
+									toggleSpeed="500" collapsed="true">
+									<p:panelGrid columns="2">
+										<p:row>
+											<p:panelGrid columns="4">
+												<h:outputText value="Taller:" />
+												<h:selectOneMenu
+													value="#{ControladorSiniestros.codRubroTaller}"
+													id="somTaller">
+													<f:selectItem itemLabel="Seleccione...." itemValue="0" />
+													<f:selectItems
+														value="#{ControladorSiniestros.lsRubrosTalleres}"
+														var="taller" itemValue="#{taller.cd_rubro}"
+														itemLabel="#{taller.desc_rubro}">
+													</f:selectItems>
+												</h:selectOneMenu>
+												<h:outputText value="Diagnostico:" />
+												<h:selectOneMenu
+													value="#{ControladorSiniestros.diagnosticoSlm}"
+													id="somDiag" style="width:150px" autoWidth="false">
+													<f:selectItem itemLabel="Seleccione...." itemValue="0" />
+													<f:selectItems
+														value="#{ControladorSiniestros.lstDiagnostico}" var="diag"
+														itemValue="#{diag.diagnistico}"
+														itemLabel="#{diag.diagnistico}">
+													</f:selectItems>
+												</h:selectOneMenu>
+												<h:outputText value="No.Factura:" />
+												<p:inputText
+													value="#{ControladorSiniestros.proformaSinies.numero_factura}"
+													id="iptxtnumFacliq"></p:inputText>
+												<h:outputText value="Proveedor:" />
+												<p:inputText
+													value="#{ControladorSiniestros.proformaSinies.descripcion_Proveedor}"
+													id="inptxtDescripProvliq"></p:inputText>
+												<h:outputText value="Valor:" />
+												<p:inputNumber
+													value="#{ControladorSiniestros.proformaSinies.valor_presentado}"
+													id="inptxtvalPresliq"></p:inputNumber>
+												<p:commandButton
+													update="@this frm_siniestros:editaSiniestro:tabSiniestro:dtProformaSinies frm_siniestros:editaSiniestro:tabSiniestro:inptxtvalPresliq frm_siniestros:editaSiniestro:tabSiniestro:iptxtnumFacliq frm_siniestros:editaSiniestro:tabSiniestro:inptxtDescripProvliq"
+													action="#{ControladorSiniestros.agregarProforma}"
+													value="Agregar" icon="ui-icon-plusthick"
+													process="@this,frm_siniestros:editaSiniestro:tabSiniestro:somTaller,
+											frm_siniestros:editaSiniestro:tabSiniestro:somDiag,
+											frm_siniestros:editaSiniestro:tabSiniestro:inptxtvalPresliq,frm_siniestros:editaSiniestro:tabSiniestro:iptxtnumFacliq,frm_siniestros:editaSiniestro:tabSiniestro:inptxtDescripProvliq">
+												</p:commandButton>
+											</p:panelGrid>
+										</p:row>
+										<p:row>
+											<p:dataTable id="dtProformaSinies" var="profSinies"
+												scrollable="true" scrollHeight="80"
+												value="#{ControladorSiniestros.lstProformaSinies}"
+												selectionMode="single"
+												selection="#{ControladorSiniestros.selectedProformaSinies}"
+												rowKey="#{profSinies.cd_proforma}"
+												style="font-family:Verdana; font-size: 10px;">
+												<f:facet name="header">
+							            Facturas - Siniestro
+							        </f:facet>
+												<p:column headerText="Proveedor/Taller"
+													style="width:80px;text-align:center">
+													<h:outputText value="#{profSinies.descripcion_Proveedor}" />
+												</p:column>
+												<p:column headerText="No.Factura"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{profSinies.numero_factura}" />
+												</p:column>
+												<p:column headerText="Valor"
+													style="width:40px;text-align:center">
+													<h:outputText value="#{profSinies.valor_presentado}" />
+												</p:column>
+												<f:facet name="footer">
+													<p:commandButton
+														update="@this frm_siniestros:editaSiniestro:tabSiniestro:dtProformaSinies"
+														action="#{ControladorSiniestros.eliminaProforma}"
+														value="Eliminar" icon="ui-icon-minusthick"
+														process="@this,frm_siniestros:editaSiniestro:tabSiniestro:dtProformaSinies">
+													</p:commandButton>
+												</f:facet>
+											</p:dataTable>
+										</p:row>
+									</p:panelGrid>
+								</p:fieldset>
+								<p:fieldset legend="Liquidación Siniestro" toggleable="true"
+									toggleSpeed="500" collapsed="true">
+									<p:dataTable id="dtLiquidacion" var="reservaLst"
+										scrollable="true" scrollHeight="80"
+										value="#{ControladorSiniestros.lstReservas}"
+										selectionMode="single"
+										selection="#{ControladorSiniestros.selectedReservas}"
+										rowKey="#{reservaLst.cd_reserva}"
+										style="font-family:Verdana; font-size: 10px;">
+										<f:facet name="header">
+							            Liquidaciones - Siniestro
+							        </f:facet>
+										<p:column headerText="Valor Siniestro"
+											style="width:80px;text-align:center">
+											<h:outputText value="#{reservaLst.valor_perdida}" />
+										</p:column>
+										<p:column headerText="Deducible"
+											style="width:40px;text-align:center">
+											<h:outputText value="#{reservaLst.val_deducible}" />
+										</p:column>
+										<p:column headerText="Rasa"
+											style="width:40px;text-align:center">
+											<h:outputText value="#{reservaLst.val_rasa}">
+											</h:outputText>
+										</p:column>
+										<p:column headerText="Indemnización"
+											style="width:40px;text-align:center">
+											<h:outputText value="#{reservaLst.val_indemnizacion}" />
+										</p:column>
+										<f:facet name="footer">
+											<p:commandButton
+												update="@this frm_siniestros:editaSiniestro:tabSiniestro:dtLiquidacion"
+												action="#{ControladorSiniestros.eliminaReserva}"
+												value="Eliminar" icon="ui-icon-minusthick"
+												process="@this,frm_siniestros:editaSiniestro:tabSiniestro:dtLiquidacion">
+											</p:commandButton>
+											<p:commandButton
+												update="@this frm_siniestros:editaSiniestro:tabSiniestro:dtLiquidacion frm_siniestros:frmLiqSiniestroEdit:inptxLiqValor frm_siniestros:frmLiqSiniestroEdit:inptxLiqDep
+										frm_siniestros:frmLiqSiniestroEdit:inptxLiqDed frm_siniestros:frmLiqSiniestroEdit:inptxLiqInd frm_siniestros:frmLiqSiniestroEdit:inptxLiqRasa
+										frm_siniestros:frmLiqSiniestroEdit:inptxLiqOtros frm_siniestros:frmLiqSiniestroEdit:inptxLiqTot frm_siniestros:frmLiqSiniestroEdit:inptxLiqFrmPag 
+										frm_siniestros:frmLiqSiniestroEdit:inptxLiqFecFac frm_siniestros:frmLiqSiniestroEdit:inptxLiqBanco frm_siniestros:frmLiqSiniestroEdit:inptxLiqCheq 
+										frm_siniestros:frmLiqSiniestroEdit:inptxLiqCta frm_siniestros:frmLiqSiniestroEdit:inptxLiqEstado frm_siniestros:frmLiqSiniestroEdit:sbChkFiniq 
+										frm_siniestros:frmLiqSiniestroEdit:inptxGastNoCubEdt frm_siniestros:frmLiqSiniestroEdit:inptxCopagoValEdt
+										frm_siniestros:frmLiqSiniestroEdit:sbChkFiniq"
+												action="#{ControladorSiniestros.editaLiquidacion }"
+												value="Nuevo" icon="ui-icon-plusthick" process="@this">
+											</p:commandButton>
+										</f:facet>
+									</p:dataTable>
+								</p:fieldset>
+							</p:tab>
+							<p:tab title="Documentos">
+								<p:panelGrid columns="5">
+									<h:outputText value="Tipo de Carta:" />
+									<p:selectOneMenu id="somTpCartaEdt"
+										value="#{ControladorSiniestros.nmCarta}">
+										<f:selectItem itemLabel="-- Seleccione --" itemValue="0" />
+										<f:selectItems value="#{ControladorSiniestros.lstRubrosCarta}"
+											var="cartaTp" itemValue="#{cartaTp.objeto_rubro}"
+											itemLabel="#{cartaTp.desc_rubro}">
+										</f:selectItems>
+										<p:ajax event="change"
+											update="frm_siniestros:editaSiniestro:tabSiniestro:cartaDtEdt"
+											listener="#{ControladorSiniestros.recuperaContactosCarta}"
+											process="frm_siniestros:editaSiniestro:tabSiniestro:somTpCartaEdt" />
+									</p:selectOneMenu>
+									<h:outputText value="Notas:" />
+									<p:inputTextarea rows="3" cols="60" maxlength="2000"
+										autoResize="false" id="notAdeTxtEdt"
+										value="#{ControladorSiniestros.notasAdicionalesCarta}" />
+									<p:commandButton value="Generar Documento" id="btnSaveCartaEdt"
+										update="@this" icon="ui-icon-document"
+										styleClass="ui-priority-primary"
+										process="@this,frm_siniestros:editaSiniestro:tabSiniestro:somTpCartaEdt,frm_siniestros:editaSiniestro:tabSiniestro:notAdeTxtEdt,frm_siniestros:editaSiniestro:tabSiniestro:cartaDtEdt"
+										action="#{ControladorSiniestros.guardaCarta}" />
+								</p:panelGrid>
+								<p:panel>
+									<p:dataTable id="cartaDtEdt" var="contacto"
+										value="#{ControladorSiniestros.lstContactoCarta}"
+										paginator="true" rows="5"
+										paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+										rowsPerPageTemplate="5,10,15" widgetVar="marcaTable"
+										emptyMessage="No se encuentra datos relacionados"
+										selectionMode="single"
+										selection="#{ControladorSiniestros.selectedContactoCarta}"
+										rowKey="#{contacto.cd_contacto}">
+										<f:facet name="header">
+						            Seleccione el Contacto para Generación del Documento
+						        </f:facet>
+										<p:column headerText="Nombre">
+											<h:outputText value="#{contacto.nombre_contacto}" />
+										</p:column>
+										<p:column headerText="Departamento">
+											<h:outputText value="#{contacto.departamento_contacto}" />
+										</p:column>
+										<p:column headerText="Cargo">
+											<h:outputText value="#{contacto.cargo_contacto}" />
+										</p:column>
+										<p:column headerText="Teléfono">
+											<h:outputText value="#{contacto.telefono_contacto}" />
+										</p:column>
+										<p:column headerText="Celular">
+											<h:outputText value="#{contacto.celular_contacto}" />
+										</p:column>
+										<p:column headerText="Correo">
+											<h:outputText value="#{contacto.mail_contacto}" />
+										</p:column>
+									</p:dataTable>
+								</p:panel>
+							</p:tab>
+						</p:tabView>
+					</p:outputPanel>
+				</h:form>
+			</p:dialog>
+			<!-- Inicia Dialogo Edita Liquidacion de Objeto-->
+			<p:dialog header="Liquidación Siniestros" draggable="true"
+				showEffect="fade" hideEffect="fade"
+				widgetVar="wDlgLiquidaSiniestroEdit" closable="false"
+				appendTo="@(body)" modal="true">
+				<h:form id="frmLiqSiniestroEdit">
+					<p:panelGrid columns="4">
+						<h:outputText value="Valor:" />
+						<p:inputNumber
+							value="#{ControladorSiniestros.reservas.valor_perdida}"
+							id="inptxLiqValor"></p:inputNumber>
+						<h:outputText value="Depreciación:" />
+						<p:inputNumber
+							value="#{ControladorSiniestros.reservas.val_depreciacion}"
+							id="inptxLiqDep"></p:inputNumber>
+						<h:outputText value="Deducible:" />
+						<p:inputNumber
+							value="#{ControladorSiniestros.reservas.val_deducible}"
+							id="inptxLiqDed"></p:inputNumber>
+
+						<h:outputText value="RASA:" />
+						<p:inputNumber value="#{ControladorSiniestros.reservas.val_rasa}"
+							id="inptxLiqRasa"></p:inputNumber>
+						<h:outputText value="Otros Cargos:" />
+						<p:inputNumber value="#{ControladorSiniestros.reservas.val_otros}"
+							id="inptxLiqOtros"></p:inputNumber>
+						<h:outputText value="Gastos No Cubiertos:" />
+						<p:inputNumber
+							value="#{ControladorSiniestros.reservas.gastos_no_cubiertos}"
+							id="inptxGastNoCubEdt"></p:inputNumber>
+						<h:outputText value="%Co-Pago:" />
+						<p:selectOneMenu id="pctCoPagoEdt"
+							value="#{ControladorSiniestros.reservas.copago_pct}">
+							<f:selectItem itemLabel="0%" itemValue="0" />
+							<f:selectItem itemLabel="10%" itemValue="0.1" />
+							<f:selectItem itemLabel="20%" itemValue="0.2" />
+							<f:selectItem itemLabel="30%" itemValue="0.3" />
+						</p:selectOneMenu>
+						<h:outputText value="Co-Pago:" />
+						<p:inputNumber
+							value="#{ControladorSiniestros.reservas.copago_val}"
+							id="inptxCopagoValEdt"></p:inputNumber>
+						<h:outputText value="Valor Liquidado:" />
+						<p:inputNumber
+							value="#{ControladorSiniestros.reservas.val_indemnizacion}"
+							id="inptxLiqInd"></p:inputNumber>
+						<h:outputText value="Total:" />
+						<p:row>
+							<p:inputNumber
+								value="#{ControladorSiniestros.pagoSiniesttro.val_pago}"
+								id="inptxLiqTot" style="width:40px"></p:inputNumber>
+							<p:commandButton
+								update="@this frm_siniestros:frmLiqSiniestroEdit:inptxLiqValor frm_siniestros:frmLiqSiniestroEdit:inptxLiqDep 
+						frm_siniestros:frmLiqSiniestroEdit:inptxLiqDed frm_siniestros:frmLiqSiniestroEdit:inptxLiqInd 
+						frm_siniestros:frmLiqSiniestroEdit:inptxLiqRasa frm_siniestros:frmLiqSiniestroEdit:inptxLiqOtros 
+						frm_siniestros:frmLiqSiniestroEdit:inptxGastNoCubEdt frm_siniestros:frmLiqSiniestroEdit:pctCoPagoEdt
+						frm_siniestros:frmLiqSiniestroEdit:inptxCopagoValEdt frm_siniestros:frmLiqSiniestroEdit:inptxLiqTot"
+								action="#{ControladorSiniestros.calculaPagoLiq}"
+								icon="ui-icon-gear"
+								process="@this,frm_siniestros:frmLiqSiniestroEdit:inptxLiqValor,frm_siniestros:frmLiqSiniestroEdit:inptxLiqDep,
+						frm_siniestros:frmLiqSiniestroEdit:inptxLiqDed,frm_siniestros:frmLiqSiniestroEdit:inptxLiqInd,
+						frm_siniestros:frmLiqSiniestroEdit:inptxLiqRasa,frm_siniestros:frmLiqSiniestroEdit:inptxLiqOtros,
+						frm_siniestros:frmLiqSiniestroEdit:inptxGastNoCubEdt,frm_siniestros:frmLiqSiniestroEdit:pctCoPagoEdt,
+						frm_siniestros:frmLiqSiniestroEdit:inptxCopagoValEdt,
+						frm_siniestros:frmLiqSiniestroEdit:inptxLiqTot"
+								title="Calcular">
+							</p:commandButton>
+						</p:row>
+
+						<h:outputText value="Forma Pago:" />
+						<p:selectOneMenu id="inptxLiqFrmPag"
+							value="#{ControladorSiniestros.formaPago}" style="width:60px">
+							<f:selectItem itemLabel="- Seleccione -" itemValue="0" />
+							<f:selectItem itemLabel="APLICA DEDUCIBLE"
+								itemValue="APLICA DEDUCIBLE" />
+							<f:selectItem itemLabel="CHEQUE" itemValue="CHEQUE" />
+							<f:selectItem itemLabel="DIRECTO TALLER"
+								itemValue="DIRECTO TALLER" />
+							<f:selectItem itemLabel="EFECTIVO" itemValue="EFECTIVO" />
+							<f:selectItem itemLabel="TRANSFERENCIA" itemValue="TRANSFERENCIA" />
+							<f:selectItem itemLabel="SINIESTRO NEGADO"
+								itemValue="SINIESTRO NEGADO" />
+						</p:selectOneMenu>
+						<h:outputText value="Fecha Pago:" />
+						<p:calendar
+							value="#{ControladorSiniestros.pagoSiniesttro.fc_pago}"
+							id="inptxLiqFecFac" style="width:40px" />
+						<h:outputText value="Banco:" />
+						<p:inputText value="#{ControladorSiniestros.pagoSiniesttro.banco}"
+							id="inptxLiqBanco"></p:inputText>
+						<h:outputText value="Cheque:" />
+						<p:inputText
+							value="#{ControladorSiniestros.pagoSiniesttro.cheque}"
+							id="inptxLiqCheq"></p:inputText>
+						<h:outputText value="Cta:" />
+						<p:inputText
+							value="#{ControladorSiniestros.pagoSiniesttro.cta_cte}"
+							id="inptxLiqCta"></p:inputText>
+						<h:outputText value="Estado:" />
+						<p:selectOneMenu id="inptxLiqEstado"
+							value="#{ControladorSiniestros.estado}" style="width:60px">
+							<f:selectItem itemLabel="- Seleccione -" itemValue="0" />
+							<f:selectItem itemLabel="CERRADO SIN PAGO"
+								itemValue="CERRADO SIN PAGO" />
+							<f:selectItem itemLabel="PAGO PARCIAL SINIESTRO"
+								itemValue="PAGO PARCIAL SINIESTRO" />
+							<f:selectItem itemLabel="PAGO TOTAL SINIESTRO"
+								itemValue="PAGO TOTAL SINIESTRO" />
+							<f:selectItem itemLabel="PERDIDA TOTAL" itemValue="PERDIDA TOTAL" />
+							<f:selectItem itemLabel="NEGADO" itemValue="NEGADO" />
+							<f:selectItem itemLabel="NO SUPERA DEDUCIBLE"
+								itemValue="NO SUPERA DEDUCIBLE" />
+							<f:selectItem itemLabel="AUTORIZADO TALLER"
+								itemValue="AUTORIZADO TALLER" />
+
+						</p:selectOneMenu>
+						<h:outputText value="Finiquito:" />
+						<p:selectBooleanCheckbox value="#{ControladorSiniestros.finiq}"
+							id="sbChkFiniq" />
+						<h:outputText value="Fecha Estado Siniestro:" />
+						<p:calendar id="fcEstSinEd"
+							value="#{ControladorSiniestros.fcEstadoSiniestro}" />
+						<p:commandButton
+							update="@this frm_siniestros:editaSiniestro:tabSiniestro:dtLiquidacion frm_siniestros:frmLiqSiniestroEdit:inptxLiqValor frm_siniestros:frmLiqSiniestroEdit:inptxLiqDep
+					frm_siniestros:frmLiqSiniestroEdit:inptxLiqDed frm_siniestros:frmLiqSiniestroEdit:inptxLiqInd frm_siniestros:frmLiqSiniestroEdit:inptxLiqRasa
+					frm_siniestros:frmLiqSiniestroEdit:inptxLiqOtros frm_siniestros:frmLiqSiniestroEdit:inptxLiqTot frm_siniestros:frmLiqSiniestroEdit:inptxLiqFrmPag 
+					frm_siniestros:frmLiqSiniestroEdit:inptxLiqFecFac frm_siniestros:frmLiqSiniestroEdit:inptxLiqBanco frm_siniestros:frmLiqSiniestroEdit:inptxLiqCheq 
+					frm_siniestros:frmLiqSiniestroEdit:inptxLiqCta frm_siniestros:frmLiqSiniestroEdit:inptxLiqEstado frm_siniestros:frmLiqSiniestroEdit:sbChkFiniq"
+							action="#{ControladorSiniestros.agregaLiquidacionEdit}"
+							value="Guardar" icon="ui-icon-disk"
+							process="@this,frm_siniestros:frmLiqSiniestroEdit:inptxLiqValor,frm_siniestros:frmLiqSiniestroEdit:inptxLiqDep,
+					frm_siniestros:frmLiqSiniestroEdit:inptxLiqDed,frm_siniestros:frmLiqSiniestroEdit:inptxLiqInd,frm_siniestros:frmLiqSiniestroEdit:inptxLiqRasa,
+					frm_siniestros:frmLiqSiniestroEdit:inptxLiqOtros,frm_siniestros:frmLiqSiniestroEdit:inptxLiqTot,frm_siniestros:frmLiqSiniestroEdit:inptxLiqFrmPag,
+					frm_siniestros:frmLiqSiniestroEdit:inptxLiqFecFac,frm_siniestros:frmLiqSiniestroEdit:inptxLiqBanco,frm_siniestros:frmLiqSiniestroEdit:inptxLiqCheq,
+					frm_siniestros:frmLiqSiniestroEdit:inptxLiqCta,frm_siniestros:frmLiqSiniestroEdit:inptxLiqEstado,frm_siniestros:frmLiqSiniestroEdit:sbChkFiniq,
+					frm_siniestros:frmLiqSiniestroEdit:fcEstSinEd">
+						</p:commandButton>
+
+						<p:commandButton
+							update="@this frm_siniestros:editaSiniestro:tabSiniestro:dtLiquidacion frm_siniestros:frmLiqSiniestroEdit:inptxLiqValor frm_siniestros:frmLiqSiniestroEdit:inptxLiqDep
+					frm_siniestros:frmLiqSiniestroEdit:inptxLiqDed frm_siniestros:frmLiqSiniestroEdit:inptxLiqInd frm_siniestros:frmLiqSiniestroEdit:inptxLiqRasa
+					frm_siniestros:frmLiqSiniestroEdit:inptxLiqOtros frm_siniestros:frmLiqSiniestroEdit:inptxLiqTot frm_siniestros:frmLiqSiniestroEdit:inptxLiqFrmPag 
+					frm_siniestros:frmLiqSiniestroEdit:inptxLiqFecFac frm_siniestros:frmLiqSiniestroEdit:inptxLiqBanco frm_siniestros:frmLiqSiniestroEdit:inptxLiqCheq 
+					frm_siniestros:frmLiqSiniestroEdit:inptxLiqCta frm_siniestros:frmLiqSiniestroEdit:inptxLiqEstado frm_siniestros:frmLiqSiniestroEdit:sbChkFiniq"
+							action="#{ControladorSiniestros.cierraLiquidacion}" value="Salir"
+							icon="ui-icon-power"
+							process="@this,frm_siniestros:frmLiqSiniestroEdit:inptxLiqValor,frm_siniestros:frmLiqSiniestroEdit:inptxLiqDep,
+					frm_siniestros:frmLiqSiniestroEdit:inptxLiqDed,frm_siniestros:frmLiqSiniestroEdit:inptxLiqInd,frm_siniestros:frmLiqSiniestroEdit:inptxLiqRasa,
+					frm_siniestros:frmLiqSiniestroEdit:inptxLiqOtros,frm_siniestros:frmLiqSiniestroEdit:inptxLiqTot,frm_siniestros:frmLiqSiniestroEdit:inptxLiqFrmPag,
+					frm_siniestros:frmLiqSiniestroEdit:inptxLiqFecFac,frm_siniestros:frmLiqSiniestroEdit:inptxLiqBanco,frm_siniestros:frmLiqSiniestroEdit:inptxLiqCheq,
+					frm_siniestros:frmLiqSiniestroEdit:inptxLiqCta,frm_siniestros:frmLiqSiniestroEdit:inptxLiqEstado,frm_siniestros:frmLiqSiniestroEdit:sbChkFiniq">
+						</p:commandButton>
+
+
+					</p:panelGrid>
+				</h:form>
+			</p:dialog>
+
+
+		</h:form>
+	</ui:define>
+	<ui:define name="tituloFormulario">Siniestros</ui:define>
+</ui:composition>
+</html>

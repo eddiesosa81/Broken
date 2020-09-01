@@ -1,0 +1,70 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/templates/Template.xhtml">
+	<ui:define name="tituloPagina">Certificados Emitidos</ui:define>
+	<ui:define name="contenido">
+		<p:ajaxStatus
+			style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+			<f:facet name="start">
+				<p:graphicImage value="/images/ajax-loadercircle.gif" />
+			</f:facet>
+			<f:facet name="complete">
+				<h:outputText value="" />
+			</f:facet>
+		</p:ajaxStatus>
+		<h:form id="frm_correspondencia">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<p:menubar>
+				<p:menuitem value="Inicio" icon="ui-icon-home"
+					url="/Broken/emisionMensualizado/comercial.jsf"></p:menuitem>
+			</p:menubar>
+			<h:panelGrid columns="2">
+				<h:outputText value="Número Documento: " />
+				<p:inputText id="iptxtNoDoc"
+					value="#{ControladorCorrespMensual.numDoc}"></p:inputText>
+				<p:commandButton value="Consultar" styleClass="ui-priority-primary"
+					action="#{ControladorCorrespMensual.cargarCorrespondencia}"
+					icon="ui-icon-search" update="@this,frm_correspondencia:dtCorrespon" />
+				<p:commandButton value="Imprimir" id="btnPrint"
+					action="#{ControladorCorrespMensual.execute()}" ajax="false"
+					styleClass="ui-priority-primary" icon="ui-icon-print"
+					style="width:100px; font-family:Verdana; font-size: 12px;"
+					update="@all">
+				</p:commandButton>
+			</h:panelGrid>
+			<p:dataTable id="dtCorrespon" var="correspondencia"
+				value="#{ControladorCorrespMensual.listCorrespon}"
+				selectionMode="single"
+				selection="#{ControladorCorrespMensual.selectedCorrespond}"
+				rowKey="#{correspondencia.cd_correspondencia}" scrollable="true"
+				scrollHeight="150" style="font-family:Verdana; font-size: 10px;">
+				<f:facet name="header">
+	            	Certificados
+	        	</f:facet>
+				<p:column headerText="Año" sortBy="#{correspondencia.anio}">
+					<h:outputText value="#{correspondencia.anio}" />
+				</p:column>
+				<p:column headerText="# Carta" sortBy="#{correspondencia.num_Carta}">
+					<h:outputText value="#{correspondencia.num_Carta}" />
+				</p:column>
+				<p:column headerText="# Fecha" sortBy="#{correspondencia.fecha}">
+					<h:outputText value="#{correspondencia.fecha}" />
+				</p:column>
+				<p:column headerText="Cliente" sortBy="#{correspondencia.nmContacto}">
+					<h:outputText value="#{correspondencia.nmContacto}" />
+				</p:column>
+				<p:column headerText="Elaborado Por"
+					sortBy="#{correspondencia.elaboradorPor}">
+					<h:outputText value="#{correspondencia.elaboradorPor}" />
+				</p:column>
+			</p:dataTable>
+		</h:form>
+	</ui:define>
+	<ui:define name="tituloFormulario">Certificados Emitidos</ui:define>
+</ui:composition>
+</html>

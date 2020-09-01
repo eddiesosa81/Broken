@@ -1,0 +1,594 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+	<h:panelGrid columns="2" cellpadding="5">
+		<p:row>
+			<p:dataTable id="dtPlan" var="plan"
+				value="#{ControladorPlanes.lstPlanRamAseg}" scrollable="true"
+				scrollHeight="150"
+				style="width:500px; font-family:Verdana; font-size: 12px;"
+				selectionMode="single"
+				selection="#{ControladorPlanes.selectedPlanRamAseg}"
+				rowKey="#{plan.cd_plan}"
+				emptyMessage="No se encuentra en la busqueda"
+				filteredValue="#{ControladorPlanes.lstFilteredPlanRamAseg}"
+				editable="true">
+				<f:facet name="header">
+			            Planes
+			        </f:facet>
+				<p:ajax event="rowEdit"
+					listener="#{ControladorPlanes.onRowEditPlan}" update="@this" />
+				<p:ajax event="rowSelect"
+					listener="#{ControladorPlanes.onRowSelect}"
+					update="frm_planes:dtClausulas,frm_planes:dtCobertura,frm_planes:dtDeducible" />
+
+				<p:column headerText="Aseguradora"
+					filterBy="#{plan.nombreCortoAseguradora}"
+					sortBy="#{plan.nombreCortoAseguradora}" filterMatchMode="contains">
+					<h:outputText value="#{plan.nombreCortoAseguradora}" />
+				</p:column>
+				<p:column headerText="Ramo" filterBy="#{plan.descRamo}"
+					sortBy="#{plan.descRamo}" filterMatchMode="contains">
+					<h:outputText value="#{plan.descRamo}" />
+				</p:column>
+
+				<p:column headerText="Descripción Plan">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{plan.descripcionPlan}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputText id="descInput" value="#{plan.descripcionPlan}"
+								style="width:100%" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column style="width:32px">
+					<p:rowEditor />
+				</p:column>
+			</p:dataTable>
+			<p:commandButton value="Agregar" icon="ui-icon-plusthick"
+				id="btnNuevoPlan" update="@this" styleClass="ui-priority-primary"
+				actionListener="#{ControladorPlanes.nuevoPlan}" process="@this" />
+			<p:commandButton value="Copiar" icon="ui-icon-comment"
+				id="btnCopiaPlan" update="@this" styleClass="ui-priority-primary"
+				actionListener="#{ControladorPlanes.copiaPlan}" process="@this" />
+			<p:commandButton value="Depreciación" icon="ui-icon-unlocked"
+				id="btnPlanDepreciacion" update="@this frm_planes:dtDeprePlan"
+				styleClass="ui-priority-primary"
+				actionListener="#{ControladorPlanes.depreciacionPlan}"
+				process="@this" />
+			<p:commandButton value="Desactivar" icon="ui-icon-minusthick"
+				id="btnEliminaPlan" update="@this,:frm_planes:dtPlan"
+				styleClass="ui-priority-primary"
+				actionListener="#{ControladorPlanes.eliminaPlan}"
+				process="@this,:frm_planes:dtPlan">
+				<p:confirm header="Confirmación"
+					message="Desea desactivar el registro?" icon="ui-icon-alert" />
+			</p:commandButton>
+		</p:row>
+		<p:row>
+			<p:dataTable id="dtCobertura" var="cob"
+				value="#{ControladorPlanes.lstCoberturasPlan}" scrollable="true"
+				scrollHeight="150"
+				style="width:500px; font-family:Verdana; font-size: 12px;"
+				selectionMode="single"
+				selection="#{ControladorPlanes.selectedCoberturasPlan}"
+				rowKey="#{cob.cd_plancobertura}"
+				emptyMessage="No se encuentra en la busqueda"
+				filteredValue="#{ControladorPlanes.lstFilteredCoberturasPlan}"
+				editable="true">
+				<f:facet name="header">
+			            Coberturas
+			        </f:facet>
+				<p:ajax event="rowEdit"
+					listener="#{ControladorPlanes.onRowEditCobertura}"
+					update="@this,frm_planes:dtCobertura" />
+
+				<p:column headerText="Descripción Cobertura"
+					filterBy="#{cob.desc_cobertura}" sortBy="#{cob.desc_cobertura}"
+					filterMatchMode="contains">
+					<h:outputText value="#{cob.desc_cobertura}" style="width:80px" />
+				</p:column>
+				<p:column headerText="Porcentae">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{cob.porcentajeplancobertura}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputNumber value="#{cob.porcentajeplancobertura}"
+								style="width:100%" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Valor">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{cob.valor_plancobertura}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputNumber value="#{cob.valor_plancobertura}"
+								style="width:100%" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column style="width:32px">
+					<p:rowEditor />
+				</p:column>
+			</p:dataTable>
+			<p:commandButton value="Agregar" icon="ui-icon-plusthick"
+				id="btnNuevoaCobertura" update="@this frm_planes:checkboxDTCob"
+				styleClass="ui-priority-primary"
+				actionListener="#{ControladorPlanes.nuevaCobertura}" process="@this" />
+			<p:commandButton value="Desactivar" icon="ui-icon-minusthick"
+				id="btnEliminaCobertura" update="@this frm_planes:dtCobertura"
+				styleClass="ui-priority-primary"
+				actionListener="#{ControladorPlanes.eliminaCobertura}"
+				process="@this,frm_planes:dtCobertura">
+				<p:confirm header="Confirmación"
+					message="Desea desactivar el registro?" icon="ui-icon-alert" />
+			</p:commandButton>
+			<p:commandButton value="Modifica Nombre"
+				icon="ui-icon-transferthick-e-w" id="btnModNmCobertura"
+				update="frm_planes:pnlNmCobertura" styleClass="ui-priority-primary"
+				actionListener="#{ControladorPlanes.cambiaNombreCobertura}"
+				process="@this">
+			</p:commandButton>
+			<p:commandButton value="Salir" id="btnSalir" icon="ui-icon-cancel"
+				styleClass="ui-priority-primary"
+				action="#{ControladorPlanes.guardaSiniestro}" process="@this"
+				update="@this" />
+			<p:panel id="pnlNmCobertura" visible="#{ControladorPlanes.btnNmCob}"
+				header="Actualiza Datos Cobertura">
+				<h:outputText value="Descripción :" />
+				<p:inputText id="float-input" value="#{ControladorPlanes.inptNmCob}"
+					style="text-transform:uppercase;"
+					onkeyup="javascript:this.value=this.value.toUpperCase();" />
+				<p:commandButton value="Guardar" icon="ui-icon-transferthick-e-w"
+					update="frm_planes:dtCobertura,frm_planes:float-input,frm_planes:pnlNmCobertura"
+					styleClass="ui-priority-primary"
+					actionListener="#{ControladorPlanes.guardaNmCob}"
+					process="@this,frm_planes:dtCobertura,frm_planes:float-input">
+				</p:commandButton>
+			</p:panel>
+		</p:row>
+		<p:row>
+			<p:dataTable id="dtDeducible" var="ded"
+				value="#{ControladorPlanes.lstPlanDeducibles}" scrollable="true"
+				scrollHeight="150"
+				style="width:500px; font-family:Verdana; font-size: 12px;"
+				selectionMode="single"
+				selection="#{ControladorPlanes.selectedPlanDeducibles}"
+				rowKey="#{ded.cd_plandeducible}"
+				emptyMessage="No se encuentra en la busqueda"
+				filteredValue="#{ControladorPlanes.lstFilteredPlanDeducibles}"
+				editable="true">
+				<f:facet name="header">
+			            Deducibles
+			        </f:facet>
+				<p:ajax event="rowEdit"
+					listener="#{ControladorPlanes.onRowEditDeducible}"
+					update="@this,frm_planes:dtDeducible" />
+				<p:column headerText="Descripción Deducible"
+					filterBy="#{ded.desc_deducible}" sortBy="#{ded.desc_deducible}"
+					filterMatchMode="contains">
+					<h:outputText value="#{ded.desc_deducible}" />
+				</p:column>
+				<p:column headerText="% Valor Siniestro">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{ded.porcentaje_valor_siniestro}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputNumber value="#{ded.porcentaje_valor_siniestro}"
+								style="width:100%" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="% Valor Asegurado">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{ded.porcentaje_valor_asegurado}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputNumber value="#{ded.porcentaje_valor_asegurado}"
+								style="width:100%" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Valor Mínimo">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{ded.valor_minimo}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputNumber value="#{ded.valor_minimo}" style="width:100%" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Valor Fijo">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{ded.valor_fijo}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputNumber value="#{ded.valor_fijo}" style="width:100%" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column style="width:32px">
+					<p:rowEditor />
+				</p:column>
+			</p:dataTable>
+			<p:commandButton value="Agregar" icon="ui-icon-plusthick"
+				id="btnNuevoDeducible"
+				update="@this frm_planes:checkboxDTded frm_planes:inptNumPorValSin 
+				frm_planes:inptNumPorValAseg frm_planes:inptNumValMin frm_planes:inptNumValFijo "
+				styleClass="ui-priority-primary"
+				actionListener="#{ControladorPlanes.nuevoDeducible}" process="@this" />
+			<p:commandButton value="Desactivar" icon="ui-icon-minusthick"
+				id="btnEliminaDeducible" update="@this frm_planes:dtDeducible"
+				styleClass="ui-priority-primary"
+				actionListener="#{ControladorPlanes.eliminaDeducible}"
+				process="@this frm_planes:dtDeducible">
+				<p:confirm header="Confirmación"
+					message="Desea desactivar el registro?" icon="ui-icon-alert" />
+			</p:commandButton>
+		</p:row>
+		<p:row>
+			<p:dataTable id="dtClausulas" var="cla"
+				value="#{ControladorPlanes.lstPlanCalusulaView}" scrollable="true"
+				scrollHeight="150"
+				style="width:500px; font-family:Verdana; font-size: 12px;"
+				selectionMode="single"
+				selection="#{ControladorPlanes.selectedPlanCalusulaView}"
+				rowKey="#{cla.cd_planclausula}"
+				emptyMessage="No se encuentra en la busqueda"
+				filteredValue="#{ControladorPlanes.lstFilteredPlanCalusulaView}"
+				editable="true">
+				<f:facet name="header">
+			            Clausulas
+			        </f:facet>
+				<p:ajax event="rowEdit"
+					listener="#{ControladorPlanes.onRowEditClausula}"
+					update="@this,frm_planes:dtClausulas" />
+				<p:column headerText="Descripción Clausula"
+					filterBy="#{cla.desc_clausula}" sortBy="#{cla.desc_clausula}"
+					filterMatchMode="contains">
+					<h:outputText value="#{cla.desc_clausula}" />
+				</p:column>
+				<p:column headerText="Porcentaje">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{cla.porcentaje_planclausula}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputNumber value="#{cla.porcentaje_planclausula}"
+								style="width:100%" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Valor">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{cla.valor_planclausula}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputNumber value="#{cla.valor_planclausula}"
+								style="width:100%" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column style="width:32px">
+					<p:rowEditor />
+				</p:column>
+			</p:dataTable>
+			<p:commandButton value="Agregar" icon="ui-icon-plusthick"
+				id="btnNuevaClausula" update="@this"
+				styleClass="ui-priority-primary"
+				actionListener="#{ControladorPlanes.nuevaClausula}" process="@this" />
+			<p:commandButton value="Desactivar" icon="ui-icon-minusthick"
+				id="btnEliminaClausula" update="@this frm_planes:dtClausulas"
+				styleClass="ui-priority-primary"
+				actionListener="#{ControladorPlanes.eliminaClausula}"
+				process="@this,frm_planes:dtClausulas ">
+				<p:confirm header="Confirmación"
+					message="Desea desactivar el registro?" icon="ui-icon-alert" />
+			</p:commandButton>
+		</p:row>
+	</h:panelGrid>
+	<p:confirmDialog id="confirmDelete" global="true" showEffect="fade"
+		hideEffect="fade">
+		<p:commandButton value="Si" type="button"
+			styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+		<p:commandButton value="No" type="button"
+			styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+	</p:confirmDialog>
+	<!-- Inicia Dialogo Planes -->
+	<p:dialog header="Planes" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgNuevoPlan" closable="true">
+		<h:panelGrid columns="2" style="width:100%;text-align:left;">
+			<h:outputText value="Aseguradora" />
+			<p:selectOneMenu id="inpTxtAseg" value="#{ControladorPlanes.codAseg}">
+				<f:selectItem itemLabel="Select One" itemValue="0" />
+				<f:selectItems var="aseg"
+					value="#{ControladorPlanes.lstAseguradora}"
+					itemLabel="#{aseg.nombre_corto_aseguradora}"
+					itemValue="#{aseg.cd_aseguradora}" />
+			</p:selectOneMenu>
+			<h:outputText value="Ramo" />
+			<p:selectOneMenu id="inpTxtRamo" value="#{ControladorPlanes.codRamo}">
+				<f:selectItem itemLabel="Select One" itemValue="0" />
+				<f:selectItems var="ram" value="#{ControladorPlanes.lstRamo}"
+					itemLabel="#{ram.desc_ramo}" itemValue="#{ram.cd_ramo}" />
+			</p:selectOneMenu>
+			<h:outputText value="Descripción Plan" />
+			<p:inputText value="#{ControladorPlanes.descPlan}"
+				id="inpTxtDscPlan1" style="text-transform:uppercase;"
+				onkeyup="javascript:this.value=this.value.toUpperCase();" />
+		</h:panelGrid>
+		<p:commandButton icon="ui-icon-check" value="Guardar"
+			process="@this,frm_planes:inpTxtAseg,frm_planes:inpTxtRamo,frm_planes:inpTxtDscPlan1"
+			update="@this,:frm_planes:dtPlan"
+			action="#{ControladorPlanes.guardaPlan}">
+		</p:commandButton>
+	</p:dialog>
+	<!-- fin Dialogo Planes -->
+	<!-- Inicia Dialogo Copia Planes -->
+	<p:dialog header="Planes" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgCopiaPlan" closable="true">
+		<h:panelGrid columns="2" style="width:100%;text-align:left;">
+			<h:outputText value="Aseguradora" />
+			<p:selectOneMenu id="inpTxtAsegIns"
+				value="#{ControladorPlanes.codAsegIns}">
+				<f:selectItems var="asegIns"
+					value="#{ControladorPlanes.lstAseguradora}"
+					itemLabel="#{asegIns.nombre_corto_aseguradora}"
+					itemValue="#{asegIns.cd_aseguradora}" />
+			</p:selectOneMenu>
+			<h:outputText value="Descripción Plan" />
+			<p:inputText value="#{ControladorPlanes.descPlan}" id="inpTxtDscPlan"
+				style="text-transform:uppercase;"
+				onkeyup="javascript:this.value=this.value.toUpperCase();" />
+		</h:panelGrid>
+		<p:commandButton icon="ui-icon-check" value="Guardar"
+			process="@this,frm_planes:inpTxtDscPlan,frm_planes:inpTxtAsegIns"
+			update="@this,:frm_planes:dtPlan,frm_planes:inpTxtDscPlan"
+			action="#{ControladorPlanes.guardaCopiaPlan}">
+		</p:commandButton>
+	</p:dialog>
+	<!-- fin Dialogo Planes -->
+	<!-- Inicia Dialogo Coberturas -->
+	<p:dialog header="Coberturas" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgNuevaCobertura" closable="true">
+		<h:panelGrid columns="2">
+			<p:row>
+				<p:dataTable id="checkboxDTCob" var="cob"
+					value="#{ControladorPlanes.lstCoberturas}"
+					selection="#{ControladorPlanes.selectedLstCoberturas}"
+					rowKey="#{cob.cd_cobertura}" style="width:500px;" scrollable="true"
+					scrollHeight="150" emptyMessage="No hay registros en la busqueda"
+					filteredValue="#{ControladorPlanes.lstFilteredCoberturas}">
+
+					<f:facet name="header">
+				            Coberturas
+				        </f:facet>
+					<p:column selectionMode="multiple"
+						style="width:16px;text-align:center" />
+
+					<p:column headerText="Descripción" filterBy="#{cob.desc_cobertura}"
+						sortBy="#{cob.desc_cobertura}" filterMatchMode="contains">
+						<h:outputText value="#{cob.desc_cobertura}" />
+					</p:column>
+				</p:dataTable>
+			</p:row>
+			<p:row>
+				<h:panelGrid columns="2">
+					<h:outputText value="Porcentaje" />
+					<p:inputNumber value="#{ControladorPlanes.porcCob}"
+						id="inptNumPor2"></p:inputNumber>
+					<h:outputText value="Valor" />
+					<p:inputNumber value="#{ControladorPlanes.valorCob}"
+						id="inptNumValC"></p:inputNumber>
+				</h:panelGrid>
+			</p:row>
+		</h:panelGrid>
+		<p:commandButton icon="ui-icon-check" value="Guardar"
+			process="@this,frm_planes:checkboxDTCob,frm_planes:inptNumPor2,frm_planes:inptNumValC,frm_planes:dtCobertura"
+			update="@this frm_planes:dtCobertura"
+			action="#{ControladorPlanes.guardaCobertura}">
+		</p:commandButton>
+		<p:commandButton value="Limpiar" icon="ui-icon-refresh"
+			update="@this frm_planes:checkboxDTCob"
+			actionListener="#{ControladorPlanes.limpiaCoberturas}"
+			process="@this" />
+	</p:dialog>
+	<!-- fin Dialogo Coberturas -->
+	<!-- Inicia Dialogo Deducible -->
+	<p:dialog header="Deducibles" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgNuevoDeducible" closable="true">
+		<h:panelGrid columns="2">
+			<p:row>
+				<p:dataTable id="checkboxDTded2" var="dedu"
+					value="#{ControladorPlanes.lstDeducibles}"
+					selection="#{ControladorPlanes.selectedlstDeducibles}"
+					rowKey="#{dedu.cd_deducible}" style="width:500px;"
+					scrollable="true" scrollHeight="150"
+					emptyMessage="No hay registros en la busqueda"
+					filteredValue="#{ControladorPlanes.lstFilteredDeducibles}">
+
+					<f:facet name="header">
+				            Deducibles
+				        </f:facet>
+					<p:column selectionMode="multiple"
+						style="width:16px;text-align:center" />
+
+					<p:column headerText="Descripción"
+						filterBy="#{dedu.desc_deducible}" sortBy="#{dedu.desc_deducible}"
+						filterMatchMode="contains">
+						<h:outputText value="#{dedu.desc_deducible}" />
+					</p:column>
+				</p:dataTable>
+			</p:row>
+			<p:row>
+				<h:panelGrid columns="2">
+					<h:outputText value="% Valor Siniestro" />
+					<p:inputNumber value="#{ControladorPlanes.porcDedValSin}"
+						id="inptNumPorValSin"></p:inputNumber>
+					<h:outputText value="% Valor Asegurado" />
+					<p:inputNumber value="#{ControladorPlanes.porcDedValAseg}"
+						id="inptNumPorValAseg"></p:inputNumber>
+					<h:outputText value="Valor Mínimo" />
+					<p:inputNumber value="#{ControladorPlanes.valorDedMin}"
+						id="inptNumValMin"></p:inputNumber>
+					<h:outputText value="Valor Fijo" />
+					<p:inputNumber value="#{ControladorPlanes.valorDedFijo}"
+						id="inptNumValFijo"></p:inputNumber>
+				</h:panelGrid>
+			</p:row>
+		</h:panelGrid>
+		<p:commandButton icon="ui-icon-check" value="Guardar"
+			process="@this,frm_planes:checkboxDTded2,frm_planes:inptNumPorValSin,
+				frm_planes:inptNumPorValAseg,frm_planes:inptNumValMin,frm_planes:inptNumValFijo"
+			update="@this frm_planes:dtDeducible"
+			action="#{ControladorPlanes.guardaDeducible}">
+		</p:commandButton>
+	</p:dialog>
+	<!-- fin Dialogo Deducibl -->
+	<!-- Inicia Dialogo Clausulas -->
+	<p:dialog header="Cláusulas" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgNuevaClausula" closable="true">
+		<h:panelGrid columns="2">
+			<p:row>
+				<p:dataTable id="checkboxDTded" var="clausu"
+					value="#{ControladorPlanes.lstClausulas}"
+					selection="#{ControladorPlanes.selectedlstClausulas}"
+					rowKey="#{clausu.cd_clausula}" style="width:500px;"
+					scrollable="true" scrollHeight="150"
+					emptyMessage="No hay registros en la busqueda"
+					filteredValue="#{ControladorPlanes.lstFilteredClausulas}">
+
+					<f:facet name="header">
+				            Cláusula
+				        </f:facet>
+					<p:column selectionMode="multiple"
+						style="width:16px;text-align:center" />
+
+					<p:column headerText="Descripción"
+						filterBy="#{clausu.desc_clausula}"
+						sortBy="#{clausu.desc_clausula}" filterMatchMode="contains">
+						<h:outputText value="#{clausu.desc_clausula}" />
+					</p:column>
+				</p:dataTable>
+			</p:row>
+			<p:row>
+				<h:panelGrid columns="2">
+					<h:outputText value="Porcentaje" />
+					<p:inputNumber value="#{ControladorPlanes.porcClau}"
+						id="inptNumPor"></p:inputNumber>
+					<h:outputText value="Valor" />
+					<p:inputNumber value="#{ControladorPlanes.valorClau}"
+						id="inptNumVal"></p:inputNumber>
+				</h:panelGrid>
+			</p:row>
+		</h:panelGrid>
+		<p:commandButton icon="ui-icon-check" value="Guardar"
+			process="@this,frm_planes:checkboxDTded,frm_planes:inptNumPor,frm_planes:inptNumVal"
+			update="@this frm_planes:dtClausulas"
+			action="#{ControladorPlanes.guardaClausula}">
+		</p:commandButton>
+		<p:commandButton value="Limpiar" icon="ui-icon-refresh"
+			update="@this frm_planes:checkboxDTded"
+			actionListener="#{ControladorPlanes.limpiaClausulas}" process="@this" />
+	</p:dialog>
+	<!-- fin Dialogo Deducibl -->
+	<!-- Inicia Dialogo Depreciacion Planes -->
+	<p:dialog header="Depreciación" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgDepreciacionPlan" closable="true">
+		<p:panelGrid columns="3">
+			<h:outputText value="Número de Años:"></h:outputText>
+			<p:inputNumber id="imptNumAnio"
+				value="#{ControladorPlanes.numAnioDepre}"></p:inputNumber>
+			<p:commandButton icon="ui-icon-plus" value="Nuevo"
+				process="@this,frm_planes:imptNumAnio"
+				update="@this frm_planes:dtDeprePlan"
+				action="#{ControladorPlanes.generaDepre}">
+			</p:commandButton>
+		</p:panelGrid>
+		<p:dataTable id="dtDeprePlan" var="planDep"
+			value="#{ControladorPlanes.lstPlanDepreciacion}" scrollable="true"
+			scrollHeight="150"
+			style="width:500px; font-family:Verdana; font-size: 12px;"
+			selectionMode="single"
+			selection="#{ControladorPlanes.selectedPlanDepreciacion}"
+			rowKey="#{planDep.cd_plandepecia}" editable="true">
+			<f:facet name="header">
+			            Parámetros Depreciación
+			    </f:facet>
+			<p:ajax event="rowEdit"
+				listener="#{ControladorPlanes.onRowEditDepreciacion}" update="@this"
+				process="@this" />
+
+			<p:column headerText="AÑo">
+				<h:outputText value="#{planDep.anio}" />
+			</p:column>
+			<p:column headerText="% Depreciación">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{planDep.porcentaje}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{planDep.porcentaje}" style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Tasa Objeto Asegurado">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{planDep.tasa_obj}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{planDep.tasa_obj}" style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Super de Bancos">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{planDep.superbancos}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{planDep.superbancos}" style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Seguro Campesino">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{planDep.segurocampesino}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{planDep.segurocampesino}" style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Derechos de Emisión">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{planDep.derechoemision}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{planDep.derechoemision}" style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column style="width:32px">
+				<p:rowEditor />
+			</p:column>
+		</p:dataTable>
+	</p:dialog>
+	<!-- fin Dialogo Planes -->
+
+</ui:composition>

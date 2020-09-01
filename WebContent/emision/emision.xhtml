@@ -1,0 +1,524 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/templates/Template.xhtml">
+	<ui:define name="tituloPagina">Emisión</ui:define>
+	<ui:define name="contenido">
+		<p:ajaxStatus
+			style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+			<f:facet name="start">
+				<p:graphicImage value="/images/ajax-loadercircle.gif" />
+			</f:facet>
+			<f:facet name="complete">
+				<h:outputText value="" />
+			</f:facet>
+		</p:ajaxStatus>
+		<h:form id="frm_emision">
+			<p:menubar>
+				<p:menuitem value="Inicio" icon="ui-icon-home"
+					url="/Broken/index.jsf"></p:menuitem>
+				<p:submenu label="Proceso" icon="ui-icon-wrench">
+					<p:menuitem value="Emisiones Masivas"
+						url="/Broken/emision/emisionesMasivas.jsf" icon="ui-icon-gear" />
+				</p:submenu>
+			</p:menubar>
+			<p:tabView id="tab_emision">
+				<p:tab title="Datos Informativos">
+					<!-- CABECERA COTIZACION -->
+					<ui:include src="/emision/datosInformativos.xhtml" />
+					<!-- Fin CABECERA COTIZACION -->
+				</p:tab>
+				<p:tab title="Objetos Asegurados / Rubros">
+					<!-- CABECERA RAMO- UBICACION-OBJETO -->
+					<ui:include src="/emision/objetosAsegurados.xhtml" />
+					<!-- Fin RAMO- UBICACION-OBJETO -->
+				</p:tab>
+				<p:tab title="Forma de Pago / Poliza">
+					<h:panelGrid columns="4" cellpadding="5">
+						<!-- CABECERA RAMO- UBICACION-OBJETO -->
+						<ui:include src="/emision/formaPago.xhtml" />
+						<!-- Fin RAMO- UBICACION-OBJETO -->
+					</h:panelGrid>
+				</p:tab>
+				<p:tab title="Correspondencia">
+					<!-- Emitir Carta -->
+					<ui:include src="/emision/cartaEmision.xhtml" />
+					<!-- Fin Emitir Carta -->
+				</p:tab>
+				<p:tab title="Documentos">
+					<h:panelGrid columns="2">
+						<h:outputText value="Documento:" />
+						<p:selectOneMenu id="slomDo"
+							value="#{ControladorEmision.tipoArchivo}" style="width:150px"
+							autoWidth="false">
+							<p:ajax listener="#{ControladorEmision.verificaDocuGest}"
+								process="@this"
+								update="frm_emision:tab_emision:slomTpD,frm_emision:tab_emision:sloTpDocClie,frm_emision:tab_emision:imptPolGest" />
+
+							<f:selectItems value="#{ControladorEmision.lstTipoGestDoc}"
+								var="tpD" itemLabel="#{tpD.desc_general}"
+								itemValue="#{tpD.desc_general}" />
+						</p:selectOneMenu>
+						<h:outputText value="Tipo" />
+						<p:selectOneMenu id="slomTpD"
+							value="#{ControladorEmision.objetoArchivo}" style="width:150px"
+							autoWidth="false">
+							<p:ajax listener="#{ControladorEmision.verificaDescGest}"
+								process="@this,frm_emision:tab_emision:slomDo"
+								update="frm_emision:tab_emision:sloTpDocClie" />
+							<f:selectItem itemLabel="Seleccione..." itemValue="%" />
+							<f:selectItems value="#{ControladorEmision.lstObjetoGestDoc}"
+								var="tp" itemLabel="#{tp.desc_general}"
+								itemValue="#{tp.desc_general}" />
+						</p:selectOneMenu>
+
+						<h:outputText value="Descripción:" />
+						<p:selectOneMenu id="sloTpDocClie" autoWidth="false"
+							value="#{ControladorEmision.tipoArchivoDoc}" style="width:150px;">
+							<p:ajax listener="#{ControladorEmision.gestionDocumental}"
+								process="frm_emision:tab_emision:sloTpDocClie" />
+							<f:selectItem itemLabel="Seleccione..." itemValue="%" />
+							<f:selectItems value="#{ControladorEmision.lstRubroGestDoc}"
+								var="tp" itemLabel="#{tp.desc_rubro}" itemValue="#{tp.cd_rubro}" />
+						</p:selectOneMenu>
+						<p:row></p:row>
+						<p:inputText placeholder="Número de Póliza" style="width:150px"
+							value="#{ControladorEmision.polizaGestDocu}" id="imptPolGest"
+							disabled="#{ControladorEmision.flgPolizaDocu}">
+							<p:ajax listener="#{ControladorEmision.gestionDocumental}"
+								process="frm_emision:tab_emision:sloTpDocClie,frm_emision:tab_emision:imptPolGest" />
+						</p:inputText>
+						<p:commandButton value="Consultar"
+							actionListener="#{ControladorEmision.consultaArchivosGuardados}"
+							update="frm_emision:tab_emision:dtArch" icon="ui-icon-search"
+							process="@this,frm_emision:tab_emision:slomDo,frm_emision:tab_emision:slomTpD,
+							frm_emision:tab_emision:sloTpDocClie,frm_emision:tab_emision:otxtNumCot,frm_emision:tab_emision:imptPolGest">
+						</p:commandButton>
+						<p:commandButton value="Nueva Consulta"
+							actionListener="#{ControladorEmision.enceraDocumentoGes}"
+							update="frm_emision:tab_emision:slomDo,frm_emision:tab_emision:slomTpD,
+							frm_emision:tab_emision:sloTpDocClie,frm_emision:tab_emision:otxtNumCot,frm_emision:tab_emision:imptPolGest,frm_emision:tab_emision:dtArch"
+							icon="ui-icon-refresh" process="@this">
+						</p:commandButton>
+					</h:panelGrid>
+					<p:separator></p:separator>
+					<p:panel header="Ingreso Nuevo Documento">
+						<p:fileUpload listener="#{ControladorEmision.handleFileUpload}"
+							mode="advanced" dragDropSupport="true" fileLimit="3"
+							allowTypes="/(\.|\/)(PDF|pdf|gif|jpe?g|png)$/"
+							update="@this,frm_emision:tab_emision:dtArch,frm_emision:tab_emision:imptPolGest"
+							process="@this,frm_emision:tab_emision:slomDo,frm_emision:tab_emision:slomTpD,frm_emision:tab_emision:sloTpDocClie,frm_emision:tab_emision:imptPolGest" />
+
+					</p:panel>
+
+					<p:dataTable var="docu" id="dtArch"
+						value="#{ControladorEmision.lstArchivos}" rows="3"
+						paginator="true"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+						<p:column headerText="Documentos">
+							<h:outputText value="#{docu.ubicacion}" escape="false" />
+						</p:column>
+						<p:column headerText="Descripción">
+							<h:outputText value="#{docu.desc_docu}" />
+						</p:column>
+						<p:column style="width:22px">
+							<p:commandButton title="Borrar Archivo"
+								actionListener="#{ControladorEmision.onRowDeleteFile(docu)}"
+								update="frm_emision:tab_emision:dtArch"
+								icon="ui-icon-circle-minus" style="width:19px"
+								process="@this,frm_emision:tab_emision:slomDo,frm_emision:tab_emision:slomTpD,frm_emision:tab_emision:sloTpDocClie">
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+
+				</p:tab>
+			</p:tabView>
+		</h:form>
+
+		<!-- Edita Cotizacion -->
+		<p:dialog header="Edita Cotización" draggable="true"
+			widgetVar="editaCotiza" showEffect="fade" hideEffect="fade"
+			closable="true" appendTo="@(body)" modal="true">
+			<h:form id="frmEdtCot">
+				<h:panelGrid id="pgEditRamo" columns="4" cellpadding="5">
+					<h:outputText value="Tipo " />
+					<p:selectOneMenu id="slomEdtTipo"
+						value="#{ControladorEmision.txtCd_rubroEdith}" style="width:125px"
+						autoWidth="false">
+						<f:selectItem itemLabel="POLIZA" itemValue="8" />
+						<f:selectItem itemLabel="RENOVACION" itemValue="9" />
+					</p:selectOneMenu>
+					<h:outputText value="Vigencia desde " />
+					<p:calendar id="vEdtDesde"
+						value="#{ControladorEmision.fcDesdeEdita}" pattern="dd/MM/yyyy"
+						mask="true">
+					</p:calendar>
+					<h:outputText value="# Renovación" />
+					<p:inputNumber id="numEdtRenov" style="width:65px"
+						value="#{ControladorEmision.lsnumRenovaEdit}">
+					</p:inputNumber>
+					<h:outputText value="Vigencia hasta " />
+					<p:calendar id="vEdthasta"
+						value="#{ControladorEmision.fcHastaEdita}" pattern="dd/MM/yyyy"
+						mask="true">
+					</p:calendar>
+					<h:outputText value="Ejecutivo " />
+					<p:selectOneMenu id="listaEjecutivosMod"
+						value="#{ControladorEmision.codEjecutivo}" style="width:125px"
+						autoWidth="false">
+						<f:selectItems var="ejecutivos"
+							value="#{ControladorEmision.listaEjecutivos}"
+							itemLabel="#{ejecutivos.primer_apellido_ejecutivo} #{ejecutivos.primer_nombre_ejecutivo}"
+							itemValue="#{ejecutivos.cd_ejecutivo}" />
+					</p:selectOneMenu>
+					<p:row></p:row>
+					<p:selectBooleanCheckbox id="sbcBisiesto"
+						value="#{ControladorEmision.flgAnoBisiesto}"
+						itemLabel="Año Bisiesto" />
+				</h:panelGrid>
+
+				<p:commandButton value="Modificar" id="btnEdtiraCot"
+					icon="ui-icon-disk"
+					action="#{ControladorEmision.guardaEdtCotizacion}"
+					styleClass="ui-priority-primary"
+					process="@this,frmEdtCot:slomEdtTipo,frmEdtCot:vEdtDesde,frmEdtCot:numEdtRenov,
+					frmEdtCot:vEdthasta,frmEdtCot:listaEjecutivosMod,frmEdtCot:sbcBisiesto" />
+			</h:form>
+		</p:dialog>
+		<!-- nueva ubicacion -->
+		<p:dialog header="Ubicación" draggable="true"
+			widgetVar="nuevaUbicacion" showEffect="fade" hideEffect="fade"
+			closable="false" height="800">
+			<h:form id="frmUbcRamoCot">
+				<h:panelGrid columns="1" cellpadding="5" style="width:50%;">
+					<h:outputText value="Ubicación " />
+					<p:inputText id="nombreUbicacion"
+						value="#{ControladorEmision.dscUbicacion}" style="width:100%;" />
+					<h:outputText value="Plan Ubicación " />
+					<p:selectOneMenu id="listPlanesUbc"
+						value="#{ControladorEmision.codPlanUbc}" style="width:125px"
+						autoWidth="false"
+						disabled="#{ControladorEmision.flgActivaPlanUbc}">
+						<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+						<f:selectItems var="planes"
+							value="#{ControladorEmision.listaPlan}"
+							itemLabel="#{planes.descripcion_plan}"
+							itemValue="#{planes.cd_plan}" />
+					</p:selectOneMenu>
+				</h:panelGrid>
+				<h3>Objetos</h3>
+				<p:commandButton value="Aceptar" icon="ui-icon-disk"
+					id="btnAceptaUbicacion"
+					update="@this,frm_emision:tab_emision:dTRamo,frm_emision:tab_emision:dtUbcTot"
+					styleClass="ui-priority-primary"
+					actionListener="#{ControladorEmision.aceptaUbicacion}"
+					process="@this,frmUbcRamoCot:nombreUbicacion,frmUbcRamoCot:listPlanesUbc,frmUbcRamoCot:objectUbc" />
+				<p:commandButton value="Cargar Archivo" id="btnArchObjPrin"
+					icon="ui-icon-folder-open" styleClass="ui-priority-primary"
+					action="#{ControladorEmision.cargaArchivo}"
+					process="@this,frmUbcRamoCot:nombreUbicacion,frmUbcRamoCot:listPlanesUbc"
+					update="@this,frmUbcRamoCot:objectUbc" />
+
+				<h:panelGrid columns="1">
+					<p:dataTable id="objectUbc" var="obj"
+						value="#{ControladorEmision.lstObjetoCot}" editable="true"
+						style="font-family:Verdana; font-size: 10px;"
+						selectionMode="single"
+						selection="#{ControladorEmision.selectedDatosObjetoCotizacion}"
+						rowKey="#{obj.cd_obj_cotizacion}">
+						<f:facet name="header">
+						</f:facet>
+
+						<p:ajax event="rowEdit" listener="#{ControladorEmision.onRowEditObjPol}"
+							/>
+
+						<p:ajax event="rowSelect"
+							listener="#{ControladorEmision.onRowSelect}"
+							update="frmUbcRamoCot:objSubObj,frmUbcRamoCot:vhCaracEdtita" />
+						<p:column headerText="Objeto Asegurado">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{obj.descripcion_objeto}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{obj.descripcion_objeto}"
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Monto Asegurado">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{obj.valor_asegurador_objeto}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{obj.valor_asegurador_objeto}"
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Tasa">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{obj.tasa_objeto}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{obj.tasa_objeto}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Prima">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{obj.prima_objeto}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{obj.prima_objeto}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+
+						<p:column headerText="Fecha Nacimiento">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{obj.fecha_nacimiento_obj}">
+										<f:convertDateTime pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</f:facet>
+								<f:facet name="input">
+									<p:calendar value="#{obj.fecha_nacimiento_obj}" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+
+						<p:column headerText="Edad">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{obj.edad_obj}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{obj.edad_obj}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Cédula">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{obj.edad_obj}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{obj.edad_obj}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Observaciones">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{obj.observaciones_objeto}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{obj.observaciones_objeto}"
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+
+						<p:column style="width:35px">
+							<p:rowEditor />
+						</p:column>
+					</p:dataTable>
+					<h3>SubObjetos</h3>
+					<p:dataTable id="objSubObj" var="subObjsCons"
+						value="#{ControladorEmision.lstSubObjetoCons}" scrollable="true"
+						scrollHeight="150" editable="true"
+						style="font-family:Verdana; font-size: 10px;">
+						<p:column headerText="Item Aseg">
+							<h:outputText value="#{subObjsCons.item_aseguradora_subobjeto}" />
+						</p:column>
+						<p:column headerText="Descripción">
+							<h:outputText value="#{subObjsCons.descripcion_subobjeto}" />
+						</p:column>
+						<p:column headerText="Prima">
+							<h:outputText value="#{subObjsCons.prima_subobjeto}">
+								<f:convertNumber type="currency" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Fecha Nacimiento">
+							<h:outputText value="#{subObjsCons.fecha_nacimiento_subobj}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Edad">
+							<h:outputText value="#{subObjsCons.edad_subobj}" />
+						</p:column>
+						<p:column headerText="Cédula">
+							<h:outputText value="#{subObjsCons.cedula_subobj}" />
+						</p:column>
+						<p:column headerText="Parentesco">
+							<h:outputText value="#{subObjsCons.parentesco}" />
+						</p:column>
+					</p:dataTable>
+					<h3>Características</h3>
+					<p:dataTable var="caracEdit"
+						value="#{ControladorEmision.lstCaractVeh}" editable="true"
+						style="font-family:Verdana; font-size: 10px;" id="vhCaracEdtita">
+						<p:ajax event="rowEdit"
+							listener="#{ControladorEmision.onRowEditCaract}" update="@this" />
+						<p:column headerText="Placa">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{caracEdit.placa}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{caracEdit.placa}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="RAMV">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{caracEdit.ranv_cpn}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{caracEdit.ranv_cpn}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="MARCA">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{caracEdit.marca}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{caracEdit.marca}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="MODELO">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{caracEdit.modelo}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{caracEdit.modelo}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="COLOR">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{caracEdit.color}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{caracEdit.color}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="MOTOR">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{caracEdit.no_de_motor}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{caracEdit.no_de_motor}"
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="CHASIS">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{caracEdit.no_de_chasis}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{caracEdit.no_de_chasis}"
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="AÑO">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{caracEdit.anio_de_fabricacion}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{caracEdit.anio_de_fabricacion}"
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="DISPOSITIVO">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{caracEdit.dispositivo}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{caracEdit.dispositivo}"
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="ENDOSO">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{caracEdit.endoso}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{caracEdit.endoso}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="FECHA ENDOSO">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{caracEdit.fecha_endoso}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:calendar value="#{caracEdit.fecha_endoso}" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="USO DEL VEHICULO">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{caracEdit.uso_vehiculo}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{caracEdit.uso_vehiculo}"
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Propietario">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{caracEdit.propietario}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{caracEdit.propietario}"
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column style="width:22px">
+							<p:rowEditor />
+						</p:column>
+					</p:dataTable>
+
+				</h:panelGrid>
+				<p:confirmDialog id="confirmDelete" global="true" showEffect="fade"
+					hideEffect="fade">
+					<p:commandButton value="Si" type="button"
+						styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+					<p:commandButton value="No" type="button"
+						styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+				</p:confirmDialog>
+			</h:form>
+		</p:dialog>
+
+	</ui:define>
+	<ui:define name="tituloFormulario">Emisión</ui:define>
+</ui:composition>
+</html>

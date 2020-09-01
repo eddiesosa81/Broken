@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<title>CONFIA S.A.</title>
+	<style type="text/css">
+body {
+	background: url("http://35.237.152.6:8081/images/macosx/macback.png");
+	/*background-color:#83AED4;*/
+	margin: 0;
+	padding: 0;
+	font-family: geneva, arial, helvetica, sans-serif;
+	font-size: 80%;
+}
+
+.ui-menuitem-icon.ui-icon.appleIcon {
+	background: url("http://35.237.152.6:8081/images/macosx/apple.png"); )
+	no-repeat;
+	width: 16px;
+	height: 16px;
+	border-radius: 0px;
+}
+
+.ui-dialog .ui-terminal {
+	border: 0;
+}
+
+.ui-dialog.terminalDialog .ui-dialog-content {
+	padding: 0;
+}
+</style>
+</h:head>
+<body>
+	<!-- Imagen de carga de actividad de pagina -->
+	<p:ajaxStatus
+		style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+		<f:facet name="start">
+			<p:graphicImage
+				value="http://35.237.152.6:8081/images/ajax-loadercircle.gif" />
+		</f:facet>
+
+		<f:facet name="complete">
+			<h:outputText value="" />
+		</f:facet>
+	</p:ajaxStatus>
+	<p:growl id="growl" showDetail="true" life="1500" />
+
+	<!-- Planes -->
+	<p:dialog widgetVar="planes" header="Planes" resizable="true"
+		showEffect="fade" hideEffect="fade" closable="false">
+		<h:form id="frm_planes">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<ui:include src="/gestion/planes.xhtml" />
+		</h:form>
+	</p:dialog>
+	<!-- fin cobranzas -->
+	<!-- Tasas -->
+	<p:dialog widgetVar="PlanTasa" header="Tasa" resizable="true"
+		showEffect="fade" hideEffect="fade" closable="false">
+		<h:form id="frm_planTasa">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<ui:include src="/gestion/planTasa.xhtml" />
+		</h:form>
+	</p:dialog>
+	<!-- Comisiones -->
+	<p:dialog widgetVar="comisionBroker" header="Comision Broker"
+		resizable="true" showEffect="fade" hideEffect="fade" closable="false">
+		<h:form id="frm_comisionBroker">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<ui:include src="/gestion/comisionBroker.xhtml" />
+		</h:form>
+	</p:dialog>
+	<!-- Subagentes-->
+	<p:dialog widgetVar="subagentes" header="Canal" resizable="true"
+		showEffect="fade" hideEffect="fade" closable="false">
+		<h:form id="frm_subagentes">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<ui:include src="/gestion/subagentes.xhtml" />
+		</h:form>
+	</p:dialog>
+	<!-- Aseguradoras-->
+	<p:dialog widgetVar="Aseguradoras" header="Aseguradora"
+		resizable="true" showEffect="fade" hideEffect="fade" closable="false">
+		<h:form id="frm_DatosAsegu">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<ui:include src="/gestion/Aseguradoras.xhtml" />
+		</h:form>
+	</p:dialog>
+	<!-- Clientes-->
+	<p:dialog widgetVar="Clientes" header="Clientes" resizable="true"
+		showEffect="fade" hideEffect="fade" closable="false">
+		<h:form id="frm_DatosCliente">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<ui:include src="/gestion/Clientes.xhtml" />
+		</h:form>
+	</p:dialog>
+	<!-- marca y modelo -->
+	<p:dialog widgetVar="marcaModeloVh" header="Vehículos" resizable="true"
+		showEffect="fade" hideEffect="fade" closable="false">
+		<h:form id="frm_marcaModeloVh">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<ui:include src="/gestion/modeloMarcaVh.xhtml" />
+		</h:form>
+	</p:dialog>
+
+
+	<!-- fin cobranzas -->
+	<p:stack icon="http://35.237.152.6:8081/images/macosx/stack.png"
+		expanded="true">
+		<p:menuitem value="Inicio"
+			icon="http://35.237.152.6:8081/images/macosx/home.png"
+			url="http://35.237.152.6:8081/Broken/index.jsf" />
+		<p:menuitem value="Planes"
+			icon="http://35.237.152.6:8081/images/macosx/planes.png" url="#"
+			onclick="PF('planes').show();" />
+		<p:menuitem value="Tasa"
+			icon="http://35.237.152.6:8081/images/macosx/calc.png" url="#"
+			onclick="PF('PlanTasa').show();" />
+		<p:menuitem value="Comisión"
+			icon="http://35.237.152.6:8081/images/macosx/comision.png" url="#"
+			onclick="PF('comisionBroker').show();" />
+		<p:menuitem value="Canal"
+			icon="http://35.237.152.6:8081/images/macosx/maletin.png" url="#"
+			onclick="PF('subagentes').show();" />
+		<p:menuitem value="Aseguradora"
+			icon="http://35.237.152.6:8081/images/macosx/aseguradora.png" url="#"
+			onclick="PF('Aseguradoras').show();" />
+		<p:menuitem value="Clientes"
+			icon="http://35.237.152.6:8081/images/macosx/cliente.png" url="#"
+			onclick="PF('Clientes').show();" />
+		<p:menuitem value="Vehículos"
+			icon="http://35.237.152.6:8081/images/macosx/vh.png" url="#"
+			onclick="PF('marcaModeloVh').show();" />
+
+	</p:stack>
+</body>
+</html>

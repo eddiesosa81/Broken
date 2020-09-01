@@ -1,0 +1,1456 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+	<p:growl showDetail="true" sticky="true">
+		<p:autoUpdate></p:autoUpdate>
+	</p:growl>
+	<!-- DATOS DE LA Póliza -->
+	<p:tabView id="tbViewInclUbc">
+		<p:tab title="Anexos">
+			<h:panelGrid columns="1">
+				<h:panelGrid columns="2">
+					<h3>Anexos Pendientes:</h3>
+					<p:commandButton id="btnBuscaAnexo"
+						action="#{ControladorAnexos.consultaAnexoPendiente}"
+						process="@this" update="@this" icon="ui-icon-refresh"
+						title="Buscar Solicitud de Anexo" />
+				</h:panelGrid>
+				<h:panelGrid id="gridCot" columns="3">
+					<p:row>
+						<h3>Datos Póliza:</h3>
+					</p:row>
+					<p:row>
+						<p:outputPanel id="polizaSelDetail" style="text-align:center;">
+							<p:panelGrid columns="2"
+								style="border: hidden;border-color: white;">
+								<h:outputText value="Cliente:" />
+								<h:outputText value="#{ControladorAnexos.clientePolizaAnexo}"
+									id="otxtPolSelClie" />
+								<h:outputText value="Póliza:" />
+								<h:outputText value="#{ControladorAnexos.numPolizaAnexo}"
+									id="otxtPolSelPol" />
+								<h:outputText value="Ramo:" />
+								<h:outputText value="#{ControladorAnexos.ramoPolizaAnexo}"
+									id="otxtPolSelRam" />
+							</p:panelGrid>
+						</p:outputPanel>
+					</p:row>
+					<p:row>
+						<p:commandButton id="btnBuscaCotizacion"
+							action="#{ControladorAnexos.consultaPoliza}" process="@this"
+							update="@this" icon="ui-icon-search" title="Seleccione Póliza"
+							disabled="#{ControladorAnexos.flgBotonoEmite}" />
+					</p:row>
+				</h:panelGrid>
+			</h:panelGrid>
+			<h:panelGrid id="gridTpAne" columns="4" cellpadding="5">
+				<h3>Tipo de Anexo:</h3>
+				<p:row>
+					<p:selectOneMenu id="tipoAne"
+						value="#{ControladorAnexos.tipoAnexoSelec}"
+						disabled="#{ControladorAnexos.flgBotonoEmite}">
+						<f:selectItem itemLabel="Selecccione..." itemValue="NO" />
+						<f:selectItem itemLabel="INCLUSION" itemValue="INCLUSION" />
+						<f:selectItem itemLabel="EXCLUSION" itemValue="EXCLUSION" />
+						<f:selectItem itemLabel="MODIFICATORIO" itemValue="MODVALASEG" />
+						<f:selectItem itemLabel="ANULACION" itemValue="ANULACION" />
+						<f:selectItem itemLabel="CANCELACION" itemValue="CANCELACION" />
+						<f:selectItem itemLabel="ACLARATORIO" itemValue="ACLARATORIO" />
+					</p:selectOneMenu>
+				</p:row>
+				<h3>Afecta:</h3>
+				<p:row>
+					<p:selectOneMenu id="tipoAfectaPol"
+						value="#{ControladorAnexos.afectaPoliza}"
+						disabled="#{ControladorAnexos.flgBotonoEmite}">
+						<f:selectItem itemLabel="Selecccione..." itemValue="NO" />
+						<f:selectItem itemLabel="UBICACION" itemValue="UBICACION" />
+						<f:selectItem itemLabel="OBJETO" itemValue="OBJETO" />
+						<f:selectItem itemLabel="EXTRA" itemValue="EXTRA" />
+						<f:selectItem itemLabel="PÓLIZA" itemValue="POLIZA" />
+					</p:selectOneMenu>
+				</p:row>
+				<h3>Fecha Anexo:</h3>
+				<p:row>
+					<p:calendar id="calFcAnexo" value="#{ControladorAnexos.fcAnexo}"
+						disabled="#{ControladorAnexos.flgBotonoEmite}" />
+				</p:row>
+			</h:panelGrid>
+			<p:row>
+				<h:panelGrid id="gridTpEmite" columns="3" cellpadding="5">
+					<p:commandButton id="btnAceptaAnexo"
+						disabled="#{ControladorAnexos.flgBotonoEmite}"
+						action="#{ControladorAnexos.aceptaAnexo}" icon="ui-icon-check"
+						value="Aceptar" styleClass="ui-priority-primary"
+						update=":frm_anexos:dtUbc :frm_anexos:dtUbc, 
+							frm_anexos:dtExcObjUbc frm_anexos:dtExcExtraUbc, 
+							frm_anexos:inpTxtInclUbc frm_anexos:btnaddubc frm_anexos:optxtFcDesde ,
+							frm_anexos:optxtFcHasta,frm_anexos:diasotxt,frm_anexos:fechaAneotxt,
+							frm_anexos:optxtFcDesdeObj,frm_anexos:optxtFcHastaObj,frm_anexos:diasotxtObj,
+							frm_anexos:optxtFcDesdeUbc,frm_anexos:optxtFcHastaUbc,frm_anexos:diasotxtUbc,
+							frm_anexos:dtExcUbc,frm_anexos:frmModValAsegObjt:dtExcObjUbc,
+							frm_anexos:frmModValAsegObjt:optValAsegExcUbcMod,frm_anexos:frmModValAsegObjt:optTasaExcUbcMod,
+							frm_anexos:frmModValAsegObjt:optFactorExcUbcMod,frm_anexos:frmModValAsegObjt:optPrimaExcUbcMod,
+							frm_anexos:optValAsegExcUbc,frm_anexos:optTasaExcUbc,frm_anexos:optFactorExcUbc,
+							frm_anexos:optPrimaExcUbc,frm_anexos:optxtFcDesdeSubj,frm_anexos:optxtFcHastaSubj,
+							frm_anexos:diasotxtSubj,frm_anexos:optFactorExcUbc,frm_anexos:optxtFcDesde,
+							frm_anexos:optxtFcHasta,frm_anexos:diasotxt,frm_anexos:optValAsegExcUbcSubj,
+							frm_anexos:optTasaExcUbcSubj,frm_anexos:optFactorExcUbcSubj,frm_anexos:optPrimaExcUbcSubj,
+							frm_anexos:frmModValAsegExtr:optxtFcDesde,frm_anexos:frmModValAsegObjt:optxtFcDesdeModUbc,
+							frm_anexos:frmModValAsegExtr:optxtFcHasta,frm_anexos:frmModValAsegExtr:diasotxt,frm_anexos:frmModValAsegExtr:dtExcExtraUbc,
+							frm_anexos:frmModValAsegExtr:optValAsegExcUbc,frm_anexos:frmModValAsegExtr:optTasaExcUbc,frm_anexos:frmModValAsegExtr:optFactorExcUbc,
+							frm_anexos:frmModValAsegExtr:optPrimaExcUbc,frm_anexos:frmAnuCanPol:optxtFcDesde,frm_anexos:frmAnuCanPol:optxtFcHasta,
+							frm_anexos:frmAnuCanPol:diasotxt,frm_anexos:frmAnuCanPol:optValAsegExcUbc,frm_anexos:frmAnuCanPol:optTasaExcUbc,
+							frm_anexos:frmAnuCanPol:optFactorExcUbc,frm_anexos:frmAnuCanPol:optPrimaExcUbc,
+							frm_anexos:btnAgregarObjeto,frm_anexos:frmModValAsegObjt:optxtFcHastaModUbc,
+							frm_anexos:frmAclaratorio:optxtFcDesdeAc,
+							frm_anexos:frmAclaratorio:optxtFcHastaAc,frm_anexos:frmAclaratorio:diasotxtAc,
+							frm_anexos:frmAclaratorio:optxtPolAc,frm_anexos:frmAclaratorio:optxtRamAc,frm_anexos:dtUbcObj,
+							frm_anexos:optxtFcDesdeExObj,frm_anexos:optxtFcHastaExObj,frm_anexos:diasotxtExObj
+							"
+						process="@this,frm_anexos:tbViewInclUbc:tipoAne,frm_anexos:tbViewInclUbc:tipoAfectaPol,frm_anexos:tbViewInclUbc:calFcAnexo" />
+					<p:commandButton id="btnEmiteAnexo"
+						styleClass="ui-priority-primary"
+						action="#{ControladorAnexos.emiteAnexo}" icon="ui-icon-wrench"
+						value="Emitir" title="Emite Anexo"
+						process="@this,frm_anexos:tbViewInclUbc:dtFrmpFinal,frm_anexos:tbViewInclUbc:tipoAfectaPol,frm_anexos:dtUbc"
+						update="frm_anexos:tbViewInclUbc:dtFrmpFinal,frm_anexos:frmEmiteAnexo:inpTxtFact" />
+					<p:commandButton id="btnEmiteAnexoCancel"
+						styleClass="ui-priority-primary"
+						action="/index.xhtml?faces-redirect=true"
+						actionListener="#{ControladorAnexos.cancelaAnexo}"
+						icon="ui-icon-cancel" value="Salir" title="Canela Anexo" />
+				</h:panelGrid>
+			</p:row>
+		</p:tab>
+		<p:tab title="Forma de Pago">
+			<h:panelGrid columns="4" cellpadding="5">
+				<!-- CABECERA RAMO- UBICACION-OBJETO -->
+				<ui:include src="/anexos/formaPagoAnexos.xhtml" />
+				<!-- Fin RAMO- UBICACION-OBJETO -->
+			</h:panelGrid>
+
+		</p:tab>
+		<p:tab title="Correspondencia">
+			<p:panelGrid columns="5">
+				<h:outputText value="Tipo de Carta:" />
+				<p:selectOneMenu id="somTpCartaAne"
+					value="#{ControladorAnexos.nmCarta}">
+					<f:selectItem itemLabel="-- Seleccione --" itemValue="0" />
+					<f:selectItems value="#{ControladorAnexos.lstRubrosCarta}"
+						var="cartaTp" itemValue="#{cartaTp.objeto_rubro}"
+						itemLabel="#{cartaTp.desc_rubro}">
+					</f:selectItems>
+					<p:ajax event="change"
+						update="@this,frm_anexos:tbViewInclUbc:cartaDtAne"
+						listener="#{ControladorAnexos.recuperaContactosCarta}"
+						process="@this,frm_anexos:tbViewInclUbc:somTpCartaAne" />
+				</p:selectOneMenu>
+				<h:outputText value="Notas:" />
+				<p:inputTextarea rows="3" cols="60" maxlength="2000"
+					autoResize="false" id="notAdeTxtAne"
+					value="#{ControladorAnexos.notasAdicionalesCarta}" />
+				<p:commandButton value="Generar Documento" id="btnSaveCartaAne"
+					update="@this" icon="ui-icon-document"
+					styleClass="ui-priority-primary"
+					process="@this,frm_anexos:tbViewInclUbc:somTpCartaAne,frm_anexos:tbViewInclUbc:notAdeTxtAne,frm_anexos:tbViewInclUbc:cartaDtAne"
+					action="#{ControladorAnexos.guardaCarta}" />
+			</p:panelGrid>
+			<p:panel>
+				<p:dataTable id="cartaDtAne" var="contacto"
+					value="#{ControladorAnexos.lstContactoCarta}" paginator="true"
+					rows="5"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="5,10,15" widgetVar="marcaTable"
+					emptyMessage="No se encuentra datos relacionados"
+					selectionMode="single"
+					selection="#{ControladorAnexos.selectedContactoCarta}"
+					rowKey="#{contacto.cd_contacto}">
+					<f:facet name="header">
+						            Seleccione el Contacto para Generación del Documento
+						        </f:facet>
+					<p:column headerText="Nombre">
+						<h:outputText value="#{contacto.nombre_contacto}" />
+					</p:column>
+					<p:column headerText="Departamento">
+						<h:outputText value="#{contacto.departamento_contacto}" />
+					</p:column>
+					<p:column headerText="Cargo">
+						<h:outputText value="#{contacto.cargo_contacto}" />
+					</p:column>
+					<p:column headerText="Teléfono">
+						<h:outputText value="#{contacto.telefono_contacto}" />
+					</p:column>
+					<p:column headerText="Celular">
+						<h:outputText value="#{contacto.celular_contacto}" />
+					</p:column>
+					<p:column headerText="Correo">
+						<h:outputText value="#{contacto.mail_contacto}" />
+					</p:column>
+				</p:dataTable>
+			</p:panel>
+		</p:tab>
+		<p:tab title="Documentos">
+			<h:panelGrid columns="2">
+				<h:outputText value="Documento:" />
+				<p:selectOneMenu id="slomDo"
+					value="#{ControladorAnexos.tipoArchivo}" style="width:150px"
+					autoWidth="false">
+					<p:ajax listener="#{ControladorAnexos.verificaDocuGest}"
+						process="@this"
+						update="frm_anexos:tbViewInclUbc:slomTpD,frm_anexos:tbViewInclUbc:sloTpDocClie,frm_anexos:tbViewInclUbc:imptPolGest" />
+
+					<f:selectItems value="#{ControladorAnexos.lstTipoGestDoc}"
+						var="tpD" itemLabel="#{tpD.desc_general}"
+						itemValue="#{tpD.desc_general}" />
+				</p:selectOneMenu>
+				<h:outputText value="Tipo" />
+				<p:selectOneMenu id="slomTpD"
+					value="#{ControladorAnexos.objetoArchivo}" style="width:150px"
+					autoWidth="false">
+					<p:ajax listener="#{ControladorAnexos.verificaDescGest}"
+						process="@this,frm_anexos:tbViewInclUbc:slomTpD"
+						update="frm_anexos:tbViewInclUbc:sloTpDocClie" />
+					<f:selectItem itemLabel="Seleccione..." itemValue="%" />
+					<f:selectItems value="#{ControladorAnexos.lstObjetoGestDoc}"
+						var="tp" itemLabel="#{tp.desc_general}"
+						itemValue="#{tp.desc_general}" />
+				</p:selectOneMenu>
+
+				<h:outputText value="Descripción:" />
+				<p:selectOneMenu id="sloTpDocClie" autoWidth="false"
+					value="#{ControladorAnexos.tipoArchivoDoc}" style="width:150px;">
+					<p:ajax listener="#{ControladorAnexos.gestionDocumental}"
+						process="frm_anexos:tbViewInclUbc:sloTpDocClie" />
+					<f:selectItem itemLabel="Seleccione..." itemValue="%" />
+					<f:selectItems value="#{ControladorAnexos.lstRubroGestDoc}"
+						var="tp" itemLabel="#{tp.desc_rubro}" itemValue="#{tp.cd_rubro}" />
+				</p:selectOneMenu>
+				<p:row></p:row>
+				<p:inputText placeholder="No.Factura/Anexo" style="width:150px"
+					value="#{ControladorAnexos.polizaGestDocu}" id="imptPolGest"
+					disabled="#{ControladorAnexos.flgPolizaDocu}">
+					<p:ajax listener="#{ControladorAnexos.gestionDocumental}"
+						process="frm_anexos:tbViewInclUbc:sloTpDocClie,frm_anexos:tbViewInclUbc:imptPolGest,frm_anexos:tbViewInclUbc:otxtPolSelPol" />
+				</p:inputText>
+				<p:commandButton value="Consultar"
+					actionListener="#{ControladorAnexos.consultaArchivosGuardados}"
+					update="frm_anexos:tbViewInclUbc:dtArch" icon="ui-icon-search"
+					process="@this,frm_anexos:tbViewInclUbc:slomDo,frm_anexos:tbViewInclUbc:slomTpD,
+							frm_anexos:tbViewInclUbc:sloTpDocClie,frm_anexos:tbViewInclUbc:otxtPolSelPol">
+				</p:commandButton>
+				<p:commandButton value="Nueva Consulta"
+					actionListener="#{ControladorAnexos.enceraDocumentoGes}"
+					update="frm_anexos:tbViewInclUbc:slomDo,frm_anexos:tbViewInclUbc:slomTpD,
+							frm_anexos:tbViewInclUbc:sloTpDocClie,frm_anexos:tbViewInclUbc:imptPolGest,frm_anexos:tbViewInclUbc:dtArch"
+					icon="ui-icon-refresh" process="@this">
+				</p:commandButton>
+			</h:panelGrid>
+			<p:separator></p:separator>
+			<p:panel header="Ingreso Nuevo Documento">
+				<p:fileUpload listener="#{ControladorAnexos.handleFileUpload}"
+					mode="advanced" dragDropSupport="true" fileLimit="3"
+					allowTypes="/(\.|\/)(PDF|pdf|gif|jpe?g|png)$/"
+					update="@this,frm_anexos:tbViewInclUbc:dtArch,frm_anexos:tbViewInclUbc:imptPolGest"
+					process="@this,frm_anexos:tbViewInclUbc:slomDo,frm_anexos:tbViewInclUbc:slomTpD,frm_anexos:tbViewInclUbc:sloTpDocClie,frm_anexos:tbViewInclUbc:imptPolGest,frm_anexos:tbViewInclUbc:otxtPolSelPol" />
+
+			</p:panel>
+
+			<p:dataTable var="docu" id="dtArch"
+				value="#{ControladorAnexos.lstArchivos}" rows="3" paginator="true"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+				<p:column headerText="Documentos">
+					<h:outputText value="#{docu.ubicacion}" escape="false" />
+				</p:column>
+				<p:column headerText="Descripción">
+					<h:outputText value="#{docu.desc_docu}" />
+				</p:column>
+				<p:column style="width:22px">
+					<p:commandButton title="Borrar Archivo"
+						actionListener="#{ControladorAnexos.onRowDeleteFile(docu)}"
+						update="@this" icon="ui-icon-circle-minus" style="width:19px"
+						process="@this,frm_anexos:tbViewInclUbc:slomDo,frm_anexos:tbViewInclUbc:slomTpD,frm_anexos:tbViewInclUbc:sloTpDocClie">
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+		</p:tab>
+	</p:tabView>
+	<!-- busca y selecciona Anexos pendiente -->
+	<p:dialog header="Buscar Anexo Pendiente" widgetVar="wbuscaAnexoPend"
+		closable="true" height="400">
+		<h:panelGrid columns="2" style="width:100%;text-align:center;">
+			<p:inputText id="nmAnePol"
+				value="#{ControladorAnexos.apellidoRazonSocialAnexoP}"
+				placeholder="Apellido / Razon Social" />
+			<p:inputText id="polAneP" value="#{ControladorAnexos.polizaAnexoP}"
+				placeholder="Número de Póliza" />
+			<p:inputText id="polAneNoCot"
+				value="#{ControladorAnexos.polizaAnexoNoCot}"
+				placeholder="Número de Codificación" />
+			<p:commandButton value="Buscar" id="btnAneP"
+				actionListener="#{ControladorAnexos.buscaAnexoPendiente}"
+				update="@this,frm_anexos:listadoAneP,frm_anexos:polAneNoCot"
+				icon="ui-icon-search"
+				process="@this,frm_anexos:nmAnePol,frm_anexos:polAneP,frm_anexos:polAneNoCot" />
+		</h:panelGrid>
+		<p:dataTable id="listadoAneP" var="ane"
+			style="font-family:Verdana; font-size: 10px;"
+			value="#{ControladorAnexos.lstAnexoPendiente}"
+			tableStyle="width:auto" rows="10" paginator="true"
+			paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+			<p:column headerText="No." visible="false">
+				<h:outputText value="#{ane.cod}" />
+			</p:column>
+			<p:column headerText="No.Reg">
+				<h:outputText value="#{ane.num_cotizacion}" />
+			</p:column>
+			<p:column headerText="Cliente">
+				<h:outputText value="#{ane.cliente}" />
+			</p:column>
+			<p:column headerText="No.Póliza">
+				<h:outputText value="#{ane.poliza}" />
+			</p:column>
+			<p:column headerText="Ramo">
+				<h:outputText value="#{ane.desc_ramo}" />
+			</p:column>
+			<p:column headerText="Vigencia Desde:">
+				<h:outputText value="#{ane.fc_ini_vig_date}">
+					<f:convertDateTime pattern="dd/MM/yyyy" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Vigencia Hasta:">
+				<h:outputText value="#{ane.fc_fin_vig_date}">
+					<f:convertDateTime pattern="dd/MM/yyyy" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Tipo:">
+				<h:outputText value="#{ane.desc_rubro}" />
+			</p:column>
+			<p:column style="width:32px;text-align: center"
+				headerText="Seleccionar" exportable="false">
+				<p:commandButton icon="ui-icon-check" title="Seleccionar"
+					process="@this"
+					actionListener="#{ControladorAnexos.buscarPolizaXIdAneP}"
+					update="@this,frm_anexos:frmEmitePendAnexo:dtCabAnexo,frm_anexos:frmEmitePendAnexo:dtAnexPendUbc"
+					onclick="PF('wbuscaAnexoPend').hide();">
+					<f:param name="cdRamoCotizacionAne"
+						value="#{ane.cd_ramo_cotizacion}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+	</p:dialog>
+	<!-- fin busca y selecciona Cotización -->
+
+	<!-- Inicia Dialogo Inclusion Objeto-->
+	<p:dialog header="Anexo de Inclusión" widgetVar="wDlgInclusionObj"
+		closable="true">
+		<p:panel header="Vigencia de la Póliza">
+			<h:panelGrid columns="4">
+				<h:outputText value="Fecha Desde: " />
+				<h:outputText
+					value="#{ControladorAnexos.polizaSeleccionadaParaAnexo.fc_ini_vig_date}"
+					id="optxtFcDesde">
+					<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+				</h:outputText>
+				<h:outputText value="Fecha Hasta: " />
+				<h:outputText
+					value="#{ControladorAnexos.polizaSeleccionadaParaAnexo.fc_fin_vig_date}"
+					id="optxtFcHasta">
+					<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+				</h:outputText>
+				<h:outputText value="Fecha Anexo: " />
+				<h:outputText value="#{ControladorAnexos.fcAnexo}" id="fechaAneotxt">
+					<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+				</h:outputText>
+				<h:outputText value="Días: " />
+				<h:outputText value="#{ControladorAnexos.dias}" id="diasotxt" />
+			</h:panelGrid>
+		</p:panel>
+		<p:panel>
+			<h:panelGrid columns="5">
+				<h:outputText value="Descripción Nueva Ubicacion" />
+				<p:inputText value="#{ControladorAnexos.descUbicacion}"
+					id="inpTxtInclUbc"
+					disabled="#{ControladorAnexos.flgHabilitaUbicacion}"></p:inputText>
+				<p:commandButton icon="ui-icon-plus"
+					process="@this frm_anexos:inpTxtInclUbc"
+					update="@this,frm_anexos:inpTxtInclUbc,frm_anexos:btnaddubc,frm_anexos:dtUbcObj"
+					id="btnaddubc" action="#{ControladorAnexos.grabaUbicacion}"
+					disabled="#{ControladorAnexos.flgHabilitaUbicacion}"
+					title="Agregar Ubicación" />
+			</h:panelGrid>
+		</p:panel>
+		<h:panelGrid columns="1" style="width:100%;text-align:center;">
+			<p:dataTable id="dtUbcObj" var="ubc" scrollable="true"
+				scrollHeight="80" value="#{ControladorAnexos.lstUbicacion}"
+				selectionMode="single"
+				selection="#{ControladorAnexos.selectedUbicacion}"
+				rowKey="#{ubc.cd_ubicacion}"
+				disabledSelection="#{ControladorAnexos.flgHabilitaUbicacionDataTable}">
+				<f:facet name="header">
+			            Seleccione la Ubicación
+			     </f:facet>
+				<p:ajax event="rowSelect"
+					listener="#{ControladorAnexos.onRowSelectIncObjUbc}"
+					process="@this" />
+				<p:column headerText="Cod." style="width:40px;text-align:center">
+					<h:outputText value="#{ubc.cd_ubicacion}" />
+				</p:column>
+				<p:column headerText="Descripción">
+					<h:outputText value="#{ubc.dsc_ubicacion}" />
+				</p:column>
+			</p:dataTable>
+			<p:panelGrid columns="2">
+				<p:commandButton value="Agregar Objeto" icon="ui-icon-plus"
+					id="btnAgregarObjeto" styleClass="ui-priority-primary"
+					action="#{ControladorAnexos.nuevoObjetoAseg}"
+					update="@this frm_anexos:tblSubObj frm_anexos:vhPlaca frm_anexos:vhramv"
+					process="@this,frm_anexos:dtUbcObj,frm_anexos:tbViewInclUbc:tipoAne,frm_anexos:tbViewInclUbc:tipoAfectaPol,frm_anexos:dtUbcObj"
+					disabled="#{ControladorAnexos.btnIncAsis}" />
+				<p:commandButton value="Cargar Archivo" id="btnArchObj"
+					icon="ui-icon-folder-open" styleClass="ui-priority-primary"
+					action="#{ControladorAnexos.cargaArchivo}"
+					process="@this,frm_anexos:dtUbcObj"
+					update="@this,frm_anexos:objectUbc" />
+			</p:panelGrid>
+			<h:panelGrid columns="2" cellpadding="5">
+				<p:dataTable id="objectUbc" var="obj"
+					value="#{ControladorAnexos.lstObjetosIncluidos}" scrollable="true"
+					scrollHeight="80" editable="true" rowKey="#{obj.cd_obj_cotizacion}">
+					<f:facet name="header">
+			            	Objetos Asegurados a Incluir
+			        	</f:facet>
+					<p:column headerText="Objeto Asegurado">
+						<h:outputText value="#{obj.descripcion_objeto}" />
+					</p:column>
+					<p:column headerText="Monto Asegurado">
+						<h:outputText value="#{obj.valor_asegurador_objeto}" />
+					</p:column>
+					<p:column headerText="Tasa">
+						<h:outputText value="#{obj.tasa_objeto}" />
+					</p:column>
+					<p:column headerText="Prima">
+						<h:outputText value="#{obj.prima_objeto}" />
+					</p:column>
+					<p:column headerText="Fecha de Nacimiento">
+						<h:outputText value="#{obj.fecha_nacimiento_obj}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Edad">
+						<h:outputText value="#{obj.edad_obj}" />
+					</p:column>
+					<p:column headerText="Cédula">
+						<h:outputText value="#{obj.cedula_obj}" />
+					</p:column>
+					<p:column style="width:22px">
+						<p:commandButton title="Borrar Objeto Asegurado"
+							action="/index.xhtml?faces-redirect=true"
+							actionListener="#{ControladorAnexos.onRowDeleteObj(obj)}"
+							update="@this frm_anexos:objectUbc" icon="ui-icon-circle-minus"
+							style="width:19px" process="@this,frm_anexos:objectUbc">
+							<p:confirm header="Confirmación"
+								message="Desea eliminar el registro?" icon="ui-icon-alert" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+
+			</h:panelGrid>
+		</h:panelGrid>
+		<p:commandButton value="Grabar" icon="ui-icon-disk"
+			styleClass="ui-priority-primary"
+			onclick="PF('wDlgInclusionObj').hide();" />
+		<p:confirmDialog id="confirmDelete" global="true" showEffect="fade"
+			hideEffect="fade">
+			<p:commandButton value="Si" type="button"
+				styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+			<p:commandButton value="No" type="button"
+				styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+		</p:confirmDialog>
+	</p:dialog>
+
+	<p:dialog header="Agregar Objeto Asegurado" draggable="true"
+		widgetVar="nuevoObjeto" showEffect="fade" hideEffect="fade"
+		closable="true">
+		<h:panelGrid columns="2" cellpadding="5">
+			<h:panelGrid columns="6" cellpadding="5">
+				<h:outputText value="Descripción " />
+				<p:inputText id="selOmItemAseg"
+					value="#{ControladorAnexos.datosObjetoCotizacion.descripcion_objeto}" />
+				<h:outputText value="Monto Asegurado " />
+				<p:inputNumber id="vhMonto"
+					value="#{ControladorAnexos.datosObjetoCotizacion.valor_asegurador_objeto}">
+				</p:inputNumber>
+				<h:outputText value="Tasa" />
+				<p:inputNumber id="vhTasa"
+					value="#{ControladorAnexos.datosObjetoCotizacion.tasa_objeto}">
+					<p:ajax event="change"
+						listener="#{ControladorAnexos.calculaPrimaObjeto}"
+						update="frm_anexos:vhPrima"
+						process="@this,frm_anexos:vhMonto,frm_anexos:vhTasa,frm_anexos:vhFactor" />
+				</p:inputNumber>
+				<h:outputText value="Factor" />
+				<p:selectOneRadio id="vhFactor"
+					value="#{ControladorAnexos.datosObjetoCotizacion.factor_objeto}">
+					<f:selectItem itemLabel="100%" itemValue="100" />
+					<f:selectItem itemLabel="1000%" itemValue="1000" />
+					<p:ajax event="change"
+						listener="#{ControladorAnexos.calculaPrimaObjeto}"
+						update="frm_anexos:vhPrima"
+						process="@this,frm_anexos:vhMonto,frm_anexos:vhTasa,frm_anexos:vhFactor" />
+				</p:selectOneRadio>
+				<h:outputText value="Prima" />
+				<p:inputNumber id="vhPrima"
+					value="#{ControladorAnexos.datosObjetoCotizacion.prima_objeto}">
+				</p:inputNumber>
+				<h:outputText value="Deducible Mínimo" />
+				<p:inputNumber id="vhDedMin"
+					value="#{ControladorAnexos.datosObjetoCotizacion.deducibleMinimo}">
+				</p:inputNumber>
+				
+				<h:outputText value="Observaciones " />
+				<p:inputText id="vhObs"
+					value="#{ControladorAnexos.datosObjetoCotizacion.observaciones_objeto}" />
+				<p:row></p:row>
+				<p:commandButton icon="ui-icon-refresh"
+					action="#{ControladorAnexos.calculaPrimaObjeto}" id="btnActDato"
+					update="frm_anexos:vhPrima" title="Calcular"
+					process="@this,frm_anexos:vhMonto,frm_anexos:vhTasa,frm_anexos:vhFactor" />
+				
+				<h:outputText value="Placa " />
+				<p:inputText id="vhPlaca"
+					value="#{ControladorAnexos.caracteristicaPlaca}" />
+				<h:outputText value="RAMV " />
+				<p:inputText id="vhramv"
+					value="#{ControladorAnexos.caracteristicaRamv}" />
+				<h:outputText value="Marca " />
+				<p:selectOneMenu id="vhMarca" value="#{ControladorAnexos.codMarca}"
+					style="width:125px" autoWidth="false">
+					<p:ajax event="change" listener="#{ControladorAnexos.listaModelos}"
+						update="vhModelo" />
+					<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+					<f:selectItems var="marcas"
+						value="#{ControladorAnexos.listadoMarcas}"
+						itemLabel="#{marcas.desc_marca}" itemValue="#{marcas.cd_marca}" />
+				</p:selectOneMenu>
+				<h:outputText value="Modelo " />
+				<p:selectOneMenu id="vhModelo"
+					value="#{ControladorAnexos.codModelo}" style="width:125px"
+					autoWidth="false">
+					<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+					<f:selectItems var="modelo"
+						value="#{ControladorAnexos.listadoModelos}"
+						itemLabel="#{modelo.desc_modelo}" itemValue="#{modelo.cd_modelo}" />
+				</p:selectOneMenu>
+				<h:outputText value="Color " />
+				<p:inputText id="vhColor"
+					value="#{ControladorAnexos.datosCaracteristicasVehiculos.color}" />
+				<h:outputText value="Motor " />
+				<p:inputText id="vhMotor"
+					value="#{ControladorAnexos.datosCaracteristicasVehiculos.no_de_motor}" />
+				<h:outputText value="Chasis " />
+				<p:inputText id="vhChasis"
+					value="#{ControladorAnexos.datosCaracteristicasVehiculos.no_de_chasis}" />
+				<h:outputText value="Año " />
+				<p:inputNumber id="vhAnio"
+					value="#{ControladorAnexos.datosCaracteristicasVehiculos.anio_de_fabricacion}" />
+				<h:outputText value="Dispositivo " />
+				<p:selectOneMenu id="vhDispositivo"
+					value="#{ControladorAnexos.datosCaracteristicasVehiculos.cd_dispositivo}"
+					style="width:125px" autoWidth="false">
+					<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+					<f:selectItems var="dispositivos"
+						value="#{ControladorAnexos.listaDispositivos}"
+						itemLabel="#{dispositivos.descripcion_dispositivo}"
+						itemValue="#{dispositivos.cd_dispositivo}" />
+				</p:selectOneMenu>
+				<h:outputText value="Información " />
+				<p:inputText id="vhinformacion"
+					value="#{ControladorAnexos.datosCaracteristicasVehiculos.observaciones}" />
+				<h:outputText value="Endoso " />
+				<p:inputText id="vhFcEndoso"
+					value="#{ControladorAnexos.datosCaracteristicasVehiculos.endoso}" />
+				<h:outputText value="Fecha Endoso " />
+				<p:calendar id="fcEndosoObj"
+					value="#{ControladorAnexos.datosCaracteristicasVehiculos.fecha_endoso}" />
+				<h:outputText value="Uso Vehículo" />
+				<p:inputText id="vhUso"
+					value="#{ControladorAnexos.datosCaracteristicasVehiculos.uso_vehiculo}" />
+				<h:outputText value="Propietario" />
+				<p:inputText id="propietEndoso"
+					value="#{ControladorAnexos.datosCaracteristicasVehiculos.propietario}" />
+			</h:panelGrid>
+			<h:panelGrid columns="1" cellpadding="5">
+				<h:panelGrid columns="6">
+					<h:outputText value="Item Aseg." />
+					<p:inputNumber id="exCantidad"
+						value="#{ControladorAnexos.exCantidad}" style="width:50px;" />
+					<h:outputText value="Detalle" />
+					<p:inputText id="exDetalle" value="#{ControladorAnexos.exDetalle}" />
+					<h:outputText value="Valor " />
+					<p:inputNumber id="exValorSubobjeto"
+						value="#{ControladorAnexos.exValorSubobjeto}" style="width:50px;" />
+					<h:outputText value="Tasa" />
+					<p:inputNumber id="exTasaSubObj"
+						value="#{ControladorAnexos.exTasa}" style="width:50px;">
+						<p:ajax event="change"
+							listener="#{ControladorAnexos.calculaPrimaSubObjeto}"
+							update="@this frm_anexos:exPrimaSubObj"
+							process="@this,frm_anexos:exValorSubobjeto,frm_anexos:exTasaSubObj,frm_anexos:exFactorSubObj" />
+					</p:inputNumber>
+					<h:outputText value="Factor" />
+					<p:selectOneRadio id="exFactorSubObj"
+						value="#{ControladorAnexos.exFactos}" style="width:50px;">
+						<f:selectItem itemLabel="100%" itemValue="100" />
+						<f:selectItem itemLabel="1000%" itemValue="1000" />
+						<p:ajax event="change"
+							listener="#{ControladorAnexos.calculaPrimaSubObjeto}"
+							update="@this frm_anexos:exPrimaSubObj"
+							process="@this,frm_anexos:exValorSubobjeto,frm_anexos:exTasaSubObj,frm_anexos:exFactorSubObj" />
+					</p:selectOneRadio>
+					<h:outputText value="Prima" />
+					<p:inputNumber id="exPrimaSubObj"
+						value="#{ControladorAnexos.exPrima}" style="width:50px;">
+					</p:inputNumber>
+				</h:panelGrid>
+				<h:panelGrid columns="2">
+					<p:commandButton value="Agregar Extra"
+						actionListener="#{ControladorAnexos.agregarExtras}"
+						icon="ui-icon-disk" id="btnAgregaSubObjetos"
+						update="@this,frm_anexos:exCantidad,frm_anexos:exTasaSubObj,
+							frm_anexos:exDetalle,frm_anexos:exFactorSubObj,frm_anexos:exValorSubobjeto,
+							frm_anexos:exPrimaSubObj frm_anexos:tblSubObj"
+						styleClass="ui-priority-primary"
+						process="@this frm_anexos:exCantidad frm_anexos:exTasaSubObj 
+							frm_anexos:exDetalle frm_anexos:exFactorSubObj frm_anexos:exValorSubobjeto
+							 frm_anexos:exPrimaSubObj " />
+					<p:commandButton value="Borrar Extras"
+						actionListener="#{ControladorAnexos.DeleteLstExtra}"
+						icon="ui-icon-trash" id="btnBorraSubObjetos"
+						update="@this,frm_anexos:exCantidad,frm_anexos:exTasaSubObj,
+							frm_anexos:exDetalle,frm_anexos:exFactorSubObj,frm_anexos:exValorSubobjeto,
+							frm_anexos:exPrimaSubObj frm_anexos:tblSubObj"
+						styleClass="ui-priority-primary" process="@this" />
+				</h:panelGrid>
+				<p:dataTable id="tblSubObj" var="extras"
+					value="#{ControladorAnexos.lstSubObjetoCot}" scrollable="true"
+					scrollHeight="150">
+					<p:column headerText="Item">
+						<h:outputText value="#{extras.item_aseguradora_subobjeto}" />
+					</p:column>
+					<p:column headerText="Detalle">
+						<h:outputText value="#{extras.descripcion_subobjeto}" />
+					</p:column>
+					<p:column headerText="Valor">
+						<h:outputText value="#{extras.valor_asegurador_subobjeto}" />
+					</p:column>
+					<p:column headerText="Tasa">
+						<h:outputText value="#{extras.tasa_subobjeto}" />
+					</p:column>
+					<p:column headerText="Factor">
+						<h:outputText value="#{extras.factor_subobjeto}" />
+					</p:column>
+					<p:column headerText="Prima">
+						<h:outputText value="#{extras.prima_subobjeto}" />
+					</p:column>
+				</p:dataTable>
+			</h:panelGrid>
+		</h:panelGrid>
+		<p:commandButton value="Agregar" icon="ui-icon-disk"
+			id="btnAgregaObjetos"
+			update="@this frm_anexos:selOmItemAseg frm_anexos:vhMonto 
+				frm_anexos:vhTasa frm_anexos:vhFactor 
+				frm_anexos:vhPrima frm_anexos:vhramv 
+				frm_anexos:vhMarca frm_anexos:vhModelo 
+				frm_anexos:vhColor frm_anexos:vhMotor 
+				frm_anexos:vhChasis frm_anexos:vhAnio 
+				frm_anexos:vhDispositivo frm_anexos:vhinformacion 
+				frm_anexos:vhFcEndoso frm_anexos:fcEndosoObj frm_anexos:objectUbc 
+				frm_anexos:objectUbc frm_anexos:vhDedMin frm_anexos:vhObs frm_anexos:vhUso"
+			styleClass="ui-priority-primary"
+			actionListener="#{ControladorAnexos.grabaObjetoAsegurado}"
+			process="@this,frm_anexos:selOmItemAseg,frm_anexos:vhMonto,
+				frm_anexos:vhTasa,frm_anexos:vhFactor,
+				frm_anexos:vhPrima,frm_anexos:vhramv,
+				frm_anexos:vhMarca,frm_anexos:vhModelo,
+				frm_anexos:vhColor,frm_anexos:vhMotor,
+				frm_anexos:vhChasis,frm_anexos:vhAnio,
+				frm_anexos:vhDispositivo,frm_anexos:vhinformacion,
+				frm_anexos:vhFcEndoso,frm_anexos:fcEndosoObj,frm_anexos:vhPlaca,frm_anexos:propietEndoso,
+				frm_anexos:vhDedMin,frm_anexos:vhObs,frm_anexos:vhUso" />
+		<p:commandButton value="Cancelar" icon="ui-icon-closethick"
+			id="btnCancelaObjetos" update="@this" type="reset"
+			onclick="PF('nuevoObjeto').hide();" />
+	</p:dialog>
+
+	<!-- Inicia Dialogo Inclusion Objeto-->
+	<!-- INCLUSION DE EXTRAS -->
+	<p:dialog header="Anexo de Inclusión" widgetVar="wDlgInclusionSubObj"
+		closable="true">
+		<p:panel header="Vigencia de la Póliza">
+			<h:panelGrid columns="4">
+				<h:outputText value="Fecha Desde: " />
+				<h:outputText
+					value="#{ControladorAnexos.polizaSeleccionadaParaAnexo.fc_ini_vig_date}"
+					id="optxtFcDesdeObj">
+					<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+				</h:outputText>
+				<h:outputText value="Fecha Hasta: " />
+				<h:outputText
+					value="#{ControladorAnexos.polizaSeleccionadaParaAnexo.fc_fin_vig_date}"
+					id="optxtFcHastaObj">
+					<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+				</h:outputText>
+				<h:outputText value="Fecha Anexo: " />
+				<h:outputText value="#{ControladorAnexos.fcAnexo}"
+					id="fechaAneotxtObj">
+					<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+				</h:outputText>
+				<h:outputText value="Días: " />
+				<h:outputText value="#{ControladorAnexos.dias}" id="diasotxtObj" />
+			</h:panelGrid>
+		</p:panel>
+
+		<h:panelGrid columns="1" style="width:100%;text-align:center;">
+			<p:dataTable id="dtUbc" var="ubc" scrollable="true" scrollHeight="80"
+				value="#{ControladorAnexos.lstUbicacion}" selectionMode="single"
+				selection="#{ControladorAnexos.selectedUbicacion}"
+				rowKey="#{ubc.cd_ubicacion}">
+				<f:facet name="header">
+			            Seleccione la Ubicación
+			        </f:facet>
+				<p:ajax event="rowSelect"
+					listener="#{ControladorAnexos.onRowSelectUbicacion}"
+					update="frm_anexos:dtObjeto" />
+				<p:column headerText="Cod." style="width:40px;text-align:center">
+					<h:outputText value="#{ubc.cd_ubicacion}" />
+				</p:column>
+				<p:column headerText="Descripción">
+					<h:outputText value="#{ubc.dsc_ubicacion}" />
+				</p:column>
+			</p:dataTable>
+			<p:dataTable id="dtObjeto" var="obj" scrollable="true"
+				scrollHeight="80" value="#{ControladorAnexos.lstObjetosPoliza}"
+				selectionMode="single"
+				selection="#{ControladorAnexos.selectedObjetosPoliza}"
+				rowKey="#{obj.cd_obj_cotizacion}">
+				<f:facet name="header">
+			            Seleccione el Objeto
+			        </f:facet>
+				<p:ajax event="rowSelect"
+					listener="#{ControladorAnexos.onRowSelectObjeto}"
+					update="frm_anexos:dtObjeto" />
+				<p:column headerText="Cod." style="width:40px;text-align:center">
+					<h:outputText value="#{obj.cd_obj_cotizacion}" />
+				</p:column>
+				<p:column headerText="Descripción">
+					<h:outputText value="#{obj.descripcion_objeto}" />
+				</p:column>
+				<p:column headerText="Total Asegurado">
+					<h:outputText value="#{obj.total_asegurado_objeto}" />
+				</p:column>
+				<p:column headerText="Tasa">
+					<h:outputText value="#{obj.tasa_objeto}" />
+				</p:column>
+				<p:column headerText="Prima">
+					<h:outputText value="#{obj.prima_objeto}" />
+				</p:column>
+			</p:dataTable>
+			<h:panelGrid columns="2">
+				<p:commandButton value="Nuevo SubObjeto" icon="ui-icon-plus"
+					id="btnAgregarExtra" styleClass="ui-priority-primary"
+					action="#{ControladorAnexos.agregarSubobjeto}" update="@this"
+					process="@this,frm_anexos:dtObjeto" />
+				<p:commandButton value="Grabar" icon="ui-icon-disk"
+					styleClass="ui-priority-primary"
+					action="#{ControladorAnexos.grabaSubObjetoAsegurado}"
+					update="@this" process="@this,frm_anexos:objectExtra" />
+			</h:panelGrid>
+			<h:panelGrid columns="2" cellpadding="5">
+				<p:dataTable id="objectExtra" var="subObj"
+					value="#{ControladorAnexos.lstSubObjetoCot}" scrollable="true"
+					scrollHeight="80" editable="true"
+					rowKey="#{subObj.cd_subobj_cotizacion}">
+					<f:facet name="header">
+			            	SubOjetos/Extras a Incluir
+			        	</f:facet>
+					<p:column headerText="Objeto Asegurado">
+						<h:outputText value="#{subObj.descripcion_subobjeto}" />
+					</p:column>
+					<p:column headerText="Monto Asegurado">
+						<h:outputText value="#{subObj.valor_asegurador_subobjeto}" />
+					</p:column>
+					<p:column headerText="Tasa">
+						<h:outputText value="#{subObj.tasa_subobjeto}" />
+					</p:column>
+					<p:column headerText="Prima">
+						<h:outputText value="#{subObj.prima_subobjeto}" />
+					</p:column>
+				</p:dataTable>
+			</h:panelGrid>
+		</h:panelGrid>
+	</p:dialog>
+
+	<p:dialog header="Agregar SubObjeto / Extra" draggable="true"
+		widgetVar="nuevoSubObjeto" showEffect="fade" hideEffect="fade"
+		closable="true" height="300" width="800">
+		<h:panelGrid columns="1" cellpadding="5">
+			<h:panelGrid columns="6">
+				<h:outputText value="Item Aseg." />
+				<p:inputNumber id="exCantidadSub"
+					value="#{ControladorAnexos.exCantidad}" style="width:50px;" />
+				<h:outputText value="Detalle" />
+				<p:inputText id="exDetalleSub"
+					value="#{ControladorAnexos.exDetalle}" />
+				<h:outputText value="Valor " />
+				<p:inputNumber id="exValorSubobjetoSub"
+					value="#{ControladorAnexos.exValorSubobjeto}" style="width:50px;" />
+				<h:outputText value="Tasa" />
+				<p:inputNumber id="exTasaSubObjSub"
+					value="#{ControladorAnexos.exTasa}" style="width:50px;">
+					<p:ajax event="change"
+						listener="#{ControladorAnexos.calculaPrimaSubObjeto}"
+						update="@this frm_anexos:exPrimaSubObjSub"
+						process="@this,frm_anexos:exCantidadSub,frm_anexos:exDetalleSub,
+							frm_anexos:exValorSubobjetoSub,frm_anexos:exTasaSubObjSub,
+							frm_anexos:exFactorSubObjSub" />
+				</p:inputNumber>
+				<h:outputText value="Factor" />
+				<p:selectOneRadio id="exFactorSubObjSub"
+					value="#{ControladorAnexos.exFactos}" style="width:50px;">
+					<f:selectItem itemLabel="100%" itemValue="100" />
+					<f:selectItem itemLabel="1000%" itemValue="1000" />
+					<p:ajax event="change"
+						listener="#{ControladorAnexos.calculaPrimaSubObjeto}"
+						update="@this frm_anexos:exPrimaSubObjSub"
+						process="@this,frm_anexos:exCantidadSub,frm_anexos:exDetalleSub,
+							frm_anexos:exValorSubobjetoSub,frm_anexos:exTasaSubObjSub,
+							frm_anexos:exFactorSubObjSub" />
+				</p:selectOneRadio>
+				<h:outputText value="Prima" />
+				<p:inputNumber id="exPrimaSubObjSub"
+					value="#{ControladorAnexos.exPrima}" style="width:50px;">
+				</p:inputNumber>
+			</h:panelGrid>
+			<h:panelGrid columns="2">
+				<p:commandButton value="Agregar Extra"
+					actionListener="#{ControladorAnexos.agregarExtras}"
+					icon="ui-icon-disk" id="btnAgregaSubObjetosSub"
+					update="@this frm_anexos:tblSubObjSub frm_anexos:exCantidadSub 
+						frm_anexos:exDetalleSub frm_anexos:exValorSubobjetoSub 
+						frm_anexos:exTasaSubObjSub frm_anexos:exFactorSubObjSub,
+						frm_anexos:exPrimaSubObjSub "
+					styleClass="ui-priority-primary"
+					process="@this,frm_anexos:exCantidadSub,frm_anexos:exDetalleSub,
+							frm_anexos:exValorSubobjetoSub,frm_anexos:exTasaSubObjSub,
+							frm_anexos:exFactorSubObjSub" />
+				<p:commandButton value="Borrar Extras"
+					actionListener="#{ControladorAnexos.DeleteLstExtra}"
+					icon="ui-icon-trash" id="btnBorraSubObjetosSub"
+					update="frm_anexos:tblSubObjSub frm_anexos:exCantidadSub,frm_anexos:exDetalleSub,
+							frm_anexos:exValorSubobjetoSub,frm_anexos:exTasaSubObjSub,
+							frm_anexos:exFactorSubObjSub,frm_anexos:exPrimaSubObjSub"
+					styleClass="ui-priority-primary" process="@this" />
+			</h:panelGrid>
+			<p:dataTable id="tblSubObjSub" var="extras"
+				value="#{ControladorAnexos.lstSubObjetoCot}" scrollable="true"
+				scrollHeight="150">
+				<p:column headerText="Item">
+					<h:outputText value="#{extras.item_aseguradora_subobjeto}" />
+				</p:column>
+				<p:column headerText="Detalle">
+					<h:outputText value="#{extras.descripcion_subobjeto}" />
+				</p:column>
+				<p:column headerText="Valor">
+					<h:outputText value="#{extras.valor_asegurador_subobjeto}" />
+				</p:column>
+				<p:column headerText="Tasa">
+					<h:outputText value="#{extras.tasa_subobjeto}" />
+				</p:column>
+				<p:column headerText="Factor">
+					<h:outputText value="#{extras.factor_subobjeto}" />
+				</p:column>
+				<p:column headerText="Prima">
+					<h:outputText value="#{extras.prima_subobjeto}" />
+				</p:column>
+			</p:dataTable>
+		</h:panelGrid>
+		<p:commandButton value="Aceptar" icon="ui-icon-disk"
+			id="btnAgregaSubObjetosDlg" update="frm_anexos:objectExtra"
+			styleClass="ui-priority-primary"
+			actionListener="#{ControladorAnexos.aceptarSubObjAseg}"
+			process="@this,frm_anexos:tblSubObjSub" />
+		<p:commandButton value="Cancelar" icon="ui-icon-closethick"
+			id="btnSubCancelaObjetos" update="@this" type="reset"
+			onclick="PF('nuevoSubObjeto').hide();" />
+	</p:dialog>
+
+	<!-- FIN INCLUSION DE EXTRA -->
+	<!-- Inicia Dialogo Exclusion Ubicacion-->
+	<p:dialog header="Anexo de Exclusión" widgetVar="wDlgExclusionUbc">
+		<p:panel header="Vigencia de la Póliza">
+			<h:panelGrid columns="4">
+				<h:outputText value="Fecha Desde: " />
+				<h:outputText
+					value="#{ControladorAnexos.polizaSeleccionadaParaAnexo.fc_ini_vig_date}"
+					id="optxtFcDesdeUbc">
+					<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+				</h:outputText>
+				<h:outputText value="Fecha Hasta: " />
+				<h:outputText
+					value="#{ControladorAnexos.polizaSeleccionadaParaAnexo.fc_fin_vig_date}"
+					id="optxtFcHastaUbc">
+					<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+				</h:outputText>
+				<h:outputText value="Fecha Anexo: " />
+				<h:outputText value="#{ControladorAnexos.fcAnexo}"
+					id="fechaAneotxtUbc">
+					<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+				</h:outputText>
+				<h:outputText value="Días: " />
+				<h:outputText value="#{ControladorAnexos.dias}" id="diasotxtUbc" />
+			</h:panelGrid>
+		</p:panel>
+		<h:panelGrid columns="1" style="width:100%;text-align:center;">
+			<p:dataTable id="dtExcUbc" var="ubc" scrollable="true"
+				scrollHeight="80" value="#{ControladorAnexos.lstUbicacion}"
+				selectionMode="single"
+				selection="#{ControladorAnexos.selectedUbicacion}"
+				rowKey="#{ubc.cd_ubicacion}">
+				<f:facet name="header">
+			            Seleccione la Ubicación
+			        </f:facet>
+				<p:ajax event="rowSelect"
+					listener="#{ControladorAnexos.onRowSelectUbicacion}"
+					update="@this,frm_anexos:dtExcUbc,frm_anexos:dtExcObjObjeto
+							frm_anexos:optValAsegExcUbc,frm_anexos:optTasaExcUbc,frm_anexos:optFactorExcUbc,
+							frm_anexos:optPrimaExcUbc" />
+				<p:column headerText="Cod." style="width:40px;text-align:center">
+					<h:outputText value="#{ubc.cd_ubicacion}" />
+				</p:column>
+				<p:column headerText="Descripción">
+					<h:outputText value="#{ubc.dsc_ubicacion}" />
+				</p:column>
+			</p:dataTable>
+		</h:panelGrid>
+		<p:panel>
+			<h:panelGrid columns="8">
+				<h:outputText value="Valor Asegurado: " />
+				<p:inputNumber value="#{ControladorAnexos.valAsegExcAne}"
+					id="optValAsegExcUbc">
+				</p:inputNumber>
+				<h:outputText value="Tasa: " />
+				<p:inputNumber value="#{ControladorAnexos.tasaExcAne}"
+					id="optTasaExcUbc">
+					<p:ajax event="change"
+						listener="#{ControladorAnexos.calculaPrimaExclusiones}"
+						update="@this,frm_anexos:optPrimaExcUbc"
+						process="@this,frm_anexos:optValAsegExcUbc,frm_anexos:optTasaExcUbc,
+							frm_anexos:optFactorExcUbc,frm_anexos:optPrimaExcUbc" />
+				</p:inputNumber>
+				<h:outputText value="Factor" />
+				<p:selectOneRadio id="optFactorExcUbc"
+					value="#{ControladorAnexos.factorExcAne}">
+					<f:selectItem itemLabel="100%" itemValue="100" />
+					<f:selectItem itemLabel="1000%" itemValue="1000" />
+					<p:ajax event="change"
+						listener="#{ControladorAnexos.calculaPrimaExclusiones}"
+						update="@this,frm_anexos:optPrimaExcUbc"
+						process="@this,frm_anexos:optValAsegExcUbc,frm_anexos:optTasaExcUbc,
+							frm_anexos:optFactorExcUbc,frm_anexos:optPrimaExcUbc" />
+				</p:selectOneRadio>
+				<h:outputText value="Prima: " />
+				<p:inputNumber value="#{ControladorAnexos.primaExcAne}"
+					id="optPrimaExcUbc">
+				</p:inputNumber>
+			</h:panelGrid>
+			<p:commandButton value="Excluir" icon="ui-icon-plus" id="btnExcUbc"
+				styleClass="ui-priority-primary"
+				action="#{ControladorAnexos.excluirUbicacion}" update="@this"
+				process="@this,frm_anexos:dtExcUbc,frm_anexos:optValAsegExcUbc,frm_anexos:optTasaExcUbc
+					frm_anexos:optPrimaExcUbc,frm_anexos:optFactorExcUbc" />
+		</p:panel>
+	</p:dialog>
+	<!-- Inicia Dialogo Exclusion -->
+	<p:dialog header="Anexo de Exclusión Objeto"
+		widgetVar="wDlgExclusionObj">
+		<p:panel header="Vigencia de la Póliza">
+			<h:panelGrid columns="4">
+				<h:outputText value="Fecha Desde: " />
+				<h:outputText
+					value="#{ControladorAnexos.polizaSeleccionadaParaAnexo.fc_ini_vig_date}"
+					id="optxtFcDesdeExObj">
+					<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+				</h:outputText>
+				<h:outputText value="Fecha Hasta: " />
+				<h:outputText
+					value="#{ControladorAnexos.polizaSeleccionadaParaAnexo.fc_fin_vig_date}"
+					id="optxtFcHastaExObj">
+					<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+				</h:outputText>
+				<h:outputText value="Fecha Anexo: " />
+				<h:outputText value="#{ControladorAnexos.fcAnexo}"
+					id="fechaAneotxtExObj">
+					<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+				</h:outputText>
+				<h:outputText value="Días: " />
+				<h:outputText value="#{ControladorAnexos.dias}" id="diasotxtExObj" />
+			</h:panelGrid>
+		</p:panel>
+		<h:panelGrid columns="1" style="width:100%;text-align:center;">
+			<p:dataTable id="dtExcObjUbc" var="ubc" scrollable="true"
+				scrollHeight="80" value="#{ControladorAnexos.lstUbicacion}"
+				selectionMode="single"
+				selection="#{ControladorAnexos.selectedUbicacion}"
+				rowKey="#{ubc.cd_ubicacion}">
+				<f:facet name="header">
+			            Seleccione la Ubicación
+			        </f:facet>
+				<p:ajax event="rowSelect"
+					listener="#{ControladorAnexos.onRowSelectUbicacion}"
+					update="frm_anexos:dtExcObjObjeto" />
+				<p:column headerText="Cod." style="width:40px;text-align:center">
+					<h:outputText value="#{ubc.cd_ubicacion}" />
+				</p:column>
+				<p:column headerText="Descripción">
+					<h:outputText value="#{ubc.dsc_ubicacion}" />
+				</p:column>
+			</p:dataTable>
+			<p:dataTable id="dtExcObjObjeto" var="obj" scrollable="true"
+				scrollHeight="80" value="#{ControladorAnexos.lstObjetosPoliza}"
+				selectionMode="multiple"
+				selection="#{ControladorAnexos.selectedLstObjetosPoliza}"
+				rowKey="#{obj.cd_obj_cotizacion}" widgetVar="objtsTable"
+				emptyMessage="No se encuentra registros"
+				filteredValue="#{ControladorAnexos.filteredLstObjetosPoliza}">
+				<f:facet name="header">
+			            Seleccione el Objeto a Excluir
+			        </f:facet>
+				<p:ajax event="rowSelect"
+					listener="#{ControladorAnexos.onRowSelectExcObj}"
+					update="frm_anexos:optValAsegExcOBJ" />
+
+				<p:column filterBy="#{obj.cd_obj_cotizacion}"
+					filterMatchMode="contains" headerText="Cod."
+					style="width:40px;text-align:center">
+					<h:outputText value="#{obj.cd_obj_cotizacion}" />
+				</p:column>
+				<p:column headerText="Descripción"
+					filterBy="#{obj.descripcion_objeto}" filterMatchMode="contains">
+					<h:outputText value="#{obj.descripcion_objeto}" />
+				</p:column>
+				<p:column filterBy="#{obj.total_asegurado_objeto}"
+					filterMatchMode="contains" headerText="Total Asegurado">
+					<h:outputText value="#{obj.total_asegurado_objeto}" />
+				</p:column>
+				<p:column headerText="Tasa">
+					<h:outputText value="#{obj.tasa_objeto}" />
+				</p:column>
+				<p:column headerText="Prima" filterBy="#{obj.prima_objeto}"
+					filterMatchMode="contains">
+					<h:outputText value="#{obj.prima_objeto}" />
+				</p:column>
+			</p:dataTable>
+		</h:panelGrid>
+		<p:panel>
+			<h:panelGrid columns="8">
+				<h:outputText value="Valor Asegurado: " />
+				<p:inputNumber value="#{ControladorAnexos.valAsegExcAne}"
+					id="optValAsegExcOBJ">
+				</p:inputNumber>
+				<h:outputText value="Tasa: " />
+				<p:inputNumber value="#{ControladorAnexos.tasaExcAne}"
+					id="optTasaExcObj">
+					<p:ajax event="change"
+						listener="#{ControladorAnexos.calculaPrimaExclusiones}"
+						update="@this frm_anexos:optPrimaExcObj"
+						process="@this,frm_anexos:optValAsegExcOBJ,frm_anexos:optTasaExcObj,frm_anexos:optFactorExcObj" />
+				</p:inputNumber>
+				<h:outputText value="Factor" />
+				<p:selectOneRadio id="optFactorExcObj"
+					value="#{ControladorAnexos.factorExcAne}">
+					<f:selectItem itemLabel="100%" itemValue="100" />
+					<f:selectItem itemLabel="1000%" itemValue="1000" />
+					<p:ajax event="change"
+						listener="#{ControladorAnexos.calculaPrimaExclusiones}"
+						update="@this frm_anexos:optPrimaExcObj"
+						process="@this,frm_anexos:optValAsegExcOBJ,frm_anexos:optTasaExcObj,frm_anexos:optFactorExcObj" />
+				</p:selectOneRadio>
+				<h:outputText value="Prima: " />
+				<p:inputNumber value="#{ControladorAnexos.primaExcAne}"
+					id="optPrimaExcObj">
+				</p:inputNumber>
+			</h:panelGrid>
+			<p:commandButton value="Aceptar" icon="ui-icon-plus" id="btnExcObjt"
+				styleClass="ui-priority-primary"
+				action="#{ControladorAnexos.excluirObjeto}" update="@this"
+				process="@this,frm_anexos:optValAsegExcOBJ,frm_anexos:optTasaExcObj,frm_anexos:optFactorExcObj,frm_anexos:optPrimaExcObj,
+				frm_anexos:dtExcObjObjeto,frm_anexos:dtExcObjUbc" />
+		</p:panel>
+	</p:dialog>
+
+	<p:dialog header="Anexo de Exclusión SubObjeto"
+		widgetVar="wDlgExclusionExtra">
+		<p:panel header="Vigencia de la Póliza">
+			<h:panelGrid columns="4">
+				<h:outputText value="Fecha Desde: " />
+				<h:outputText
+					value="#{ControladorAnexos.polizaSeleccionadaParaAnexo.fc_ini_vig_date}"
+					id="optxtFcDesdeSubj">
+					<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+				</h:outputText>
+				<h:outputText value="Fecha Hasta: " />
+				<h:outputText
+					value="#{ControladorAnexos.polizaSeleccionadaParaAnexo.fc_fin_vig_date}"
+					id="optxtFcHastaSubj">
+					<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+				</h:outputText>
+				<h:outputText value="Fecha Anexo: " />
+				<h:outputText value="#{ControladorAnexos.fcAnexo}"
+					id="fechaAneotxtSubj">
+					<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+				</h:outputText>
+				<h:outputText value="Días: " />
+				<h:outputText value="#{ControladorAnexos.dias}" id="diasotxtSubj" />
+			</h:panelGrid>
+		</p:panel>
+		<h:panelGrid columns="1" style="width:100%;text-align:center;">
+			<p:dataTable id="dtExcExtraUbc" var="ubc" scrollable="true"
+				scrollHeight="80" value="#{ControladorAnexos.lstUbicacion}"
+				selectionMode="single"
+				selection="#{ControladorAnexos.selectedUbicacion}"
+				rowKey="#{ubc.cd_ubicacion}">
+				<f:facet name="header">
+			            Seleccione la Ubicación
+			        </f:facet>
+				<p:ajax event="rowSelect"
+					listener="#{ControladorAnexos.onRowSelectUbicacion}"
+					update="frm_anexos:dtExcExtraObjeto" />
+				<p:column headerText="Cod." style="width:40px;text-align:center">
+					<h:outputText value="#{ubc.cd_ubicacion}" />
+				</p:column>
+				<p:column headerText="Descripción">
+					<h:outputText value="#{ubc.dsc_ubicacion}" />
+				</p:column>
+			</p:dataTable>
+			<p:dataTable id="dtExcExtraObjeto" var="obj" scrollable="true"
+				scrollHeight="80" value="#{ControladorAnexos.lstObjetosPoliza}"
+				selectionMode="single"
+				selection="#{ControladorAnexos.selectedObjetosPoliza}"
+				rowKey="#{obj.cd_obj_cotizacion}">
+				<f:facet name="header">
+			            Seleccione el Objeto
+			        </f:facet>
+				<p:ajax event="rowSelect"
+					listener="#{ControladorAnexos.onRowSelectObjeto}"
+					update="frm_anexos:dtExcluyeExtra" />
+				<p:column headerText="Cod." style="width:40px;text-align:center">
+					<h:outputText value="#{obj.cd_obj_cotizacion}" />
+				</p:column>
+				<p:column headerText="Descripción">
+					<h:outputText value="#{obj.descripcion_objeto}" />
+				</p:column>
+				<p:column headerText="Total Asegurado">
+					<h:outputText value="#{obj.total_asegurado_objeto}" />
+				</p:column>
+				<p:column headerText="Tasa">
+					<h:outputText value="#{obj.tasa_objeto}" />
+				</p:column>
+				<p:column headerText="Prima">
+					<h:outputText value="#{obj.prima_objeto}" />
+				</p:column>
+			</p:dataTable>
+
+			<p:dataTable id="dtExcluyeExtra" var="subObj" scrollable="true"
+				scrollHeight="80" value="#{ControladorAnexos.lstSubobjetoPol}"
+				selectionMode="multiple"
+				selection="#{ControladorAnexos.selectedLstSubobjetoPol}"
+				rowKey="#{subObj.cd_subobj_cotizacion}"
+				emptyMessage="No found with given criteria"
+				filteredValue="#{ControladorAnexos.filteredLstSubobjetoPol}">
+				<f:facet name="header">
+			            Seleccione el SubObjeto / Extra para Excluir
+			        </f:facet>
+				<p:ajax event="rowSelect"
+					listener="#{ControladorAnexos.onRowSelectExcSubObjeto}"
+					update="frm_anexos:optValAsegExcUbcSubj" process="@this" />
+
+				<p:column headerText="Cod." style="width:40px;text-align:center">
+					<h:outputText value="#{subObj.cd_subobj_cotizacion}" />
+				</p:column>
+				<p:column filterBy="#{subObj.descripcion_subobjeto}" headerText="Descripción"
+					filterMatchMode="contains">
+					<h:outputText value="#{subObj.descripcion_subobjeto}" />
+				</p:column>
+				<p:column headerText="Total Asegurado">
+					<h:outputText value="#{subObj.valor_asegurador_subobjeto}" />
+				</p:column>
+				<p:column headerText="Tasa">
+					<h:outputText value="#{subObj.tasa_subobjeto}" />
+				</p:column>
+				<p:column headerText="Prima">
+					<h:outputText value="#{subObj.prima_subobjeto}" />
+				</p:column>
+			</p:dataTable>
+		</h:panelGrid>
+		<p:panel>
+			<h:panelGrid columns="8">
+				<h:outputText value="Valor Asegurado: " />
+				<p:inputNumber value="#{ControladorAnexos.valAsegExcAne}"
+					id="optValAsegExcUbcSubj">
+				</p:inputNumber>
+				<h:outputText value="Tasa: " />
+				<p:inputNumber value="#{ControladorAnexos.tasaExcAne}"
+					id="optTasaExcUbcSubj">
+					<p:ajax event="change"
+						listener="#{ControladorAnexos.calculaPrimaExclusiones}"
+						update="frm_anexos:optPrimaExcUbcSubj"
+						process="@this,frm_anexos:optValAsegExcUbcSubj" />
+				</p:inputNumber>
+				<h:outputText value="Factor" />
+				<p:selectOneRadio id="optFactorExcUbcSubj"
+					value="#{ControladorAnexos.factorExcAne}">
+					<f:selectItem itemLabel="100%" itemValue="100" />
+					<f:selectItem itemLabel="1000%" itemValue="1000" />
+					<p:ajax event="change"
+						listener="#{ControladorAnexos.calculaPrimaExclusiones}"
+						update="frm_anexos:optPrimaExcUbcSubj"
+						process="@this,frm_anexos:optValAsegExcUbcSubj,frm_anexos:optTasaExcUbcSubj" />
+				</p:selectOneRadio>
+				<h:outputText value="Prima: " />
+				<p:inputNumber value="#{ControladorAnexos.primaExcAne}"
+					id="optPrimaExcUbcSubj">
+				</p:inputNumber>
+			</h:panelGrid>
+			<p:commandButton value="Aceptar" icon="ui-icon-plus"
+				id="btnExcObjtSubj" styleClass="ui-priority-primary"
+				action="#{ControladorAnexos.excluirSubobjeto}" update="@this"
+				process="@this,frm_anexos:optPrimaExcUbcSubj,frm_anexos:optFactorExcUbcSubj,frm_anexos:optTasaExcUbcSubj,frm_anexos:optValAsegExcUbcSubj" />
+		</p:panel>
+	</p:dialog>
+	<!-- fin Dialogo Exclusion -->
+
+	<p:dialog header="Anexo Modificatorio" widgetVar="wDlgModValAsegExtra">
+		<h:form id="frmModValAsegExtr">
+			<p:panel header="Vigencia de la Póliza">
+				<h:panelGrid columns="4">
+					<h:outputText value="Fecha Desde: " />
+					<h:outputText
+						value="#{ControladorAnexos.polizaSeleccionadaParaAnexo.fc_ini_vig_date}"
+						id="optxtFcDesde">
+						<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+					</h:outputText>
+					<h:outputText value="Fecha Hasta: " />
+					<h:outputText
+						value="#{ControladorAnexos.polizaSeleccionadaParaAnexo.fc_fin_vig_date}"
+						id="optxtFcHasta">
+						<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+					</h:outputText>
+					<h:outputText value="Fecha Anexo: " />
+					<h:outputText value="#{ControladorAnexos.fcAnexo}"
+						id="fechaAneotxt">
+						<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+					</h:outputText>
+					<h:outputText value="Días: " />
+					<h:outputText value="#{ControladorAnexos.dias}" id="diasotxt" />
+				</h:panelGrid>
+			</p:panel>
+			<h:panelGrid columns="1" style="width:100%;text-align:center;">
+				<p:dataTable id="dtExcExtraUbc" var="ubc" scrollable="true"
+					scrollHeight="80" value="#{ControladorAnexos.lstUbicacion}"
+					selectionMode="single"
+					selection="#{ControladorAnexos.selectedUbicacion}"
+					rowKey="#{ubc.cd_ubicacion}">
+					<f:facet name="header">
+			            Seleccione la Ubicación
+			        </f:facet>
+					<p:ajax event="rowSelect"
+						listener="#{ControladorAnexos.onRowSelectUbicacion}"
+						update="frm_anexos:frmModValAsegExtr:dtExcExtraObjeto" />
+					<p:column headerText="Cod." style="width:40px;text-align:center">
+						<h:outputText value="#{ubc.cd_ubicacion}" />
+					</p:column>
+					<p:column headerText="Descripción">
+						<h:outputText value="#{ubc.dsc_ubicacion}" />
+					</p:column>
+				</p:dataTable>
+				<p:dataTable id="dtExcExtraObjeto" var="obj" scrollable="true"
+					scrollHeight="80" value="#{ControladorAnexos.lstObjetosPoliza}"
+					selectionMode="single"
+					selection="#{ControladorAnexos.selectedObjetosPoliza}"
+					rowKey="#{obj.cd_obj_cotizacion}">
+					<f:facet name="header">
+			            Seleccione el Objeto
+			        </f:facet>
+					<p:ajax event="rowSelect"
+						listener="#{ControladorAnexos.onRowSelectObjeto}"
+						update="frm_anexos:frmModValAsegExtr:dtExcluyeExtra" />
+					<p:column headerText="Cod." style="width:40px;text-align:center">
+						<h:outputText value="#{obj.cd_obj_cotizacion}" />
+					</p:column>
+					<p:column headerText="Descripción">
+						<h:outputText value="#{obj.descripcion_objeto}" />
+					</p:column>
+					<p:column headerText="Total Asegurado">
+						<h:outputText value="#{obj.total_asegurado_objeto}" />
+					</p:column>
+					<p:column headerText="Tasa">
+						<h:outputText value="#{obj.tasa_objeto}" />
+					</p:column>
+					<p:column headerText="Prima">
+						<h:outputText value="#{obj.prima_objeto}" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dataTable id="dtExcluyeExtra" var="subObj" scrollable="true"
+					scrollHeight="80" value="#{ControladorAnexos.lstSubobjetoPol}"
+					selectionMode="single"
+					selection="#{ControladorAnexos.selectedSubobjetoPol}"
+					rowKey="#{subObj.cd_subobj_cotizacion}">
+					<f:facet name="header">
+			            Seleccione el SubObjeto / Extra para Modificar el Valor Asegurado
+			        </f:facet>
+
+					<p:column headerText="Cod." style="width:40px;text-align:center">
+						<h:outputText value="#{subObj.cd_subobj_cotizacion}" />
+					</p:column>
+					<p:column headerText="Descripción">
+						<h:outputText value="#{subObj.descripcion_subobjeto}" />
+					</p:column>
+					<p:column headerText="Total Asegurado">
+						<h:outputText value="#{subObj.valor_asegurador_subobjeto}" />
+					</p:column>
+					<p:column headerText="Tasa">
+						<h:outputText value="#{subObj.tasa_subobjeto}" />
+					</p:column>
+					<p:column headerText="Prima">
+						<h:outputText value="#{subObj.prima_subobjeto}" />
+					</p:column>
+				</p:dataTable>
+			</h:panelGrid>
+			<p:panel>
+				<h:panelGrid columns="8">
+					<h:outputText value="Valor Asegurado: " />
+					<p:inputNumber value="#{ControladorAnexos.valAsegExcAne}"
+						id="optValAsegExcUbc">
+					</p:inputNumber>
+					<h:outputText value="Tasa: " />
+					<p:inputNumber value="#{ControladorAnexos.tasaExcAne}"
+						id="optTasaExcUbc">
+						<p:ajax event="change"
+							listener="#{ControladorAnexos.calculaPrimaExclusiones}"
+							update="@this frm_anexos:frmModValAsegExtr:optPrimaExcUbc"
+							process="@this,frm_anexos:frmModValAsegExtr:optValAsegExcUbc,
+							frm_anexos:frmModValAsegExtr:optTasaExcUbc,frm_anexos:frmModValAsegExtr:optFactorExcUbc,
+							frm_anexos:frmModValAsegExtr:optPrimaExcUbc" />
+					</p:inputNumber>
+					<h:outputText value="Factor" />
+					<p:selectOneRadio id="optFactorExcUbc"
+						value="#{ControladorAnexos.factorExcAne}">
+						<f:selectItem itemLabel="100%" itemValue="100" />
+						<f:selectItem itemLabel="1000%" itemValue="1000" />
+						<p:ajax event="change"
+							listener="#{ControladorAnexos.calculaPrimaExclusiones}"
+							update="@this frm_anexos:frmModValAsegExtr:optPrimaExcUbc"
+							process="@this,frm_anexos:frmModValAsegExtr:optValAsegExcUbc,
+							frm_anexos:frmModValAsegExtr:optTasaExcUbc,frm_anexos:frmModValAsegExtr:optFactorExcUbc,
+							frm_anexos:frmModValAsegExtr:optPrimaExcUbc" />
+					</p:selectOneRadio>
+					<h:outputText value="Prima: " />
+					<p:inputNumber value="#{ControladorAnexos.primaExcAne}"
+						id="optPrimaExcUbc">
+					</p:inputNumber>
+				</h:panelGrid>
+				<p:commandButton value="Aceptar" icon="ui-icon-plus" id="btnExcObjt"
+					styleClass="ui-priority-primary"
+					action="#{ControladorAnexos.modificaValAsegSubobjeto}"
+					update="@this"
+					process="@this,,frm_anexos:frmModValAsegExtr:optValAsegExcUbc,
+							frm_anexos:frmModValAsegExtr:optTasaExcUbc,frm_anexos:frmModValAsegExtr:optFactorExcUbc,
+							frm_anexos:frmModValAsegExtr:optPrimaExcUbc,frm_anexos:frmModValAsegExtr:dtExcExtraUbc,
+							frm_anexos:frmModValAsegExtr:dtExcExtraObjeto,frm_anexos:frmModValAsegExtr:dtExcluyeExtra" />
+			</p:panel>
+		</h:form>
+	</p:dialog>
+	<p:dialog header="Anexo Anulación/Cancelación"
+		widgetVar="wDlgAnuCanPol">
+		<h:form id="frmAnuCanPol">
+			<p:panel header="Vigencia de la Póliza">
+				<h:panelGrid columns="4">
+					<h:outputText value="Fecha Desde: " />
+					<h:outputText
+						value="#{ControladorAnexos.polizaSeleccionadaParaAnexo.fc_ini_vig_date}"
+						id="optxtFcDesde">
+						<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+					</h:outputText>
+					<h:outputText value="Fecha Hasta: " />
+					<h:outputText
+						value="#{ControladorAnexos.polizaSeleccionadaParaAnexo.fc_fin_vig_date}"
+						id="optxtFcHasta">
+						<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+					</h:outputText>
+					<h:outputText value="Fecha Anexo: " />
+					<h:outputText value="#{ControladorAnexos.fcAnexo}"
+						id="fechaAneotxt">
+						<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+					</h:outputText>
+					<h:outputText value="Días: " />
+					<h:outputText value="#{ControladorAnexos.dias}" id="diasotxt" />
+				</h:panelGrid>
+			</p:panel>
+			<p:panel>
+				<h:panelGrid columns="8">
+					<h:outputText value="Valor Asegurado: " />
+					<p:inputNumber value="#{ControladorAnexos.valAsegExcAne}"
+						id="optValAsegExcUbc">
+					</p:inputNumber>
+					<h:outputText value="Tasa: " />
+					<p:inputNumber value="#{ControladorAnexos.tasaExcAne}"
+						id="optTasaExcUbc">
+						<p:ajax event="change"
+							listener="#{ControladorAnexos.calculaPrimaExclusiones}"
+							update="@this frm_anexos:frmAnuCanPol:optPrimaExcUbc "
+							process="@this,frm_anexos:frmAnuCanPol:optValAsegExcUbc,frm_anexos:frmAnuCanPol:optTasaExcUbc,
+							frm_anexos:frmAnuCanPol:optFactorExcUbc,frm_anexos:frmAnuCanPol:optPrimaExcUbc" />
+					</p:inputNumber>
+					<h:outputText value="Factor" />
+					<p:selectOneRadio id="optFactorExcUbc"
+						value="#{ControladorAnexos.factorExcAne}">
+						<f:selectItem itemLabel="100%" itemValue="100" />
+						<f:selectItem itemLabel="1000%" itemValue="1000" />
+						<p:ajax event="change"
+							listener="#{ControladorAnexos.calculaPrimaExclusiones}"
+							update="@this frm_anexos:frmAnuCanPol:optPrimaExcUbc"
+							process="@this,frm_anexos:frmAnuCanPol:optValAsegExcUbc,frm_anexos:frmAnuCanPol:optTasaExcUbc,
+							frm_anexos:frmAnuCanPol:optFactorExcUbc,frm_anexos:frmAnuCanPol:optPrimaExcUbc" />
+					</p:selectOneRadio>
+					<h:outputText value="Prima: " />
+					<p:inputNumber value="#{ControladorAnexos.primaExcAne}"
+						id="optPrimaExcUbc">
+					</p:inputNumber>
+				</h:panelGrid>
+				<p:commandButton value="Aceptar" icon="ui-icon-plus" id="btnExcObjt"
+					styleClass="ui-priority-primary"
+					action="#{ControladorAnexos.anulaCancelaPol}" update="@this"
+					process="@this,frm_anexos:frmAnuCanPol:optValAsegExcUbc,frm_anexos:frmAnuCanPol:optTasaExcUbc,
+					frm_anexos:frmAnuCanPol:optFactorExcUbc,frm_anexos:frmAnuCanPol:optPrimaExcUbc" />
+			</p:panel>
+		</h:form>
+	</p:dialog>
+	<!-- Inicia Carga Archivo Objeto -->
+	<p:dialog header="Carga de Archivos" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgCargaArchivo" closable="true"
+		appendTo="@(body)" modal="true">
+		<h:form id="frmCargaArchivo">
+			<p:fileUpload listener="#{ControladorAnexos.subirArchivos}"
+				label="Seleccionar" uploadLabel="Adjuntar" cancelLabel="Cancelar"
+				mode="advanced" dragDropSupport="true"
+				update="@this,frm_anexos:objectUbc" sizeLimit="9000000"
+				fileLimit="1" allowTypes="/(\.|\/)(xls)$/">
+			</p:fileUpload>
+
+		</h:form>
+	</p:dialog>
+</ui:composition>

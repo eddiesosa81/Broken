@@ -1,0 +1,351 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+	<h:panelGrid id="gridCobranzasMain" columns="4" style="width:100%;">
+		<h:outputText value="Contratante: " />
+		<p:row>
+			<p:inputText readonly="true" id="txtContratanteCob"
+				value="#{ControladorCobranzas.datosCliente.razon_social_cliente}" />
+			<p:commandButton id="btnBuscaSolicitanteCob"
+				onclick="PF('wbuscaClienteCobranza').show();" icon="ui-icon-search" />
+		</p:row>
+		<h:outputText value="" />
+		<h:outputText value="" />
+
+		<h:outputText value="Póliza: " />
+		<p:inputText id="txtNumPoliza"
+			value="#{ControladorCobranzas.numPoliza}" />
+		<h:outputText value="Factura: " />
+		<p:row>
+			<h:panelGrid columns="1">
+				<p:inputText id="txtNumFactura"
+					value="#{ControladorCobranzas.numFactura}" />
+				<p:selectBooleanCheckbox
+					value="#{ControladorCobranzas.flgFactPerio}"
+					itemLabel="Factura Periódica" id="checkFactPer" />
+			</h:panelGrid>
+		</p:row>
+		<h:outputText value="Ramo: " />
+		<p:selectOneMenu id="ramosCobranzas"
+			value="#{ControladorCobranzas.cdRamo}" style="width:125px"
+			autoWidth="false">
+			<f:selectItem itemValue="0" itemLabel="-- Todos --" />
+			<f:selectItems var="ramosCob"
+				value="#{ControladorCobranzas.listRamos}"
+				itemLabel="#{ramosCob.desc_ramo}" itemValue="#{ramosCob.cd_ramo}" />
+		</p:selectOneMenu>
+		<h:outputText value="Grupo Contratante: " />
+		<p:selectOneMenu id="gpContCobranzas"
+			value="#{ControladorCobranzas.cdContratante}" style="width:125px"
+			autoWidth="false">
+			<f:selectItem itemValue="0" itemLabel="-- Todos --" />
+			<f:selectItems var="gpConCob"
+				value="#{ControladorCobranzas.listGrupoContratante}"
+				itemLabel="#{gpConCob.nombre_corto_grupo_contratante}"
+				itemValue="#{gpConCob.cd_grupo_contratante}" />
+		</p:selectOneMenu>
+
+		<h:outputText value="Aseguradora: " />
+		<p:selectOneMenu id="asegCobranzas"
+			value="#{ControladorCobranzas.cdAseguradora}" style="width:125px"
+			autoWidth="false">
+			<f:selectItem itemValue="0" itemLabel="-- Todos --" />
+			<f:selectItems var="asegCob"
+				value="#{ControladorCobranzas.listAseguradoras}"
+				itemLabel="#{asegCob.nombre_corto_aseguradora}"
+				itemValue="#{asegCob.cd_aseguradora}" />
+		</p:selectOneMenu>
+		<h:outputText value="Tipo: " />
+		<p:selectOneMenu id="tipo" value="#{ControladorCobranzas.tipo}"
+			style="width:125px" autoWidth="false">
+			<f:selectItem itemLabel="- Todos -" itemValue="%" />
+			<f:selectItem itemLabel="MENSUALIZADO" itemValue="1" />
+			<f:selectItem itemLabel="CUOTAS" itemValue="0" />
+		</p:selectOneMenu>
+
+		<h:outputText value="Pago vence desde: " />
+		<p:calendar id="maskDesde" value="#{ControladorCobranzas.fechaDesde}"
+			pattern="dd-MM-yyyy" mask="true" />
+		<h:outputText value="Hasta: " />
+		<p:calendar id="maskHasta" value="#{ControladorCobranzas.fechaHasta}"
+			pattern="dd-MM-yyyy" mask="true" />
+
+	</h:panelGrid>
+	<h:panelGrid columns="4" cellpadding="5">
+		<p:commandButton value="Buscar" id="btnBuscaCobranza"
+			update="frm_cobranza:dataCuotasCobrar"
+			styleClass="ui-priority-primary"
+			action="#{ControladorCobranzas.buscadorCuotas}" />
+		<p:commandButton value="Salir" id="btnSalir" icon="ui-icon-cancel"
+			styleClass="ui-priority-primary"
+			action="/index.xhtml?faces-redirect=true" process="@this"
+			update="@this" />
+	</h:panelGrid>
+
+	<p:dataTable id="dataCuotasCobrar"
+		value="#{ControladorCobranzas.listaCuotasXCobrar}"
+		selection="#{ControladorCobranzas.selectedCuotasXCobrar}"
+		rowKey="#{cc.id}" var="cc" selectionMode="multiple" scrollable="true"
+		scrollHeight="150" style="font-family:Verdana; font-size: 10px;">
+		<f:facet name="header">
+				        Listado de pólizas
+				</f:facet>
+		<p:column headerText="Tipo" style="width:50px;text-align:center">
+			<h:outputText value="#{cc.desc_rubro}" />
+		</p:column>
+		<p:column headerText="Póliza" style="width:50px;text-align:center">
+			<h:outputText value="#{cc.poliza}" />
+		</p:column>
+
+		<p:column headerText="Factura" style="width:110px;text-align:center">
+			<h:outputText value="#{cc.factura_aseguradora}" />
+		</p:column>
+		<p:column headerText="Factura Mensual"
+			style="width:110px;text-align:center">
+			<h:outputText value="#{cc.dfp_factura_aseguradora}" />
+		</p:column>
+
+		<p:column headerText="Cliente" style="width:100px;text-align:center">
+			<h:outputText value="#{cc.razon_social_cliente}" />
+		</p:column>
+
+		<p:column headerText="Aseguradora"
+			style="width:80px;text-align:center">
+			<h:outputText value="#{cc.razon_social_aseguradora}" />
+		</p:column>
+		<p:column headerText="Total Prima Neta"
+			style="width:50px;text-align:center">
+			<h:outputText value="#{cc.total_prima_formapago}" />
+		</p:column>
+
+		<p:column headerText="No. Cuota" style="width:80px;text-align:center">
+			<h:outputText value="#{cc.ncuotas}" />
+		</p:column>
+
+		<p:column headerText="Vencimiento Pago"
+			style="width:80px;text-align:center">
+			<h:outputText value="#{cc.fecha_vencimiento_date}">
+				<f:convertDateTime pattern="dd/MM/yyyy" />
+			</h:outputText>
+		</p:column>
+		<p:column headerText="Valor" style="width:50px;text-align:center">
+			<h:outputText value="#{cc.valor}" />
+		</p:column>
+
+		<p:column headerText="Saldo" style="width:50px;text-align:center">
+			<h:outputText value="#{cc.saldo}" />
+		</p:column>
+		<p:column headerText="Vigencia Desde"
+			style="width:80px;text-align:center">
+			<h:outputText value="#{cc.fc_inicio_vigencia}">
+				<f:convertDateTime pattern="dd/MM/yyyy" />
+			</h:outputText>
+		</p:column>
+		<p:column headerText="Vigencia Hasta"
+			style="width:80px;text-align:center">
+			<h:outputText value="#{cc.fc_fin_vigencia}">
+				<f:convertDateTime pattern="dd/MM/yyyy" />
+			</h:outputText>
+		</p:column>
+		<p:column headerText="Mensualizado"
+			style="width:80px;text-align:center">
+			<h:outputText value="#{cc.fact_periodica_cot}">
+			</h:outputText>
+		</p:column>
+		<f:facet name="footer">
+			<p:commandButton id="btnProcesarPolizas"
+				process="@this,frm_cobranza:dataCuotasCobrar"
+				update="@this frm_cobranza:lblTotalCobranza 
+					frm_cobranza:valPagoCob frm_cobranza:valRetenCob,
+					frm_cobranza:lblTotalCobranzaVal,frm_cobranza:outCob2,
+					frm_cobranza:outCob3,frm_cobranza:outCob1"
+				icon="ui-icon-search" value="Cobrar"
+				styleClass="ui-priority-primary"
+				action="#{ControladorCobranzas.sumaTotalCobranza}" />
+		</f:facet>
+	</p:dataTable>
+
+	<!-- busca y selecciona cliente -->
+	<p:dialog header="Buscar cliente" draggable="true"
+		widgetVar="wbuscaClienteCobranza" showEffect="fade" hideEffect="fade"
+		closable="true">
+		<h:panelGrid columns="1" style="width:100%;text-align:center;">
+			<p:row>
+				<p:inputText id="contratanteBuscado"
+					value="#{ControladorCobranzas.str_cliente}" />
+				<p:commandButton value="Buscar"
+					update="frm_cobranza:listadoClientesCobranza"
+					actionListener="#{ControladorCobranzas.buscarClientes}"
+					icon="ui-icon-search"
+					process="@this,frm_cobranza:contratanteBuscado" />
+			</p:row>
+		</h:panelGrid>
+		<p:dataTable id="listadoClientesCobranza" var="client"
+			value="#{ControladorCobranzas.listaClientes}" tableStyle="width:auto"
+			rows="5" paginator="true"
+			paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+			<p:column headerText="CD" visible="false">
+				<h:outputText value="#{client.cd_cliente}" />
+			</p:column>
+			<p:column headerText="Identificación">
+				<h:outputText value="#{client.identificacion_cliente}" />
+			</p:column>
+
+			<p:column headerText="Cliente">
+				<h:outputText
+					value="#{client.razon_social_cliente} #{client.primer_apellido_cliente} #{client.segundo_apellido_cliente} #{client.primer_nombre_cliente} #{client.segundo_nombre_cliente}" />
+			</p:column>
+
+			<p:column headerText="Razón Social">
+				<h:outputText value="#{client.razon_social_cliente}" />
+			</p:column>
+
+			<p:column headerText="Tipo Cliente">
+				<h:outputText value="#{client.tipo_cliente}" />
+			</p:column>
+
+			<p:column style="width:32px;text-align: center"
+				headerText="Seleccionar" exportable="false">
+				<p:commandButton icon="ui-icon-check" title="Seleccionar"
+					process="@this,frm_cobranza:listadoClientesCobranza"
+					actionListener="#{ControladorCobranzas.buscarClientesXId}"
+					update="@this frm_cobranza:txtContratanteCob"
+					onclick="PF('wbuscaClienteCobranza').hide();">
+					<f:param name="identClienteCobranza" value="#{client.cd_cliente}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+	</p:dialog>
+	<!-- realiza la cobranza de las polizas/facturas seleccionadas -->
+	<p:dialog header="Cobrar cuotas" draggable="true"
+		widgetVar="wcobraCuotasCobranza" showEffect="fade" hideEffect="fade"
+		closable="true" height="700" width="1300">
+		<h:panelGrid columns="2">
+			<p:row>
+				<h:panelGrid columns="2">
+					<h:outputText value="Forma de pago" />
+					<p:selectOneMenu id="cmbFormaPago"
+						value="#{ControladorCobranzas.pagos.forma_pago}"
+						style="width:125px">
+						<p:ajax listener="#{ControladorCobranzas.activaSLOMCruceFact}"
+							update="frm_cobranza:slomCrucFact" />
+						<f:selectItem itemLabel="Contado" itemValue="Contado" />
+						<f:selectItem itemLabel="Cheque" itemValue="Cheque" />
+						<f:selectItem itemLabel="Directo a la Aseguradora"
+							itemValue="Directo a la Aseguradora" />
+						<f:selectItem itemLabel="Débito Tarjeta"
+							itemValue="Débito Tarjeta" />
+						<f:selectItem itemLabel="Débito Cuenta" itemValue="Débito Cuenta" />
+						<f:selectItem itemLabel="Deposito" itemValue="Deposito" />
+						<f:selectItem itemLabel="Nota de Crédito"
+							itemValue="Nota de Crédito" />
+						<f:selectItem itemLabel="Tarjeta de Crédito"
+							itemValue="Tarjeta de Crédito" />
+						<f:selectItem itemLabel="Transferencia" itemValue="Transferencia" />
+						<f:selectItem itemLabel="Cruce de Facturas"
+							itemValue="Cruce de Facturas" />
+						<f:selectItem itemLabel="Devolución NC" itemValue="Devolucion NC" />
+						<f:selectItem itemLabel="Aplica NC" itemValue="Aplica NC" />
+					</p:selectOneMenu>
+					<h:outputText value="Cruce Total N.C:" />
+					<p:selectBooleanCheckbox id="slomCrucFact"
+						value="#{ControladorCobranzas.flgCruceFactTot}"
+						disabled="#{ControladorCobranzas.flgCruceFactTotSloMenu}" />
+					<h:outputText id="lblTotalCobranza" value="Total x Cobrar "
+						style="float:rigth;font-weight:bold;" />
+					<h:outputText id="lblTotalCobranzaVal"
+						value="#{ControladorCobranzas.totalCobranza}"
+						style="float:rigth;font-weight:bold;" />
+					<h:outputText value="Valor retención" />
+					<p:inputNumber id="valRetenCob"
+						value="#{ControladorCobranzas.valorRetencion}">
+						<f:ajax listener="#{ControladorCobranzas.calcAbono}"
+							render="frm_cobranza:valPagoCob" />
+					</p:inputNumber>
+					<h:outputText value="# Doc. Retención" />
+					<p:inputText id="docuCob"
+						value="#{ControladorCobranzas.noRetencion}"></p:inputText>
+					<h:outputText value="# Cuenta" />
+					<p:inputText id="cuentaCob"
+						value="#{ControladorCobranzas.pagos.cta_cte}"></p:inputText>
+					<h:outputText value="Banco" />
+					<p:inputText id="bancoCob"
+						value="#{ControladorCobranzas.pagos.banco}"></p:inputText>
+					<h:outputText value="Abono" />
+					<p:inputNumber id="valPagoCob"
+						value="#{ControladorCobranzas.valorPagoT}"></p:inputNumber>
+					<p:commandButton value="Agregar"
+						update="frm_cobranza:listadoPagoCobranza 
+							frm_cobranza:outCob1 
+							frm_cobranza:outCob2 
+							frm_cobranza:outCob3  
+							frm_cobranza:valPagoCob"
+						action="#{ControladorCobranzas.agregaPago}" icon="ui-icon-plus"
+						process="@this,frm_cobranza:cmbFormaPago,frm_cobranza:valRetenCob,
+							frm_cobranza:docuCob,frm_cobranza:cuentaCob,
+							frm_cobranza:bancoCob,frm_cobranza:valPagoCob,
+							frm_cobranza:listadoPagoCobranza" />
+					<p:commandButton value="Re Calcular"
+						update="@this,frm_cobranza:valPagoCob,
+							frm_cobranza:outCob1,
+							frm_cobranza:outCob2,
+							frm_cobranza:outCob3"
+						action="#{ControladorCobranzas.reCalcular}" icon="ui-icon-refresh"
+						process="@this,frm_cobranza:valRetenCob,
+							frm_cobranza:valPagoCob,
+							frm_cobranza:listadoPagoCobranza" />
+				</h:panelGrid>
+			</p:row>
+			<p:row>
+				<p:dataTable id="listadoPagoCobranza" var="detpago"
+					value="#{ControladorCobranzas.listPagos}" scrollable="true"
+					scrollHeight="80"
+					style="width:500px;font-family:Verdana; font-size: 10px;">
+					<f:facet name="header">
+
+					</f:facet>
+					<p:column headerText="Forma de Pago">
+						<h:outputText value="#{detpago.forma_pago}" />
+					</p:column>
+					<p:column headerText="Valor Pago">
+						<h:outputText value="#{detpago.valor_total_pago}" />
+					</p:column>
+					<p:column headerText="Doc.Retención">
+						<h:outputText value="#{detpago.no_retencion}" />
+					</p:column>
+
+				</p:dataTable>
+			</p:row>
+		</h:panelGrid>
+		<p:panelGrid columns="2">
+			<h:outputText value="Total a Pagar" />
+			<h:outputText id="outCob1"
+				value="#{ControladorCobranzas.sumaFormasPagos}" />
+			<h:outputText value="Total x Cobrar" />
+			<h:outputText id="outCob2"
+				value="#{ControladorCobranzas.totalCobranza}" />
+			<h:outputText value="Saldo Pendiente" />
+			<h:outputText id="outCob3"
+				value="#{ControladorCobranzas.saldoFormasPagos}" />
+		</p:panelGrid>
+
+		<br />
+
+		<h:panelGrid columns="4" cellpadding="5">
+			<p:commandButton value="Guardar Cobro" id="btnAceptaCobrarCobranza"
+				update="@this frm_cobranza:dataCuotasCobrar"
+				styleClass="ui-priority-primary"
+				action="/index.xhtml?faces-redirect=true"
+				actionListener="#{ControladorCobranzas.guardaCobranza}"
+				process="@this,frm_cobranza:listadoPagoCobranza,frm_cobranza:dataCuotasCobrar,
+					frm_cobranza:slomCrucFact" />
+			<p:commandButton value="Cancelar" id="btnCancelCobrarCobranza"
+				icon="ui-icon-cancel" action="/index.xhtml?faces-redirect=true"
+				process="@this" styleClass="ui-priority-primary" update="@this" />
+		</h:panelGrid>
+	</p:dialog>
+	<!-- fin realiza la cobranza de las polizas/facturas seleccionadas -->
+</ui:composition>

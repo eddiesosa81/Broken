@@ -1,0 +1,320 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/templates/Template.xhtml">
+	<ui:define name="tituloPagina">Actualización de Provisionales</ui:define>
+	<ui:define name="contenido">
+		<p:ajaxStatus
+			style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+			<f:facet name="start">
+				<p:graphicImage value="/images/ajax-loadercircle.gif" />
+			</f:facet>
+			<f:facet name="complete">
+				<h:outputText value="" />
+			</f:facet>
+		</p:ajaxStatus>
+		<h:form id="frmActProv">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<h:panelGrid columns="8">
+				<h:outputText value="Endoso" />
+				<p:selectOneMenu id="tipoAne"
+					value="#{ControladorAnexoProvisional.tipoAnexoSelec}">
+					<f:selectItem itemLabel="INCLUSION" itemValue="INCLUSION" />
+					<f:selectItem itemLabel="EXCLUSION" itemValue="EXCLUSION" />
+					<f:selectItem itemLabel="MODIFICATORIO" itemValue="MODVALASEG" />
+				</p:selectOneMenu>
+				<h:outputText value="Contratante: " />
+				<p:row>
+					<p:inputText readonly="true" id="txtContratanteCob"
+						value="#{ControladorAnexoProvisional.datosCliente.razon_social_cliente}" />
+					<p:commandButton id="btnBuscaClie"
+						onclick="PF('wbuscaCliente').show();" icon="ui-icon-search" />
+				</p:row>
+				<h:outputText value="Póliza: " />
+				<p:inputText id="txtNumPoliza"
+					value="#{ControladorAnexoProvisional.numPoliza}" />
+				<p:row></p:row>
+			</h:panelGrid>
+			<h:panelGrid columns="1">
+				<p:row></p:row>
+				<p:row></p:row>
+			</h:panelGrid>
+
+			<h:panelGrid columns="3">
+				<p:commandButton icon="ui-icon-zoomin" value="Consultar"
+					styleClass="ui-priority-primary"
+					process="@this,frmActProv:tipoAne,frmActProv:txtContratanteCob,frmActProv:txtNumPoliza"
+					update="frmActProv:checkboxDT"
+					actionListener="#{ControladorAnexoProvisional.consultaProv}">
+				</p:commandButton>
+				<p:commandButton value="Forma de Pago" id="btnFrmPagoA"
+					icon="ui-icon-plus" styleClass="ui-priority-primary"
+					action="#{ControladorAnexoProvisional.agregaFormaPago}"
+					process="@this,frmActProv:checkboxDT"
+					update="frmActProv:FactAsegFrmP,frmActProv:iptFrmPrimTot,frmActProv:iptFrmPDerEmi,frmActProv:iptFrmSupBanco,
+					frmActProv:iptFrmSegCamp,frmActProv:iptFrmOtroVal,frmActProv:iptFrmIva,frmActProv:sbmAplicaIva,frmActProv:sbmCalculaIva,
+					frmActProv:iptFrmTotla,frmActProv:iptFrmCuotaIni,frmActProv:iptFrmNumPago" />
+				<p:commandButton action="/index.xhtml?faces-redirect=true"
+					value="Salir" id="btnSalir" icon="ui-icon-cancel"
+					styleClass="ui-priority-primary" />
+			</h:panelGrid>
+			<h:panelGrid columns="1">
+				<p:row></p:row>
+				<p:row></p:row>
+				<p:row></p:row>
+				<p:row></p:row>
+			</h:panelGrid>
+
+			<h:panelGrid columns="1" cellpadding="5">
+				<p:row>
+					<p:dataTable id="checkboxDT" var="ramCot"
+						value="#{ControladorAnexoProvisional.lstCotProvisiol}"
+						selection="#{ControladorAnexoProvisional.selectedlstCotProvisiol}"
+						rowKey="#{ramCot.cd_ramo_cotizacion}"
+						style="font-family:Verdana; font-size: 10px;">
+						<f:facet name="header">
+						  Póliza
+						</f:facet>
+						<p:ajax event="rowSelect"
+							listener="#{ControladorAnexoProvisional.onRowSelectRamCot}"
+							update="frmActProv:dtUbcTot,frmActProv:dtObjTot,frmActProv:dtSubObjTot" />
+						<p:column selectionMode="multiple"
+							style="width:16px;text-align:center" />
+						<p:column headerText="CD" visible="false">
+							<h:outputText value="#{ramCot.cd_ramo_cotizacion}" />
+						</p:column>
+						<p:column headerText="Ramo">
+							<h:outputText value="#{ramCot.desc_ramo}" />
+						</p:column>
+						<p:column headerText="Grupo Contratante">
+							<h:outputText value="#{ramCot.nm_grupo_contratante}" />
+						</p:column>
+						<p:column headerText="Total Asegurado">
+							<h:outputText value="#{ramCot.total_asegurado}">
+								<f:convertNumber type="currency" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Total Prima">
+							<h:outputText value="#{ramCot.total_prima}">
+								<f:convertNumber type="currency" />
+							</h:outputText>
+						</p:column>
+					</p:dataTable>
+				</p:row>
+				<p:row>
+					<p:dataTable id="dtUbcTot" var="ubicaTot"
+						value="#{ControladorAnexoProvisional.listadoUbicaciones}"
+						scrollable="true" scrollHeight="150" selectionMode="single"
+						style="font-family:Verdana; font-size: 9px;"
+						selection="#{ControladorAnexoProvisional.selectedDatosUbicacion}"
+						rowKey="#{ubicaTot.cd_ubicacion}">
+						<f:facet name="header">
+						  Ubicaciones
+						</f:facet>
+						<p:ajax event="rowSelect"
+							listener="#{ControladorAnexoProvisional.onRowSelectUbc}"
+							update="frmActProv:dtObjTot,frmActProv:dtSubObjTot" />
+
+						<p:column headerText="id" visible="false">
+							<h:outputText value="#{ubicaTot.cd_ubicacion}" />
+						</p:column>
+						<p:column headerText="Descripción">
+							<h:outputText value="#{ubicaTot.dsc_ubicacion}" />
+						</p:column>
+					</p:dataTable>
+				</p:row>
+				<p:row>
+					<p:dataTable id="dtObjTot" var="objTot"
+						value="#{ControladorAnexoProvisional.lstObjetoConsulta}"
+						scrollable="true" scrollHeight="150" selectionMode="single"
+						style="font-family:Verdana; font-size: 10px;"
+						selection="#{ControladorAnexoProvisional.selectedObjetoConsulta}"
+						rowKey="#{objTot.cd_obj_cotizacion}">
+						<f:facet name="header">
+						  Objetos Asegurados
+						</f:facet>
+						<p:ajax event="rowSelect"
+							listener="#{ControladorAnexoProvisional.onRowSelectObj}"
+							update="frmActProv:dtSubObjTot" />
+
+						<p:column headerText="Descripción">
+							<h:outputText value="#{objTot.descripcion_objeto}" />
+						</p:column>
+						<p:column headerText="Valor Asegurado">
+							<h:outputText value="#{objTot.valor_asegurador_objeto}">
+								<f:convertNumber type="currency" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Total Asegurado">
+							<h:outputText value="#{objTot.total_asegurado_objeto}">
+								<f:convertNumber type="currency" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Prima">
+							<h:outputText value="#{objTot.prima_objeto}">
+								<f:convertNumber type="currency" />
+							</h:outputText>
+						</p:column>
+					</p:dataTable>
+				</p:row>
+				<p:row>
+					<p:dataTable id="dtSubObjTot" var="subObjTot"
+						value="#{ControladorAnexoProvisional.lstSubObjetoConsulta}"
+						scrollable="true" scrollHeight="150"
+						style="font-family:Verdana; font-size: 10px;">
+						<f:facet name="header">
+						  Extras
+						</f:facet>
+						<p:column headerText="Descripción">
+							<h:outputText value="#{subObjTot.descripcion_subobjeto}" />
+						</p:column>
+						<p:column headerText="Valor">
+							<h:outputText value="#{subObjTot.valor_asegurador_subobjeto}">
+								<f:convertNumber type="currency" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Prima">
+							<h:outputText value="#{subObjTot.prima_subobjeto}">
+								<f:convertNumber type="currency" />
+							</h:outputText>
+						</p:column>
+					</p:dataTable>
+				</p:row>
+			</h:panelGrid>
+			<!-- busca y selecciona cliente -->
+			<p:dialog header="Buscar cliente" draggable="true"
+				widgetVar="wbuscaCliente" showEffect="fade" hideEffect="fade"
+				closable="true">
+				<h:panelGrid columns="1" style="width:100%;text-align:center;">
+					<p:row>
+						<p:inputText id="contratanteBuscado"
+							value="#{ControladorAnexoProvisional.str_cliente}"
+							style="text-transform:uppercase;"
+							onkeyup="javascript:this.value=this.value.toUpperCase();" />
+						<p:commandButton value="Buscar" update="listadoClientes"
+							actionListener="#{ControladorAnexoProvisional.buscarClientes}"
+							icon="ui-icon-search" process="@this,contratanteBuscado" />
+					</p:row>
+				</h:panelGrid>
+				<p:dataTable id="listadoClientes" var="client"
+					value="#{ControladorAnexoProvisional.listaClientes}"
+					style="font-family:Verdana; font-size: 10px;"
+					tableStyle="width:auto" rows="5" paginator="true"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+					<p:column headerText="Identificación">
+						<h:outputText value="#{client.identificacion_cliente}" />
+					</p:column>
+
+					<p:column headerText="Cliente">
+						<h:outputText
+							value="#{client.razon_social_cliente} #{client.primer_apellido_cliente} #{client.segundo_apellido_cliente} #{client.primer_nombre_cliente} #{client.segundo_nombre_cliente}" />
+					</p:column>
+
+					<p:column headerText="Razón Social">
+						<h:outputText value="#{client.razon_social_cliente}" />
+					</p:column>
+
+					<p:column style="width:32px;text-align: center"
+						headerText="Seleccionar" exportable="false">
+						<p:commandButton icon="ui-icon-check" title="Seleccionar"
+							process="@this,listadoClientes"
+							actionListener="#{ControladorAnexoProvisional.buscarClientesXId}"
+							update="frmActProv:txtContratanteCob"
+							onclick="PF('wbuscaCliente').hide();">
+							<f:param name="identClienteCobranza" value="#{client.cd_cliente}" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+			</p:dialog>
+			<!-- nueva Forma de Pago -->
+			<p:dialog header="Forma de Pago" draggable="true"
+				widgetVar="nuevaFormaPago" showEffect="fade" hideEffect="fade"
+				closable="true">
+				<h:panelGrid id="pgridRamo" columns="4" cellpadding="5">
+					<h:outputText value="Número de Factura: " />
+					<p:inputMask value="#{ControladorAnexoProvisional.facturaNo}"
+						mask="999-999-999999999" id="FactAsegFrmP" />
+					<h:outputText value="Forma de Pago: " />
+					<p:selectOneMenu id="slomFrmPago"
+						value="#{ControladorAnexoProvisional.tpFromaPago}"
+						style="width:125px">
+						<f:selectItem itemLabel="Contado" itemValue="CONTADO" />
+						<f:selectItem itemLabel="Tarjeta Crédito" itemValue="TARJETA" />
+						<f:selectItem itemLabel="Crédito" itemValue="CREDITO" />
+						<f:selectItem itemLabel="Débito Bancario" itemValue="DEBITO" />
+					</p:selectOneMenu>
+					<h:outputText value="Prima Neta: " />
+					<p:inputText value="#{ControladorAnexoProvisional.frmPagoPrimaTot}"
+						id="iptFrmPrimTot" />
+					<h:outputText value="Derecho de Emisión: " />
+					<p:inputText
+						value="#{ControladorAnexoProvisional.frmPagoDerechoEmision}"
+						id="iptFrmPDerEmi" />
+					<h:outputText value="Super de Bancos: " />
+					<p:inputText
+						value="#{ControladorAnexoProvisional.frmPagoSuperBancos}"
+						id="iptFrmSupBanco" />
+					<h:outputText value="Seguro Campesino: " />
+					<p:inputText
+						value="#{ControladorAnexoProvisional.frmPagoSegCampesino}"
+						id="iptFrmSegCamp" />
+					<h:outputText value="Otro Valor: " />
+					<p:inputText
+						value="#{ControladorAnexoProvisional.frmPagoOtroValor}"
+						id="iptFrmOtroVal" />
+					<h:outputText value="IVA: " />
+					<p:inputText value="#{ControladorAnexoProvisional.frmPagoIva}"
+						id="iptFrmIva" />
+
+					<h:outputText value="Aplica IVA: " />
+					<p:selectBooleanCheckbox
+						value="#{ControladorAnexoProvisional.aplicaIva}" id="sbmAplicaIva" />
+					<h:outputText value="Sin IVA: " />
+					<p:selectBooleanCheckbox
+						value="#{ControladorAnexoProvisional.calculaIva}"
+						id="sbmCalculaIva" />
+
+					<h:outputText value="TOTAL: " />
+					<p:row>
+						<h:outputText value="#{ControladorAnexoProvisional.frmPagoTotal}"
+							id="iptFrmTotla" />
+						<p:commandButton icon="ui-icon-refresh"
+							action="#{ControladorAnexoProvisional.calculaPagoTotal}"
+							id="btnfrmPagAct"
+							update="frmActProv:FactAsegFrmP,frmActProv:iptFrmPrimTot,frmActProv:iptFrmPDerEmi,frmActProv:iptFrmSupBanco,
+					frmActProv:iptFrmSegCamp,frmActProv:iptFrmOtroVal,frmActProv:iptFrmIva,frmActProv:sbmAplicaIva,frmActProv:sbmCalculaIva,
+					frmActProv:iptFrmTotla,frmActProv:iptFrmCuotaIni,frmActProv:iptFrmNumPago"
+							title="Calcular"
+							process="@this,frmActProv:FactAsegFrmP,frmActProv:iptFrmPrimTot,frmActProv:iptFrmPDerEmi,frmActProv:iptFrmSupBanco,
+					frmActProv:iptFrmSegCamp,frmActProv:iptFrmOtroVal,frmActProv:iptFrmIva,frmActProv:sbmAplicaIva,frmActProv:sbmCalculaIva,
+					frmActProv:iptFrmTotla,frmActProv:iptFrmCuotaIni,frmActProv:iptFrmNumPago" />
+					</p:row>
+					<h:outputText value="%Cuota Inicial: " />
+					<p:inputText value="#{ControladorAnexoProvisional.frmPagoCuotaIni}"
+						id="iptFrmCuotaIni" />
+					<h:outputText value="Num. Pagos: " />
+					<p:inputText value="#{ControladorAnexoProvisional.frmPagoNumPago}"
+						id="iptFrmNumPago" />
+
+
+				</h:panelGrid>
+				<p:commandButton value="Aceptar" id="btnFrmPagoSave"
+					icon="ui-icon-plus" styleClass="ui-priority-primary"
+					action="#{ControladorAnexoProvisional.guardaFormaPago}"
+					process="@this,frmActProv:FactAsegFrmP,frmActProv:iptFrmPrimTot,frmActProv:iptFrmPDerEmi,frmActProv:iptFrmSupBanco,
+					frmActProv:iptFrmSegCamp,frmActProv:iptFrmOtroVal,frmActProv:iptFrmIva,frmActProv:sbmAplicaIva,frmActProv:sbmCalculaIva,
+					frmActProv:iptFrmTotla,frmActProv:iptFrmCuotaIni,frmActProv:iptFrmNumPago"
+					update="frmActProv:FactAsegFrmP,frmActProv:iptFrmPrimTot,frmActProv:iptFrmPDerEmi,frmActProv:iptFrmSupBanco,
+					frmActProv:iptFrmSegCamp,frmActProv:iptFrmOtroVal,frmActProv:iptFrmIva,frmActProv:sbmAplicaIva,frmActProv:sbmCalculaIva,
+					frmActProv:iptFrmTotla,frmActProv:iptFrmCuotaIni,frmActProv:iptFrmNumPago,frmActProv:checkboxDT,
+					frmActProv:dtUbcTot,frmActProv:dtSubObjTot" />
+			</p:dialog>
+		</h:form>
+	</ui:define>
+	<ui:define name="tituloFormulario">Actualiza Anexo Provisional</ui:define>
+</ui:composition>
+</html>

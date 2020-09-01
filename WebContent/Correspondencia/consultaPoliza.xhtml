@@ -1,0 +1,565 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+	<h:panelGrid columns="2" style="width:100%;text-align:center;">
+		<p:row>
+			<p:panelGrid columns="6">
+				<p:inputText id="iptnumPoliza"
+					value="#{ControladorConsultaPoliza.numPoliza}"
+					placeholder="No. Póliza" />
+				<p:inputText id="iptnumFactura"
+					value="#{ControladorConsultaPoliza.numFactura}"
+					placeholder="No. Factura/N.C." />
+				<p:inputText id="cotizaBuscaPol"
+					value="#{ControladorConsultaPoliza.nmCliente}"
+					placeholder="Apellido / Razon Social" />
+				<p:selectOneMenu id="gCtrtBusc"
+					value="#{ControladorConsultaPoliza.codGrupoContratante}"
+					style="width:125px" autoWidth="false">
+					<f:selectItem itemValue="0" itemLabel="Grupo Contratante" />
+					<f:selectItems var="gcontratante"
+						value="#{ControladorConsultaPoliza.listaGrupoContratante}"
+						itemLabel="#{gcontratante.nombre_corto_grupo_contratante}"
+						itemValue="#{gcontratante.cd_grupo_contratante}" />
+				</p:selectOneMenu>
+				<p:inputText value="#{ControladorConsultaPoliza.objAsegurado}"
+					placeholder="Descripción Obj" id="intxtbuscaPolObjAseg"
+					style="text-transform:uppercase;"
+					onkeyup="javascript:this.value=this.value.toUpperCase();"></p:inputText>
+				<p:inputText value="#{ControladorConsultaPoliza.placa}"
+					placeholder="Placa" id="intxtbuscaPolPlaca"></p:inputText>
+				<p:inputText value="#{ControladorConsultaPoliza.motor}"
+					placeholder="No.Motor" id="intxtbuscaPolMotor"></p:inputText>
+				<p:selectOneRadio id="rbotonFac"
+					value="#{ControladorConsultaPoliza.rBotonPolAne}">
+					<f:selectItem itemLabel="Póliza" itemValue="poliza" />
+					<f:selectItem itemLabel="Anexo" itemValue="anexo" />
+					<f:selectItem itemLabel="Anula/Cancela" itemValue="anulaCancela" />
+				</p:selectOneRadio>
+				<p:commandButton value="Buscar" styleClass="ui-priority-primary"
+					actionListener="#{ControladorConsultaPoliza.buscaPoliza}"
+					update="@this frm_consultas:tab_consulta:listadoPolizaBusca"
+					icon="ui-icon-search"
+					process="@this,frm_consultas:tab_consulta:rbotonFac,frm_consultas:tab_consulta:iptnumPoliza,
+						frm_consultas:tab_consulta:iptnumFactura,frm_consultas:tab_consulta:cotizaBuscaPol,
+						frm_consultas:tab_consulta:gCtrtBusc,frm_consultas:tab_consulta:intxtbuscaPolPlaca,
+						frm_consultas:tab_consulta:intxtbuscaPolMotor,
+						frm_consultas:tab_consulta:intxtbuscaPolObjAseg" />
+				<p:commandButton value="Renueva Póliza"
+					styleClass="ui-priority-primary"
+					actionListener="#{ControladorConsultaPoliza.renuevaPol}"
+					update="@this" icon="ui-icon-transferthick-e-w"
+					process="@this,frm_consultas:tab_consulta:listadoPolizaBusca" />
+				<p:commandButton value="Gestionar" id="btnGestiona"
+					icon="ui-icon-suitcase" styleClass="ui-priority-primary"
+					action="#{ControladorConsultaPoliza.gestionaCliente}"
+					update="@this,frmGestionaClie:tbviewClie:clienteApePrimer,
+						frmGestionaClie:tbviewClie:clienteApeSeg,frmGestionaClie:tbviewClie:clienteNomPrimer,
+						frmGestionaClie:tbviewClie:clienteNomSeg,frmGestionaClie:tbviewClie:clienteRazSoc,
+						frmGestionaClie:tbviewClie:clienteTipID,frmGestionaClie:tbviewClie:clienteIdentif,
+						frmGestionaClie:tbviewClie:clienteEstCiv,frmGestionaClie:tbviewClie:clienteFecNaci,
+						frmGestionaClie:tbviewClie:clienteDir,frmGestionaClie:tbviewClie:clienteCiudad,
+						frmGestionaClie:tbviewClie:clienteSector,frmGestionaClie:tbviewClie:clienteSector,
+						frmGestionaClie:tbviewClie:clienteProvincia,frmGestionaClie:tbviewClie:clienteRef,
+						frmGestionaClie:tbviewClie:clienteCiudadTelf,frmGestionaClie:tbviewClie:impNumTelf,
+						frmGestionaClie:tbviewClie:impNumTelfOfi,frmGestionaClie:tbviewClie:impExtTelf,
+						frmGestionaClie:tbviewClie:impNumTelfCel,frmGestionaClie:tbviewClie:impCorreoP,
+						frmGestionaClie:tbviewClie:impNmConta,frmGestionaClie:tbviewClie:impNumTelfCont,
+						frmGestionaClie:tbviewClie:impNumCelCont,frmGestionaClie:tbviewClie:impCorreoPCont,
+						frmGestionaClie:tbviewClie:impCargoCont,frmGestionaClie:tbviewClie:impDepCont,
+						frmGestionaClie:tbviewClie:impDireccCont,frmGestionaClie:tbviewClie:polGestionada,
+						frmGestionaClie:tblgesT,frmGestionaClie:tbviewClie:dtPlan,
+						frmGestionaClie:tbviewClie:dtCobertura,frmGestionaClie:tbviewClie:dtDeducible,
+						frmGestionaClie:tbviewClie:dtClausulas"
+					process="@this" />
+				<p:commandButton value="Salir" icon="ui-icon-cancel" update="@all"
+					action="/index.xhtml?faces-redirect=true"
+					styleClass="ui-priority-primary" />
+			</p:panelGrid>
+		</p:row>
+	</h:panelGrid>
+
+	<p:dataTable id="listadoPolizaBusca" var="pol" scrollable="true"
+		scrollHeight="80"
+		value="#{ControladorConsultaPoliza.lstConsultaPoliza}"
+		selectionMode="single"
+		selection="#{ControladorConsultaPoliza.selectedConsultaPoliza}"
+		rowKey="#{pol.cd_ramo_cotizacion}"
+		style="font-family:Verdana; font-size: 10px;">
+		<f:facet name="header">
+						  Seleccione la Póliza
+						</f:facet>
+		<p:ajax event="rowSelect"
+			listener="#{ControladorConsultaPoliza.onRowSelectPol}"
+			update="@this frm_consultas:tab_consulta:dtUbcPol frm_consultas:tab_consulta:dtExcel
+				 frm_consultas:panelTranPol" />
+
+		<p:column headerText="No.">
+			<h:outputText value="#{pol.num_cotizacion}" />
+		</p:column>
+		<p:column headerText="Cliente">
+			<h:outputText value="#{pol.cliente}" />
+		</p:column>
+		<p:column headerText="Aseguradora">
+			<h:outputText value="#{pol.nombre_corto_aseguradora}" />
+		</p:column>
+		<p:column headerText="Canal">
+			<h:outputText value="#{pol.nmSubagente}" />
+		</p:column>
+		<p:column headerText="Grupo Contratante">
+			<h:outputText value="#{pol.nm_grupo_contratante}" />
+		</p:column>
+		<p:column headerText="Póliza">
+			<h:outputText value="#{pol.poliza}" />
+		</p:column>
+		<p:column headerText="Factura">
+			<h:outputText value="#{pol.factura_aseguradora}" />
+		</p:column>
+		<p:column headerText="Anexo">
+			<h:outputText value="#{pol.anexo}" />
+		</p:column>
+		<p:column headerText="Ramo">
+			<h:outputText value="#{pol.desc_ramo}" />
+		</p:column>
+
+		<p:column headerText="Vigencia Desde:">
+			<h:outputText value="#{pol.fc_ini_vig_date}">
+				<f:convertDateTime pattern="dd/MM/yyyy" />
+			</h:outputText>
+		</p:column>
+		<p:column headerText="Vigencia Hasta:">
+			<h:outputText value="#{pol.fc_fin_vig_date}">
+				<f:convertDateTime pattern="dd/MM/yyyy" />
+			</h:outputText>
+		</p:column>
+		<p:column headerText="Total Asegurado:">
+			<h:outputText value="#{pol.total_asegurado}">
+			</h:outputText>
+		</p:column>
+		<p:column headerText="Tipo">
+			<h:outputText value="#{pol.desc_rubro}">
+			</h:outputText>
+		</p:column>
+		<p:column style="width:22px">
+			<p:commandButton title="Nota Aclaratoria"
+				onclick="PF('notaAclaDialog').show();"
+				actionListener="#{ControladorConsultaPoliza.onRowNotaAclaratoria(pol)}"
+				update="@this,frm_consultas:tab_consulta:dtDetAcla"
+				icon="ui-icon-suitcase" style="width:19px" process="@this">
+			</p:commandButton>
+		</p:column>
+		<f:facet name="footer">
+			<p:commandButton
+				action="#{ControladorConsultaPoliza.onRowSelectPago}" value="Pagos"
+				icon="ui-icon-suitcase"
+				update="@this frm_consultas:tab_consulta:idConsPagoPol"
+				process="@this,frm_consultas:tab_consulta:listadoPolizaBusca">
+			</p:commandButton>
+		</f:facet>
+	</p:dataTable>
+	<p:panel visible="false" toggleable="true">
+		<p:dataTable id="dtExcel" var="trans"
+			value="#{ControladorConsultaPoliza.lstTransaccionPoliza}">
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="Id" />
+				</f:facet>
+				<h:outputText value="#{trans.id}" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="desc_ramo" />
+				</f:facet>
+				<h:outputText value="#{trans.desc_ramo}" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="poliza" />
+				</f:facet>
+				<h:outputText value="#{trans.poliza}" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="valor_asegurado_ramo" />
+				</f:facet>
+				<h:outputText value="#{trans.valor_asegurado_ramo}" />
+			</p:column>
+
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="dsc_ubicacion" />
+				</f:facet>
+				<h:outputText value="#{trans.dsc_ubicacion}" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="valor_asegurado_ramo" />
+				</f:facet>
+				<h:outputText value="#{trans.valor_asegurado_ramo}" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="valor_asegurado_ubicacion" />
+				</f:facet>
+				<h:outputText value="#{trans.valor_asegurado_ubicacion}" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="descripcion_objeto" />
+				</f:facet>
+				<h:outputText value="#{trans.descripcion_objeto}" />
+			</p:column>
+
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="valor_asegurador_objeto" />
+				</f:facet>
+				<h:outputText value="#{trans.valor_asegurador_objeto}" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="transaccion_objeto" />
+				</f:facet>
+				<h:outputText value="#{trans.transaccion_objeto}" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="descripcion_subobjeto" />
+				</f:facet>
+				<h:outputText value="#{trans.descripcion_subobjeto}" />
+			</p:column>
+
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="valor_asegurador_subobjeto" />
+				</f:facet>
+				<h:outputText value="#{trans.valor_asegurador_subobjeto}" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="Fecha Inicio Vigencia Objeto" />
+				</f:facet>
+				<h:outputText value="#{trans.fechaIniObj}" />
+			</p:column>
+
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="transaccion_subobjeto" />
+				</f:facet>
+				<h:outputText value="#{trans.transaccion_subobjeto}" />
+			</p:column>
+
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="no_de_motor" />
+				</f:facet>
+				<h:outputText value="#{trans.no_de_motor}" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="no_de_chasis" />
+				</f:facet>
+				<h:outputText value="#{trans.no_de_chasis}" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="placa" />
+				</f:facet>
+				<h:outputText value="#{trans.placa}" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="color" />
+				</f:facet>
+				<h:outputText value="#{trans.color}" />
+			</p:column>
+
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="modelo" />
+				</f:facet>
+				<h:outputText value="#{trans.modelo}" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="cd_ramo_cotizacion" />
+				</f:facet>
+				<h:outputText value="#{trans.cd_ramo_cotizacion}" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="cd_ubicacion" />
+				</f:facet>
+				<h:outputText value="#{trans.cd_ubicacion}" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="cd_obj_cotizacion" />
+				</f:facet>
+				<h:outputText value="#{trans.cd_obj_cotizacion}" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="cd_subobj_cotizacion" />
+				</f:facet>
+				<h:outputText value="#{trans.cd_subobj_cotizacion}" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+					<h:outputText value="cd_carac_vh" />
+				</f:facet>
+				<h:outputText value="#{trans.cd_carac_vh}" />
+			</p:column>
+		</p:dataTable>
+	</p:panel>
+	<p:panelGrid id="idPGridPoliza" columns="2">
+		<p:row>
+			<p:dataTable id="dtUbcPol" var="ubc" scrollable="true"
+				scrollHeight="80"
+				value="#{ControladorConsultaPoliza.lstUbicacionPoliza}"
+				selectionMode="single"
+				selection="#{ControladorConsultaPoliza.selectedUbicacionPoliza}"
+				rowKey="#{ubc.cd_ubicacion}"
+				style="width:500px; font-family:Verdana; font-size: 12px;">
+				<f:facet name="header">
+				            Seleccione la Ubicación
+				        </f:facet>
+				<p:ajax event="rowSelect"
+					listener="#{ControladorConsultaPoliza.onRowSelectUbicacion}"
+					update="@this frm_consultas:tab_consulta:dtPolObjeto" />
+				<p:column headerText="Cod." style="width:40px;text-align:center">
+					<h:outputText value="#{ubc.cd_ubicacion}" />
+				</p:column>
+				<p:column headerText="Descripción">
+					<h:outputText value="#{ubc.dsc_ubicacion}" />
+				</p:column>
+			</p:dataTable>
+		</p:row>
+		<p:row>
+			<p:dataTable id="dtPolObjeto" var="obj" scrollable="true"
+				scrollHeight="80"
+				value="#{ControladorConsultaPoliza.lstObjetosPoliza}"
+				selectionMode="single"
+				selection="#{ControladorConsultaPoliza.selectedObjetosPoliza}"
+				rowKey="#{obj.cd_obj_cotizacion}"
+				style="width:500px; font-family:Verdana; font-size: 12px;">
+				<f:facet name="header">
+				            Seleccione el Objeto
+				        </f:facet>
+				<p:ajax event="rowSelect"
+					listener="#{ControladorConsultaPoliza.onRowSelectObjeto}"
+					update="@this frm_consultas:tab_consulta:dtPolCaract frm_consultas:tab_consulta:dtPolSubObjeto" />
+				<p:column headerText="Cod." style="width:40px;text-align:center">
+					<h:outputText value="#{obj.cd_obj_cotizacion}" />
+				</p:column>
+				<p:column headerText="Descripción">
+					<h:outputText value="#{obj.descripcion_objeto}" />
+				</p:column>
+				<p:column headerText="Valor Asegurado">
+					<h:outputText value="#{obj.valor_asegurador_objeto}" />
+				</p:column>
+				<p:column headerText="Tasa">
+					<h:outputText value="#{obj.tasa_objeto}" />
+				</p:column>
+				<p:column headerText="Estado">
+					<h:outputText value="#{obj.estado_Objeto}" />
+				</p:column>
+			</p:dataTable>
+		</p:row>
+		<p:row>
+			<p:dataTable id="dtPolCaract" var="caract" scrollable="true"
+				scrollHeight="80"
+				value="#{ControladorConsultaPoliza.lstCaracteristicas}"
+				style="width:500px; font-family:Verdana; font-size: 10px;">
+				<f:facet name="header">
+				            Caracteristicas del Objeto
+				    </f:facet>
+				<p:column headerText="Cod."  width="80">
+					<h:outputText value="#{caract.cd_carac_vh}" />
+				</p:column>
+				<p:column headerText="Placa" width="100">
+					<h:outputText value="#{caract.placa}" />
+				</p:column>
+				<p:column headerText="Motor" width="100">
+					<h:outputText value="#{caract.no_de_motor}" />
+				</p:column>
+				<p:column headerText="Chasis" width="100">
+					<h:outputText value="#{caract.no_de_chasis}" />
+				</p:column>
+				<p:column headerText="Marca" width="100">
+					<h:outputText value="#{caract.marca}" />
+				</p:column>
+				<p:column headerText="Año" width="100">
+					<h:outputText value="#{caract.anio_de_fabricacion}" />
+				</p:column>
+				<p:column headerText="Endoso" width="100">
+					<h:outputText value="#{caract.endoso}" />
+				</p:column>
+				<p:column headerText="Fecha Endoso" width="100">
+					<h:outputText value="#{caract.fecha_endoso}" />
+				</p:column>
+				<p:column headerText="Propietario" width="100">
+					<h:outputText value="#{caract.propietario}" />
+				</p:column>
+				<p:column headerText="Modelo" width="100">
+					<h:outputText value="#{caract.modelo}" />
+				</p:column>
+				<p:column headerText="Color" width="100">
+					<h:outputText value="#{caract.color}" />
+				</p:column>
+				<p:column headerText="Uso del Vehículo" width="100">
+					<h:outputText value="#{caract.uso_vehiculo}" />
+				</p:column>
+				
+			</p:dataTable>
+		</p:row>
+		<p:row>
+			<p:dataTable id="dtPolSubObjeto" var="subObj" scrollable="true"
+				scrollHeight="80"
+				value="#{ControladorConsultaPoliza.lstSubObjetosPoliza}"
+				style="width:500px; font-family:Verdana; font-size: 10px;">
+				<f:facet name="header">
+				            Sub Objetos
+				        </f:facet>
+				<p:column headerText="Cod." style="width:40px;text-align:center">
+					<h:outputText value="#{subObj.cd_subobj_cotizacion}" />
+				</p:column>
+				<p:column headerText="Descripción">
+					<h:outputText value="#{subObj.descripcion_subobjeto}" />
+				</p:column>
+				<p:column headerText="Valor Asegurado">
+					<h:outputText value="#{subObj.valor_asegurador_subobjeto}" />
+				</p:column>
+				<p:column headerText="Tasa">
+					<h:outputText value="#{subObj.tasa_subobjeto}" />
+				</p:column>
+			</p:dataTable>
+		</p:row>
+	</p:panelGrid>
+	<p:dialog header="Pagos Póliza" draggable="false"
+		widgetVar="dlgPagoPolCons" showEffect="fade" hideEffect="fade"
+		closable="true">
+		<p:panel>
+			<p:dataTable id="idConsPagoPol" var="pag"
+				value="#{ControladorConsultaPoliza.lstPagoPoliza}" scrollable="true"
+				scrollHeight="150"
+				style="width:500px; font-family:Verdana; font-size: 12px;">
+				<p:column headerText="Tipo">
+					<h:outputText value="#{pag.tipo}" />
+				</p:column>
+				<p:column headerText="Valor">
+					<h:outputText value="#{pag.valor}" />
+				</p:column>
+				<p:column headerText="Saldo">
+					<h:outputText value="#{pag.saldo}" />
+				</p:column>
+				<p:column headerText="Estado">
+					<h:outputText value="#{pag.estado}" />
+				</p:column>
+				<p:column headerText="Fc. Vencimiento">
+					<h:outputText value="#{pag.fecha_vencimiento_date}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+				<p:column style="width:32px;text-align: center">
+					<p:commandButton update="@this"
+						actionListener="#{ControladorConsultaPoliza.buscarDetallePago}"
+						oncomplete="PF('pagoDialog').show()" icon="ui-icon-search"
+						title="Ver Pagos">
+						<f:param name="codDetPago" value="#{pag.cd_det_forma_pago}" />
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+	</p:dialog>
+	<!-- finaliza consulta pago -->
+	<p:dialog header="Pagos" widgetVar="pagoDialog" modal="true"
+		showEffect="fade" hideEffect="fade" resizable="false">
+		<p:panel>
+			<p:dataTable id="idConPago" var="pag"
+				value="#{ControladorConsultaPoliza.lstPagoPoliza}" scrollable="true"
+				scrollHeight="150"
+				style="width:500px; font-family:Verdana; font-size: 10px;">
+				<p:column headerText="Tipo">
+					<h:outputText value="#{pag.tipo}" />
+				</p:column>
+				<p:column headerText="Valor">
+					<h:outputText value="#{pag.valor}" />
+				</p:column>
+				<p:column headerText="Saldo">
+					<h:outputText value="#{pag.saldo}" />
+				</p:column>
+				<p:column headerText="Estado">
+					<h:outputText value="#{pag.estado}" />
+				</p:column>
+				<p:column headerText="Fc. Vencimiento">
+					<h:outputText value="#{pag.fecha_vencimiento_date}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+				<p:column style="width:32px;text-align: center">
+					<p:commandButton update=":frm_consultas:tab_consulta:dtDetPAgo"
+						action="#{ControladorConsultaPoliza.buscarDetallePago}"
+						icon="ui-icon-search" title="Ver Pagos">
+						<f:param name="codDetPago" value="#{pag.cd_det_forma_pago}" />
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+	</p:dialog>
+	<p:dialog header="Detalle Pago" draggable="true" widgetVar="pagoDialog"
+		showEffect="fade" hideEffect="fade" closable="true" appendTo="@(body)"
+		modal="true">
+		<p:dataTable var="pagDet"
+			value="#{ControladorConsultaPoliza.lstPagoRealizado}" id="dtDetPAgo"
+			style="width:700px; font-family:Verdana; font-size: 10px;">
+			<p:column headerText="Recibo Pago">
+				<h:outputText value="#{pagDet.cd_pago}" />
+			</p:column>
+			<p:column headerText="Fecha Pago">
+				<h:outputText value="#{pagDet.fecha_pago}" />
+			</p:column>
+			<p:column headerText="Forma Pago">
+				<h:outputText value="#{pagDet.forma_pago}" />
+			</p:column>
+
+			<p:column headerText="Banco">
+				<h:outputText value="#{pagDet.banco}" />
+			</p:column>
+
+			<p:column headerText="Cuenta">
+				<h:outputText value="#{pagDet.cta_cte}" />
+			</p:column>
+
+			<p:column headerText="# Retención">
+				<h:outputText value="#{pagDet.no_retencion}" />
+			</p:column>
+
+			<p:column headerText="Valor Pago">
+				<h:outputText value="#{pagDet.valor_pago}" />
+			</p:column>
+		</p:dataTable>
+	</p:dialog>
+	<p:dialog header="Notas Aclaratorias" draggable="true"
+		widgetVar="notaAclaDialog" showEffect="fade" hideEffect="fade"
+		closable="true" appendTo="@(body)" modal="true">
+		<p:dataTable var="acla"
+			value="#{ControladorConsultaPoliza.lstNotaAclaratoria}"
+			id="dtDetAcla"
+			style="width:700px; font-family:Verdana; font-size: 10px;">
+			<p:column headerText="COD.">
+				<h:outputText value="#{acla.cd_nota_aclaratoria}" />
+			</p:column>
+			<p:column headerText="Descripción">
+				<h:outputText value="#{acla.detalle_aclaratorio}" />
+			</p:column>
+
+		</p:dataTable>
+		<p:commandButton value="Cerrar" icon="ui-icon-cancel"
+			onclick="PF('notaAclaDialog').hide();" update="@this" process="@this">
+		</p:commandButton>
+	</p:dialog>
+
+</ui:composition>

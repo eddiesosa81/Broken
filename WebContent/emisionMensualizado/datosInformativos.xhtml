@@ -1,0 +1,701 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+	<!-- DATOS DE LA COTIZACION -->
+	<h:panelGrid id="gridCot" columns="3" cellpadding="5">
+		<h3>Cotización</h3>
+		<h:outputText value="#{ControladorEmisionMensualizado.numCotizacion}"
+			id="otxtNumCot" />
+		<p:row>
+			<p:commandButton id="btnBuscaCotizacion"
+				onclick="PF('wbuscaCotizacion').show();" icon="ui-icon-search"
+				title="Buscar Cotización" />
+			<p:commandButton id="btnNuevaCotizacion"
+				action="#{ControladorEmisionMensualizado.nuevaCotizacion}"
+				icon="ui-icon-minusthick" title="Elimina Cotización"
+				update="frmMensualizado:tab_emision" />
+		</p:row>
+	</h:panelGrid>
+	<!-- datos cliente -->
+
+	<h:panelGrid id="grid_emision" columns="4" cellpadding="5">
+		<h:outputText value="Solicitante " />
+		<p:row>
+			<p:inputText readonly="true" id="txt_solicitante"
+				value="#{ControladorEmisionMensualizado.datosCliente.razon_social_cliente}" />
+			<!-- <p:commandButton id="btnBuscaSolicitante"
+					onclick="PF('wbuscaCliente').show();" icon="ui-icon-search"
+					title="Buscar Solicitante" disabled="true"  /> -->
+			<p:commandButton id="btnInsertaSolicitante"
+				onclick="PF('winsertaCliente').show();" icon="ui-icon-plus"
+				title="Nuevo Solicitante"
+				disabled="#{ControladorEmisionMensualizado.flgActivaCotiza}" />
+		</p:row>
+		<h:outputText value="Asegurado " />
+		<p:row>
+			<p:inputText readonly="true" id="txt_asegurado"
+				value="#{ControladorEmisionMensualizado.datosClienteSol.razon_social_cliente}" />
+			<p:commandButton id="btnBuscaASegurado"
+				onclick="PF('wbuscaAsegurado').show();" icon="ui-icon-search"
+				disabled="#{ControladorEmisionMensualizado.flgActivaCotiza}" />
+		</p:row>
+		<h:outputText value="Igual a Solicitante? " />
+		<p:selectBooleanCheckbox
+			value="#{ControladorEmisionMensualizado.mismoSolicitante}"
+			disabled="#{ControladorEmisionMensualizado.flgActivaCotiza}" />
+	</h:panelGrid>
+	<br />
+	<!-- datos plan, aseguradora -->
+	<h:panelGrid columns="4" cellpadding="5" id="grid_emision2">
+		<h:outputText value="Aseguradora " />
+		<p:selectOneMenu id="aseguradoras"
+			value="#{ControladorEmisionMensualizado.datosCotizacion.cd_aseguradora}"
+			style="width:125px" autoWidth="false"
+			disabled="#{ControladorEmisionMensualizado.flgActivaCotiza}">
+			<p:ajax event="change"
+				listener="#{ControladorEmisionMensualizado.listarRamosAseguradora}"
+				update="@this" />
+			<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+			<f:selectItems var="aseguradoras"
+				value="#{ControladorEmisionMensualizado.listadoAseguradoras}"
+				itemLabel="#{aseguradoras.nombre_corto_aseguradora}"
+				itemValue="#{aseguradoras.cd_aseguradora}" />
+		</p:selectOneMenu>
+		<h:outputText value="Tipo " />
+		<p:selectOneMenu id="slomTipo"
+			value="#{ControladorEmisionMensualizado.txtCd_rubro}"
+			style="width:125px" autoWidth="false" disabled="true">
+			<p:ajax event="change"
+				listener="#{ControladorEmisionMensualizado.asignaVigencia}" />
+			<f:selectItem itemLabel="POLIZA" itemValue="8" />
+			<f:selectItem itemLabel="RENOVACION" itemValue="9" />
+		</p:selectOneMenu>
+		<h:outputText value="# Renovación" />
+		<p:inputNumber id="numRenov" style="width:65px"
+			value="#{ControladorEmisionMensualizado.lsnumRenova}" disabled="true">
+			<p:ajax listener="#{ControladorEmisionMensualizado.asignaNumRenova}"
+				event="change" />
+		</p:inputNumber>
+		<h:outputText value="Ejecutivo " />
+		<p:selectOneMenu id="listaEjecutivos"
+			value="#{ControladorEmisionMensualizado.codEjecutivo}"
+			style="width:125px" autoWidth="false"
+			disabled="#{ControladorEmisionMensualizado.flgActivaCotiza}">
+			<p:ajax event="change"
+				listener="#{ControladorEmisionMensualizado.asignaVigencia}" />
+			<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+			<f:selectItems var="ejecutivos"
+				value="#{ControladorEmisionMensualizado.listaEjecutivos}"
+				itemLabel="#{ejecutivos.primer_apellido_ejecutivo} #{ejecutivos.primer_nombre_ejecutivo}"
+				itemValue="#{ejecutivos.cd_ejecutivo}" />
+		</p:selectOneMenu>
+		<h:outputText value="Vigencia desde " />
+		<p:calendar id="vDesde"
+			value="#{ControladorEmisionMensualizado.fcDesde}"
+			pattern="dd/MM/yyyy" mask="true"
+			disabled="#{ControladorEmisionMensualizado.flgActivaCotiza}"
+			locale="de" navigator="true">
+			<p:ajax event="dateSelect"
+				listener="#{ControladorEmisionMensualizado.asignaVigencia}" />
+		</p:calendar>
+		<h:outputText value="Vigencia hasta " />
+		<p:calendar id="vhasta"
+			value="#{ControladorEmisionMensualizado.fcHasta}" locale="de"
+			navigator="true" pattern="dd/MM/yyyy"
+			disabled="#{ControladorEmisionMensualizado.flgActivaCotiza}">
+			<p:ajax event="dateSelect"
+				listener="#{ControladorEmisionMensualizado.asignaVigencia}" />
+		</p:calendar>
+		<p:row></p:row>
+		<p:row></p:row>
+		<p:row></p:row>
+		<p:row></p:row>
+
+		<p:commandButton value="Aprobación" id="btnAprue" icon="ui-icon-disk"
+			styleClass="ui-priority-primary"
+			action="#{ControladorEmisionMensualizado.emitirPoliza}"
+			process="@this"
+			update="@this frmMensualizado:tab_emision:frmEmitePol:dtEmitePol" />
+
+	</h:panelGrid>
+	<!-- busca y selecciona Cotizacion -->
+	<p:dialog header="Buscar Cotización" draggable="true"
+		widgetVar="wbuscaCotizacion" showEffect="fade" hideEffect="fade"
+		closable="true">
+		<h:panelGrid columns="2">
+			<p:inputText id="cotizaBuscado"
+				value="#{ControladorEmisionMensualizado.apellidoRazonSocial}"
+				placeholder="Apellido / Razon Social" />
+			<p:inputText id="numCotizaBuscado"
+				value="#{ControladorEmisionMensualizado.numCotBusq}"
+				placeholder="Número de Cotización" />
+			<p:row>
+				<p:commandButton value="Buscar"
+					actionListener="#{ControladorEmisionMensualizado.buscaCotizacion}"
+					update="@this frmMensualizado:tab_emision:listadoCotizaciones"
+					icon="ui-icon-search"
+					process="@this,frmMensualizado:tab_emision:cotizaBuscado,frmMensualizado:tab_emision:numCotizaBuscado" />
+			</p:row>
+		</h:panelGrid>
+		<p:dataTable id="listadoCotizaciones" var="cotiza" scrollable="true"
+			scrollHeight="150"
+			value="#{ControladorEmisionMensualizado.lstCotizacioneesPendientes}"
+			style="font-family:Verdana; font-size: 10px;" rows="5"
+			paginator="true"
+			paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			selectionMode="single"
+			selection="#{ControladorEmisionMensualizado.selectedCotizacioneesPendientes}"
+			rowKey="#{cotiza.id}">
+			<f:facet name="header">
+		            Seleccione la Cotización
+		        </f:facet>
+			<p:ajax event="rowSelect"
+				listener="#{ControladorEmisionMensualizado.buscarCotizacionPendiente}"
+				update="frmMensualizado:tab_emision:otxtNumCot,
+					frmMensualizado:tab_emision:txt_solicitante,
+					frmMensualizado:tab_emision:txt_asegurado,
+					frmMensualizado:tab_emision:aseguradoras,
+					frmMensualizado:tab_emision:slomTipo,
+					frmMensualizado:tab_emision:listaEjecutivos,
+					frmMensualizado:tab_emision:dTRamo,
+					frmMensualizado:tab_emision:vDesde,
+					frmMensualizado:tab_emision:vhasta,
+					frmMensualizado:tab_emision:slomTipo,
+					frmMensualizado:tab_emision:listaEjecutivos,
+					frmMensualizado:tab_emision:btnInsertaSolicitante,
+					frmMensualizado:tab_emision:btnBuscaASegurado" />
+
+			<p:column headerText="No." visible="false">
+				<h:outputText value="#{cotiza.id}" />
+			</p:column>
+
+			<p:column headerText="No.">
+				<h:outputText value="#{cotiza.num_cotizacion}" />
+			</p:column>
+			<p:column headerText="Cliente">
+				<h:outputText value="#{cotiza.datosCliente}" />
+			</p:column>
+
+			<p:column headerText="Ramo">
+				<h:outputText value="#{cotiza.desc_ramo}" />
+			</p:column>
+
+			<p:column headerText="Tipo">
+				<h:outputText value="#{cotiza.desc_rubro}" />
+			</p:column>
+		</p:dataTable>
+	</p:dialog>
+	<!-- fin busca y selecciona Cotización -->
+
+
+	<!-- busca y selecciona cliente -->
+	<p:dialog header="Buscar cliente" draggable="true"
+		widgetVar="wbuscaCliente" showEffect="fade" hideEffect="fade"
+		closable="true">
+		<h:form id="frmDlgClie">
+			<h:panelGrid columns="1" style="width:100%;text-align:center;">
+				<p:row>
+					<p:inputText id="clienteBuscado"
+						value="#{ControladorEmisionMensualizado.str_cliente}" />
+					<p:commandButton value="Buscar"
+						update="frmMensualizado:tab_emision:frmDlgClie:listadoClientes"
+						actionListener="#{ControladorEmisionMensualizado.buscarClientes}"
+						icon="ui-icon-search"
+						process="frmMensualizado:tab_emision:frmDlgClie" />
+				</p:row>
+			</h:panelGrid>
+			<p:dataTable id="listadoClientes" var="cliente" scrollable="true"
+				scrollHeight="150"
+				value="#{ControladorEmisionMensualizado.listaClientes}"
+				style="font-family:Verdana; font-size: 10px;" rows="5"
+				paginator="true"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				editable="true">
+
+				<p:ajax event="rowEdit"
+					listener="#{ControladorEmisionMensualizado.onRowEditClie}"
+					update="@this" />
+
+				<p:column headerText="Tipo">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{cliente.tipo_persona_cliente}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:selectOneMenu value="#{cliente.tipo_persona_cliente}">
+								<f:selectItem itemLabel="Natural" itemValue="NAT" />
+								<f:selectItem itemLabel="Juridico" itemValue="JUR" />
+							</p:selectOneMenu>
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Documento">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{cliente.tipo_identificacion_cliente}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:selectOneMenu value="#{cliente.tipo_identificacion_cliente}">
+								<f:selectItem itemLabel="Cédula" itemValue="CED" />
+								<f:selectItem itemLabel="RUC" itemValue="RUC" />
+								<f:selectItem itemLabel="Pasaporte" itemValue="PAS" />
+							</p:selectOneMenu>
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Identificación">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{cliente.identificacion_cliente}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputText value="#{cliente.identificacion_cliente}"></p:inputText>
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Cliente">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText
+								value="#{cliente.primer_nombre_cliente} #{cliente.segundo_nombre_cliente} #{cliente.primer_apellido_cliente} #{cliente.segundo_apellido_cliente}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputText value="#{cliente.primer_nombre_cliente}"
+								title="Primer Nombre" style="text-transform:uppercase;"
+								onkeyup="javascript:this.value=this.value.toUpperCase();"></p:inputText>
+							<p:inputText value="#{cliente.segundo_nombre_cliente}"
+								title="Segundo Nombre" style="text-transform:uppercase;"
+								onkeyup="javascript:this.value=this.value.toUpperCase();"></p:inputText>
+							<p:inputText value="#{cliente.primer_apellido_cliente}"
+								title="Primer Apellido" style="text-transform:uppercase;"
+								onkeyup="javascript:this.value=this.value.toUpperCase();"></p:inputText>
+							<p:inputText value="#{cliente.segundo_apellido_cliente}"
+								title="Segundo Apellido" style="text-transform:uppercase;"
+								onkeyup="javascript:this.value=this.value.toUpperCase();"></p:inputText>
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Razón Social">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{cliente.razon_social_cliente}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputText value="#{cliente.razon_social_cliente}"
+								style="text-transform:uppercase;"
+								onkeyup="javascript:this.value=this.value.toUpperCase();"></p:inputText>
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Tipo Cliente">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{cliente.tipo_cliente}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:selectOneMenu value="#{cliente.tipo_cliente}">
+								<f:selectItem itemLabel="Individual" itemValue="IND" />
+								<f:selectItem itemLabel="Coorporativo" itemValue="COR" />
+							</p:selectOneMenu>
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column style="width:52px;text-align: center"
+					headerText="Selecciona" exportable="false">
+					<p:commandButton icon="ui-icon-check" title="Seleccionar"
+						process="@this"
+						actionListener="#{ControladorEmisionMensualizado.buscarClientesXId}"
+						update="frmMensualizado:tab_emision:txt_solicitante"
+						onclick="PF('wbuscaCliente').hide();">
+						<f:param name="identificacion_cliente"
+							value="#{cliente.cd_cliente}" />
+					</p:commandButton>
+				</p:column>
+				<p:column style="width:32px">
+					<p:rowEditor />
+				</p:column>
+			</p:dataTable>
+
+		</h:form>
+	</p:dialog>
+	<!-- fin busca y selecciona cliente -->
+	<!-- inserta y selecciona cliente -->
+	<p:dialog header="Nuevo cliente" draggable="true"
+		widgetVar="winsertaCliente" showEffect="fade" hideEffect="fade"
+		closable="true">
+		<h:form id="frmDlgInsClie">
+			<p:tabView id="tbviewClie">
+				<p:tab title="Datos">
+					<p:panel header="Datos">
+						<h:panelGrid columns="4" style="width:100%;text-align:center;">
+							<h:outputText value="Cédula de Identidad" />
+							<p:inputText id="clienteIdentif"
+								value="#{ControladorEmisionMensualizado.nuevoCliente.identificacion_cliente}">
+								<p:ajax event="change"
+									update="@this,frmMensualizado:tab_emision:txt_solicitante"
+									listener="#{ControladorEmisionMensualizado.buscarClientes}" />
+							</p:inputText>
+							<h:outputText value="Razon Social" />
+							<p:inputText id="clienteRazSoc"
+								value="#{ControladorEmisionMensualizado.nuevoCliente.razon_social_cliente}"
+								style="text-transform:uppercase;"
+								onkeyup="javascript:this.value=this.value.toUpperCase();" />
+							<h:outputText value="Primer Apellido" />
+							<p:inputText id="clienteApePrimer"
+								value="#{ControladorEmisionMensualizado.nuevoCliente.primer_apellido_cliente}"
+								style="text-transform:uppercase;"
+								onkeyup="javascript:this.value=this.value.toUpperCase();" />
+							<h:outputText value="Segundo Apellido" />
+							<p:inputText id="clienteApeSeg"
+								value="#{ControladorEmisionMensualizado.nuevoCliente.segundo_apellido_cliente}"
+								style="text-transform:uppercase;"
+								onkeyup="javascript:this.value=this.value.toUpperCase();" />
+							<h:outputText value="Primer Nombre" />
+							<p:inputText id="clienteNomPrimer"
+								value="#{ControladorEmisionMensualizado.nuevoCliente.primer_nombre_cliente}"
+								style="text-transform:uppercase;"
+								onkeyup="javascript:this.value=this.value.toUpperCase();" />
+							<h:outputText value="Segundo Nombre" />
+							<p:inputText id="clienteNomSeg"
+								value="#{ControladorEmisionMensualizado.nuevoCliente.segundo_nombre_cliente}"
+								style="text-transform:uppercase;"
+								onkeyup="javascript:this.value=this.value.toUpperCase();" />
+							<h:outputText value="Tipo de Persona" />
+							<p:selectOneMenu id="clienteTipPer"
+								value="#{ControladorEmisionMensualizado.nuevoCliente.tipo_persona_cliente}"
+								style="width:125px">
+								<f:selectItem itemLabel="NATURAL" itemValue="NAT" />
+								<f:selectItem itemLabel="JURIDICA" itemValue="JUR" />
+							</p:selectOneMenu>
+							<h:outputText value="Tipo de Identificacion" />
+							<p:selectOneMenu id="clienteTipID"
+								value="#{ControladorEmisionMensualizado.nuevoCliente.tipo_identificacion_cliente}"
+								style="width:125px">
+								<f:selectItem itemLabel="CEDULA" itemValue="CED" />
+								<f:selectItem itemLabel="RUC" itemValue="RUC" />
+								<f:selectItem itemLabel="PASAPORTE" itemValue="PAS" />
+							</p:selectOneMenu>
+							<h:outputText value="Género" />
+							<p:selectOneMenu id="clienteGen"
+								value="#{ControladorEmisionMensualizado.nuevoCliente.genero_cliente}"
+								style="width:125px">
+								<f:selectItem itemLabel="MASCULINO" itemValue="M" />
+								<f:selectItem itemLabel="FEMENINO" itemValue="F" />
+							</p:selectOneMenu>
+							<h:outputText value="Estado Civil" />
+							<p:selectOneMenu id="clienteEstCiv"
+								value="#{ControladorEmisionMensualizado.nuevoCliente.estado_civil_cliente}"
+								style="width:125px">
+								<f:selectItem itemLabel="NINGUNO" itemValue="NON" />
+								<f:selectItem itemLabel="CASADO" itemValue="CAS" />
+								<f:selectItem itemLabel="DIVORCIADO" itemValue="DIV" />
+								<f:selectItem itemLabel="SOLTERO" itemValue="SOL" />
+								<f:selectItem itemLabel="VIUDO" itemValue="VIU" />
+							</p:selectOneMenu>
+							<h:outputText value="Fecha Nacimiento" />
+							<p:calendar id="clienteFecNaci"
+								value="#{ControladorEmisionMensualizado.nuevoCliente.fecha_nacimiento_cliente}" />
+							<h:outputText value="Tipo" />
+							<p:selectOneMenu id="clientetipoClie"
+								value="#{ControladorEmisionMensualizado.nuevoCliente.tipo_cliente}"
+								style="width:125px">
+								<f:selectItem itemLabel="INDIVIDUAL" itemValue="IND" />
+								<f:selectItem itemLabel="COORPORATIVO" itemValue="COR" />
+							</p:selectOneMenu>
+							<h:outputText value="Nacionalidad" />
+							<p:selectOneMenu id="clienteNacion"
+								value="#{ControladorEmisionMensualizado.nuevoCliente.cd_nacionalidad}">
+								<f:selectItems
+									value="#{ControladorEmisionMensualizado.lstNacionalidad}"
+									var="nac" itemValue="#{nac.cd_nacionalidad}"
+									itemLabel="#{nac.nacdescripcion}" />
+							</p:selectOneMenu>
+						</h:panelGrid>
+					</p:panel>
+				</p:tab>
+				<p:tab title="Direccion">
+					<p:panel header="Direccion">
+						<h:panelGrid columns="4" style="width:100%;text-align:center;">
+							<h:outputText value="Direccion" />
+							<p:inputText id="clienteDir"
+								value="#{ControladorEmisionMensualizado.direccion.direccion}"
+								style="text-transform:uppercase;"
+								onkeyup="javascript:this.value=this.value.toUpperCase();" />
+							<h:outputText value="Ciudad" />
+							<p:selectOneMenu id="clienteCiudad"
+								value="#{ControladorEmisionMensualizado.direccion.cd_ciudad}"
+								style="width:125px" autoWidth="false">
+								<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+								<f:selectItems var="ciudad"
+									value="#{ControladorEmisionMensualizado.lstCiudad}"
+									itemLabel="#{ciudad.nm_ciudad}" itemValue="#{ciudad.cd_ciudad}" />
+							</p:selectOneMenu>
+							<h:outputText value="Sector" />
+							<p:selectOneMenu id="clienteSector"
+								value="#{ControladorEmisionMensualizado.direccion.cd_rubro}"
+								style="width:125px" autoWidth="false">
+								<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+								<f:selectItems var="sect"
+									value="#{ControladorEmisionMensualizado.lsrRubroSectorDirec}"
+									itemLabel="#{sect.desc_rubro}" itemValue="#{sect.cd_rubro}" />
+							</p:selectOneMenu>
+							<h:outputText value="Referencia" />
+							<p:inputText id="clienteRef"
+								value="#{ControladorEmisionMensualizado.direccion.referencia}"
+								style="text-transform:uppercase;"
+								onkeyup="javascript:this.value=this.value.toUpperCase();" />
+						</h:panelGrid>
+					</p:panel>
+				</p:tab>
+				<p:tab title="Teléfonos">
+					<p:panel header="Teléfonos">
+						<h:panelGrid columns="4" style="width:100%;text-align:center;">
+							<h:outputText value="Ciudad" />
+							<p:selectOneMenu id="clienteCiudadTelf"
+								value="#{ControladorEmisionMensualizado.telefono.cd_ciudad}"
+								style="width:125px" autoWidth="false">
+								<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+								<f:selectItems var="ciu"
+									value="#{ControladorEmisionMensualizado.lstCiudad}"
+									itemLabel="#{ciu.nm_ciudad}" itemValue="#{ciu.cd_ciudad}" />
+							</p:selectOneMenu>
+							<h:outputText value="Tipo" />
+							<p:selectOneMenu id="somTipoTel"
+								value="#{ControladorEmisionMensualizado.telefono.tipo}"
+								style="width:125px">
+								<f:selectItem itemLabel="Celular" itemValue="CELULAR" />
+								<f:selectItem itemLabel="Convencional" itemValue="CONVENCIONAL" />
+								<f:selectItem itemLabel="Otro" itemValue="OTRO" />
+							</p:selectOneMenu>
+							<h:outputText value="Número " />
+							<p:inputNumber id="impNumTelf"
+								value="#{ControladorEmisionMensualizado.telefono.telefono}"></p:inputNumber>
+							<h:outputText value="Extensión " />
+							<p:inputNumber id="impExtTelf"
+								value="#{ControladorEmisionMensualizado.telefono.ext}"></p:inputNumber>
+							<h:outputText value="Correo Personal " />
+							<p:inputText id="impCorreoP"
+								value="#{ControladorEmisionMensualizado.telefono.correo}"></p:inputText>
+						</h:panelGrid>
+					</p:panel>
+				</p:tab>
+				<p:tab title="Contactos">
+					<p:panel header="Contactos">
+						<h:panelGrid columns="4" style="width:100%;text-align:center;">
+							<h:outputText value="Nombre Contacto" />
+							<p:inputText id="impNmConta"
+								value="#{ControladorEmisionMensualizado.contacto.nombre_contacto}"></p:inputText>
+							<h:outputText value="Número Teléfono" />
+							<p:inputNumber id="impNumTelfCont"
+								value="#{ControladorEmisionMensualizado.contacto.telefono_contacto}"></p:inputNumber>
+							<h:outputText value="Número Celular" />
+							<p:inputNumber id="impNumCelCont"
+								value="#{ControladorEmisionMensualizado.contacto.celular_contacto}"></p:inputNumber>
+							<h:outputText value="Correo  " />
+							<p:inputText id="impCorreoPCont"
+								value="#{ControladorEmisionMensualizado.contacto.mail_contacto}"></p:inputText>
+							<h:outputText value="Cargo" />
+							<p:inputText id="impCargoCont"
+								value="#{ControladorEmisionMensualizado.contacto.cargo_contacto}"></p:inputText>
+							<h:outputText value="Departamento  " />
+							<p:inputText id="impDepCont"
+								value="#{ControladorEmisionMensualizado.contacto.departamento_contacto}"></p:inputText>
+							<h:outputText value="Dirección  " />
+							<p:inputText id="impDireccCont"
+								value="#{ControladorEmisionMensualizado.contacto.direccion_contacto}"></p:inputText>
+						</h:panelGrid>
+					</p:panel>
+					<p:commandButton id="btnSaveClie" styleClass="ui-priority-primary"
+						action="#{ControladorEmisionMensualizado.guardaNuevoCliente}"
+						icon="ui-icon-disk" value="Guardar"
+						update="frmMensualizado:tab_emision:txt_solicitante"
+						process="@this,frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:clienteApePrimer,
+						frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:clienteApeSeg,frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:clienteNomPrimer,
+						frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:clienteNomSeg,frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:clienteNomSeg,
+						frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:clienteRazSoc,frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:clienteTipPer,
+						frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:clienteTipID,frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:clienteIdentif,
+						frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:clienteGen,frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:clienteEstCiv,
+						frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:clienteFecNaci,frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:clientetipoClie,
+						frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:clienteNacion,frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:clienteDir,
+						frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:clienteCiudad,frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:clienteSector,
+						frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:clienteRef,frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:clienteCiudadTelf,
+						frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:somTipoTel,frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:impNumTelf,
+						frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:impExtTelf,frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:impCorreoP,
+						frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:impNmConta,frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:impNumTelfCont,
+						frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:impNumCelCont,frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:impCorreoPCont,
+						frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:impCargoCont,frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:impDepCont,
+						frmMensualizado:tab_emision:frmDlgInsClie:tbviewClie:impDireccCont" />
+				</p:tab>
+			</p:tabView>
+
+
+		</h:form>
+	</p:dialog>
+	<!-- fin Inserta y selecciona cliente -->
+
+	<!-- busca y selecciona asegurado -->
+	<p:dialog header="Buscar asegurado" draggable="true"
+		widgetVar="wbuscaAsegurado" showEffect="fade" hideEffect="fade"
+		closable="true">
+		<h:form id="frmClieAseCot">
+			<h:panelGrid columns="1" style="width:100%;text-align:center;">
+				<p:row>
+					<p:inputText id="aseguradoBuscado"
+						value="#{ControladorEmisionMensualizado.str_cliente}"
+						placeholder="Apellidos" />
+					<p:commandButton value="Buscar"
+						update="frmMensualizado:tab_emision:frmClieAseCot:listadoAsegurados"
+						actionListener="#{ControladorEmisionMensualizado.buscarClieAseg}"
+						process="@this,frmMensualizado:tab_emision:frmClieAseCot:aseguradoBuscado"
+						icon="ui-icon-search" />
+				</p:row>
+			</h:panelGrid>
+			<p:dataTable id="listadoAsegurados" var="asegurado" scrollable="true"
+				scrollHeight="150"
+				value="#{ControladorEmisionMensualizado.listaClientes}" rows="10"
+				paginator="true" style="font-family:Verdana; font-size: 10px;"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+				<p:column headerText="CD" visible="false">
+					<h:outputText value="#{asegurado.cd_cliente}" />
+				</p:column>
+
+				<p:column headerText="Identificación">
+					<h:outputText value="#{asegurado.identificacion_cliente}" />
+				</p:column>
+
+				<p:column headerText="Cliente">
+					<h:outputText
+						value="#{asegurado.primer_nombre_cliente} #{asegurado.segundo_nombre_cliente} #{asegurado.primer_apellido_cliente} #{asegurado.segundo_apellido_cliente}" />
+				</p:column>
+
+				<p:column headerText="Razón Social">
+					<h:outputText value="#{asegurado.razon_social_cliente}" />
+				</p:column>
+
+				<p:column headerText="Tipo Cliente">
+					<h:outputText value="#{asegurado.tipo_cliente}" />
+				</p:column>
+
+				<p:column style="width:52px;text-align: center"
+					headerText="Selecciona" exportable="false">
+					<p:commandButton icon="ui-icon-check" title="Seleccionar"
+						process="@this"
+						actionListener="#{ControladorEmisionMensualizado.buscarAseguradosXId}"
+						update="frmMensualizado:tab_emision:txt_asegurado"
+						onclick="PF('wbuscaAsegurado').hide();">
+						<f:param name="identificacion_asegurado"
+							value="#{asegurado.cd_cliente}" />
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+
+		</h:form>
+	</p:dialog>
+	<!-- fin busca y selecciona asegurado -->
+	<!-- EMISION DE POLIZA -->
+	<p:dialog header="Aprobación de Póliza" draggable="true"
+		widgetVar="wemitePoliza" showEffect="fade" hideEffect="fade"
+		closable="false">
+		<h:form id="frmEmitePol">
+			<p:dataTable id="dtEmitePol" var="emite" scrollable="true"
+				scrollHeight="150"
+				value="#{ControladorEmisionMensualizado.lstEmitirPoliza}"
+				editable="true"
+				style="font-family:Verdana; font-size: 10px;margin-bottom:20px">
+				<f:facet name="header">
+			           Aprobación de Póliza
+			    </f:facet>
+
+				<p:ajax event="rowEdit"
+					listener="#{ControladorEmisionMensualizado.onRowEditEmitePol}"
+					update="@this" />
+
+				<p:column headerText="Ramo">
+					<h:outputText value="#{emite.desc_ramo}" />
+				</p:column>
+				<p:column headerText="Total Asegurado">
+					<h:outputText value="#{emite.total_asegurado}" />
+				</p:column>
+
+				<p:column headerText="Fc Desde">
+					<h:outputText value="#{emite.fc_ini_vig}">
+						<f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Fc Hasta">
+					<h:outputText value="#{emite.fc_fin_vig}">
+						<f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Fc. Emisión Aseguradora">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{emite.fc_emision_aseguradora_date}">
+								<f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+							</h:outputText>
+						</f:facet>
+						<f:facet name="input">
+							<p:calendar value="#{emite.fc_emision_aseguradora_date}"
+								style="width:100%" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+
+				<p:column headerText="No. Póliza">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{emite.poliza}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputText value="#{emite.poliza}" style="width:100%" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="No. Factura">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{emite.factura}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputMask value="#{emite.factura}" mask="999-999-999999999"
+								style="width:100%" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Anexo">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{emite.anexo}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputText value="#{emite.anexo}" style="width:100%" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="No. Asistencia">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{emite.numero_asistencia}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputText value="#{emite.numero_asistencia}"
+								style="width:100%" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+
+				<p:column style="width:32px">
+					<p:rowEditor />
+				</p:column>
+			</p:dataTable>
+			<p:commandButton value="Aprobar"
+				actionListener="#{ControladorEmisionMensualizado.emitir}"
+				icon="ui-icon-check" process="@this"
+				onclick="/Broken/index.jsf" />
+
+		</h:form>
+	</p:dialog>
+	<!-- fin emision -->
+</ui:composition>

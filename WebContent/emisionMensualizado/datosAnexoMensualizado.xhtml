@@ -1,0 +1,269 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+	<!-- DATOS DE LA Póliza -->
+	<p:tabView id="tbNivelaFac">
+		<p:tab title="Cancelación Seguro">
+			<h:panelGrid columns="1">
+				<h:panelGrid id="gridCot" columns="3">
+					<p:row>
+						<h3>Consulta Póliza:</h3>
+					</p:row>
+					<p:row>
+						<p:outputPanel id="polizaSelDetail" style="text-align:center;">
+							<p:panelGrid columns="2"
+								style="border: hidden;border-color: white;">
+								<h:outputText value="Cliente:" />
+								<h:outputText
+									value="#{ControladorNivelaMensualizado.clientePolizaAnexo}"
+									id="otxtPolSelClie" />
+								<h:outputText value="Póliza:" />
+								<h:outputText
+									value="#{ControladorNivelaMensualizado.numPolizaAnexo}"
+									id="otxtPolSelPol" />
+								<h:outputText value="Ramo:" />
+								<h:outputText
+									value="#{ControladorNivelaMensualizado.ramoPolizaAnexo}"
+									id="otxtPolSelRam" />
+							</p:panelGrid>
+						</p:outputPanel>
+					</p:row>
+					<p:row>
+						<p:commandButton id="btnBuscaCotizacion"
+							action="#{ControladorNivelaMensualizado.consultaPoliza}"
+							process="@this,frmMensualAnexo:listadoPoliza"
+							update="@this,frmMensualAnexo:tbNivelaFac:dtDetFrmPagMen"
+							icon="ui-icon-search" title="Seleccione Póliza" />
+					</p:row>
+					<p:row>
+						<h3>Fecha Anexo:</h3>
+					</p:row>
+					<p:row>
+						<p:calendar id="calFcAnexoM"
+							value="#{ControladorNivelaMensualizado.fcAnexo}" />
+					</p:row>
+
+				</h:panelGrid>
+				<p:dataTable id="dtDetFrmPagMen" var="frmPagoM"
+					value="#{ControladorNivelaMensualizado.lstDetalleFormaPago}"
+					style="font-family:Verdana; font-size: 10px;" scrollable="true"
+					scrollHeight="250">
+					<f:facet name="header">
+				            Datos Mensualizado
+				        </f:facet>
+					<p:column headerText="Mes">
+						<h:outputText value="#{frmPagoM.tipo}" />
+					</p:column>
+					<p:column headerText="Valor Asegurado">
+						<h:outputText value="#{frmPagoM.valor_asegurado_mensual}">
+							<f:convertNumber type="currency" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Prima Neta">
+						<h:outputText value="#{frmPagoM.prima_neta_registro}">
+							<f:convertNumber type="currency" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Prima Total">
+						<h:outputText value="#{frmPagoM.total_registro}">
+							<f:convertNumber type="currency" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Vigencia Fc.Inicio">
+						<h:outputText value="#{frmPagoM.fc_inicio_vigencia}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Vigencia Fc.Fin">
+						<h:outputText value="#{frmPagoM.fc_fin_vigencia}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Saldo">
+						<h:outputText value="#{frmPagoM.SALDO}">
+							<f:convertNumber type="currency" />
+						</h:outputText>
+					</p:column>
+
+				</p:dataTable>
+			</h:panelGrid>
+			<p:row>
+				<h:panelGrid id="gridTpEmite" columns="3" cellpadding="5">
+					<p:commandButton id="btnAceptaAnexo"
+						action="#{ControladorNivelaMensualizado.aceptaAnexo}"
+						icon="ui-icon-check" value="Aceptar"
+						styleClass="ui-priority-primary" update="@this" />
+
+					<p:commandButton id="btnEmiteAnexoCancel"
+						styleClass="ui-priority-primary" ajax="false"
+						action="#{ControladorNivelaMensualizado.cancelaAnexo}"
+						icon="ui-icon-cancel" value="Salir" />
+				</h:panelGrid>
+			</p:row>
+		</p:tab>
+	</p:tabView>
+	<!-- busca y selecciona Poliza -->
+	<p:dialog header="Buscar Póliza" widgetVar="wbuscaPolizaAneMen"
+		closable="true"  height="700" width="1300">
+			<h:panelGrid columns="1" style="width:100%;text-align:center;">
+				<p:row>
+					<p:inputText id="cotizaBuscado"
+						value="#{ControladorNivelaMensualizado.apellidoRazonSocial}"
+						placeholder="Apellido / Razon Social" />
+					<p:commandButton value="Buscar"
+						actionListener="#{ControladorNivelaMensualizado.buscaPoliza}"
+						update="frmMensualAnexo:listadoPoliza"
+						icon="ui-icon-search"
+						process="@this,frmMensualAnexo:cotizaBuscado" />
+				</p:row>
+			</h:panelGrid>
+			<p:dataTable id="listadoPoliza" var="pol"
+				style="font-family:Verdana; font-size: 10px;"
+				value="#{ControladorNivelaMensualizado.lstConsultaPoliza}"
+				tableStyle="width:auto" rows="10" paginator="true"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				selectionMode="single"
+				selection="#{ControladorNivelaMensualizado.selectedDatosObjetoCotizacion}"
+				rowKey="#{pol.cd_ramo_cotizacion}">
+				<p:ajax event="rowSelect"
+					listener="#{ControladorNivelaMensualizado.onRowSelectPol}"
+					update="frmMensualAnexo:dtUbcAne" />
+				<p:column headerText="No." visible="false">
+					<h:outputText value="#{pol.codigo}" />
+				</p:column>
+
+				<p:column headerText="Cliente">
+					<h:outputText value="#{pol.cliente}" />
+				</p:column>
+				<p:column headerText="No.Póliza">
+					<h:outputText value="#{pol.poliza}" />
+				</p:column>
+
+				<p:column headerText="Ramo">
+					<h:outputText value="#{pol.desc_ramo}" />
+				</p:column>
+
+				<p:column headerText="Vigencia Desde:">
+					<h:outputText value="#{pol.fc_ini_vig_date}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Vigencia Hasta:">
+					<h:outputText value="#{pol.fc_fin_vig_date}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+				<p:column style="width:32px;text-align: center"
+					headerText="Seleccionar" exportable="false">
+					<p:commandButton icon="ui-icon-check" title="Seleccionar"
+						process="@this"
+						actionListener="#{ControladorNivelaMensualizado.buscarPolizaXIdAneP}"
+						update="@this,frmMensualAnexo:tbNivelaFac:dtDetFrmPagMen,frmMensualAnexo:tbNivelaFac:otxtPolSelClie,
+								frmMensualAnexo:tbNivelaFac:otxtPolSelPol,frmMensualAnexo:tbNivelaFac:otxtPolSelRam"
+						onclick="PF('wbuscaPolizaAneMen').hide();">
+						<f:param name="cdCotizacion" value="#{pol.cd_cotizacion}" />
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+			<p:panel menuTitle="Detalle Póliza">
+				<h:panelGrid columns="2">
+					<p:dataTable id="dtUbcAne" var="UbcMenC"
+						value="#{ControladorNivelaMensualizado.lstUbicacion}"
+						selectionMode="single"
+						selection="#{ControladorNivelaMensualizado.selectedUbicacion}"
+						rowKey="#{UbcMenC.cd_ubicacion}"
+						style="font-family:Verdana; font-size: 10px;">
+						<f:facet name="header">
+				            Seleccione Ubicación
+				        </f:facet>
+						<p:ajax event="rowSelect"
+							listener="#{ControladorNivelaMensualizado.onRowSelectUbc}"
+							update="frmMensualAnexo:dtObjAne" />
+						<p:column headerText="Descripción">
+							<h:outputText value="#{UbcMenC.dsc_ubicacion}" />
+						</p:column>
+					</p:dataTable>
+					<p:dataTable id="dtObjAne" var="ObjMen"
+						value="#{ControladorNivelaMensualizado.lstObjetosPoliza}"
+						selectionMode="single"
+						selection="#{ControladorNivelaMensualizado.selectedDatosObjt}"
+						rowKey="#{ObjMen.cd_obj_cotizacion}"
+						style="font-family:Verdana; font-size: 10px;">
+						<f:facet name="header">
+				            Seleccione Objeto
+				        </f:facet>
+						<p:ajax event="rowSelect"
+							listener="#{ControladorNivelaMensualizado.onRowSelectObj}"
+							update="@this,frmMensualAnexo:dtSObjAne,frmMensualAnexo:dtCaractAne" />
+						<p:column headerText="Descripción">
+							<h:outputText value="#{ObjMen.descripcion_objeto}" />
+						</p:column>
+					</p:dataTable>
+					<p:dataTable id="dtSObjAne" var="SubObjMen"
+						value="#{ControladorNivelaMensualizado.lstSubObjetoCot}"
+						style="font-family:Verdana; font-size: 10px;">
+						<f:facet name="header">
+				            Sub Objeto
+				        </f:facet>
+						<p:column headerText="Descripción">
+							<h:outputText value="#{SubObjMen.descripcion_subobjeto}" />
+						</p:column>
+					</p:dataTable>
+					<p:dataTable id="dtCaractAne" var="caractMen"
+						value="#{ControladorNivelaMensualizado.lstCaracteristicasVh}"
+						style="font-family:Verdana; font-size: 10px;">
+						<f:facet name="header">
+				            Caracteristicas
+				        </f:facet>
+						<p:column headerText="Placa">
+							<h:outputText value="#{caractMen.placa}" />
+						</p:column>
+						<p:column headerText="Motor">
+							<h:outputText value="#{caractMen.modelo}" />
+						</p:column>
+						<p:column headerText="Marca">
+							<h:outputText value="#{caractMen.marca}" />
+						</p:column>
+						<p:column headerText="Modelo">
+							<h:outputText value="#{caractMen.modelo}" />
+						</p:column>
+					</p:dataTable>
+				</h:panelGrid>
+			</p:panel>
+	</p:dialog>
+	<!-- fin busca y selecciona Cotización -->
+	<p:dialog header="Anulación ó Nivelación - Factura"
+		widgetVar="wDlgNivelaPol" modal="true" appendTo="@(body)">
+			<p:panel header="Datos Anexo">
+				<h:panelGrid columns="4">
+					<h:outputText value="Fecha Anexo: " />
+					<h:outputText value="#{ControladorNivelaMensualizado.fcAnexo}"
+						id="fechaAneotxt">
+						<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</h:panelGrid>
+			</p:panel>
+			<h:panelGrid columns="2" style="width:100%;text-align:center;">
+				<h:outputText value="Factura" />
+				<p:inputMask
+					value="#{ControladorNivelaMensualizado.facturaAseguradora}"
+					mask="999-999-999999999" id="inpTxtFact" />
+				<h:outputText value="Anexo" />
+				<p:inputText value="#{ControladorNivelaMensualizado.anexo}"
+					id="inpTxtAnexo"></p:inputText>
+			</h:panelGrid>
+			<p:panel>
+				<p:commandButton value="Aceptar" icon="ui-icon-plus" id="btnExcObjt"
+					styleClass="ui-priority-primary"
+					action="#{ControladorNivelaMensualizado.procesaAnexo}"
+					process="@this,frmMensualAnexo:inpTxtFact,frmMensualAnexo:inpTxtAnexo" />
+				<p:commandButton id="btnEmiteNiv" styleClass="ui-priority-primary"
+					ajax="false" action="#{ControladorNivelaMensualizado.cancelaAnexo}"
+					icon="ui-icon-cancel" value="Canelar" />
+			</p:panel>
+	</p:dialog>
+
+
+</ui:composition>

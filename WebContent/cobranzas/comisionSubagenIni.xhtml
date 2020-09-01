@@ -1,0 +1,71 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/templates/Template.xhtml">
+	<ui:define name="tituloPagina">Liquida Canal</ui:define>
+	<ui:define name="contenido">
+		<p:ajaxStatus
+			style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+			<f:facet name="start">
+				<p:graphicImage value="/images/ajax-loadercircle.gif" />
+			</f:facet>
+
+			<f:facet name="complete">
+				<h:outputText value="" />
+			</f:facet>
+		</p:ajaxStatus>
+		<h:form id="frm_comiSubagen">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<ui:include src="/cobranzas/comisionSubagen.xhtml" />
+		</h:form>
+		<p:dialog header="Cambio Canal" widgetVar="cambiaSuba"
+			showEffect="fade" hideEffect="fade" resizable="false">
+			<h:form id="frmComiSubagenCam">
+				<p:panelGrid columns="1">
+					<h4>Seleccione el nuevo Canal</h4>
+					<p:selectOneMenu id="subagenCan"
+						value="#{ControladorComisionSubagen.codNuevoSubagnete}"
+						style="width:160px" filter="true" effect="fade"
+						filterMatchMode="startsWith">
+						<f:selectItem itemLabel="- Seleccione el Canal -" itemValue="0" />
+						<f:selectItems
+							value="#{ControladorComisionSubagen.listSubagentes}"
+							var="canalNn"
+							itemLabel="#{canalNn.primer_nombre_subagente == null ? canalNn.razonSocial_subagente : canalNn.primer_nombre_subagente} #{canalNn.segundo_nombre_subagente} #{canalNn.primer_apellido_subagente} #{canalNn.segundo_apellido_subagente}"
+							itemValue="#{canalNn.cd_subagente}" />
+					</p:selectOneMenu>
+					<p:commandButton value="Cambiar" id="btnCambia"
+						update="frm_comiSubagen:checkboxDTComiSubagenPol"
+						styleClass="ui-priority-primary" icon="ui-icon-search"
+						action="#{ControladorComisionSubagen.modificaSubagenPol}"
+						process="@this,frmComiSubagenCam:subagenCan,frm_comiSubagen:checkboxDTComiSubagenPol" />
+				</p:panelGrid>
+			</h:form>
+		</p:dialog>
+		<p:dialog header="No. Factura Canal" widgetVar="numFactSuba"
+			appendTo="@(body)" modal="true" showEffect="fade" hideEffect="fade"
+			resizable="false">
+			<h:form id="frmNumFactSuba">
+				<p:panelGrid columns="1">
+					<p:inputMask value="#{ControladorComisionSubagen.numFactura}"
+						mask="999-999-999999999" style="width:100%" id="numFactConpt" />
+					<p:calendar id="fcFacCom"
+						value="#{ControladorComisionSubagen.fcFacturaCom}" />
+					<p:commandButton value="Pagar" id="btnpagarFac"
+						update="@this frm_comiSubagen:checkboxDTComiSubagenPol,frm_comiSubagen:btnPrint"
+						styleClass="ui-priority-primary" icon="ui-icon-person"
+						process="@this,frmNumFactSuba:numFactConpt
+					,frmNumFactSuba:fcFacCom"
+						action="#{ControladorComisionSubagen.guardarComiSubagenPol}" />
+				</p:panelGrid>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+	<ui:define name="tituloFormulario">Liquida Canal</ui:define>
+</ui:composition>
+</html>
+

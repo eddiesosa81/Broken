@@ -1,0 +1,75 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/templates/Template.xhtml">
+	<ui:define name="tituloPagina">Emisión Masiva</ui:define>
+	<ui:define name="contenido">
+		<h:form id="frmCargaArchivo">
+			<p:fileUpload
+				listener="#{ControladorEmisionesMasivas.subirArchivos}"
+				label="Seleccionar" uploadLabel="Adjuntar" cancelLabel="Cancelar"
+				mode="advanced" dragDropSupport="true" update="@this"
+				sizeLimit="9000000" fileLimit="1" allowTypes="/(\.|\/)(xls)$/">
+			</p:fileUpload>
+			<p:panelGrid columns="4">
+				<p:outputLabel value="Fecha Carga:" />
+				<p:calendar id="cfCarga"
+					value="#{ControladorEmisionesMasivas.fcCarga}" />
+				<p:commandButton value="Consultar" id="btnCons"
+					icon="ui-icon-search" styleClass="ui-priority-primary"
+					action="#{ControladorEmisionesMasivas.consultaData}"
+					update="@this,frmCargaArchivo:dtCarga" />
+				<p:commandButton action="/index.xhtml?faces-redirect=true"
+					value="Salir" id="btnSalir" icon="ui-icon-cancel"
+					styleClass="ui-priority-primary" />
+			</p:panelGrid>
+
+			<p:dataTable var="carg" id="dtCarga"
+				style="font-family:Verdana; font-size: 10px;"
+				value="#{ControladorEmisionesMasivas.lstEmisionMasiva}" rows="10"
+				paginator="true"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="5,10,15">
+
+				<p:column headerText="Cliente">
+					<h:outputText
+						value="#{carg.PRIMER_APELLIDO_CLIENTE} #{carg.SEGUNDO_APELLIDO_CLIENTE} #{carg.PRIMER_NOMBRE_CLIENTE} #{carg.SEGUNDO_NOMBRE_CLIENTE} #{carg.RAZON_SOCIAL_CLIENTE} " />
+				</p:column>
+
+				<p:column headerText="Póliza">
+					<h:outputText value="#{carg.POLIZA}" />
+				</p:column>
+
+				<p:column headerText="Factura">
+					<h:outputText value="#{carg.FACTURA_ASEGURADORA}" />
+				</p:column>
+
+				<p:column headerText="Anexo">
+					<h:outputText value="#{carg.ANEXO}" />
+				</p:column>
+
+				<p:column headerText="Objeto Asegurado">
+					<h:outputText value="#{carg.DESCRIPCION_OBJETO}" />
+				</p:column>
+
+				<p:column headerText="Fecha Carga">
+					<h:outputText value="#{carg.fecha_creacion}" />
+				</p:column>
+
+				<p:column headerText="Fecha Proceso">
+					<h:outputText value="#{carg.fecha_proceso}" />
+				</p:column>
+
+				<p:column headerText="Estado">
+					<h:outputText value="#{carg.ESTADO}" />
+				</p:column>
+
+			</p:dataTable>
+
+		</h:form>
+	</ui:define>
+	<ui:define name="tituloFormulario">Emisión Masiva</ui:define>
+</ui:composition>
+</html>

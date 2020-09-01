@@ -1,0 +1,32 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+	<script type="text/javascript">				
+		function cerrarVentana(){		
+			var miVentana=window.open("http://35.237.152.6:8081/Broken/login.jsf","_top","");
+			
+		}
+	</script>
+	<h:form id="frmTimeOcut">
+		<p:growl id="messages" showDetail="true" sticky="true" />
+		<p:idleMonitor timeout="380000" onidle="PF('idleDialog').show()">
+		</p:idleMonitor>
+		
+		<p:dialog header="¡ALERTA DE SEGURIDAD!" resizable="false"
+			widgetVar="idleDialog" modal="true" width="400" fixedCenter="true"
+			closable="false">
+			<h:form>
+				<h:panelGrid columns="1">
+					<h:outputText value="Su sesión a Caducado" />
+					<h:outputText value="Ingrese al Sistema" />
+					<p:commandButton value="Aceptar" ajax="false" action = "#{controladorTimeOut.cerrarSesion}"/>
+					<p:separator />
+					<h:outputText value="Confia S.A. - Todos los derechos reservados ©"
+						style="background-color: transparent;" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+	</h:form>
+</ui:composition>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+	<persistence-unit name="cmd">
+		<jta-data-source>java:/OracleBroken</jta-data-source>
+		<class>confia.entidades.basicos.Usuarios</class>
+		<class>confia.entidades.basicos.Clientes</class>
+		<class>confia.entidades.basicos.Aseguradoras</class>
+		<class>confia.entidades.basicos.AseguradoraRamo</class>
+		<class>confia.entidades.basicos.Plan</class>
+		<class>confia.entidades.basicos.Subagentes</class>
+		<class>confia.entidades.basicos.Ejecutivos</class>
+		<class>confia.entidades.basicos.GrupoContratante</class>
+		<class>confia.entidades.basicos.Rubros</class>
+		<class>confia.entidades.basicos.Contacto</class>
+		<class>confia.entidades.basicos.CoberturasAdicionales</class>
+		<class>confia.entidades.basicos.Ciudad</class>
+		<class>confia.entidades.basicos.Nacionalidad</class>
+		<class>confia.entidades.basicos.Marca</class>
+		<class>confia.entidades.basicos.Modelo</class>
+		<class>confia.entidades.basicos.Dispositivos</class>
+		<class>confia.entidades.basicos.ComisionRamoAseguradora</class>
+		<class>confia.entidades.basicos.CuotasXCobrar</class>
+		<class>confia.entidades.basicos.PagoDetallePago</class>
+		<class>confia.entidades.basicos.Ramo</class>
+		<class>confia.entidades.basicos.RamoAseguradora</class>
+		<class>confia.entidades.basicos.Coberturas</class>
+		<class>confia.entidades.basicos.AseguradoraCobertura</class>
+		<class>confia.entidades.basicos.PlanCobertura</class>
+		<class>confia.entidades.basicos.PlanDeducible</class>
+		<class>confia.entidades.basicos.Deducibles</class>
+		<class>confia.entidades.basicos.AseguradoraDeducible</class>
+		<class>confia.entidades.basicos.Clausulas</class>
+		<class>confia.entidades.basicos.AseguradoraClausula</class>
+		<class>confia.entidades.basicos.PlanClausula</class>
+		<class>confia.entidades.basicos.PlanTasa</class>
+		<class>confia.entidades.basicos.CoberturasEmitidas</class>
+		<class>confia.entidades.basicos.ClausulasEmitidas</class>
+		<class>confia.entidades.basicos.DeduciblesEmitidas</class>
+		<class>confia.entidades.basicos.SubagenteRamo</class>
+		<class>confia.entidades.basicos.ComisionSubagente</class>
+		<class>confia.entidades.basicos.ComisionSubagentePol</class>
+		<class>confia.entidades.basicos.Telefono</class>
+		<class>confia.entidades.basicos.Direccion</class>
+		<class>confia.entidades.basicos.PlanDepreciacion</class>
+		<class>confia.entidades.basicos.Diagnostico</class>
+		<class>confia.entidades.basicos.InclusionObjMasivaTmp</class>
+		<class>confia.entidades.basicos.Provincias</class>
+		
+		
+		
+		<class>confia.entidades.vistas.CotizacionesPendientes</class>
+		<class>confia.entidades.vistas.CoberturasRamoAsegView</class>
+		<class>confia.entidades.vistas.ConsultaPolizaView</class>
+		<class>confia.entidades.vistas.ConsultaUbicacionPolView</class>
+		<class>confia.entidades.vistas.ConsultaObjetoPolView</class>
+		<class>confia.entidades.vistas.ConsultaSubObjetoPolView</class>
+		<class>confia.entidades.vistas.ConsultaCaractPolView</class>
+		<class>confia.entidades.vistas.ConsultaPagoPolView</class>
+		<class>confia.entidades.vistas.CoberturasPlanView</class>
+		<class>confia.entidades.vistas.PlanDeduciblesView</class>
+		<class>confia.entidades.vistas.PrefacturarView</class>
+		<class>confia.entidades.vistas.PreFacturaDetalleView</class>
+		<class>confia.entidades.vistas.PlanRamoAseguradoraView</class>
+		<class>confia.entidades.vistas.PlanClausulasView</class>
+		<class>confia.entidades.vistas.PlanTasaView</class>
+		<class>confia.entidades.vistas.ComisionRamoAseguradoraView</class>
+		<class>confia.entidades.vistas.ComisionesSubagentesView</class>
+		<class>confia.entidades.vistas.ComiSubagenPolView</class>
+		<class>confia.entidades.vistas.ComisionDiferencialPolView</class>
+		<class>confia.entidades.vistas.PagosCabView</class>
+		<class>confia.entidades.vistas.ConsultaAnexoPendienteView</class>
+		<class>confia.entidades.vistas.ConsultaPolizaAnexoView</class>
+		<class>confia.entidades.vistas.ProduccionEmitidaView</class>
+		<class>confia.entidades.vistas.ProduccionPendientePagoView</class>
+		<class>confia.entidades.vistas.ProduccionPagadaView</class>
+		<class>confia.entidades.vistas.ConsultaUbicacionAneView</class>
+		<class>confia.entidades.vistas.ConsultaObjetoAneView</class>
+		<class>confia.entidades.vistas.ConsultaSubObjetoAneView</class>
+		<class>confia.entidades.vistas.ConsultaPagoRealizadosView</class>
+		<class>confia.entidades.vistas.ReporteRepositorioSiniestro</class>
+		<class>confia.entidades.vistas.ReporteSiniestralidadView</class>
+		<class>confia.entidades.vistas.ProduccionGeneralView</class>
+		<class>confia.entidades.vistas.TransaccionPolizaView</class>
+		<class>confia.entidades.vistas.ProduccionEmitidaMensualizadoView</class>
+		<class>confia.entidades.vistas.ReporteCuotasIniImpaga</class>
+		<class>confia.entidades.vistas.ReporteComisionPendteView</class>
+		<class>confia.entidades.vistas.ReporteComisionesLiquidadasView</class>
+		<class>confia.entidades.vistas.ReporteCanalesView</class>
+		<class>confia.entidades.vistas.ConsultaFactConifaView</class>
+		<class>confia.entidades.vistas.ProduccionEmisionesPendientesView</class>
+		<class>confia.entidades.vistas.ReporteCanalesPendienteView</class>
+		<class>confia.entidades.vistas.ReporteVencimientoView</class>
+		<class>confia.entidades.vistas.ReporteVencimientoMenView</class>
+		<class>confia.entidades.vistas.EndososProvisionalesView</class>
+		
+		
+		
+		
+		<class>confia.entidades.transaccionales.Cotizacion</class>
+		<class>confia.entidades.transaccionales.RamoCotizacion</class>
+		<class>confia.entidades.transaccionales.Ubicacion</class>
+		<class>confia.entidades.transaccionales.ObjetoCotizacion</class>
+		<class>confia.entidades.transaccionales.SubObjetoCotizacion</class>
+		<class>confia.entidades.transaccionales.CaracteristicasVehiculos</class>
+		<class>confia.entidades.transaccionales.FormaPago</class>
+		<class>confia.entidades.transaccionales.DetalleFormaPago</class>
+		<class>confia.entidades.transaccionales.ConsultaUbicacionPolView</class>
+		<class>confia.entidades.transaccionales.Siniestros</class>
+		<class>confia.entidades.transaccionales.DetalleSiniestros</class>
+		<class>confia.entidades.transaccionales.CoberturasSiniestro</class>
+		<class>confia.entidades.transaccionales.PagoSiniestro</class>
+		<class>confia.entidades.transaccionales.DocumentoSiniestro</class>
+		<class>confia.entidades.transaccionales.Reservas</class>
+		<class>confia.entidades.transaccionales.ProformaSiniestro</class>
+		<class>confia.entidades.transaccionales.ComisionesPoliza</class>
+		<class>confia.entidades.transaccionales.ComisionPoliza</class>
+		<class>confia.entidades.transaccionales.DetallePagos</class>
+		<class>confia.entidades.transaccionales.Factura</class>
+		<class>confia.entidades.transaccionales.FacturaDetalle</class>
+		<class>confia.entidades.transaccionales.Pagos</class>
+		<class>confia.entidades.transaccionales.PreFactura</class>
+		<class>confia.entidades.transaccionales.PreFacturaDetalle</class>
+		<class>confia.entidades.transaccionales.Remision</class>
+		<class>confia.entidades.transaccionales.LiquidaDiferencial</class>
+		<class>confia.entidades.transaccionales.Correspondencia</class>
+		<class>confia.entidades.transaccionales.TransaccionesPeriodicas</class>
+		<class>confia.entidades.transaccionales.DiagnosticoReclamo</class>		
+		<class>confia.entidades.transaccionales.NotasAclaratorias</class>
+		<class>confia.entidades.transaccionales.EmisionMasiva</class>
+		<class>confia.entidades.transaccionales.Gestion</class>
+		<class>confia.entidades.transaccionales.Archivos</class>
+		<class>confia.entidades.transaccionales.MensualComercial</class>
+		
+		<properties>
+			<property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect" />
+			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.format_sql" value="true" />
+		</properties>
+	</persistence-unit>
+</persistence>

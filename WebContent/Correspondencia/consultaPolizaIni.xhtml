@@ -1,0 +1,514 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/templates/Template.xhtml">
+	<ui:define name="tituloPagina">Consulta Póliza</ui:define>
+	<ui:define name="contenido">
+		<p:ajaxStatus
+			style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+			<f:facet name="start">
+				<p:graphicImage value="/images/ajax-loadercircle.gif" />
+			</f:facet>
+			<f:facet name="complete">
+				<h:outputText value="" />
+			</f:facet>
+		</p:ajaxStatus>
+		<h:form id="frm_consultas">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<p:panel header="Exportar Transacciones Póliza" id="panelTranPol"
+				visible="#{ControladorConsultaPoliza.lbTransaccion}"
+				toggleable="true">
+				<h:commandLink>
+					<p:graphicImage value="/images/excel.png" width="24" />
+					<p:dataExporter type="xls"
+						target="frm_consultas:tab_consulta:dtExcel" fileName="transaccion" />
+				</h:commandLink>
+			</p:panel>
+			<p:tabView id="tab_consulta">
+				<p:tab title="Consulta Pólizas">
+					<ui:include src="/Correspondencia/consultaPoliza.xhtml" />
+				</p:tab>
+				<p:tab title="Correspondencia">
+					<ui:include src="/Correspondencia/cartaPolizas.xhtml" />
+				</p:tab>
+				<p:tab title="Documentos">
+					<h:panelGrid columns="2">
+						<h:outputText value="Documento:" />
+						<p:selectOneMenu id="slomDo"
+							value="#{ControladorConsultaPoliza.tipoArchivo}"
+							style="width:150px" autoWidth="false">
+							<f:selectItems
+								value="#{ControladorConsultaPoliza.lstTipoGestDoc}" var="tpD"
+								itemLabel="#{tpD.desc_general}" itemValue="#{tpD.desc_general}" />
+						</p:selectOneMenu>
+					</h:panelGrid>
+					<p:separator></p:separator>
+					<p:commandButton value="Consultar"
+						actionListener="#{ControladorConsultaPoliza.consultaArchivosGuardados}"
+						update="frm_consultas:tab_consulta:dtArch" icon="ui-icon-search"
+						process="@this,frm_consultas:tab_consulta:slomDo,frm_consultas:tab_consulta:listadoPolizaBusca">
+					</p:commandButton>
+					<p:dataTable var="docu" id="dtArch"
+						value="#{ControladorConsultaPoliza.lstArchivos}" rows="3"
+						paginator="true"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+						<p:column headerText="Documentos">
+							<h:outputText value="#{docu.ubicacion}" escape="false" />
+						</p:column>
+						<p:column headerText="Descripción">
+							<h:outputText value="#{docu.desc_docu}" />
+						</p:column>
+						<p:column headerText="Módulo de Ingreso">
+							<h:outputText value="#{docu.modulo}" />
+						</p:column>
+						<p:column headerText="Póliza Ingresada en Gestión">
+							<h:outputText value="#{docu.poliza}" />
+						</p:column>
+					</p:dataTable>
+				</p:tab>
+			</p:tabView>
+		</h:form>
+		<p:dialog header="Gestión" draggable="true" widgetVar="gestionaClie"
+			showEffect="fade" hideEffect="fade" closable="true"
+			appendTo="@(body)" modal="true" resizable="true">
+			<h:form id="frmGestionaClie">
+				<h:panelGrid columns="2">
+					<p:tabView id="tbviewClie">
+						<p:tab title="Datos">
+							<p:panel header="Datos">
+								<h:panelGrid columns="4" style="width:100%;text-align:center;">
+									<h:outputText value="Primer Apellido" />
+									<p:inputText id="clienteApePrimer"
+										value="#{ControladorConsultaPoliza.cliente.primer_apellido_cliente}"
+										style="text-transform:uppercase;"
+										onkeyup="javascript:this.value=this.value.toUpperCase();" />
+									<h:outputText value="Segundo Apellido" />
+									<p:inputText id="clienteApeSeg"
+										value="#{ControladorConsultaPoliza.cliente.segundo_apellido_cliente}"
+										style="text-transform:uppercase;"
+										onkeyup="javascript:this.value=this.value.toUpperCase();" />
+									<h:outputText value="Primer Nombre" />
+									<p:inputText id="clienteNomPrimer"
+										value="#{ControladorConsultaPoliza.cliente.primer_nombre_cliente}"
+										style="text-transform:uppercase;"
+										onkeyup="javascript:this.value=this.value.toUpperCase();" />
+									<h:outputText value="Segundo Nombre" />
+									<p:inputText id="clienteNomSeg"
+										value="#{ControladorConsultaPoliza.cliente.segundo_nombre_cliente}"
+										style="text-transform:uppercase;"
+										onkeyup="javascript:this.value=this.value.toUpperCase();" />
+									<h:outputText value="Razon Social" />
+									<p:inputText id="clienteRazSoc"
+										value="#{ControladorConsultaPoliza.cliente.razon_social_cliente}"
+										style="text-transform:uppercase;"
+										onkeyup="javascript:this.value=this.value.toUpperCase();" />
+									<h:outputText value="Tipo de Identificacion" />
+									<p:selectOneMenu id="clienteTipID"
+										value="#{ControladorConsultaPoliza.cliente.tipo_identificacion_cliente}"
+										style="width:125px">
+										<f:selectItem itemLabel="CEDULA" itemValue="CED" />
+										<f:selectItem itemLabel="RUC" itemValue="RUC" />
+										<f:selectItem itemLabel="PASAPORTE" itemValue="PAS" />
+									</p:selectOneMenu>
+									<h:outputText value="No.Identificación" />
+									<p:inputText id="clienteIdentif"
+										value="#{ControladorConsultaPoliza.cliente.identificacion_cliente}" />
+									<h:outputText value="Estado Civil" />
+									<p:selectOneMenu id="clienteEstCiv"
+										value="#{ControladorConsultaPoliza.cliente.estado_civil_cliente}"
+										style="width:125px">
+										<f:selectItem itemLabel="NINGUNO" itemValue="NON" />
+										<f:selectItem itemLabel="CASADO" itemValue="CAS" />
+										<f:selectItem itemLabel="DIVORCIADO" itemValue="DIV" />
+										<f:selectItem itemLabel="SOLTERO" itemValue="SOL" />
+										<f:selectItem itemLabel="VIUDO" itemValue="VIU" />
+									</p:selectOneMenu>
+									<h:outputText value="Fecha Nacimiento" />
+									<p:calendar id="clienteFecNaci"
+										value="#{ControladorConsultaPoliza.cliente.fecha_nacimiento_cliente}" />
+								</h:panelGrid>
+							</p:panel>
+							<p:panel header="Direccion">
+								<h:panelGrid columns="4" style="width:100%;text-align:center;">
+									<h:outputText value="Direccion" />
+									<p:inputText id="clienteDir"
+										value="#{ControladorConsultaPoliza.direccion.direccion}"
+										style="text-transform:uppercase;"
+										onkeyup="javascript:this.value=this.value.toUpperCase();" />
+									<h:outputText value="Ciudad" />
+									<p:selectOneMenu id="clienteCiudad"
+										value="#{ControladorConsultaPoliza.direccion.cd_ciudad}"
+										style="width:125px" autoWidth="false">
+										<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+										<f:selectItems var="ciudad"
+											value="#{ControladorConsultaPoliza.lstCiudad}"
+											itemLabel="#{ciudad.nm_ciudad}"
+											itemValue="#{ciudad.cd_ciudad}" />
+									</p:selectOneMenu>
+									<h:outputText value="Sector" />
+									<p:selectOneMenu id="clienteSector"
+										value="#{ControladorConsultaPoliza.direccion.cd_rubro}"
+										style="width:125px" autoWidth="false">
+										<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+										<f:selectItems var="sect"
+											value="#{ControladorConsultaPoliza.lsrRubroSectorDirec}"
+											itemLabel="#{sect.desc_rubro}" itemValue="#{sect.cd_rubro}" />
+									</p:selectOneMenu>
+									<h:outputText value="Provincia" />
+									<p:selectOneMenu id="clienteProvincia"
+										value="#{ControladorConsultaPoliza.direccion.cd_provincia}"
+										style="width:125px" autoWidth="false">
+										<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+										<f:selectItems var="prov"
+											value="#{ControladorConsultaPoliza.lstProvincias}"
+											itemLabel="#{prov.desc_provincia}"
+											itemValue="#{prov.cd_provincia}" />
+									</p:selectOneMenu>
+									<h:outputText value="Referencia" />
+									<p:inputText id="clienteRef"
+										value="#{ControladorConsultaPoliza.direccion.referencia}"
+										style="text-transform:uppercase;"
+										onkeyup="javascript:this.value=this.value.toUpperCase();" />
+								</h:panelGrid>
+							</p:panel>
+							<p:panel header="Teléfonos">
+								<h:panelGrid columns="4" style="width:100%;text-align:center;">
+									<h:outputText value="Ciudad" />
+									<p:selectOneMenu id="clienteCiudadTelf"
+										value="#{ControladorConsultaPoliza.telefono.cd_ciudad}"
+										style="width:125px" autoWidth="false">
+										<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+										<f:selectItems var="ciu"
+											value="#{ControladorConsultaPoliza.lstCiudad}"
+											itemLabel="#{ciu.nm_ciudad}" itemValue="#{ciu.cd_ciudad}" />
+									</p:selectOneMenu>
+									<h:outputText value="Número Particular" />
+									<p:inputText id="impNumTelf"
+										value="#{ControladorConsultaPoliza.telefono.telefono}"></p:inputText>
+									<h:outputText value="Número Oficina" />
+									<p:inputText id="impNumTelfOfi"
+										value="#{ControladorConsultaPoliza.telefono.telefono_oficina}"></p:inputText>
+									<h:outputText value="Extensión " />
+									<p:inputText id="impExtTelf"
+										value="#{ControladorConsultaPoliza.telefono.ext}"></p:inputText>
+									<h:outputText value="Número Celular" />
+									<p:inputText id="impNumTelfCel"
+										value="#{ControladorConsultaPoliza.telefono.telefono_celular}"></p:inputText>
+									<h:outputText value="Correo Personal " />
+									<p:inputText id="impCorreoP"
+										value="#{ControladorConsultaPoliza.telefono.correo}"></p:inputText>
+								</h:panelGrid>
+							</p:panel>
+						</p:tab>
+						<p:tab title="Contactos">
+							<p:panel header="Contactos">
+								<h:panelGrid columns="4" style="width:100%;text-align:center;">
+									<h:outputText value="Nombre Contacto" />
+									<p:inputText id="impNmConta"
+										value="#{ControladorConsultaPoliza.strNombreContacto}"></p:inputText>
+									<h:outputText value="Número Teléfono" />
+									<p:inputText id="impNumTelfCont"
+										value="#{ControladorConsultaPoliza.strNumerotelefono}"></p:inputText>
+									<h:outputText value="Número Celular" />
+									<p:inputText id="impNumCelCont"
+										value="#{ControladorConsultaPoliza.strNumerocelular}"></p:inputText>
+									<h:outputText value="Correo  " />
+									<p:inputText id="impCorreoPCont"
+										value="#{ControladorConsultaPoliza.strcorreo}"></p:inputText>
+									<h:outputText value="Cargo" />
+									<p:inputText id="impCargoCont"
+										value="#{ControladorConsultaPoliza.strCargo}"></p:inputText>
+									<h:outputText value="Departamento  " />
+									<p:inputText id="impDepCont"
+										value="#{ControladorConsultaPoliza.strDepartamento}"></p:inputText>
+									<h:outputText value="Dirección  " />
+									<p:inputText id="impDireccCont"
+										value="#{ControladorConsultaPoliza.strDireccion}"></p:inputText>
+								</h:panelGrid>
+							</p:panel>
+						</p:tab>
+						<p:tab title="Pólizas">
+							<p:panel header="Pólizas">
+								<p:dataTable id="polGestionada" var="poli" scrollable="true"
+									scrollHeight="80"
+									value="#{ControladorConsultaPoliza.lstPolizaGestionada}"
+									style="font-family:Verdana; font-size: 10px;">
+									<f:facet name="header">
+
+									</f:facet>
+
+									<p:column headerText="Canal" style="width:80px">
+										<h:outputText value="#{poli.nmSubagente}" />
+									</p:column>
+									<p:column headerText="Grupo Contratante" style="width:80px">
+										<h:outputText value="#{poli.nm_grupo_contratante}" />
+									</p:column>
+									<p:column headerText="Póliza" style="width:80px">
+										<h:outputText value="#{poli.poliza}" />
+									</p:column>
+									<p:column headerText="Ramo" style="width:80px">
+										<h:outputText value="#{poli.desc_ramo}" />
+									</p:column>
+
+									<p:column headerText="Vigencia Desde:" style="width:80px">
+										<h:outputText value="#{poli.fc_ini_vig_date}">
+											<f:convertDateTime pattern="dd/MM/yyyy" />
+										</h:outputText>
+									</p:column>
+									<p:column headerText="Vigencia Hasta:" style="width:80px">
+										<h:outputText value="#{poli.fc_fin_vig_date}">
+											<f:convertDateTime pattern="dd/MM/yyyy" />
+										</h:outputText>
+									</p:column>
+									<p:column headerText="Total Asegurado:" style="width:80px">
+										<h:outputText value="#{poli.total_asegurado}">
+										</h:outputText>
+									</p:column>
+									<p:column headerText="Tipo" style="width:80px">
+										<h:outputText value="#{poli.desc_rubro}">
+										</h:outputText>
+									</p:column>
+								</p:dataTable>
+							</p:panel>
+						</p:tab>
+						<p:tab title="Plan Póliza">
+							<h:panelGrid columns="2">
+								<p:row>
+									<p:dataTable id="dtPlan" var="plan"
+										value="#{ControladorConsultaPoliza.lstPlanRamAseg}"
+										scrollable="true" scrollHeight="150"
+										style="font-family:Verdana; font-size: 10px;">
+										<f:facet name="header">
+							            Planes
+							        </f:facet>
+
+										<p:column headerText="Aseguradora">
+											<h:outputText value="#{plan.nombreCortoAseguradora}" />
+										</p:column>
+										<p:column headerText="Ramo">
+											<h:outputText value="#{plan.descRamo}" />
+										</p:column>
+										<p:column headerText="Descripción Plan">
+											<h:outputText value="#{plan.descripcionPlan}" />
+										</p:column>
+									</p:dataTable>
+
+								</p:row>
+								<p:row>
+									<p:dataTable id="dtCobertura" var="cob"
+										value="#{ControladorConsultaPoliza.lstCoberturas}"
+										scrollable="true" scrollHeight="150"
+										style="font-family:Verdana; font-size: 10px;">
+										<f:facet name="header">
+							            Coberturas
+							        </f:facet>
+										<p:column headerText="Descripción Cobertura">
+											<h:outputText value="#{cob.desc_cobertura}" />
+										</p:column>
+										<p:column headerText="Porcentaje">
+											<h:outputText value="#{cob.porcentajeplancobertura}" />
+										</p:column>
+										<p:column headerText="Valor">
+											<h:outputText value="#{cob.valor_plancobertura}" />
+										</p:column>
+									</p:dataTable>
+								</p:row>
+								<p:row>
+									<p:dataTable id="dtDeducible" var="ded"
+										value="#{ControladorConsultaPoliza.lstDeducibles}"
+										scrollable="true" scrollHeight="150"
+										style="font-family:Verdana; font-size: 10px;">
+										<f:facet name="header">
+							            Deducibles
+							        </f:facet>
+
+										<p:column headerText="Descripción Deducible">
+											<h:outputText value="#{ded.desc_deducible}" />
+										</p:column>
+										<p:column headerText="% Valor Siniestro">
+											<h:outputText value="#{ded.porcentaje_valor_siniestro}" />
+										</p:column>
+										<p:column headerText="% Valor Asegurado">
+											<h:outputText value="#{ded.porcentaje_valor_asegurado}" />
+										</p:column>
+										<p:column headerText="Valor Mínimo">
+											<h:outputText value="#{ded.valor_minimo}" />
+										</p:column>
+										<p:column headerText="Valor Fijo">
+											<h:outputText value="#{ded.valor_fijo}" />
+										</p:column>
+									</p:dataTable>
+								</p:row>
+								<p:row>
+									<p:dataTable id="dtClausulas" var="cla"
+										value="#{ControladorConsultaPoliza.lstCalusulas}"
+										scrollable="true" scrollHeight="150"
+										style="font-family:Verdana; font-size: 10px;">
+										<f:facet name="header">
+							            Clausulas
+							        </f:facet>
+										<p:column headerText="Descripción Clausula">
+											<h:outputText value="#{cla.desc_clausula}" />
+										</p:column>
+										<p:column headerText="Porcentaje">
+											<h:outputText value="#{cla.porcentaje_planclausula}" />
+										</p:column>
+										<p:column headerText="Valor">
+											<h:outputText value="#{cla.valor_planclausula}" />
+										</p:column>
+									</p:dataTable>
+								</p:row>
+							</h:panelGrid>
+
+						</p:tab>
+					</p:tabView>
+					<p:row>
+						<p:panel header="Nueva Gestión">
+							<h:panelGrid columns="2" style="width:100%;text-align:center;">
+								<p:row>
+									<h:panelGrid columns="2" style="width:100%;text-align:left;">
+										<h:outputText value="Tipo" />
+										<p:selectOneMenu id="tpGest"
+											value="#{ControladorConsultaPoliza.gestion.tipo}"
+											style="width:150px" autoWidth="false">
+											<f:selectItem itemLabel="POLIZA" itemValue="POLIZA" />
+											<f:selectItem itemLabel="VENCIMIENTO" itemValue="VENCIMIENTO" />
+											<f:selectItem itemLabel="SINIESTRO" itemValue="SINIESTRO" />
+											<f:selectItem itemLabel="COBRANZA" itemValue="COBRANZA" />
+										</p:selectOneMenu>
+										<h:outputText value="Resultado de la llamada:" />
+										<p:selectOneMenu id="tpGestRes"
+											value="#{ControladorConsultaPoliza.gestion.resultado}"
+											style="width:150px" autoWidth="false">
+											<f:selectItem itemLabel="POSITIVO" itemValue="POSITIVO" />
+											<f:selectItem itemLabel="NEGATIVO" itemValue="NEGATIVO" />
+										</p:selectOneMenu>
+										<h:outputText value="Contacto" />
+										<p:inputText id="impNmConta"
+											value="#{ControladorConsultaPoliza.gestion.contacto}"></p:inputText>
+										<h:outputText value="Asunto:" />
+										<p:inputText id="txtAsunto"
+											value="#{ControladorConsultaPoliza.asunto}"></p:inputText>
+										<h:outputText value="Fecha a Pagar:" />
+										<p:calendar id="gestFcPag"
+											value="#{ControladorConsultaPoliza.fcPaga}"
+											pattern="dd/MM/yyyy HH:mm" />
+
+										<h:outputText value="Fecha de Seguimiento:" />
+										<p:calendar id="gestFcSeg"
+											value="#{ControladorConsultaPoliza.fcSeg}"
+											pattern="dd/MM/yyyy HH:mm" />
+									</h:panelGrid>
+								</p:row>
+								<p:row>
+									<h:panelGrid columns="2" style="width:100%;text-align:center;">
+										<h:outputText value="Descripción:" />
+										<p:inputTextarea id="intxtDescGes" rows="5" cols="30"
+											value="#{ControladorConsultaPoliza.gestion.instruccion}" />
+										<h:outputText value="Destinatario Correo:" />
+										<p:selectCheckboxMenu id="scmUsr"
+											value="#{ControladorConsultaPoliza.selectedUsuarios}"
+											label="Usuarios" multiple="true" filter="true"
+											filterMatchMode="startsWith" panelStyle="width:250px"
+											autoWidth="false" style="width:150px">
+											<f:selectItems var="usr"
+												value="#{ControladorConsultaPoliza.lstUsuarios}"
+												itemLabel="#{usr.usrapellidos} #{usr.usrnombres}"
+												itemValue="#{usr.correo}" />
+										</p:selectCheckboxMenu>
+										<p:row></p:row>
+										<p:commandButton value="Gestionar" id="btnGestSave"
+											icon="ui-icon-suitcase" styleClass="ui-priority-primary"
+											action="#{ControladorConsultaPoliza.guardaGestion}"
+											process="@this,frmGestionaClie:tpGest,frmGestionaClie:tpGestRes,frmGestionaClie:impNmConta,
+											frmGestionaClie:txtAsunto,frmGestionaClie:gestFcPag,frmGestionaClie:gestFcSeg,
+											frmGestionaClie:gestFcSeg,frmGestionaClie:intxtDescGes,frmGestionaClie:scmUsr,
+											frmGestionaClie:tbviewClie:clienteApePrimer,frmGestionaClie:tbviewClie:clienteApeSeg,
+											frmGestionaClie:tbviewClie:clienteNomPrimer,frmGestionaClie:tbviewClie:clienteNomSeg,
+											frmGestionaClie:tbviewClie:clienteRazSoc,frmGestionaClie:tbviewClie:clienteTipID,
+											frmGestionaClie:tbviewClie:clienteIdentif,frmGestionaClie:tbviewClie:clienteEstCiv,
+											frmGestionaClie:tbviewClie:clienteFecNaci,frmGestionaClie:tbviewClie:clienteDir,
+											frmGestionaClie:tbviewClie:clienteCiudad,frmGestionaClie:tbviewClie:clienteSector,
+											frmGestionaClie:tbviewClie:clienteProvincia,frmGestionaClie:tbviewClie:clienteRef,
+											frmGestionaClie:tbviewClie:clienteCiudadTelf,frmGestionaClie:tbviewClie:impNumTelf,
+											frmGestionaClie:tbviewClie:impNumTelfOfi,frmGestionaClie:tbviewClie:impExtTelf,
+											frmGestionaClie:tbviewClie:impNumTelfCel,frmGestionaClie:tbviewClie:impCorreoP,
+											frmGestionaClie:tbviewClie:impNmConta,frmGestionaClie:tbviewClie:impNumTelfCont,
+											frmGestionaClie:tbviewClie:impNumCelCont,frmGestionaClie:tbviewClie:impCorreoPCont,
+											frmGestionaClie:tbviewClie:impCargoCont,frmGestionaClie:tbviewClie:impDepCont,
+											frmGestionaClie:tbviewClie:impDireccCont
+											"
+											update="@this,frmGestionaClie:tbviewClie:clienteApePrimer,
+										frmGestionaClie:tbviewClie:clienteApeSeg,frmGestionaClie:tbviewClie:clienteNomPrimer,
+										frmGestionaClie:tbviewClie:clienteNomSeg,frmGestionaClie:tbviewClie:clienteRazSoc,
+										frmGestionaClie:tbviewClie:clienteTipID,frmGestionaClie:tbviewClie:clienteIdentif,
+										frmGestionaClie:tbviewClie:clienteEstCiv,frmGestionaClie:tbviewClie:clienteFecNaci,
+										frmGestionaClie:tbviewClie:clienteDir,frmGestionaClie:tbviewClie:clienteCiudad,
+										frmGestionaClie:tbviewClie:clienteSector,frmGestionaClie:tbviewClie:clienteSector,
+										frmGestionaClie:tbviewClie:clienteProvincia,frmGestionaClie:tbviewClie:clienteRef,
+										frmGestionaClie:tbviewClie:clienteCiudadTelf,frmGestionaClie:tbviewClie:impNumTelf,
+										frmGestionaClie:tbviewClie:impNumTelfOfi,frmGestionaClie:tbviewClie:impExtTelf,
+										frmGestionaClie:tbviewClie:impNumTelfCel,frmGestionaClie:tbviewClie:impCorreoP,
+										frmGestionaClie:tbviewClie:impNmConta,frmGestionaClie:tbviewClie:impNumTelfCont,
+										frmGestionaClie:tbviewClie:impNumCelCont,frmGestionaClie:tbviewClie:impCorreoPCont,
+										frmGestionaClie:tbviewClie:impCargoCont,frmGestionaClie:tbviewClie:impDepCont,
+										frmGestionaClie:tbviewClie:impDireccCont,frmGestionaClie:tbviewClie:polGestionada,
+										frmGestionaClie:impNmConta,frmGestionaClie:gestFcPag,
+										frmGestionaClie:gestFcSeg,frmGestionaClie:intxtDescGes,frmGestionaClie:tpGestRes,
+										frmGestionaClie:tpGest,frmGestionaClie:tblgesT,frmGestionaClie:scmUsr" />
+									</h:panelGrid>
+								</p:row>
+							</h:panelGrid>
+						</p:panel>
+						<p:panel header="Gestiones Realizadas">
+							<p:dataTable var="gestbl" id="tblgesT"
+								value="#{ControladorConsultaPoliza.lstGestion}" rows="3"
+								paginator="true"
+								paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+								rowsPerPageTemplate="3,5,10,15">
+								<p:column headerText="Fecha Contacto">
+									<h:outputText value="#{gestbl.fecha_contacto}">
+										<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+									</h:outputText>
+								</p:column>
+
+								<p:column headerText="Tipo">
+									<h:outputText value="#{gestbl.tipo}" />
+								</p:column>
+
+								<p:column headerText="Contacto">
+									<h:outputText value="#{gestbl.contacto}" />
+								</p:column>
+
+								<p:column headerText="Resultado">
+									<h:outputText value="#{gestbl.resultado}" />
+								</p:column>
+
+								<p:column headerText="Descripción">
+									<h:outputText value="#{gestbl.instruccion}" />
+								</p:column>
+
+								<p:column headerText="Fecha Seguimiento">
+									<h:outputText value="#{gestbl.instruccion}" />
+								</p:column>
+								<p:column headerText="Fecha Pago">
+									<h:outputText value="#{gestbl.fecha_pago}">
+										<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+									</h:outputText>
+								</p:column>
+							</p:dataTable>
+						</p:panel>
+					</p:row>
+
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+	<ui:define name="tituloFormulario">Consulta Póliza</ui:define>
+</ui:composition>
+</html>
+

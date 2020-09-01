@@ -1,0 +1,105 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+	<p:growl showDetail="true" sticky="true">
+		<p:autoUpdate></p:autoUpdate>
+	</p:growl>
+	<h:panelGrid columns="2" cellpadding="5">
+		<p:row>
+			<p:dataTable id="dtMarca" var="mark"
+				value="#{ControladorMarcaModeloVH.lstMarca}" scrollable="true"
+				scrollHeight="150"
+				style="width:500px; font-family:Verdana; font-size: 12px;"
+				selectionMode="single"
+				selection="#{ControladorMarcaModeloVH.selectedMarca}"
+				rowKey="#{mark.cd_marca}"
+				emptyMessage="No se encuentra en la busqueda"
+				filteredValue="#{ControladorMarcaModeloVH.lstFilteredMarca}">
+				<f:facet name="header">
+			       Seleccione la Marca
+			    </f:facet>
+				<p:ajax event="rowSelect"
+					listener="#{ControladorMarcaModeloVH.onRowSelect}" process="@this"
+					update="frm_marcaModeloVh:dtModelo" />
+
+				<p:column headerText="Descripción" filterBy="#{mark.desc_marca}"
+					sortBy="#{mark.desc_marca}" filterMatchMode="contains">
+					<h:outputText value="#{mark.desc_marca}" />
+				</p:column>
+			</p:dataTable>
+			<p:commandButton value="Salir" id="btnSalir" icon="ui-icon-cancel"
+				styleClass="ui-priority-primary"
+				action="#{ControladorMarcaModeloVH.salir}" process="@this"
+				update="@this" />
+		</p:row>
+		<p:row>
+			<p:dataTable id="dtModelo" var="model"
+				value="#{ControladorMarcaModeloVH.lstModelo}" scrollable="true"
+				scrollHeight="150"
+				style="width:500px; font-family:Verdana; font-size: 12px;"
+				selectionMode="single"
+				selection="#{ControladorMarcaModeloVH.selectedModelo}"
+				rowKey="#{model.cd_modelo}"
+				emptyMessage="No se encuentra en la busqueda" editable="true">
+
+				<f:facet name="header">
+			            Modelo
+			    </f:facet>
+				<p:ajax event="rowEdit"
+					listener="#{ControladorMarcaModeloVH.onRowEditModelo}"
+					update="frm_marcaModeloVh:dtModelo" />
+				
+				<p:column headerText="Descripción">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{model.desc_modelo}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputText value="#{model.desc_modelo}" style="width:100%"></p:inputText>
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+
+				<p:column style="width:32px">
+					<p:rowEditor />
+				</p:column>
+			</p:dataTable>
+			<p:commandButton value="Agregar" icon="ui-icon-plusthick"
+				id="btnNuevoModelo" update="@this" styleClass="ui-priority-primary"
+				actionListener="#{ControladorMarcaModeloVH.nuevoModelo}"
+				process="@this,frm_marcaModeloVh:dtMarca" />
+			<p:commandButton value="Desactivar" icon="ui-icon-minusthick"
+				id="btnEliminaModelo" update="@this,frm_marcaModeloVh:dtModelo"
+				styleClass="ui-priority-primary"
+				actionListener="#{ControladorMarcaModeloVH.eliminaModelo}"
+				process="@this,frm_marcaModeloVh:dtMarca">
+				<p:confirm header="Confirmación"
+					message="Desea desactivar el registro?" icon="ui-icon-alert" />
+			</p:commandButton>
+		</p:row>
+	</h:panelGrid>
+	<p:confirmDialog id="confirmDelete" global="true" showEffect="fade"
+		hideEffect="fade">
+		<p:commandButton value="Si" type="button"
+			styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+		<p:commandButton value="No" type="button"
+			styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+	</p:confirmDialog>
+	<!-- Inicia Dialogo Planes -->
+	<p:dialog header="Modelo" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgModelo" closable="true">
+		<h:panelGrid columns="2" style="width:100%;text-align:left;">
+			<h:outputText value="Descripción Modelo" />
+			<p:inputText id="impModelo"
+				value="#{ControladorMarcaModeloVH.descModelo}"></p:inputText>
+		</h:panelGrid>
+		<p:commandButton icon="ui-icon-check" value="Guardar"
+			process="@this,frm_marcaModeloVh:impModelo"
+			update="@this frm_marcaModeloVh:dtModelo frm_marcaModeloVh:impModelo "
+			action="#{ControladorMarcaModeloVH.guardaModelo}">
+		</p:commandButton>
+	</p:dialog>
+	<!-- fin Dialogo Planes -->
+</ui:composition>

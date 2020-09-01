@@ -1,0 +1,107 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+	<h:panelGrid columns="2" cellpadding="5">
+		<p:dataTable id="dtAseg" var="aseg"
+			value="#{controladorComisionBroker.lstComisionRamAseg}"
+			scrollable="true" scrollHeight="150"
+			style="width:500px; font-family:Verdana; font-size: 12px;"
+			selectionMode="single"
+			selection="#{controladorComisionBroker.selectedViewComisionRamAsegu}"
+			rowKey="#{aseg.cd_com_ramaseg}">
+			<f:facet name="header">
+			        Aseguradoras
+			    </f:facet>
+			<p:ajax event="rowSelect"
+				listener="#{controladorComisionBroker.onRowSelectComi}"
+				update="@this,frm_comisionBroker:dtAseg" />
+			<p:column headerText="Nombre Aseguradora">
+				<h:outputText value="#{aseg.nombre_corto_aseguradora}" />
+			</p:column>
+			<p:column headerText="Descripción Ramo">
+				<h:outputText value="#{aseg.descRamo}" />
+			</p:column>
+			<p:column headerText="Porcentaje">
+				<h:outputText value="#{aseg.porcentaje_com_ramaseg}" />
+			</p:column>
+			<p:column headerText="Grupo Contratante">
+				<h:outputText value="#{aseg.nombre_corto_grupo_contratante}" />
+			</p:column>
+		</p:dataTable>
+		<p:commandButton value="Agregar" id="btnAgregar"
+			icon="ui-icon-plusthick"
+			actionListener="#{controladorComisionBroker.Aseguradora}"
+			process="@this" />
+		<p:commandButton value="Salir" id="btnSalir" icon="ui-icon-cancel"
+			styleClass="ui-priority-primary"
+			action="#{controladorComisionBroker.guardaComi}" process="@this"
+			update="@this" />
+		
+		<p:commandButton value="Eliminar" id="btnEliminComi"
+			icon="ui-icon-cancel" styleClass="ui-priority-primary"
+			action="#{controladorComisionBroker.EliminaComision}" process="@this"
+			update="@this,frm_comisionBroker:dtAseg" />
+	</h:panelGrid>
+	<!-- Incia Dialogo comision aseg ramo -->
+	<p:dialog header="Comisión" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgComision" closable="true">
+		<h:panelGrid columns="2" cellpadding="5">
+			<p:row>
+				<h:outputText value="Grupo Contratante " />
+				<p:separator></p:separator>
+				<p:selectOneMenu id="geconomico"
+					value="#{controladorComisionBroker.codGrupoEconomico}" style="width:125px"
+					autoWidth="false">
+					<f:selectItem itemValue="0" itemLabel="-- Todos --" />
+					<f:selectItems var="gcontratante"
+						value="#{controladorComisionBroker.listaGrupoContratante}"
+						itemLabel="#{gcontratante.nombre_corto_grupo_contratante}"
+						itemValue="#{gcontratante.cd_grupo_contratante}" />
+				</p:selectOneMenu>
+				<p:dataTable id="dtAsegC" var="aseg"
+					value="#{controladorComisionBroker.lstAseguradora}"
+					scrollable="true" scrollHeight="150"
+					style="width:500px; font-family:Verdana; font-size: 12px;"
+					selectionMode="single"
+					selection="#{controladorComisionBroker.selectedAseguradora}"
+					rowKey="#{aseg.cd_aseguradora}">
+					<f:facet name="header">
+			            Aseguradora
+			        </f:facet>
+					<p:column headerText="Nombre Aseguradora">
+						<h:outputText value="#{aseg.nombre_corto_aseguradora}" />
+					</p:column>
+				</p:dataTable>
+				
+			</p:row>
+			<p:row>
+				<p:dataTable id="dtRam" var="ram"
+					value="#{controladorComisionBroker.lstRamo}" scrollable="true"
+					selection="#{controladorComisionBroker.selectedLstRamo}"
+					rowKey="#{ram.cd_ramo}" scrollHeight="150"
+					style="width:500px; font-family:Verdana; font-size: 12px;">
+					<f:facet name="header">
+				            Ramo
+				        </f:facet>
+					<p:column selectionMode="multiple"
+						style="width:16px;text-align:center" />
+					<p:column headerText="Descripción Ramo">
+						<h:outputText value="#{ram.desc_ramo}" />
+					</p:column>
+				</p:dataTable>
+				<h:panelGrid columns="2" cellpadding="5">
+					<h:outputText value="Valor Comisión" />
+					<p:inputNumber id="valComision"
+						value="#{controladorComisionBroker.valComi}"></p:inputNumber>
+					<p:commandButton icon="ui-icon-check" value="Guardar"
+						process="@this,frm_comisionBroker:dtAsegC,frm_comisionBroker:dtRam,
+									frm_comisionBroker:valComision,frm_comisionBroker:geconomico"
+						update="@this,frm_comisionBroker:dtAsegC,frm_comisionBroker:dtAseg"
+						action="#{controladorComisionBroker.guardaValComi}" />
+				</h:panelGrid>
+			</p:row>
+		</h:panelGrid>
+	</p:dialog>
+</ui:composition>

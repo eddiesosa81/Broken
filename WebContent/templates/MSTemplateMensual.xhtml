@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core">
+
+<h:head>
+	<title><ui:insert name="tituloPagina">
+		</ui:insert></title>
+	<h:outputScript name="validador.js"></h:outputScript>
+	<script src="resources/navegador.js"></script>
+</h:head>
+
+<h:body onload="nobackbutton();">
+	<br />
+	<table style="border: 1px solid #CAD6E0" align="center" cellpadding="0"
+		cellspacing="0" border="0" width="1200">
+		<tr>
+
+			<td class="header" height="30" align="center" valign="middle"
+				width="100%"
+				style="font-family: Verdana; font-size: 20px; color: navy; font-weight: bold;">
+				<ui:insert name="tituloFormulario">
+				</ui:insert>
+			</td>
+
+		</tr>
+		<tr>
+			<td height="1" width="150%" bgcolor="#CAD6E0"></td>
+		</tr>
+		<tr>
+			<td width="100%" colspan="2">
+				<table width="100%" style="height: 150px" align="left"
+					cellpadding="0" cellspacing="0" border="0">
+					<tr>
+						<td align="center" width="100%" valign="middle" class="formulario"
+							style="font-family: Verdana; font-size: 12px;"><br /> <br />
+							<ui:insert name="contenido">
+								Aqui va el contenido
+							</ui:insert></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+
+		<tr>
+			<td colspan="2" valign="bottom" height="1" width="100%"
+				bgcolor="#CAD6E0"
+				style="font-family: Verdana, Arial, Helvetica, sans-serif; font-style: Italic; font-size: 14px;"><ui:insert
+					name="autor" /> - Confia -</td>
+		</tr>
+
+	</table>
+</h:body>
+
+</html>

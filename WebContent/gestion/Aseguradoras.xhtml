@@ -1,0 +1,539 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+	<h:panelGrid columns="2" cellpadding="5">
+		<p:row>
+			<p:dataTable id="dtAseguradora" var="asegura"
+				value="#{controladorAseguradoras.lstAseguradora}"
+				selectionMode="single"
+				selection="#{controladorAseguradoras.selectedAseguradora}"
+				rowKey="#{asegura.cd_aseguradora}" scrollable="true"
+				scrollHeight="150" editable="true"
+				style="width:500px; font-family:Verdana; font-size: 10px;">
+				<f:facet name="header">
+			            Aseguradoras
+			        </f:facet>
+				<p:ajax event="rowSelect"
+					listener="#{controladorAseguradoras.onRowSelectAsegu}"
+					update="frm_DatosAsegu:dttelef
+						frm_DatosAsegu:dtDireccion frm_DatosAsegu:dtContacto" />
+				<p:column headerText="Ruc Aseguradora">
+					<h:outputText value="#{asegura.ruc_aseguradora}" />
+				</p:column>
+				<p:column headerText="Razón Social">
+					<h:outputText value="#{asegura.razon_social_aseguradora}" />
+				</p:column>
+				<p:column headerText="Nombre Aseguradora">
+					<h:outputText value="#{asegura.nombre_corto_aseguradora}" />
+				</p:column>
+			</p:dataTable>
+			<p:commandButton value="Agregar" id="btnAgregar"
+				icon="ui-icon-plusthick" styleClass="ui-priority-primary"
+				actionListener="#{controladorAseguradoras.AgregarAseguradora}"
+				process="@this" />
+			<p:commandButton value="Salir" id="btnSalir" icon="ui-icon-cancel"
+				styleClass="ui-priority-primary"
+				action="#{controladorAseguradoras.Salir}" process="@this"
+				update="@this" />
+		</p:row>
+
+		<p:row>
+			<p:dataTable id="dttelef" var="telef"
+				value="#{controladorAseguradoras.lstTelefono}" editable="true"
+				scrollable="true" scrollHeight="150"
+				style="width:500px; font-family:Verdana; font-size: 10px;">
+				<f:facet name="header">
+			            Teléfonos
+			        </f:facet>
+				<p:ajax event="rowEdit"
+					listener="#{controladorAseguradoras.onEditTelefono}"
+					update="frm_DatosAsegu:dttelef" />
+				<p:column headerText="Tipo">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{telef.tipo}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputText value="#{telef.tipo}" style="width:100%" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Teléfono">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{telef.telefono}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputText value="#{telef.telefono}" style="width:100%" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Extensión">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{telef.ext}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputText value="#{telef.ext}" style="width:100%" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Correo">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{telef.correo}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputText value="#{telef.correo}" style="width:100%" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column style="width:32px">
+					<p:rowEditor />
+				</p:column>
+				<p:column style="width:32px">
+					<p:commandButton icon="ui-icon-minus" id="btnEliminaTelef"
+						actionListener="#{controladorAseguradoras.EliminaTelefono(telef)}"
+						update="frm_DatosAsegu:dttelef">
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+			<p:commandButton value="Agregar" icon="ui-icon-plusthick"
+				id="btnNuevoTelefono" update="@this"
+				styleClass="ui-priority-primary"
+				actionListener="#{controladorAseguradoras.AgregarTelefono}"
+				process="@this" />
+		</p:row>
+
+		<p:row>
+			<p:dataTable id="dtDireccion" var="direc"
+				value="#{controladorAseguradoras.lstDireccion}" editable="true"
+				scrollable="true" scrollHeight="150"
+				style="width:500px; font-family:Verdana; font-size: 10px;">
+				<f:facet name="header">
+				        Direcciones
+				    </f:facet>
+
+				<p:ajax event="rowEdit"
+					listener="#{controladorAseguradoras.onEditDireccion}"
+					update="frm_DatosAsegu:dtDireccion" />
+
+				<p:column headerText="Dirección">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{direc.direccion}" />
+						</f:facet>
+						<f:facet name="input">
+							<h:inputText value="#{direc.direccion}" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Referencia">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{direc.referencia}" />
+						</f:facet>
+						<f:facet name="input">
+							<h:inputText value="#{direc.referencia}" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column style="width:32px">
+					<p:rowEditor />
+				</p:column>
+				<p:column style="width:32px">
+					<p:commandButton icon="ui-icon-minus" id="btnEliminaDirec"
+						actionListener="#{controladorAseguradoras.EliminaDireccion(direc)}"
+						update="frm_DatosAsegu:dtDireccion">
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+			<p:commandButton value="Agregar" id="btnAgregarDirec"
+				icon="ui-icon-plusthick" styleClass="ui-priority-primary"
+				actionListener="#{controladorAseguradoras.AgregarDireccion}"
+				process="@this" />
+		</p:row>
+		<p:row>
+			<p:dataTable id="dtContacto" var="contac"
+				value="#{controladorAseguradoras.lstContacto}" editable="true"
+				scrollable="true" scrollHeight="150"
+				style="font-family:Verdana; font-size: 10px;">
+				<f:facet name="header">
+				        Contactos
+				    </f:facet>
+
+				<p:ajax event="rowEdit"
+					listener="#{controladorAseguradoras.onEditContacto}"
+					update="dtContacto" />
+				<p:column headerText="Nombre">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{contac.nombre_contacto}" />
+						</f:facet>
+						<f:facet name="input">
+							<h:inputText value="#{contac.nombre_contacto}" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Teléfono">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{contac.telefono_contacto}" />
+						</f:facet>
+						<f:facet name="input">
+							<h:inputText value="#{contac.telefono_contacto}" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Celular">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{contac.celular_contacto}" />
+						</f:facet>
+						<f:facet name="input">
+							<h:inputText value="#{contac.celular_contacto}" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Mail">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{contac.mail_contacto}" />
+						</f:facet>
+						<f:facet name="input">
+							<h:inputText value="#{contac.mail_contacto}" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Cargo">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{contac.cargo_contacto}" />
+						</f:facet>
+						<f:facet name="input">
+							<h:inputText value="#{contac.cargo_contacto}" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Dept.">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{contac.departamento_contacto}" />
+						</f:facet>
+						<f:facet name="input">
+							<h:inputText value="#{contac.departamento_contacto}" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Direc.">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{contac.direccion_contacto}" />
+						</f:facet>
+						<f:facet name="input">
+							<h:inputText value="#{contac.direccion_contacto}" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column headerText="Ciudad">
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{contac.ciudad}" />
+						</f:facet>
+						<f:facet name="input">
+							<h:inputText value="#{contac.ciudad}" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
+				<p:column style="width:32px">
+					<p:rowEditor />
+				</p:column>
+				<p:column style="width:32px">
+					<p:commandButton icon="ui-icon-minus" id="btnEliminaContact"
+						actionListener="#{controladorAseguradoras.EliminaContacto(contac)}"
+						update="frm_DatosAsegu:dtContacto">
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+			<p:commandButton value="Agregar" id="btnAgregarCont"
+				icon="ui-icon-plusthick" styleClass="ui-priority-primary"
+				actionListener="#{controladorAseguradoras.AgregarContacto}"
+				process="@this" />
+
+		</p:row>
+	</h:panelGrid>
+
+	<!-- Incia Dialogo agregar aseguradora, telefono, dirección y contactos -->
+	<p:dialog header="Aseguradora" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgDatCons" closable="true">
+		<p:tabView>
+			<p:tab id="aseguradora" title="Aseguradora">
+				<p:panel header="Agregar Aseguradora">
+					<p:messages />
+					<h:panelGrid columns="2" columnClasses="label, value">
+						<h:outputText value="Ruc Aseguradora" />
+						<p:inputText value="#{controladorAseguradoras.ruc_aseguradora}"
+							required="true" label="Ruc Aseguradora" />
+						<h:outputText value="Razon Social Aseguradora" />
+						<p:inputText
+							value="#{controladorAseguradoras.razon_social_aseguradora}"
+							required="true" label="Razon Social Aseguradora"
+							style="text-transform:uppercase;"
+							onkeyup="javascript:this.value=this.value.toUpperCase();" />
+						<h:outputText value="Nombre Aseguradora" />
+						<p:inputText
+							value="#{controladorAseguradoras.nombre_corto_aseguradora}"
+							required="true" label="Nombre Aseguradora"
+							style="text-transform:uppercase;"
+							onkeyup="javascript:this.value=this.value.toUpperCase();" />
+					</h:panelGrid>
+				</p:panel>
+			</p:tab>
+			<p:tab id="telefono" title="Teléfono">
+				<p:panel header="Agregar Teléfono">
+					<p:messages />
+					<h:panelGrid columns="2" columnClasses="label, value">
+						<h:outputText value="Ciudad:" />
+						<p:selectOneMenu id="ciudad"
+							value="#{controladorAseguradoras.cd_ciudadCons}"
+							style="width:125px" autoWidth="false">
+							<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+							<f:selectItems var="ciud"
+								value="#{controladorAseguradoras.lstCiudad}"
+								itemLabel="#{ciud.nm_ciudad}" itemValue="#{ciud.cd_ciudad}" />
+						</p:selectOneMenu>
+
+						<h:outputText value="Tipo:" />
+						<p:selectOneMenu id="TipoTel"
+							value="#{controladorAseguradoras.tipoCons}">
+							<f:selectItem itemLabel="-- Seleccionar --" itemValue="" />
+							<f:selectItem itemLabel="Celular" itemValue="CELULAR" />
+							<f:selectItem itemLabel="Convencional" itemValue="CONVENCIONAL" />
+							<f:selectItem itemLabel="OTRO" itemValue="OTRO" />
+						</p:selectOneMenu>
+
+						<h:outputText value="Número de Teléfono:" />
+						<p:inputText id="telef"
+							value="#{controladorAseguradoras.telefonoCons}" />
+						<h:outputText value="Extensión:" />
+						<p:inputText id="ext" value="#{controladorAseguradoras.extCons}" />
+						<h:outputText value="Correo:" />
+						<p:inputText id="cont"
+							value="#{controladorAseguradoras.correoCons}"
+							style="text-transform:uppercase;"
+							onkeyup="javascript:this.value=this.value.toUpperCase();" />
+					</h:panelGrid>
+				</p:panel>
+			</p:tab>
+			<p:tab id="direccion" title="Dirección">
+				<p:panel header="Agregar Dirección">
+					<p:messages />
+					<h:panelGrid columns="2" columnClasses="label, value">
+						<h:outputText value="Dirección:" />
+						<p:inputText id="direc"
+							value="#{controladorAseguradoras.direccionCons}"
+							style="text-transform:uppercase;"
+							onkeyup="javascript:this.value=this.value.toUpperCase();" />
+
+						<h:outputText value="Ciudad" />
+						<p:selectOneMenu id="CiudadDirec"
+							value="#{controladorAseguradoras.cd_ciudadCons}">
+							<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+							<f:selectItems var="ciudades"
+								value="#{controladorAseguradoras.lstCiudad}"
+								itemLabel="#{ciudades.nm_ciudad}"
+								itemValue="#{ciudades.cd_ciudad}" />
+						</p:selectOneMenu>
+						<h:outputText value="Sector" />
+						<p:selectOneMenu id="SectorDirec"
+							value="#{controladorAseguradoras.cd_rubro}">
+							<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+							<f:selectItems var="sector"
+								value="#{controladorAseguradoras.lsrRubroSectorDirec}"
+								itemLabel="#{sector.desc_rubro}" itemValue="#{sector.cd_rubro}" />
+						</p:selectOneMenu>
+
+						<h:outputText value="Referencia:" />
+						<p:inputText id="refer"
+							value="#{controladorAseguradoras.referenciaCons}"
+							style="text-transform:uppercase;"
+							onkeyup="javascript:this.value=this.value.toUpperCase();" />
+					</h:panelGrid>
+				</p:panel>
+			</p:tab>
+			<p:tab id="contacto" title="Contacto">
+				<p:panel header="Agregar Contacto">
+					<p:messages />
+					<h:panelGrid columns="2" columnClasses="label, value">
+						<h:outputText value="Nombre Contacto:" />
+						<p:inputText id="Nomcont"
+							value="#{controladorAseguradoras.nombreContacto}" />
+						<h:outputText value="Teléfono Contacto:" />
+						<p:inputText id="telcont"
+							value="#{controladorAseguradoras.telefono_contactoCons}" />
+						<h:outputText value="Celular Contacto:" />
+						<p:inputText id="celucont"
+							value="#{controladorAseguradoras.celular_contactoCons}" />
+						<h:outputText value="Mail Contacto:" />
+						<p:inputText id="mailcont"
+							value="#{controladorAseguradoras.mail_contactoCons}"
+							style="text-transform:uppercase;"
+							onkeyup="javascript:this.value=this.value.toUpperCase();" />
+						<h:outputText value="Cargo Contacto:" />
+						<p:inputText id="cargcont"
+							value="#{controladorAseguradoras.cargo_contactoCons}"
+							style="text-transform:uppercase;"
+							onkeyup="javascript:this.value=this.value.toUpperCase();" />
+						<h:outputText value="Departamento Contacto:" />
+						<p:inputText id="depcont"
+							value="#{controladorAseguradoras.departamento_contactoCons}"
+							style="text-transform:uppercase;"
+							onkeyup="javascript:this.value=this.value.toUpperCase();" />
+						<h:outputText value="Dirección Contacto:" />
+						<p:inputText id="dircont"
+							value="#{controladorAseguradoras.direccion_contactoCons}"
+							style="text-transform:uppercase;"
+							onkeyup="javascript:this.value=this.value.toUpperCase();" />
+					</h:panelGrid>
+				</p:panel>
+				<p:commandButton value="Guardar"
+					actionListener="#{controladorAseguradoras.agregaDatosCons}"
+					process="@this" icon="ui-icon-disk"
+					update="@this,frm_DatosAsegu:dtAseguradora,frm_DatosAsegu:dttelef,
+							frm_DatosAsegu:dtDireccion,frm_DatosAsegu:dtContacto">
+				</p:commandButton>
+			</p:tab>
+		</p:tabView>
+	</p:dialog>
+
+	<!-- Incia Dialogo agregar telefonos -->
+	<p:dialog header="Teléfonos" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgDatTelefAseg" closable="true">
+		<h:panelGrid columns="4" style="width:100%;text-align:center;">
+			<h:outputText value="Ciudad:" />
+			<p:selectOneMenu id="ciudad"
+				value="#{controladorAseguradoras.cd_ciudad}" style="width:125px"
+				autoWidth="false">
+				<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+				<f:selectItems var="ciuda"
+					value="#{controladorAseguradoras.lstCiudad}"
+					itemLabel="#{ciuda.nm_ciudad}" itemValue="#{ciuda.cd_ciudad}" />
+			</p:selectOneMenu>
+			<h:outputText value="Tipo:" />
+			<p:selectOneMenu id="TipoTel" value="#{controladorAseguradoras.tipo}">
+				<f:selectItem itemLabel="-- Seleccionar --" itemValue="" />
+				<f:selectItem itemLabel="Celular" itemValue="CELULAR" />
+				<f:selectItem itemLabel="Convencional" itemValue="CONVENCIONAL" />
+				<f:selectItem itemLabel="OTRO" itemValue="OTRO" />
+			</p:selectOneMenu>
+			<h:outputText value="Número de Teléfono:" />
+			<p:inputText id="telef" value="#{controladorAseguradoras.telefono}" />
+			<h:outputText value="Extensión:" />
+			<p:inputText id="ext" value="#{controladorAseguradoras.ext}" />
+			<h:outputText value="Correo:" />
+			<p:inputText id="cont" value="#{controladorAseguradoras.correo}"
+				style="text-transform:uppercase;"
+				onkeyup="javascript:this.value=this.value.toUpperCase();" />
+		</h:panelGrid>
+		<p:commandButton value="Guardar"
+			actionListener="#{controladorAseguradoras.guardaTelefonosAseg}"
+			process="@this,frm_DatosAsegu:dtAseguradora,frm_DatosAsegu:ciudad,frm_DatosAsegu:telef,
+				frm_DatosAsegu:cont,frm_DatosAsegu:TipoTel,frm_DatosAsegu:ext"
+			icon="ui-icon-disk" update="dttelef">
+		</p:commandButton>
+	</p:dialog>
+
+	<!-- Incia Dialogo agregar direcciones -->
+	<p:dialog header="Direcciones" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgDatDirecAseg" closable="true">
+		<h:panelGrid columns="4" style="width:100%;text-align:center;">
+			<h:outputText value="Dirección:" />
+			<p:inputText id="direc" value="#{controladorAseguradoras.direccion}"
+				style="text-transform:uppercase;"
+				onkeyup="javascript:this.value=this.value.toUpperCase();" />
+			<h:outputText value="Ciudad:" />
+			<p:selectOneMenu id="CiudadDirec"
+				value="#{controladorAseguradoras.ciudad}">
+				<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+				<f:selectItems var="ciudades"
+					value="#{controladorAseguradoras.lstCiudad}"
+					itemLabel="#{ciudades.nm_ciudad}" itemValue="#{ciudades.cd_ciudad}" />
+			</p:selectOneMenu>
+			<h:outputText value="Sector:" />
+			<p:selectOneMenu id="SectorDirec"
+				value="#{controladorAseguradoras.cd_rubro}">
+				<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+				<f:selectItems var="sector"
+					value="#{controladorAseguradoras.lsrRubroSectorDirec}"
+					itemLabel="#{sector.desc_rubro}" itemValue="#{sector.cd_rubro}" />
+			</p:selectOneMenu>
+			<h:outputText value="Referencia:" />
+			<p:inputText id="refer" value="#{controladorAseguradoras.referencia}"
+				style="text-transform:uppercase;"
+				onkeyup="javascript:this.value=this.value.toUpperCase();" />
+		</h:panelGrid>
+		<p:commandButton value="Guardar"
+			actionListener="#{controladorAseguradoras.guardaDireccion}"
+			process="@this,frm_DatosAsegu:dtAseguradora,frm_DatosAsegu:direc,frm_DatosAsegu:SectorDirec,
+				frm_DatosAsegu:CiudadDirec,frm_DatosAsegu:refer "
+			icon="ui-icon-disk" update="@this dtDireccion">
+		</p:commandButton>
+	</p:dialog>
+
+	<!-- Incia Dialogo agregar contacto -->
+	<p:dialog header="Contactos" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgContactAseg" closable="true"
+		>
+			<h:panelGrid columns="4" style="width:100%;text-align:center;">
+				<h:outputText value="Nombre Contacto:" />
+				<p:inputText id="nomCont"
+					value="#{controladorAseguradoras.nombreContacto}" />
+				<h:outputText value="Teléfono Contacto:" />
+				<p:inputText id="telcont"
+					value="#{controladorAseguradoras.telefono_contacto}" />
+				<h:outputText value="Celular Contacto:" />
+				<p:inputText id="celucont"
+					value="#{controladorAseguradoras.celular_contacto}" />
+				<h:outputText value="Mail Contacto:" />
+				<p:inputText id="mailcont"
+					value="#{controladorAseguradoras.mail_contacto}"
+					style="text-transform:uppercase;"
+					onkeyup="javascript:this.value=this.value.toUpperCase();" />
+				<h:outputText value="Cargo Contacto:" />
+				<p:inputText id="cargcont"
+					value="#{controladorAseguradoras.cargo_contacto}"
+					style="text-transform:uppercase;"
+					onkeyup="javascript:this.value=this.value.toUpperCase();" />
+				<h:outputText value="Departamento Contacto:" />
+				<p:inputText id="depcont"
+					value="#{controladorAseguradoras.departamento_contacto}"
+					style="text-transform:uppercase;"
+					onkeyup="javascript:this.value=this.value.toUpperCase();" />
+				<h:outputText value="Dirección Contacto:" />
+				<p:inputText id="dircont"
+					value="#{controladorAseguradoras.direccion_contacto}"
+					style="text-transform:uppercase;"
+					onkeyup="javascript:this.value=this.value.toUpperCase();" />
+				<h:outputText value="Ciudad Contacto:" />
+				<p:selectOneMenu id="CiudadCont"
+					value="#{controladorAseguradoras.ciudad}">
+					<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+					<f:selectItems var="ciudades"
+						value="#{controladorAseguradoras.lstCiudad}"
+						itemLabel="#{ciudades.nm_ciudad}"
+						itemValue="#{ciudades.nm_ciudad}" />
+				</p:selectOneMenu>
+			</h:panelGrid>
+			<p:commandButton value="Guardar"
+				actionListener="#{controladorAseguradoras.guardaContacto}"
+				process="@this,frm_DatosAsegu:dtAseguradora,frm_DatosAsegu:telcont,
+				frm_DatosAsegu:celucont,frm_DatosAsegu:mailcont,
+				frm_DatosAsegu:cargcont,frm_DatosAsegu:depcont,
+				frm_DatosAsegu:dircont,frm_DatosAsegu:nomCont,
+				frm_DatosAsegu:CiudadCont"
+				icon="ui-icon-disk" update="@this dtContacto">
+			</p:commandButton>
+	</p:dialog>
+</ui:composition>

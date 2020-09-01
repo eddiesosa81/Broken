@@ -1,0 +1,491 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+		<h:panelGrid columns="2" cellpadding="5">
+			<p:row>
+				<p:dataTable id="dtCliente" var="clie"
+					value="#{controladorClientes.lstClientes}" selectionMode="single"
+					selection="#{controladorClientes.selectedCliente}"
+					rowKey="#{clie.cd_cliente}" scrollable="true" scrollHeight="150"
+					editable="true"
+					style="width:500px; font-family:Verdana; font-size: 10px;"
+					widgetVar="clieTable"
+					emptyMessage="No Clients found with given criteria"
+					filteredValue="#{controladorClientes.filteredLstClientes}">
+					<f:facet name="header">
+			            Clientes
+			        </f:facet>
+					<p:ajax event="rowSelect"
+						listener="#{controladorClientes.onRowSelectAsegu}"
+						update="frm_DatosCliente:dttelef frm_DatosCliente:dtDireccion frm_DatosCliente:dtContacto" />
+					<p:column filterBy="#{clie.primer_apellido_cliente}"
+						headerText="Nombres y Apellidos" filterMatchMode="contains">
+						<h:outputText
+							value="#{clie.primer_apellido_cliente} #{clie.segundo_apellido_cliente} #{clie.primer_nombre_cliente} #{clie.segundo_nombre_cliente}" />
+					</p:column>
+					<p:column headerText="Cédula"
+						filterBy="#{clie.identificacion_cliente}"
+						filterMatchMode="contains">
+						<h:outputText value="#{clie.identificacion_cliente}" />
+					</p:column>
+				</p:dataTable>
+				<p:commandButton value="Salir" id="btnSalir" icon="ui-icon-cancel"
+					styleClass="ui-priority-primary"
+					action="#{controladorClientes.Salir}" process="@this"
+					update="@this" />
+			</p:row>
+			<p:row>
+				<p:dataTable id="dttelef" var="telef"
+					value="#{controladorClientes.lstTelefono}" editable="true"
+					scrollable="true" scrollHeight="150"
+					style="width:500px; font-family:Verdana; font-size: 10px;">
+					<f:facet name="header">
+			            Teléfonos
+			        </f:facet>
+					<p:ajax event="rowEdit"
+						listener="#{controladorClientes.onEditTelefono}" update="@this" />
+					<p:column headerText="Particular">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{telef.telefono}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{telef.telefono}" style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Celular">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{telef.telefono_celular}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{telef.telefono_celular}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Oficina">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{telef.telefono_oficina}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{telef.telefono_oficina}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Extensión">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{telef.ext}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{telef.ext}" style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Correo">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{telef.correo}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{telef.correo}" style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column style="width:32px">
+						<p:rowEditor />
+					</p:column>
+					<p:column style="width:32px">
+						<p:commandButton icon="ui-icon-minus" id="btnEliminaTelef"
+							actionListener="#{controladorClientes.EliminaTelefono(telef)}"
+							update="frm_DatosCliente:dttelef">
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+				<p:commandButton value="Agregar" icon="ui-icon-plusthick"
+					id="btnNuevoTelefono" update="@this"
+					styleClass="ui-priority-primary"
+					actionListener="#{controladorClientes.AgregarTelefono}"
+					process="@this" />
+			</p:row>
+
+			<p:row>
+				<p:dataTable id="dtDireccion" var="direc"
+					value="#{controladorClientes.lstDireccion}" editable="true"
+					scrollable="true" scrollHeight="150"
+					style="width:500px; font-family:Verdana; font-size: 10px;">
+					<f:facet name="header">
+				        Direcciones
+				    </f:facet>
+
+					<p:ajax event="rowEdit"
+						listener="#{controladorClientes.onEditDireccion}" update="@this" />
+
+					<p:column headerText="Dirección">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{direc.direccion}" />
+							</f:facet>
+							<f:facet name="input">
+								<h:inputText value="#{direc.direccion}" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Referencia">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{direc.referencia}" />
+							</f:facet>
+							<f:facet name="input">
+								<h:inputText value="#{direc.referencia}" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Sector">
+						<p:cellEditor>
+							<f:facet name="output">
+								<p:selectOneMenu value="#{direc.cd_rubro}" style="width:125px"
+									disabled="true" autoWidth="false">
+									<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+									<f:selectItems var="sect"
+										value="#{controladorClientes.lsrRubroSectorDirec}"
+										itemLabel="#{sect.desc_rubro}" itemValue="#{sect.cd_rubro}" />
+								</p:selectOneMenu>
+							</f:facet>
+							<f:facet name="input">
+								<p:selectOneMenu value="#{direc.cd_rubro}" style="width:125px"
+									autoWidth="false">
+									<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+									<f:selectItems var="sect"
+										value="#{controladorClientes.lsrRubroSectorDirec}"
+										itemLabel="#{sect.desc_rubro}" itemValue="#{sect.cd_rubro}" />
+								</p:selectOneMenu>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Ciudad">
+						<p:cellEditor>
+							<f:facet name="output">
+								<p:selectOneMenu value="#{direc.cd_ciudad}" disabled="true"
+									style="width:125px" autoWidth="false">
+									<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+									<f:selectItems var="ciudad"
+										value="#{controladorClientes.lstCiudad}"
+										itemLabel="#{ciudad.nm_ciudad}"
+										itemValue="#{ciudad.cd_ciudad}" />
+								</p:selectOneMenu>
+							</f:facet>
+							<f:facet name="input">
+								<p:selectOneMenu value="#{direc.cd_ciudad}" style="width:125px"
+									autoWidth="false">
+									<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+									<f:selectItems var="ciudad"
+										value="#{controladorClientes.lstCiudad}"
+										itemLabel="#{ciudad.nm_ciudad}"
+										itemValue="#{ciudad.cd_ciudad}" />
+								</p:selectOneMenu>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Provincia">
+						<p:cellEditor>
+							<f:facet name="output">
+								<p:selectOneMenu disabled="true" value="#{direc.cd_provincia}"
+									style="width:125px" autoWidth="false">
+									<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+									<f:selectItems var="prov"
+										value="#{controladorClientes.lstProvincias}"
+										itemLabel="#{prov.desc_provincia}"
+										itemValue="#{prov.cd_provincia}" />
+								</p:selectOneMenu>
+							</f:facet>
+							<f:facet name="input">
+								<p:selectOneMenu value="#{direc.cd_provincia}"
+									style="width:125px" autoWidth="false">
+									<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+									<f:selectItems var="prov"
+										value="#{controladorClientes.lstProvincias}"
+										itemLabel="#{prov.desc_provincia}"
+										itemValue="#{prov.cd_provincia}" />
+								</p:selectOneMenu>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column style="width:32px">
+						<p:rowEditor />
+					</p:column>
+					<p:column style="width:32px">
+						<p:commandButton icon="ui-icon-minus" id="btnEliminaDirec"
+							actionListener="#{controladorClientes.EliminaDireccion(direc)}"
+							update="frm_DatosCliente:dtDireccion">
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+				<p:commandButton value="Agregar" id="btnAgregarDirec"
+					icon="ui-icon-plusthick" styleClass="ui-priority-primary"
+					actionListener="#{controladorClientes.AgregarDireccion}"
+					process="@this" />
+			</p:row>
+			<p:row>
+				<p:dataTable id="dtContacto" var="contac"
+					value="#{controladorClientes.lstContacto}" editable="true"
+					scrollable="true" scrollHeight="150"
+					style="font-family:Verdana; font-size: 10px;">
+					<f:facet name="header">
+				        Contactos
+				    </f:facet>
+
+					<p:ajax event="rowEdit"
+						listener="#{controladorClientes.onEditContacto}" update="@this" />
+					<p:column headerText="Nombre">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{contac.nombre_contacto}" />
+							</f:facet>
+							<f:facet name="input">
+								<h:inputText value="#{contac.nombre_contacto}" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Teléfono">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{contac.telefono_contacto}" />
+							</f:facet>
+							<f:facet name="input">
+								<h:inputText value="#{contac.telefono_contacto}" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Celular">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{contac.celular_contacto}" />
+							</f:facet>
+							<f:facet name="input">
+								<h:inputText value="#{contac.celular_contacto}" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Mail">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{contac.mail_contacto}" />
+							</f:facet>
+							<f:facet name="input">
+								<h:inputText value="#{contac.mail_contacto}" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Cargo">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{contac.cargo_contacto}" />
+							</f:facet>
+							<f:facet name="input">
+								<h:inputText value="#{contac.cargo_contacto}" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Dept.">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{contac.departamento_contacto}" />
+							</f:facet>
+							<f:facet name="input">
+								<h:inputText value="#{contac.departamento_contacto}" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Direc.">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{contac.direccion_contacto}" />
+							</f:facet>
+							<f:facet name="input">
+								<h:inputText value="#{contac.direccion_contacto}" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Ciudad">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{contac.ciudad}" />
+							</f:facet>
+							<f:facet name="input">
+								<h:inputText value="#{contac.ciudad}" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column style="width:32px">
+						<p:rowEditor />
+					</p:column>
+					<p:column style="width:32px">
+						<p:commandButton icon="ui-icon-minus" id="btnEliminaContact"
+							actionListener="#{controladorClientes.EliminaContacto(contac)}"
+							update="frm_DatosCliente:dtContacto">
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+				<p:commandButton value="Agregar" id="btnAgregarCont"
+					icon="ui-icon-plusthick" styleClass="ui-priority-primary"
+					actionListener="#{controladorClientes.AgregarContacto}"
+					process="@this" />
+
+			</p:row>
+		</h:panelGrid>
+	<!-- Incia Dialogo agregar telefonos -->
+	<p:dialog header="Teléfonos" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgDatTelef" closable="true"
+		>
+			<h:panelGrid columns="4" style="width:100%;text-align:center;">
+				<h:outputText value="Ciudad:" />
+				<p:selectOneMenu id="ciudad"
+					value="#{controladorClientes.cd_ciudad}" style="width:125px"
+					autoWidth="false">
+					<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+					<f:selectItems var="ciuda" value="#{controladorClientes.lstCiudad}"
+						itemLabel="#{ciuda.nm_ciudad}" itemValue="#{ciuda.cd_ciudad}" />
+				</p:selectOneMenu>
+				<h:outputText value="Particular:" />
+				<p:inputText id="telef" value="#{controladorClientes.telefono}" />
+				<h:outputText value="Celular:" />
+				<p:inputText id="telefCel"
+					value="#{controladorClientes.telefonoCelu}" />
+				<h:outputText value="Oficina:" />
+				<p:inputText id="telefOf" value="#{controladorClientes.telefonoOfi}" />
+				<h:outputText value="Extensión:" />
+				<p:inputText id="ext" value="#{controladorClientes.ext}" />
+				<h:outputText value="Correo:" />
+				<p:inputText id="cont" value="#{controladorClientes.correo}"
+					style="text-transform:uppercase;"
+					onkeyup="javascript:this.value=this.value.toUpperCase();" />
+				<p:panel visible="false">
+					<h:outputText value="Tipo:" />
+					<p:selectOneMenu id="TipoTel" value="#{controladorClientes.tipo}">
+						<f:selectItem itemLabel="-- Seleccionar --" itemValue="" />
+						<f:selectItem itemLabel="Celular" itemValue="CELULAR" />
+						<f:selectItem itemLabel="Convencional" itemValue="CONVENCIONAL" />
+						<f:selectItem itemLabel="OTRO" itemValue="OTRO" />
+					</p:selectOneMenu>
+				</p:panel>
+			</h:panelGrid>
+			<p:commandButton value="Guardar"
+				actionListener="#{controladorClientes.guardaTelefonos}"
+				process="@this,frm_DatosCliente:ciudad,frm_DatosCliente:TipoTel,
+				frm_DatosCliente:telef,frm_DatosCliente:ext,frm_DatosCliente:cont,
+				frm_DatosCliente:telefCel,frm_DatosCliente:telefOf"
+				icon="ui-icon-disk"
+				update="@this frm_DatosCliente:dttelef">
+			</p:commandButton>
+	</p:dialog>
+	<!-- Incia Dialogo agregar direcciones -->
+	<p:dialog header="Direcciones" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgDatDirec" closable="true"
+		>
+			<h:panelGrid columns="4" style="width:100%;text-align:center;">
+				<h:outputText value="Dirección:" />
+				<p:inputText id="direc" value="#{controladorClientes.direccion}"
+					style="text-transform:uppercase;"
+					onkeyup="javascript:this.value=this.value.toUpperCase();" />
+				<h:outputText value="Ciudad:" />
+				<p:selectOneMenu id="CiudadDirec"
+					value="#{controladorClientes.ciudad}">
+					<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+					<f:selectItems var="ciudades"
+						value="#{controladorClientes.lstCiudad}"
+						itemLabel="#{ciudades.nm_ciudad}"
+						itemValue="#{ciudades.cd_ciudad}" />
+				</p:selectOneMenu>
+				<h:outputText value="Sector:" />
+				<p:selectOneMenu id="SectorDirec"
+					value="#{controladorClientes.cd_rubro}">
+					<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+					<f:selectItems var="sector"
+						value="#{controladorClientes.lsrRubroSectorDirec}"
+						itemLabel="#{sector.desc_rubro}" itemValue="#{sector.cd_rubro}" />
+				</p:selectOneMenu>
+				<h:outputText value="Provincia:" />
+				<p:selectOneMenu value="#{controladorClientes.codProv}"
+					id="provincia" style="width:125px" autoWidth="false">
+					<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+					<f:selectItems var="prov"
+						value="#{controladorClientes.lstProvincias}"
+						itemLabel="#{prov.desc_provincia}"
+						itemValue="#{prov.cd_provincia}" />
+				</p:selectOneMenu>
+				<h:outputText value="Referencia:" />
+				<p:inputText id="refer" value="#{controladorClientes.referencia}"
+					style="text-transform:uppercase;"
+					onkeyup="javascript:this.value=this.value.toUpperCase();" />
+			</h:panelGrid>
+			<p:commandButton value="Guardar"
+				actionListener="#{controladorClientes.guardaDireccion}"
+				process="@this,frm_DatosCliente:direc,frm_DatosCliente:CiudadDirec,
+				frm_DatosCliente:SectorDirec,frm_DatosCliente:refer,frm_DatosCliente:provincia"
+				icon="ui-icon-disk"
+				update="@this frm_DatosCliente:dtDireccion">
+			</p:commandButton>
+	</p:dialog>
+
+	<!-- Incia Dialogo agregar contacto -->
+	<p:dialog header="Contactos" draggable="true" showEffect="fade"
+		hideEffect="fade" widgetVar="wDlgContact" closable="true"
+		>
+			<h:panelGrid columns="4" style="width:100%;text-align:center;">
+				<h:outputText value="Nombre Contacto:" />
+				<p:inputText id="nomCont"
+					value="#{controladorClientes.nombreContacto}" />
+				<h:outputText value="Teléfono Contacto:" />
+				<p:inputText id="telcont"
+					value="#{controladorClientes.telefono_contacto}" />
+				<h:outputText value="Celular Contacto:" />
+				<p:inputText id="celucont"
+					value="#{controladorClientes.celular_contacto}" />
+				<h:outputText value="Mail Contacto:" />
+				<p:inputText id="mailcont"
+					value="#{controladorClientes.mail_contacto}"
+					style="text-transform:uppercase;"
+					onkeyup="javascript:this.value=this.value.toUpperCase();" />
+				<h:outputText value="Cargo Contacto:" />
+				<p:inputText id="cargcont"
+					value="#{controladorClientes.cargo_contacto}"
+					style="text-transform:uppercase;"
+					onkeyup="javascript:this.value=this.value.toUpperCase();" />
+				<h:outputText value="Departamento Contacto:" />
+				<p:inputText id="depcont"
+					value="#{controladorClientes.departamento_contacto}"
+					style="text-transform:uppercase;"
+					onkeyup="javascript:this.value=this.value.toUpperCase();" />
+				<h:outputText value="Dirección Contacto:" />
+				<p:inputText id="dircont"
+					value="#{controladorClientes.direccion_contacto}"
+					style="text-transform:uppercase;"
+					onkeyup="javascript:this.value=this.value.toUpperCase();" />
+				<h:outputText value="Ciudad Contacto:" />
+				<p:selectOneMenu id="CiudadCont"
+					value="#{controladorClientes.ciudad}">
+					<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+					<f:selectItems var="ciudades"
+						value="#{controladorClientes.lstCiudad}"
+						itemLabel="#{ciudades.nm_ciudad}"
+						itemValue="#{ciudades.nm_ciudad}" />
+				</p:selectOneMenu>
+			</h:panelGrid>
+			<p:commandButton value="Guardar"
+				actionListener="#{controladorClientes.guardaContacto}"
+				process="@this,frm_DatosCliente:nomCont,frm_DatosCliente:telcont,
+				frm_DatosCliente:celucont,frm_DatosCliente:mailcont,
+				frm_DatosCliente:cargcont,frm_DatosCliente:depcont,
+				frm_DatosCliente:dircont,frm_DatosCliente:CiudadCont"
+				icon="ui-icon-disk"
+				update="@this frm_DatosCliente:dtContacto">
+			</p:commandButton>
+	</p:dialog>
+</ui:composition>

@@ -1,0 +1,303 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/templates/Template.xhtml">
+	<ui:define name="tituloPagina">Consulta Módulo de Cobranzas</ui:define>
+	<ui:define name="contenido">
+		<p:ajaxStatus
+			style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+			<f:facet name="start">
+				<p:graphicImage value="/images/ajax-loadercircle.gif" />
+			</f:facet>
+			<f:facet name="complete">
+				<h:outputText value="" />
+			</f:facet>
+		</p:ajaxStatus>
+		<h:form id="frmCobranzasCons">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<h:panelGrid columns="7">
+				<h:outputText value="Código: " />
+				<p:inputText value="#{ControladorConsultaCobranza.crc}" id="cdrc"></p:inputText>
+				<h:outputText value="No.Factura: " />
+				<p:inputText value="#{ControladorConsultaCobranza.numfact}"
+					id="fact"></p:inputText>
+				<h:outputText value="Póliza: " />
+				<p:inputText value="#{ControladorConsultaCobranza.poliza}" id="pol"></p:inputText>
+				<p:commandButton value="Buscar" id="btnBusca"
+					update="@this,frmCobranzasCons:dtPol"
+					styleClass="ui-priority-primary"
+					process="@this,frmCobranzasCons:fact,frmCobranzasCons:pol,frmCobranzasCons:checkFactPer,frmCobranzasCons:cdrc"
+					action="#{ControladorConsultaCobranza.consultaFactura}" />
+				<p:row></p:row>
+				<p:selectBooleanCheckbox
+					value="#{ControladorConsultaCobranza.flgFactPerio}"
+					itemLabel="Factura Periódica" id="checkFactPer" />
+			</h:panelGrid>
+			<p:panel menuTitle="Pólizas">
+				<p:commandButton value="Reversa Póliza" id="btnReversaPol"
+					update="@this,frmCobranzasCons:dtPol"
+					styleClass="ui-priority-primary"
+					process="@this,frmCobranzasCons:fact,frmCobranzasCons:pol"
+					action="#{ControladorConsultaCobranza.reversaPol}" />
+				<p:dataTable id="dtPol"
+					value="#{ControladorConsultaCobranza.lstRamoCotizacion}"
+					selection="#{ControladorConsultaCobranza.selectedRamoCotizacion}"
+					rowKey="#{polFact.cd_ramo_cotizacion}" var="polFact"
+					selectionMode="single" scrollable="true" scrollHeight="80"
+					style="font-family:Verdana; font-size: 10px;">
+					<f:facet name="header">
+					Seleccione la  póliza
+					</f:facet>
+					<p:ajax event="rowSelect"
+						listener="#{ControladorConsultaCobranza.onRowSelect}"
+						update="frmCobranzasCons:dtfrmPag,frmCobranzasCons:dtComPol,frmCobranzasCons:dtPrefac,frmCobranzasCons:dtFac" />
+					<p:column headerText="Código" style="width:25px;text-align:center">
+						<h:outputText value="#{polFact.cd_ramo_cotizacion}" />
+					</p:column>
+					<p:column headerText="Póliza" style="width:50px;text-align:center">
+						<h:outputText value="#{polFact.poliza}" />
+					</p:column>
+					<p:column headerText="Factura Inicial"
+						style="width:110px;text-align:center">
+						<h:outputText value="#{polFact.factura_aseguradora}" />
+					</p:column>
+
+					<p:column headerText="Vigencia Desde"
+						style="width:80px;text-align:center">
+						<h:outputText value="#{polFact.fc_ini_vig_date}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Vigencia Hasta"
+						style="width:80px;text-align:center">
+						<h:outputText value="#{polFact.fc_fin_vig_date}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+				</p:dataTable>
+			</p:panel>
+
+			<p:panel menuTitle="Forma Pago">
+				<p:dataTable id="dtfrmPag"
+					value="#{ControladorConsultaCobranza.lstDetalleFromaPago}"
+					selection="#{ControladorConsultaCobranza.selectedFormPago}"
+					rowKey="#{polFrmPag.CD_DET_FORMA_PAGO}" selectionMode="single"
+					var="polFrmPag" scrollable="true" scrollHeight="80"
+					style="font-family:Verdana; font-size: 10px;" widgetVar="carsTable"
+					emptyMessage="No se encuentra registros"
+					filteredValue="#{ControladorConsultaCobranza.filteredlstDetalleFromaPago}">
+					<f:facet name="header">
+				        Forma Pago
+					</f:facet>
+					<p:ajax event="rowSelect"
+						listener="#{ControladorConsultaCobranza.onRowSelectFrmPago}"
+						update="frmCobranzasCons:dtComPol,frmCobranzasCons:dtFac,frmCobranzasCons:dtPrefac" />
+					<p:column headerText="Factura" style="width:50px;text-align:center"
+						filterBy="#{polFrmPag.FACTURA_ASEGURADORA}"
+						filterMatchMode="contains">
+						<h:outputText value="#{polFrmPag.FACTURA_ASEGURADORA}" />
+					</p:column>
+					<p:column headerText="Cuota" style="width:50px;text-align:center">
+						<h:outputText value="#{polFrmPag.tipo}" />
+					</p:column>
+					<p:column headerText="Valor" style="width:50px;text-align:center">
+						<h:outputText value="#{polFrmPag.VALOR}" />
+					</p:column>
+					<p:column headerText="Saldo" style="width:80px;text-align:center">
+						<h:outputText value="#{polFrmPag.SALDO}" />
+					</p:column>
+					<p:column headerText="Comisión"
+						style="width:80px;text-align:center">
+						<h:outputText value="#{polFrmPag.flg_comision}" />
+					</p:column>
+					<p:column headerText="Fc.Ini" style="width:50px;text-align:center">
+						<h:outputText value="#{polFrmPag.fc_inicio_vigencia}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Fc.Fin" style="width:50px;text-align:center">
+						<h:outputText value="#{polFrmPag.fc_fin_vigencia}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+				</p:dataTable>
+				<p:commandButton value="Calcula Comisión Póliza" id="btnComi"
+					update="@this" styleClass="ui-priority-primary" process="@this"
+					action="#{ControladorConsultaCobranza.calculaComision}" />
+			</p:panel>
+
+			<p:panel menuTitle="Comisión Póliza">
+				<p:dataTable id="dtComPol"
+					value="#{ControladorConsultaCobranza.lstComisionesPoliza}"
+					selection="#{ControladorConsultaCobranza.selectedComisionesPoliza}"
+					rowKey="#{polCom.cd_comision_poliza}" selectionMode="single"
+					var="polCom" scrollable="true" scrollHeight="80"
+					style="font-family:Verdana; font-size: 10px;">
+					<f:facet name="header">
+					   Comisiones Póliza
+					</f:facet>
+					<p:ajax event="rowSelect"
+						listener="#{ControladorConsultaCobranza.onRowSelectComPol}" 
+						update="@this,frmCobranzasCons:dtPrefac,frmCobranzasCons:dtFac,:frmCobranzasCons:dtComPolCanal" />
+					<p:column headerText="Prima " style="width:50px;text-align:center">
+						<h:outputText value="#{polCom.total_prima}" />
+					</p:column>
+					<p:column headerText="% Comisión "
+						style="width:50px;text-align:center">
+						<h:outputText value="#{polCom.pct_com_brk}" />
+					</p:column>
+					<p:column headerText="Valor " style="width:50px;text-align:center">
+						<h:outputText value="#{polCom.val_com_brk}" />
+					</p:column>
+					<p:column headerText="Prefacturado"
+						style="width:110px;text-align:center">
+						<h:outputText value="#{polCom.flg_pre_factura}" />
+					</p:column>
+					<p:column headerText="Facturado"
+						style="width:110px;text-align:center">
+						<h:outputText value="#{polCom.flg_factura}" />
+					</p:column>
+				</p:dataTable>
+			</p:panel>
+			<p:panel menuTitle="Comisión Canal">
+				<p:dataTable id="dtComPolCanal"
+					value="#{ControladorConsultaCobranza.lstComisionesCanal}"
+					selection="#{ControladorConsultaCobranza.selectedComisionesCanal}"
+					rowKey="#{polComCanal.cd_comisuba_pol}" selectionMode="single"
+					var="polComCanal" scrollable="true" scrollHeight="80"
+					style="font-family:Verdana; font-size: 10px;">
+					<f:facet name="header">
+					   Comisiones Canal
+					</f:facet>
+										
+					<p:column headerText="Canal "
+						style="width:50px;text-align:center">
+						<h:outputText value="#{polComCanal.datos_subagente}" />
+					</p:column>
+					<p:column headerText="Prima " style="width:50px;text-align:center">
+						<h:outputText value="#{polComCanal.total_prima}" />
+					</p:column>
+					
+					<p:column headerText="% Comisión Canal"
+						style="width:50px;text-align:center">
+						<h:outputText value="#{polComCanal.pct_com_suba}" />
+					</p:column>
+					<p:column headerText="Valor Canal" style="width:50px;text-align:center">
+						<h:outputText value="#{polComCanal.val_com_suba}" />
+					</p:column>
+					<p:column headerText="Fecha Factura Canal"
+						style="width:110px;text-align:center">
+						<h:outputText value="#{polComCanal.fc_pago_canal}" />
+					</p:column>
+					<p:column headerText="Factura Canal"
+						style="width:110px;text-align:center">
+						<h:outputText value="#{polComCanal.num_factura_canal}" />
+					</p:column>
+				</p:dataTable>
+				<p:commandButton value="Re Cálculo Comisión Canal" id="btnComiCan"
+					update="frmCobranzasCons:dtComPolCanal" styleClass="ui-priority-primary" process="@this,frmCobranzasCons:dtComPol"
+					action="#{ControladorConsultaCobranza.calculaComisionCanal}" />
+			</p:panel>
+
+			<p:panel menuTitle="Prefactura">
+				<p:dataTable id="dtPrefac"
+					value="#{ControladorConsultaCobranza.lstDetallePreFactura}"
+					selection="#{ControladorConsultaCobranza.selectedDetallePreFactura}"
+					rowKey="#{polPreFac.cd_detalle_pre_factura}" selectionMode="single"
+					var="polPreFac" scrollable="true" scrollHeight="80"
+					style="font-family:Verdana; font-size: 10px;">
+					<f:facet name="header">
+					   Prefactura 
+					</f:facet>
+					<p:ajax event="rowSelect"
+						listener="#{ControladorConsultaCobranza.onRowSelectPreFact}"
+						update="@this,frmCobranzasCons:dtFac" />
+					<p:column headerText="Número PreFactura"
+						style="width:50px;text-align:center">
+						<h:outputText value="#{polPreFac.cd_pre_factura}" />
+					</p:column>
+					<p:column headerText="% Comisión "
+						style="width:50px;text-align:center">
+						<h:outputText value="#{polPreFac.pct_com_broker}" />
+					</p:column>
+					<p:column headerText="Valor " style="width:50px;text-align:center">
+						<h:outputText value="#{polPreFac.val_com_broker}" />
+					</p:column>
+					<p:column style="width:32px;text-align: center">
+						<p:commandButton update="frmCobranzasCons:dtPreFacDet"
+							action="#{ControladorConsultaCobranza.recuperaDetallePreFact}"
+							icon="ui-icon-search" title="Detalle Pre Liquidación">
+							<f:setPropertyActionListener value="#{polPreFac}"
+								target="#{ControladorConsultaCobranza.selectedDetallePreFactura}" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+				<p:commandButton value="Reversa Pre-Factura" id="btnReversaPreFac"
+					update="@this,frmCobranzasCons:dtFac"
+					styleClass="ui-priority-primary"
+					process="@this,frmCobranzasCons:dtPrefac"
+					action="#{ControladorConsultaCobranza.reversaPreFactura}" />
+
+			</p:panel>
+
+			<p:panel menuTitle="Factura">
+				<p:dataTable id="dtFac"
+					value="#{ControladorConsultaCobranza.lstDetalleFactura}"
+					var="polFac" scrollable="true" scrollHeight="150"
+					style="font-family:Verdana; font-size: 10px;">
+					<f:facet name="header">
+					  factura  
+					</f:facet>
+					<p:column headerText="Número Factura"
+						style="width:50px;text-align:center">
+						<h:outputText value="#{polFac.num_factura}" />
+					</p:column>
+				</p:dataTable>
+				<p:commandButton value="Reversa Factura" id="btnReversaFac"
+					update="@this,frmCobranzasCons:dtFac"
+					styleClass="ui-priority-primary"
+					process="@this,frmCobranzasCons:dtFac"
+					action="#{ControladorConsultaCobranza.reversaFactura}" />
+			</p:panel>
+			<p:dialog header="Detalle Pre Liquidación" widgetVar="detallePreFact"
+				appendTo="@(body)" modal="true" showEffect="fade" hideEffect="fade"
+				resizable="false">
+				<p:outputPanel  style="text-align:center;">
+					<p:dataTable var="deta" id="dtPreFacDet"
+						value="#{ControladorConsultaCobranza.lstPreFactDetaView}"
+						scrollable="true" scrollHeight="150"
+						style="font-family:Verdana; font-size: 10px;">
+						<p:column headerText="Cliente">
+							<h:outputText value="#{deta.cliente}" />
+						</p:column>
+						<p:column headerText="Ramo">
+							<h:outputText value="#{deta.cd_ramo}" />
+						</p:column>
+						<p:column headerText="Póliza">
+							<h:outputText value="#{deta.poliza}" />
+						</p:column>
+						<p:column headerText="Factura">
+							<h:outputText value="#{deta.factura}" />
+						</p:column>
+						<p:column headerText="Prima">
+							<h:outputText value="#{deta.tot_prima}" />
+						</p:column>
+						<p:column headerText="% Comisión">
+							<h:outputText value="#{deta.pct_com_broker}" />
+						</p:column>
+						<p:column headerText="Valor Comisión">
+							<h:outputText value="#{deta.val_com_broker}" />
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
+			</p:dialog>
+
+		</h:form>
+	</ui:define>
+	<ui:define name="tituloFormulario">Consulta Módulo de Cobranzas</ui:define>
+</ui:composition>
+</html>

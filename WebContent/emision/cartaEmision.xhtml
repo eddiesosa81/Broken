@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+		<p:panelGrid columns="4">
+			<h:outputText value="Tipo de Carta:" />
+			<p:selectOneMenu id="somTpCarta"
+				value="#{ControladorEmision.nmCarta}">
+				<f:selectItem itemLabel="-- Seleccione --" itemValue="0" />
+				<f:selectItems value="#{ControladorEmision.lstRubrosCarta}"
+					var="cartaTp" itemValue="#{cartaTp.objeto_rubro}"
+					itemLabel="#{cartaTp.desc_rubro}">
+				</f:selectItems>
+				<p:ajax event="change"
+					update="@this,frm_emision:tab_emision:cartaDt"
+					listener="#{ControladorEmision.recuperaContactosCarta}"
+					process="@this" />
+			</p:selectOneMenu>
+			<h:outputText value="Notas:" />
+			<p:inputTextarea rows="3" cols="60" maxlength="2000"
+				autoResize="false" id="notAdeTxt"
+				value="#{ControladorEmision.notasAdicionalesCarta}" />
+			<p:commandButton value="Generar Documento" id="btnSaveCarta"
+				update="@this" icon="ui-icon-document"
+				styleClass="ui-priority-primary"
+				process="@this,frm_emision:tab_emision:somTpCarta,frm_emision:tab_emision:notAdeTxt,
+				frm_emision:tab_emision:cartaDt"
+				action="#{ControladorEmision.guardaCarta}" />
+		</p:panelGrid>
+		<p:panel>
+			<p:dataTable id="cartaDt" var="contacto"
+				value="#{ControladorEmision.lstContactoCarta}" paginator="true"
+				rows="5"
+				paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="5,10,15" widgetVar="marcaTable"
+				emptyMessage="No se encuentra datos relacionados"
+				selectionMode="single"
+				selection="#{ControladorEmision.selectedContactoCarta}"
+				rowKey="#{contacto.cd_contacto}">
+				<f:facet name="header">
+		            Seleccione el Contacto para Generación del Documento
+		        </f:facet>
+				<p:column headerText="Nombre">
+					<h:outputText value="#{contacto.nombre_contacto}" />
+				</p:column>
+				<p:column headerText="Departamento">
+					<h:outputText value="#{contacto.departamento_contacto}" />
+				</p:column>
+				<p:column headerText="Cargo">
+					<h:outputText value="#{contacto.cargo_contacto}" />
+				</p:column>
+				<p:column headerText="Teléfono">
+					<h:outputText value="#{contacto.telefono_contacto}" />
+				</p:column>
+				<p:column headerText="Celular">
+					<h:outputText value="#{contacto.celular_contacto}" />
+				</p:column>
+				<p:column headerText="Correo">
+					<h:outputText value="#{contacto.mail_contacto}" />
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+</ui:composition>

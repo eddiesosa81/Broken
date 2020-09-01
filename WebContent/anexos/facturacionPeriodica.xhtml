@@ -1,0 +1,217 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+		<h:panelGrid id="gridCons" columns="10" cellpadding="5">
+			<h4>Cliente:</h4>
+			<h:outputText
+				value="#{ControladorFacturaPeriodica.clientePolizaAnexo}"
+				id="otxtPolSelClie" />
+			<h4>Póliza:</h4>
+			<h:outputText value="#{ControladorFacturaPeriodica.numPolizaAnexo}"
+				id="otxtPolSelPol" />
+			<h4>Ramo:</h4>
+			<h:outputText value="#{ControladorFacturaPeriodica.ramoPolizaAnexo}"
+				id="otxtPolSelRam" />
+			<p:commandButton id="btnBuscaCotizacionFactPerPol"
+				action="#{ControladorFacturaPeriodica.consultaPoliza}"
+				process="@this"
+				update="@this,frmFactPeri:dtbFactPolizaEndoso"
+				icon="ui-icon-search" title="Seleccione Póliza" />
+			<p:selectOneMenu id="rbProcedo"
+				value="#{ControladorFacturaPeriodica.procesoSelected}">
+				<f:selectItem itemLabel="Aplicar a Todos los Meses"
+					itemValue="APLICARTODOS" />
+				<f:selectItem itemLabel="Aplicar a Factura"
+					itemValue="APLICAFACTURA" />
+				<f:selectItem itemLabel="Inserta Factura" itemValue="INSERTAFACTURA" />
+			</p:selectOneMenu>
+
+			<p:commandButton id="btnAplicarTran"
+				action="#{ControladorFacturaPeriodica.btnIngresaFact}"
+				process="@this,frmFactPeri:inpTxtFact,frmFactPeri:dtbFactPoliza,
+				frmFactPeri:dtbDetRetro,frmFactPeri:rbProcedo,
+				frmFactPeri:dtbFactPolizaEndoso,frmFactPeri:dtbFactPolizaEndoso,frmFactPeri:dtbDetfrmPag"
+				update="@this" icon="ui-icon-check" title="Aplicar Transacción" />
+
+			<p:commandButton value="Salir" icon="ui-icon-cancel" update="@all"
+				actionListener="#{ControladorFacturaPeriodica.salir}"
+				action="/index.xhtml?faces-redirect=true"
+				styleClass="ui-priority-primary" />
+		</h:panelGrid>
+		<h3>FACTURACION PÓLIZA</h3>
+		<p:dataTable var="factPeriod" id="dtbFactPoliza"
+			value="#{ControladorFacturaPeriodica.lstDetalleFormaPago}"
+			scrollable="true" scrollHeight="75"
+			style="font-family:Verdana; font-size: 10px;" selectionMode="single"
+			selection="#{ControladorFacturaPeriodica.selectedDetalleFormaPago}"
+			rowKey="#{factPeriod.CD_DET_FORMA_PAGO}">
+			<f:facet name="header">
+	            Seleccione la Factura Afectar
+	        </f:facet>
+			<p:ajax event="rowSelect" process="@this"
+				listener="#{ControladorFacturaPeriodica.onRowSelectFactMensual}" />
+			<p:column headerText="TIPO">
+				<h:outputText value="#{factPeriod.tipo}" />
+			</p:column>
+			<p:column headerText="VALOR PAGO">
+				<h:outputText value="#{factPeriod.VALOR}" />
+			</p:column>
+			<p:column headerText="FACTURA">
+				<h:outputText value="#{factPeriod.FACTURA_ASEGURADORA}" />
+			</p:column>
+			<p:column headerText="FECHA">
+				<h:outputText value="#{factPeriod.FECHA_VENCIMIENTO_DATE}">
+					<f:convertDateTime pattern="dd/MM/yyyy" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="PAGADO">
+				<h:outputText value="#{factPeriod.FLG_PAGO== 1 ?'SI':'NO'}" />
+			</p:column>
+			<p:column headerText="PRIMA NETA">
+				<h:outputText value="#{factPeriod.prima_neta_mensual}" />
+			</p:column>
+		</p:dataTable>
+		<h3>ENDOSOS</h3>
+		<p:panelGrid id="gridConsEndoso" columns="2">
+			<p:row>
+				<p:dataTable var="factPeriod" id="dtbFactPolizaEndoso"
+					value="#{ControladorFacturaPeriodica.lstAnexosPoliza}"
+					scrollable="true" scrollHeight="50"
+					style="font-family:Verdana; font-size: 10px;"
+					selectionMode="multiple"
+					selection="#{ControladorFacturaPeriodica.lstSelectedAnexosPoliza}"
+					rowKey="#{factPeriod.cd_cotizacion}">
+
+					<f:facet name="header">
+			            Seleccione un Endoso
+			        </f:facet>
+					<p:ajax event="rowSelect" process="@this"
+						listener="#{ControladorFacturaPeriodica.onRowSelect}"
+						update="@this,frmFactPeri:dtbDetfrmPag" />
+					<p:ajax event="rowUnselect"
+						listener="#{ControladorFacturaPeriodica.onRowUnselect}"
+						update="@this,frmFactPeri:dtbDetfrmPag" />
+					<p:column headerText="TIPO">
+						<h:outputText value="#{factPeriod.desc_rubro}" />
+					</p:column>
+					<p:column headerText="ANEXO">
+						<h:outputText value="#{factPeriod.anexo}" />
+					</p:column>
+					<p:column headerText="FECHA ANEXO">
+						<h:outputText value="#{factPeriod.fc_creacion}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+				</p:dataTable>
+			</p:row>
+			<p:row>
+				<p:dataTable var="factPeriodFrmp" id="dtbDetfrmPag"
+					value="#{ControladorFacturaPeriodica.lstDetalleFormaPagoAnexo}"
+					scrollable="true" scrollHeight="50"
+					style="font-family:Verdana; font-size: 10px;">
+					<f:facet name="header">
+						Datos Endoso
+					</f:facet>
+					<p:column headerText="Prima Neta">
+						<h:outputText value="#{factPeriodFrmp.prima_neta_mensual}" />
+					</p:column>
+					<p:column headerText="Super Bancos">
+						<h:outputText value="#{factPeriodFrmp.super_bancos_mensual}" />
+					</p:column>
+					<p:column headerText="Seguro Campesino">
+						<h:outputText value="#{factPeriodFrmp.seguro_campesino_mensual}" />
+					</p:column>
+					<p:column headerText="Derecho Emisión">
+						<h:outputText value="#{factPeriodFrmp.derechos_emision_mensual}" />
+					</p:column>
+					<p:column headerText="Iva">
+						<h:outputText value="#{factPeriodFrmp.iva_mensual}" />
+					</p:column>
+					<p:column headerText="Total">
+						<h:outputText value="#{factPeriodFrmp.VALOR}" />
+					</p:column>
+
+				</p:dataTable>
+			</p:row>
+		</p:panelGrid>
+		<h3>ADICIONAL - RETROACTIVO</h3>
+		<p:panelGrid id="gridConsRetro" columns="2">
+			<p:row>
+				<p:dataTable var="factPeriodFrmp" id="dtbDetRetro"
+					value="#{ControladorFacturaPeriodica.lstTransaccionesPer}"
+					scrollable="true" scrollHeight="50"
+					style="font-family:Verdana; font-size: 10px;">
+					<f:facet name="header">
+
+					</f:facet>
+					<p:column headerText="Prima Neta">
+						<h:outputText value="#{factPeriodFrmp.prima_neta}" />
+					</p:column>
+					<p:column headerText="Valor Financiamiento">
+						<h:outputText value="#{factPeriodFrmp.valor_financiamiento}" />
+					</p:column>
+					<p:column headerText="Super de Bancos">
+						<h:outputText value="#{factPeriodFrmp.super_bancos}" />
+					</p:column>
+					<p:column headerText="Seguro Campesino">
+						<h:outputText value="#{factPeriodFrmp.seguto_campesino}" />
+					</p:column>
+					<p:column headerText="Derecho de Emisión">
+						<h:outputText value="#{factPeriodFrmp.derecho_emision}" />
+					</p:column>
+					<p:column headerText="Iva">
+						<h:outputText value="#{factPeriodFrmp.iva}" />
+					</p:column>
+					<p:column headerText="Otro Valor">
+						<h:outputText value="#{factPeriodFrmp.otros}" />
+					</p:column>
+					<p:column headerText="Total">
+						<h:outputText value="#{factPeriodFrmp.total}" />
+					</p:column>
+				</p:dataTable>
+			</p:row>
+			<p:row>
+				<p:commandButton id="btnRetroact"
+					action="#{ControladorFacturaPeriodica.btnAgregaAdicional}"
+					process="@this" update="@this" icon="ui-icon-plus"
+					title="Inserta Adicional" />
+
+				<p:commandButton title="Borrar"
+					actionListener="#{ControladorFacturaPeriodica.btnEliminarAdicional}"
+					update="@this,frmFactPeri:dtbDetRetro"
+					icon="ui-icon-minusthick" process="@this">
+					<p:confirm header="Confirmation"
+						message="Desea eliminar el listado?" icon="ui-icon-alert" />
+				</p:commandButton>
+
+			</p:row>
+
+		</p:panelGrid>
+		<p:confirmDialog id="confirmDelete" global="true" showEffect="fade"
+			hideEffect="fade">
+			<p:commandButton value="Si" type="button"
+				styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+			<p:commandButton value="No" type="button"
+				styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+		</p:confirmDialog>
+	
+	<!-- añade valores adicionales o retroactivos -->
+	<p:dialog header="Facturas Adicionales - Retroactivos" draggable="true"
+		widgetVar="wfactAdcRetroIng" showEffect="fade" hideEffect="fade"
+		closable="true">
+			<h:panelGrid columns="2" style="width:100%;text-align:center;">
+				<h:outputText value="Factura:" />
+				<p:inputMask value="#{ControladorFacturaPeriodica.numFactDetFrm}"
+					mask="999-999-999999999" id="inpTxtFact" />
+			</h:panelGrid>
+			<p:commandButton value="Guardar"
+				actionListener="#{ControladorFacturaPeriodica.aplicaTransaccion}"
+				update="@this" icon="ui-icon-plus"
+				process="@this,frmFactPeri:inpTxtFact,
+				frmFactPeri:dtbDetRetro,frmFactPeri:dtbFactPoliza,
+				frmFactPeri:dtbFactPolizaEndoso,frmFactPeri:dtbDetfrmPag" />
+	</p:dialog>
+	<!-- fin busca y selecciona Cotización -->
+</ui:composition>

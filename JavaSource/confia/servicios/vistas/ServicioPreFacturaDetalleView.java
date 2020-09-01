@@ -1,0 +1,26 @@
+package confia.servicios.vistas;
+
+import java.util.List;
+
+import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import confia.entidades.vistas.PreFacturaDetalleView;
+
+@Stateless
+public class ServicioPreFacturaDetalleView {
+	@PersistenceContext
+	private EntityManager em;
+	
+	@SuppressWarnings("unchecked")
+	public List<PreFacturaDetalleView> lstPreFacturaDetalleView(Integer cdPreFac) {
+		String sql = "select * from prefacturadetalle_view where cd_pre_factura = "+cdPreFac;
+		System.out.println("SQL --->"+sql);
+		Query query = em.createNativeQuery(sql,PreFacturaDetalleView.class);
+		
+		return query.getResultList();
+	}
+
+}

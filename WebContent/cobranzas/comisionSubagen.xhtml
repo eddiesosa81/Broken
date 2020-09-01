@@ -1,0 +1,175 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+	<p:growl autoUpdate="true" showDetail="true" sticky="true"></p:growl>
+	<h:panelGrid columns="1" style="width:100%;">
+		<p:selectOneMenu id="subagen"
+			value="#{ControladorComisionSubagen.codSubagnete}"
+			style="width:150px" autoWidth="false" filter="true" effect="fade"
+			filterMatchMode="startsWith">
+			<f:selectItem itemLabel="- Seleccione el Canal -" itemValue="0" />
+			<f:selectItems value="#{ControladorComisionSubagen.listSubagentes}"
+				var="subagen"
+				itemLabel="#{subagen.primer_nombre_subagente == null ? subagen.razonSocial_subagente : subagen.primer_nombre_subagente} #{subagen.segundo_nombre_subagente} #{subagen.primer_apellido_subagente} #{subagen.segundo_apellido_subagente}"
+				itemValue="#{subagen.cd_subagente}" />
+		</p:selectOneMenu>
+		<p:selectOneMenu id="aseguradoras"
+			value="#{ControladorComisionSubagen.codigoAseguradora}"
+			style="width:150px" autoWidth="false">
+			<f:selectItems var="aseguradoras"
+				value="#{ControladorComisionSubagen.listadoAseguradoras}"
+				itemLabel="#{aseguradoras.nombre_corto_aseguradora}"
+				itemValue="#{aseguradoras.cd_aseguradora}" />
+		</p:selectOneMenu>
+
+		<p:inputText id="txtNumFactAseg"
+			value="#{ControladorComisionSubagen.numFacturaAseg}"
+			placeholder="Número de Factura"
+			title="Busqueda en caso de Modificación de Comisión"></p:inputText>
+		<p:inputText id="txtNumPol"
+			value="#{ControladorComisionSubagen.numPoliza}"
+			placeholder="Número de Póliza"
+			title="Busqueda en caso de Modificación de Comisión"></p:inputText>
+	</h:panelGrid>
+	<h:panelGrid columns="6" cellpadding="5">
+		<p:commandButton value="Buscar" id="btnBuscaSubagente"
+			update="frm_comiSubagen:checkboxDTComiSubagenPol"
+			styleClass="ui-priority-primary" icon="ui-icon-search"
+			action="#{ControladorComisionSubagen.cargarComiSubagenPol}"
+			process="@this,frm_comiSubagen:subagen,frm_comiSubagen:txtNumFactAseg,frm_comiSubagen:txtNumPol,
+				,frm_comiSubagen:aseguradoras" />
+		<p:commandButton value="Salir" id="btnSalir" icon="ui-icon-cancel"
+			styleClass="ui-priority-primary"
+			action="/index.xhtml?faces-redirect=true" process="@this"
+			update="@this" />
+
+		<p:commandButton value="Pagar" id="btnpagar"
+			styleClass="ui-priority-primary" icon="ui-icon-person"
+			process="@this,frm_comiSubagen:checkboxDTComiSubagenPol,frm_comiSubagen:subagen"
+			action="#{ControladorComisionSubagen.generaComision}" />
+		<p:commandButton value="Imprimir" id="btnPrint"
+			disabled="#{ControladorComisionSubagen.btnPrint}"
+			action="#{ControladorComisionSubagen.execute()}" ajax="false"
+			styleClass="ui-priority-primary" icon="ui-icon-script"
+			update="frm_comiSubagen:btnPrint"
+			style="width:100px; font-family:Verdana; font-size: 12px;"></p:commandButton>
+		<p:commandButton value="Cambiar Canal" id="btnCamb"
+			styleClass="ui-priority-primary" icon="ui-icon-person"
+			process="@this,frm_comiSubagen:checkboxDTComiSubagenPol"
+			action="#{ControladorComisionSubagen.cambiaSubagente}" />
+		<p:commandButton value="Total Seleccionado" icon="ui-icon-calculator"
+			styleClass="ui-priority-primary"
+			title="Total Registros Seleccionados"
+			action="#{ControladorComisionSubagen.sumaRegistros}">
+		</p:commandButton>
+	</h:panelGrid>
+	<p:dataTable id="checkboxDTComiSubagenPol" var="polSuba"
+		value="#{ControladorComisionSubagen.listComisionSubagenPol}"
+		selection="#{ControladorComisionSubagen.selectedListComiaionSubagenPol}"
+		rowKey="#{polSuba.cd_comisuba_pol}"
+		style="font-family:Verdana; font-size: 10px;" widgetVar="carsTable"
+		emptyMessage="No se encuentra registros en la búsqueda"
+		filteredValue="#{ControladorComisionSubagen.filteredComiaionSubagenPol}"
+		editable="true" rows="50" paginator="true"
+		paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+		rowsPerPageTemplate="50,100,200">
+
+
+		<p:ajax event="rowEdit"
+			listener="#{ControladorComisionSubagen.onRowEdit}"
+			style="width:1150px;font-family:Verdana; font-size: 10px;"
+			update="@this,frm_comiSubagen:checkboxDTComiSubagenPol" />
+
+		<f:facet name="header">
+          	  Listado de canales
+        	</f:facet>
+		<p:column selectionMode="multiple"
+			style="width:16px;text-align:center" />
+		<p:column headerText="Cliente" style="width:80px">
+			<h:outputText value="#{polSuba.datos_cliente}" />
+		</p:column>
+		<p:column headerText="Aseguradora" style="width:80px">
+			<h:outputText value="#{polSuba.nombre_corto_aseguradora}" />
+		</p:column>
+		<p:column headerText="Ramo" style="width:80px">
+			<h:outputText value="#{polSuba.desc_ramo}" />
+		</p:column>
+		<p:column headerText="Canal" style="width:80px">
+			<h:outputText value="#{polSuba.datos_subagente}" />
+		</p:column>
+		<p:column headerText="Cédula Canal" style="width:80px">
+			<h:outputText value="#{polSuba.cedula_canal}" />
+		</p:column>
+		<p:column headerText="Ciudad Canal" style="width:80px">
+			<h:outputText value="#{polSuba.ciudad_canal}" />
+		</p:column>
+		<p:column headerText="Plan" style="width:80px">
+			<h:outputText value="#{polSuba.descripcion_plan}" />
+		</p:column>
+		<p:column headerText="Grupo Contratante" style="width:80px">
+			<h:outputText value="#{polSuba.nombre_corto_grupo_contratante}" />
+		</p:column>
+		<p:column headerText="Poliza" style="width:80px">
+			<h:outputText value="#{polSuba.poliza}" />
+		</p:column>
+		<p:column filterBy="#{polSuba.factura_aseguradora}"
+			headerText="Factura aseguradora" filterMatchMode="contains"
+			style="width:120px">
+			<h:outputText value="#{polSuba.factura_aseguradora}" />
+		</p:column>
+		<p:column headerText="Fecha inicio vigencia" style="width:80px">
+			<h:outputText value="#{polSuba.fc_ini_vigencia}" />
+		</p:column>
+		<p:column headerText="Fecha fin vigencia" style="width:80px">
+			<h:outputText value="#{polSuba.fc_fin_vigencia}" />
+		</p:column>
+		<p:column headerText="Fecha Emisión" style="width:80px">
+			<h:outputText value="#{polSuba.fecha_emision}" />
+		</p:column>
+		<p:column headerText="Total asegurado" style="width:80px">
+			<h:outputText value="#{polSuba.total_asegurado}" />
+		</p:column>
+		<p:column headerText="Total prima" style="width:80px">
+			<h:outputText value="#{polSuba.total_prima}" />
+		</p:column>
+		<p:column headerText="% Comisión Brk" style="width:80px">
+			<h:outputText value="#{polSuba.pct_com_brk}" />
+		</p:column>
+		<p:column headerText="Val.Com.Brk" style="width:80px">
+			<h:outputText value="#{polSuba.val_com_brk}" />
+		</p:column>
+		<p:column headerText="Factura Confia" style="width:80px">
+			<h:outputText value="#{polSuba.numero_factura_brk}" />
+		</p:column>
+		<p:column headerText="Fecha Factura Confia" style="width:80px">
+			<h:outputText value="#{polSuba.fecha_factura_brk}" />
+		</p:column>
+		<p:column headerText="% Comisión" style="width:80px">
+			<p:cellEditor>
+				<f:facet name="output">
+					<h:outputText value="#{polSuba.pct_com_suba}" />
+				</f:facet>
+				<f:facet name="input">
+					<p:inputText value="#{polSuba.pct_com_suba}" style="width:100%" />
+				</f:facet>
+			</p:cellEditor>
+		</p:column>
+		<p:column headerText="Valor Comisión" style="width:80px">
+			<p:cellEditor>
+				<f:facet name="output">
+					<h:outputText value="#{polSuba.val_com_suba}" />
+				</f:facet>
+				<f:facet name="input">
+					<p:inputText value="#{polSuba.val_com_suba}" style="width:100%" />
+				</f:facet>
+			</p:cellEditor>
+		</p:column>
+
+		<p:column style="width:32px">
+			<p:rowEditor />
+		</p:column>
+
+	</p:dataTable>
+</ui:composition>
