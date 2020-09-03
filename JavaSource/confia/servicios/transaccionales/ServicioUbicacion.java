@@ -97,14 +97,14 @@ public class ServicioUbicacion {
 
 	}
 
-	public int codigoMaxUbicacion(Integer cdRamoCot) {
+	public int codigoMaxUbc(Integer cdRamCot) {
 		Connection conn;
 		String sql;
 		String resultado = "0";
 		try {
 			conn = ConectarBase.getOracleConnection();
-			sql = "select nvl(max(cd_ubicacion),1) as cd_ubicacion from ubicacion_tbl where cd_ramo_cotizacion = "
-					+ cdRamoCot;
+			sql = "select nvl(max(cd_ubicacion),1) as cd_ubicacion from ubicacion_tbl where cd_ramo_cotizacion = "+cdRamCot;
+			System.out.println("SQL -> " + sql);
 			PreparedStatement a = conn.prepareStatement(sql);
 			ResultSet res = a.executeQuery();
 			if (res.next()) {
@@ -119,6 +119,7 @@ public class ServicioUbicacion {
 		}
 		return Integer.parseInt(resultado);
 	}
+	
 
 	public void actualizaUbicacion(Ubicacion obj) {
 		em.merge(obj);

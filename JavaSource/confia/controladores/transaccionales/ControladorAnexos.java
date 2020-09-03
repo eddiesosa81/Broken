@@ -2971,7 +2971,7 @@ public class ControladorAnexos {
 		AuxdatosUbicacion.setValor_prima_ubicacion(primaExcAne);
 		AuxdatosUbicacion.setCdUbcOri(Integer.valueOf(selectedUbicacion.getCd_ubicacion()));
 		res = srvUbicacion.insertarUbicacion(AuxdatosUbicacion);
-		res = srvUbicacion.codigoMaxUbicacion(datosRamoCotizacion.getCd_ramo_cotizacion());
+		res = srvUbicacion.codigoMaxUbc(datosRamoCotizacion.getCd_ramo_cotizacion());
 		System.out.println("CD_UBICACION INSERTADA:" + res);
 		if (res == 0) {
 			FacesContext contextMsj = FacesContext.getCurrentInstance();

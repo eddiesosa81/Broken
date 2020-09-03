@@ -1009,7 +1009,7 @@ public class ControladorEmisionMensualizado {
 	}
 
 	public void agregaUbicacion() {
-		// funcion cuando presiona el boton agregar nueva ubicaci�n
+		// funcion cuando presiona el boton agregar nueva Ubicación
 		int ramoCotiza;
 		try {
 			ramoCotiza = cotizacionPendienteSelected.getCd_ramo_cotizacion();
@@ -1072,7 +1072,7 @@ public class ControladorEmisionMensualizado {
 		int res;
 		if (dscUbicacion == null) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Digite la ubicaci�n"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Digite la Ubicación"));
 			return;
 		}
 		if (auxEstadoUbicacion.equals("NuevaUbc")) {
@@ -1091,10 +1091,10 @@ public class ControladorEmisionMensualizado {
 			if (res != 1) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Advertencia",
-						"Error al ingresar la Ubicaci�n Comuniquese con el Administrador del Sistema"));
+						"Error al ingresar la Ubicación Comuniquese con el Administrador del Sistema"));
 				return;
 			}
-			res = srvUbicacion.codigoMaxUbicacion(cotizacionPendienteSelected.getCd_ramo_cotizacion());
+			res = srvUbicacion.codigoMaxUbc(cotizacionPendienteSelected.getCd_ramo_cotizacion());
 			datosUbicacion = srvUbicacion.recuperaUbicacionPorCodigo(res, cotizacionPendienteSelected.getCd_compania());
 			auxEstadoUbicacion = "UsoUbc";
 		}
@@ -1583,7 +1583,7 @@ public class ControladorEmisionMensualizado {
 				if (res == 0) {
 					FacesContext context = FacesContext.getCurrentInstance();
 					context.addMessage(null, new FacesMessage("Advertencia",
-							"Error al importar el Archivo Comun�quese con el Administrador del Sistema"));
+							"Error al importar el Archivo Comuníquese con el Administrador del Sistema"));
 					return;
 				}
 				objaux = srvObjetoCotizacion.codigoMaxObjetoCot(datosObjetoCotizacion.getCd_ubicacion());
@@ -1688,7 +1688,7 @@ public class ControladorEmisionMensualizado {
 					if (res == 0) {
 						FacesContext context = FacesContext.getCurrentInstance();
 						context.addMessage(null, new FacesMessage("Advertencia",
-								"Error al importar el Archivo Comun�quese con el Administrador del Sistema"));
+								"Error al importar el Archivo Comuníquese con el Administrador del Sistema"));
 						return;
 					}
 				}
@@ -1758,7 +1758,7 @@ public class ControladorEmisionMensualizado {
 					if (res == 0) {
 						FacesContext context = FacesContext.getCurrentInstance();
 						context.addMessage(null, new FacesMessage("Advertencia",
-								"Error al importar el Archivo Comun�quese con el Administrador del Sistema"));
+								"Error al importar el Archivo Comuníquese con el Administrador del Sistema"));
 						return;
 					}
 
@@ -1781,7 +1781,7 @@ public class ControladorEmisionMensualizado {
 		System.out.println("UBICACION:" + auxEstadoUbicacion);
 		if (dscUbicacion == null) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Digite la ubicaci�n"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Digite la Ubicación"));
 			return;
 		}
 		if (auxEstadoUbicacion.equals("NuevaUbc")) {
@@ -1804,10 +1804,10 @@ public class ControladorEmisionMensualizado {
 			} else {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Advertencia",
-						"Error al ingresar la Ubicaci�n Comuniquese con el Administrador del Sistema"));
+						"Error al ingresar la Ubicación Comuniquese con el Administrador del Sistema"));
 				return;
 			}
-			res = srvUbicacion.codigoMaxUbicacion(cotizacionPendienteSelected.getCd_ramo_cotizacion());
+			res = srvUbicacion.codigoMaxUbc(cotizacionPendienteSelected.getCd_ramo_cotizacion());
 			datosUbicacion = srvUbicacion.recuperaUbicacionPorCodigo(res, cotizacionPendienteSelected.getCd_compania());
 			auxEstadoUbicacion = "UsoUbc";
 		}
@@ -1840,7 +1840,7 @@ public class ControladorEmisionMensualizado {
 		if (res == 0) {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Advertencia",
-					"Error al ingresar el Objeto Comun�quese con el Administrador del Sistema"));
+					"Error al ingresar el Objeto Comuníquese con el Administrador del Sistema"));
 			return;
 		}
 		res = srvObjetoCotizacion.codigoMaxObjetoCot(datosObjetoCotizacion.getCd_ubicacion());
@@ -1865,7 +1865,7 @@ public class ControladorEmisionMensualizado {
 					if (res == 0) {
 						FacesContext context = FacesContext.getCurrentInstance();
 						context.addMessage(null, new FacesMessage("Advertencia",
-								"Error al ingresar el Objeto Comun�quese con el Administrador del Sistema"));
+								"Error al ingresar el Objeto Comuníquese con el Administrador del Sistema"));
 						return;
 					}
 				}
@@ -1892,7 +1892,7 @@ public class ControladorEmisionMensualizado {
 			if (res == 0) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Advertencia",
-						"Error al ingresar las caracteristicas del Objeto Comun�quese con el Administrador del Sistema"));
+						"Error al ingresar las caracteristicas del Objeto Comuníquese con el Administrador del Sistema"));
 				return;
 			}
 		} catch (Exception e) {
@@ -2621,7 +2621,7 @@ public class ControladorEmisionMensualizado {
 		if (proceso == 1) {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Advertencia",
-					"Error al Grabar la forma de Pago. Comun�quese con el Administrador del Sistema"));
+					"Error al Grabar la forma de Pago. Comuníquese con el Administrador del Sistema"));
 			return;
 		}
 		lstFrmPago = new ArrayList<FormaPago>();
@@ -2789,7 +2789,7 @@ public class ControladorEmisionMensualizado {
 			} else {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Advertencia",
-						"Error al Emitir Comun�quese con el Administrador del Sistema."));
+						"Error al Emitir Comuníquese con el Administrador del Sistema."));
 				return;
 			}
 
@@ -2818,12 +2818,12 @@ public class ControladorEmisionMensualizado {
 			if (nuevoCliente.getIdentificacion_cliente().isEmpty()
 					|| nuevoCliente.getIdentificacion_cliente() == null) {
 				FacesContext context = FacesContext.getCurrentInstance();
-				context.addMessage(null, new FacesMessage("Advertencia", "Ingrese el No. de Identificaci�n "));
+				context.addMessage(null, new FacesMessage("Advertencia", "Ingrese el No. de Identificación "));
 				return;
 			}
 		} catch (Exception e) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Ingrese el No. de Identificaci�n "));
+			context.addMessage(null, new FacesMessage("Advertencia", "Ingrese el No. de Identificación "));
 			return;
 		}
 

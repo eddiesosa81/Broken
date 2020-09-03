@@ -662,16 +662,16 @@ public class ControladorEmision {
 		System.out.println("POLIZA:" + polizaGestDocu);
 		System.out.println("tipoArchivo:" + tipoArchivo);
 		if (tipoArchivo.equals("POLIZA")) {
-			// verifico que se haya ingresado la p�liza
+			// verifico que se haya ingresado la Póliza
 			try {
 				if (polizaGestDocu.isEmpty() || polizaGestDocu == null || polizaGestDocu.equals("")) {
 					FacesContext context = FacesContext.getCurrentInstance();
-					context.addMessage(null, new FacesMessage("Advertencia", "Ingrese el n�mero de P�liza"));
+					context.addMessage(null, new FacesMessage("Advertencia", "Ingrese el Número de Póliza"));
 					return;
 				}
 			} catch (Exception e) {
 				FacesContext context = FacesContext.getCurrentInstance();
-				context.addMessage(null, new FacesMessage("Advertencia", "Ingrese el n�mero de P�liza"));
+				context.addMessage(null, new FacesMessage("Advertencia", "Ingrese el Número de Póliza"));
 				return;
 			}
 		}
@@ -680,13 +680,13 @@ public class ControladorEmision {
 			if (numCotizacion.isEmpty() || numCotizacion == null) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Advertencia",
-						"Cotizaci�n no identificado, comun�quese con el Administrador del Sistemas"));
+						"Cotización no identificado, Comunicación con el Administrador del Sistemas"));
 				return;
 			}
 		} catch (Exception e) {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Advertencia",
-					"Cotizaci�n no identificada, comun�quese con el Administrador del Sistemas"));
+					"Cotización no identificada, Comunicación con el Administrador del Sistemas"));
 			return;
 		}
 
@@ -924,7 +924,7 @@ public class ControladorEmision {
 		if (tamano == 0) {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null,
-					new FacesMessage("Advertencia", "Seleccione la Cotizaci�n antes de generar la carta"));
+					new FacesMessage("Advertencia", "Seleccione la Cotización antes de generar la carta"));
 			return;
 		} else {
 			objCarta = new Rubros();
@@ -975,8 +975,8 @@ public class ControladorEmision {
 		srvCorrespondencia.insertarCorrespondencia(carta);
 		numeroCarta = srvCorrespondencia.numCartaMax(String.valueOf(usr.getUsrid()));
 		FacesContext contextMsj = FacesContext.getCurrentInstance();
-		contextMsj.addMessage(null, new FacesMessage("Registro Exitoso", "Se Gener� el Documento N�mero " + numeroCarta
-				+ ". Ingrese al M�dulo de Correspondecia para Imprimirlo"));
+		contextMsj.addMessage(null, new FacesMessage("Registro Exitoso", "Se Generó el Documento Número " + numeroCarta
+				+ ". Ingrese al Módulo de Correspondecia para Imprimirlo"));
 	}
 
 	public void buscarCotizacionPendiente() {
@@ -1034,7 +1034,7 @@ public class ControladorEmision {
 			datosClienteSol.setRazon_social_cliente(
 					datosClienteSol.getPrimer_nombre_cliente() + ' ' + datosClienteSol.getPrimer_apellido_cliente());
 		}
-		// RECUPERO FECHAS INGRESADAS EN EL RAMO COTIZACI�N
+		// RECUPERO FECHAS INGRESADAS EN EL RAMO Cotización
 		RamoCotizacion ramCotAux = new RamoCotizacion();
 		ramCotAux = srvRamoCotizacion.obtieneIdRamoCotizacionXCotizacion(datosCotizacion.getCd_cotizacion());
 		fcEmiAse = ramCotAux.getFc_emision_aseguradora_date();
@@ -1104,7 +1104,7 @@ public class ControladorEmision {
 		numRow = lstCotizacionPendienteSelec.size();
 		if (numRow <= 0) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Seleccione una P�liza para proceder a Editar."));
+			context.addMessage(null, new FacesMessage("Advertencia", "Seleccione una Póliza para proceder a Editar."));
 			return;
 		}
 		try {
@@ -1127,7 +1127,7 @@ public class ControladorEmision {
 		System.out.println("Fc Desde:" + fcDesdeEdita);
 		System.out.println("Fc Hasta:" + fcHastaEdita);
 
-		// VERIFICA QUE EL N�MERO DE D�AS SEA EL MISMO
+		// VERIFICA QUE EL Número DE Días SEA EL MISMO
 		sdFcDesde = formato.format(fcDesdeEdita);
 		fcDesdeJul = srvProcedures.fechaJuliana(sdFcDesde);
 		asFcHasta = formato.format(fcHastaEdita);
@@ -1160,7 +1160,7 @@ public class ControladorEmision {
 		if (!flgAnoBisiesto) {
 			if (!llDiasVigencia.equals(llDiasVigenciaNuevo)) {
 				context.addMessage(null, new FacesMessage("No se Puede Modificar la Vigencia",
-						"D�as de Vigencia Ingresados " + llDiasVigenciaNuevo));
+						"Días de Vigencia Ingresados " + llDiasVigenciaNuevo));
 				return;
 			}
 		} else {
@@ -1168,20 +1168,20 @@ public class ControladorEmision {
 			System.out.println("llDiasVigenciaNuevo:" + llDiasVigenciaNuevo);
 			System.out.println("llDiasVigencia:" + llDiasVigencia);
 			if (!llDiasVigencia.equals(llDiasVigenciaNuevo)) {
-				context.addMessage(null, new FacesMessage("A�o Bisiesto Activado",
-						"D�as de Vigencia Ingresados " + llDiasVigencia + " D�as"));
+				context.addMessage(null, new FacesMessage("Año Bisiesto Activado",
+						"Días de Vigencia Ingresados " + llDiasVigencia + " Días"));
 				return;
 			}
 		}
 		if (lsnumRenovaEdit == null) {
-			context.addMessage(null, new FacesMessage("Advertencia", "Ingrese el n�mero de Renovaciones"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Ingrese el Número de Renovaciones"));
 			return;
 		}
 		res = srvProcedures.actualizaVigenciasCot(String.valueOf(datosCotizacion.getCd_cotizacion()), sdFcDesde,
 				asFcHasta, txtCd_rubroEdith, String.valueOf(lsnumRenovaEdit), codEjecutivo);
 		if (res.equals(1)) {
 			context.addMessage(null, new FacesMessage("Error",
-					"No se puede actualizar la vigencia.Comuniquese con el Administrador del Sistema"));
+					"No se puede actualizar la vigencia.Comuníquese con el Administrador del Sistema"));
 			return;
 		}
 		datosCotizacion = new Cotizacion();
@@ -1318,7 +1318,7 @@ public class ControladorEmision {
 		Integer tpRam = 0;
 		datosRamoCotizacion.setCd_ramo(Integer.decode(codRamo));
 		// verifico configuraci�n del ramo para el manejo del plan en la
-		// Ubicaci�n o RamoCotizacion
+		// Ubicación o RamoCotizacion
 		tpRam = srvRamo.tipoRamo(Integer.decode(codRamo));
 		if (tpRam.equals(1)) {
 			flgActivaPlan = true;
@@ -1387,7 +1387,7 @@ public class ControladorEmision {
 		Integer tpRam = 0;
 
 		// verifico configuraci�n del ramo para el manejo del plan en la
-		// Ubicaci�n o RamoCotizacion
+		// Ubicación o RamoCotizacion
 		System.out.println("CODRAM:" + codRamo);
 		System.out.println("CODPLAN:" + codPlan);
 		tpRam = srvRamo.tipoRamo(Integer.decode(codRamo));
@@ -1420,7 +1420,7 @@ public class ControladorEmision {
 				String.valueOf(datosSubagente.getCd_subagente()));
 		if (flgComision.equals(0)) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("No se puede a�adir el Ramo", "Ingrese la Comisi�n del Canal"));
+			context.addMessage(null, new FacesMessage("No se puede añadir el Ramo", "Ingrese la Comisión del Canal"));
 			return;
 		}
 
@@ -1445,7 +1445,7 @@ public class ControladorEmision {
 		}
 		System.out.println("---------------- datosCliente.getCd_cliente():" + datosCliente.getCd_cliente());
 		if (flg.equals(true)) {
-			// ingresa nueva cotizaci�n
+			// ingresa nueva Cotización
 			datosCotizacion.setCd_compania(liCompania);
 			if (datosCliente.getCd_cliente() == null) {
 				FacesContext context = FacesContext.getCurrentInstance();
@@ -1466,7 +1466,7 @@ public class ControladorEmision {
 					datosCotizacion.setCd_cliente_asegurado(datosClienteSol.getCd_cliente());
 				}
 			}
-			// Para facturaci�n mensualizada se utiliza el otro m�dulo
+			// Para facturaci�n mensualizada se utiliza el otro Módulo
 			factPeriodica = false;
 			datosCotizacion.setFact_periodica_cot(0);
 
@@ -1500,7 +1500,7 @@ public class ControladorEmision {
 			datosRamoCotizacion.setCd_ramo(Integer.valueOf(codRamo));
 			Integer resInsert = srvRamoCotizacion.insertarRamoCotizacion(datosRamoCotizacion);
 
-			// VERIFICA QUE EL N�MERO DE D�AS
+			// VERIFICA QUE EL Número DE Días
 			String fcDesdeTmp, fcHastaTmp;
 			Integer fcDesdeJulTemp, fcHastaJulTemp, noDiasTemp;
 			fcDesdeTmp = formato.format(fcDesde);
@@ -1510,10 +1510,10 @@ public class ControladorEmision {
 			noDiasTemp = srvProcedures.diasVigencias(fcDesdeJulTemp, fcHastaJulTemp);
 
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "D�as de Vigencias de la P�liza:" + noDiasTemp));
+			context.addMessage(null, new FacesMessage("Advertencia", "Días de Vigencias de la Póliza:" + noDiasTemp));
 
 			if (resInsert == 1) {
-				// recupero los ramos cotizaci�n
+				// recupero los ramos Cotización
 				lstCotizacionPendienteSelec = new ArrayList<CotizacionesPendientes>();
 				lstCotizacionPendienteSelec = srvCotizacionesPendientes
 						.cotizacionesPendientesXCdCot(datosCotizacion.getCd_cotizacion());
@@ -1521,7 +1521,7 @@ public class ControladorEmision {
 
 			tpRam = 0;
 			// verifico configuraci�n del ramo para el manejo del plan en la
-			// Ubicaci�n o RamoCotizacion
+			// Ubicación o RamoCotizacion
 			tpRam = srvRamo.tipoRamo(datosRamoCotizacion.getCd_ramo());
 
 			if (tpRam.equals(0)) {
@@ -1536,7 +1536,7 @@ public class ControladorEmision {
 				System.out.println("grupo contratante----->" + datosRamoCotizacion.getCd_grupo_contratante());
 			}
 		} else {
-			System.out.println("Ingreso nuevo ramo coticaci�n registrada");
+			System.out.println("Ingreso nuevo ramo coticación registrada");
 			int res;
 			datosRamoCotizacion.setCd_cotizacion(datosCotizacion.getCd_cotizacion());
 			System.out.println("Ingreso cotizacion");
@@ -1558,14 +1558,14 @@ public class ControladorEmision {
 			// res = srvRamoCotizacion.insertarRamoCotizacion(nuevoRamoAux);
 			// System.out.println("RESULTADO INSERT:"+res);
 			// if (res == 1) {
-			// recupero los ramos cotizaci�n
+			// recupero los ramos Cotización
 			lstCotizacionPendienteSelec = new ArrayList<CotizacionesPendientes>();
 			lstCotizacionPendienteSelec = srvCotizacionesPendientes
 					.cotizacionesPendientesXCdCot(datosCotizacion.getCd_cotizacion());
 			// }
 			tpRam = 0;
 			// verifico configuraci�n del ramo para el manejo del plan en la
-			// Ubicaci�n o RamoCotizacion
+			// Ubicación o RamoCotizacion
 			tpRam = srvRamo.tipoRamo(datosRamoCotizacion.getCd_ramo());
 
 			if (tpRam.equals(0)) {
@@ -1578,7 +1578,7 @@ public class ControladorEmision {
 	}
 
 	public void agregaUbicacion() {
-		// funcion cuando presiona el boton agregar nueva ubicaci�n
+		// funcion cuando presiona el boton agregar nueva Ubicación
 		int ramoCotiza;
 		try {
 			ramoCotiza = cotizacionPendienteSelected.getCd_ramo_cotizacion();
@@ -1614,7 +1614,7 @@ public class ControladorEmision {
 		if (cotizacionPendienteSelected.getCd_plan().equals(0)) {
 			if (codPlanUbc.equals("0")) {
 				FacesContext context = FacesContext.getCurrentInstance();
-				context.addMessage(null, new FacesMessage("Advertencia", "Seleccione el plan para la ubicaci�n"));
+				context.addMessage(null, new FacesMessage("Advertencia", "Seleccione el plan para la Ubicación"));
 				return;
 			} else {
 				planTemp = srvPlan.consultaPlan(Integer.valueOf(codPlanUbc));
@@ -1623,7 +1623,7 @@ public class ControladorEmision {
 
 		if (dscUbicacion == null) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Digite la ubicaci�n"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Digite la Ubicación"));
 			return;
 		}
 
@@ -1647,14 +1647,14 @@ public class ControladorEmision {
 			if (res != 1) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Advertencia",
-						"Error al ingresar la Ubicaci�n Comuniquese con el Administrador del Sistema"));
+						"Error al ingresar la Ubicación Comuníquese con el Administrador del Sistema"));
 				return;
 			}
-			res = srvUbicacion.codigoMaxUbicacion(cotizacionPendienteSelected.getCd_ramo_cotizacion());
+			res = srvUbicacion.codigoMaxUbc(cotizacionPendienteSelected.getCd_ramo_cotizacion());
 			datosUbicacion = srvUbicacion.recuperaUbicacionPorCodigo(res, cotizacionPendienteSelected.getCd_compania());
 			if (cotizacionPendienteSelected.getCd_plan().equals(0)) {
 				// inserto las coberturas, clausulas y deducibles de la
-				// ubicaci�n
+				// Ubicación
 				srvProcedures.generaCobeDedClauPolizasUbc(String.valueOf(datosUbicacion.getCd_ubicacion()),
 						String.valueOf(datosUbicacion.getCd_compania()));
 			}
@@ -1747,7 +1747,7 @@ public class ControladorEmision {
 		if (cotizacionPendienteSelected.getCd_plan().equals(0)) {
 			if (codPlanUbc.equals("0")) {
 				FacesContext context = FacesContext.getCurrentInstance();
-				context.addMessage(null, new FacesMessage("Advertencia", "Seleccione el plan para la ubicaci�n"));
+				context.addMessage(null, new FacesMessage("Advertencia", "Seleccione el plan para la Ubicación"));
 				return;
 			} else {
 				planTemp = srvPlan.consultaPlan(Integer.valueOf(codPlanUbc));
@@ -1756,7 +1756,7 @@ public class ControladorEmision {
 
 		if (dscUbicacion == null) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Digite la ubicaci�n"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Digite la Ubicación"));
 			return;
 		}
 		if (auxEstadoUbicacion.equals("NuevaUbc")) {
@@ -1779,14 +1779,14 @@ public class ControladorEmision {
 			if (res != 1) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Advertencia",
-						"Error al ingresar la Ubicaci�n Comuniquese con el Administrador del Sistema"));
+						"Error al ingresar la Ubicación Comuníquese con el Administrador del Sistema"));
 				return;
 			}
-			res = srvUbicacion.codigoMaxUbicacion(cotizacionPendienteSelected.getCd_ramo_cotizacion());
+			res = srvUbicacion.codigoMaxUbc(cotizacionPendienteSelected.getCd_ramo_cotizacion());
 			datosUbicacion = srvUbicacion.recuperaUbicacionPorCodigo(res, cotizacionPendienteSelected.getCd_compania());
 			if (cotizacionPendienteSelected.getCd_plan().equals(0)) {
 				// inserto las coberturas, clausulas y deducibles de la
-				// ubicaci�n
+				// Ubicación
 				srvProcedures.generaCobeDedClauPolizasUbc(String.valueOf(datosUbicacion.getCd_ubicacion()),
 						String.valueOf(datosUbicacion.getCd_compania()));
 			}
@@ -2381,7 +2381,7 @@ public class ControladorEmision {
 				if (res == 0) {
 					FacesContext context = FacesContext.getCurrentInstance();
 					context.addMessage(null, new FacesMessage("Advertencia",
-							"Error al importar el Archivo Comun�quese con el Administrador del Sistema"));
+							"Error al importar el Archivo Comunicación con el Administrador del Sistema"));
 					return;
 				}
 				objaux = srvObjetoCotizacion.codigoMaxObjetoCot(datosObjetoCotizacion.getCd_ubicacion());
@@ -2486,7 +2486,7 @@ public class ControladorEmision {
 					if (res == 0) {
 						FacesContext context = FacesContext.getCurrentInstance();
 						context.addMessage(null, new FacesMessage("Advertencia",
-								"Error al importar el Archivo Comun�quese con el Administrador del Sistema"));
+								"Error al importar el Archivo Comunicación con el Administrador del Sistema"));
 						return;
 					}
 				}
@@ -2592,7 +2592,7 @@ public class ControladorEmision {
 					if (res == 0) {
 						FacesContext context = FacesContext.getCurrentInstance();
 						context.addMessage(null, new FacesMessage("Advertencia",
-								"Error al importar el Archivo Comun�quese con el Administrador del Sistema"));
+								"Error al importar el Archivo Comunicación con el Administrador del Sistema"));
 						return;
 					}
 				}
@@ -2607,17 +2607,17 @@ public class ControladorEmision {
 			if (selectedDatosUbicacion.getCd_ubicacion().equals(0)) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null,
-						new FacesMessage("Advertencia", "Seleccione la Ubicaci�n antes de ingresa un nuevo objeto"));
+						new FacesMessage("Advertencia", "Seleccione la Ubicación antes de ingresa un nuevo objeto"));
 				return;
 			}
 		} catch (Exception e) {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null,
-					new FacesMessage("Advertencia", "Seleccione la Ubicaci�n antes de ingresa un nuevo objeto"));
+					new FacesMessage("Advertencia", "Seleccione la Ubicación antes de ingresa un nuevo objeto"));
 			return;
 		}
 
-		System.out.println("Ingreso a�adir objeto");
+		System.out.println("Ingreso añadir objeto");
 		listadoMarcas = new ArrayList<Marca>();
 		listadoModelos = new ArrayList<Modelo>();
 		listaDispositivos = new ArrayList<Dispositivos>();
@@ -2663,7 +2663,7 @@ public class ControladorEmision {
 		if (res == 0) {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Advertencia",
-					"Error al ingresar el Objeto Comun�quese con el Administrador del Sistema"));
+					"Error al ingresar el Objeto Comunicación con el Administrador del Sistema"));
 			return;
 		}
 		res = srvObjetoCotizacion.codigoMaxObjetoCot(datosObjetoCotizacion.getCd_ubicacion());
@@ -2696,7 +2696,7 @@ public class ControladorEmision {
 					if (res == 0) {
 						FacesContext context = FacesContext.getCurrentInstance();
 						context.addMessage(null, new FacesMessage("Advertencia",
-								"Error al ingresar el Objeto Comun�quese con el Administrador del Sistema"));
+								"Error al ingresar el Objeto Comunicación con el Administrador del Sistema"));
 						return;
 					}
 				}
@@ -2726,7 +2726,7 @@ public class ControladorEmision {
 			if (res == 0) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Advertencia",
-						"Error al ingresar las caracteristicas del Objeto Comun�quese con el Administrador del Sistema"));
+						"Error al ingresar las caracteristicas del Objeto Comunicación con el Administrador del Sistema"));
 				return;
 			}
 		} catch (Exception e) {
@@ -2745,7 +2745,7 @@ public class ControladorEmision {
 			primaObjUbc = primaObjUbc + objFin.getPrima_objeto();
 			totalValorAsegUbc = totalValorAsegUbc + objFin.getTotal_asegurado_objeto();
 		}
-		// actualizo la ubicaci�n actual
+		// actualizo la Ubicación actual
 		selectedDatosUbicacion.setValor_prima_ubicacion(primaObjUbc);
 		selectedDatosUbicacion.setValor_asegurado_ubicacion(totalValorAsegUbc);
 
@@ -2775,7 +2775,7 @@ public class ControladorEmision {
 		datosCaracteristicasVehiculos = new CaracteristicasVehiculos();
 		lstSubObjetoCot = new ArrayList<SubObjetoCotizacion>();
 
-		// Actualizo valores de la ubicaci�n y el ramo
+		// Actualizo valores de la Ubicación y el ramo
 		FacesContext contextMsj = FacesContext.getCurrentInstance();
 		contextMsj.addMessage(null, new FacesMessage("Advertencia", "Registro Exitoso"));
 		PrimeFaces.current().executeScript("PF('addObjt').hide();");
@@ -2813,7 +2813,7 @@ public class ControladorEmision {
 		if (res == 0) {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Advertencia",
-					"Error al ingresar el Objeto Comun�quese con el Administrador del Sistema"));
+					"Error al ingresar el Objeto Comunicación con el Administrador del Sistema"));
 			return;
 		}
 		res = srvObjetoCotizacion.codigoMaxObjetoCot(datosObjetoCotizacion.getCd_ubicacion());
@@ -2845,7 +2845,7 @@ public class ControladorEmision {
 					if (res == 0) {
 						FacesContext context = FacesContext.getCurrentInstance();
 						context.addMessage(null, new FacesMessage("Advertencia",
-								"Error al ingresar el Objeto Comun�quese con el Administrador del Sistema"));
+								"Error al ingresar el Objeto Comunicación con el Administrador del Sistema"));
 						return;
 					}
 				}
@@ -2996,7 +2996,7 @@ public class ControladorEmision {
 
 		Integer tpRam = 0;
 		// verifico configuraci�n del ramo para el manejo del plan en la
-		// Ubicaci�n o RamoCotizacion
+		// Ubicación o RamoCotizacion
 		tpRam = srvRamo.tipoRamo(((CotizacionesPendientes) event.getObject()).getCd_ramo());
 
 		if (tpRam.equals(0)) {
@@ -3128,7 +3128,7 @@ public class ControladorEmision {
 		lstObjetoConsulta = srvObjetoCotizacion.recuperaObjetosPorUbicacion(selectedDatosUbicacion.getCd_ubicacion(),
 				selectedDatosUbicacion.getCd_compania());
 
-		// actualizar ubicaci�n y ramo
+		// actualizar Ubicación y ramo
 		Double primaObjUbc = 0.0, totalValorAsegUbc = 0.0;
 		primaObjUbc = 0.0;
 		totalValorAsegUbc = 0.0;
@@ -3136,7 +3136,7 @@ public class ControladorEmision {
 			primaObjUbc = primaObjUbc + objFin.getPrima_objeto();
 			totalValorAsegUbc = totalValorAsegUbc + objFin.getTotal_asegurado_objeto();
 		}
-		// actualizo la ubicaci�n actual
+		// actualizo la Ubicación actual
 		selectedDatosUbicacion.setValor_prima_ubicacion(primaObjUbc);
 		selectedDatosUbicacion.setValor_asegurado_ubicacion(totalValorAsegUbc);
 
@@ -3415,7 +3415,7 @@ public class ControladorEmision {
 				}
 				if (cobA.getAfecta_va().equals("SI")) {
 					valAsegAct = objAuxCobUbc.getValor_asegurado_ubicacion();
-					valAsegAct = valAsegAct + cobA.getVal_prima();
+					valAsegAct = valAsegAct + cobA.getVal_limite();
 					objAuxCobUbc.setValor_asegurado_ubicacion(valAsegAct);
 					System.out.println("VALOR asEGURADO AFECTADA:" + valAsegAct);
 				}
@@ -3467,6 +3467,7 @@ public class ControladorEmision {
 		ObjetoCotizacion objAuxCobAdd = new ObjetoCotizacion();
 		// objAuxCobAdd = SelectedDatosObjetoCotizacion;
 		objAuxCobAdd = objCotSegCobAdc;
+		System.out.println("objAuxCobAdd:" + objAuxCobAdd);
 		for (CoberturasAdicionales cobA : lstCobAdc) {
 			if (cobA.getCd_cob_adc() == null) {
 				System.out.println("****** CODIGO COB ADCI:" + cobA.getCd_cob_adc());
@@ -3482,8 +3483,11 @@ public class ControladorEmision {
 				}
 				if (cobA.getAfecta_va().equals("SI")) {
 					valAsegAct = objAuxCobAdd.getTotal_asegurado_objeto();
-					valAsegAct = valAsegAct + cobA.getVal_prima();
+					System.out.println("valAsegAct:" + valAsegAct);
+					System.out.println("cobA.getVal_prima():" + cobA.getVal_limite());
+					valAsegAct = valAsegAct + cobA.getVal_limite();
 					objAuxCobAdd.setTotal_asegurado_objeto(valAsegAct);
+					
 					System.out.println("VALOR asEGURADO AFECTADA:" + valAsegAct);
 				}
 			}
@@ -3501,7 +3505,7 @@ public class ControladorEmision {
 		afecPrimaCobUbc = false;
 		afecValAsegCobUbc = false;
 
-		// actualizar ubicaci�n y ramo
+		// actualizar Ubicación y ramo
 		Double primaObjUbc = 0.0, totalValorAsegUbc = 0.0;
 
 		primaObjUbc = 0.0;
@@ -3510,7 +3514,7 @@ public class ControladorEmision {
 			primaObjUbc = primaObjUbc + objFin.getPrima_objeto();
 			totalValorAsegUbc = totalValorAsegUbc + objFin.getTotal_asegurado_objeto();
 		}
-		// actualizo la ubicaci�n actual
+		// actualizo la Ubicación actual
 		selectedDatosUbicacion.setValor_prima_ubicacion(primaObjUbc);
 		selectedDatosUbicacion.setValor_asegurado_ubicacion(totalValorAsegUbc);
 
@@ -3799,7 +3803,7 @@ public class ControladorEmision {
 		lstSubObjetoEdit = srvSubObjetoCotizacion.recuperaSubObjCot(
 				SelectedDatosObjetoCotizacion.getCd_obj_cotizacion(), SelectedDatosObjetoCotizacion.getCd_compania());
 		FacesContext context = FacesContext.getCurrentInstance();
-		context.addMessage(null, new FacesMessage("A�adi� un Ruevo Registro", "Complete la informaci�n"));
+		context.addMessage(null, new FacesMessage("Añadió un Ruevo Registro", "Complete la información"));
 	}
 
 	public void onRowEditaTasa() {
@@ -3881,7 +3885,7 @@ public class ControladorEmision {
 
 		if (cotizacionPendienteSelected.getCd_plan().equals(0)) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Proceso No V�lido para este Tipo de Ramo"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Proceso No Válido para este Tipo de Ramo"));
 		} else {
 			System.err.println("ObservacionesEdith:" + ObservacionesEdith);
 			System.err.println("exPrimaEdit:" + exPrimaEdit);
@@ -4021,7 +4025,7 @@ public class ControladorEmision {
 		if (tamano == 0) {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null,
-					new FacesMessage("Advertencia", "Seleccione la Cotizaci�n antes de ingresar la forma de pago"));
+					new FacesMessage("Advertencia", "Seleccione la Cotización antes de ingresar la forma de pago"));
 			return;
 		} else {
 
@@ -4037,7 +4041,7 @@ public class ControladorEmision {
 			if (res == 0) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null,
-						new FacesMessage("Advertencia", "Ingrese la Comisi�n del Broker para el Ramo: " + nmRamo));
+						new FacesMessage("Advertencia", "Ingrese la Comisión del Broker para el Ramo: " + nmRamo));
 				return;
 			}
 
@@ -4229,7 +4233,7 @@ public class ControladorEmision {
 		}
 		lstEmitirPoliza = new ArrayList<CotizacionesPendientes>();
 		lstEmitirPoliza = srvCotizacionesPendientes.cotizacionesPendientesXCdCot(datosCotizacion.getCd_cotizacion());
-		// Actualizo los Datos de la Cotizaci�n
+		// Actualizo los Datos de la Cotización
 		// RequestContext context = RequestContext.getCurrentInstance();
 		// context.execute("PF('wemitePoliza').show();");
 		PrimeFaces.current().executeScript("PF('wemitePoliza').show();");
@@ -4256,7 +4260,7 @@ public class ControladorEmision {
 		if (pol == null || fact == null || anex == null) {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null,
-					new FacesMessage("Advertencia", "Ingrese el N�mero de P�liza, Factura y Anexo para Emitir"));
+					new FacesMessage("Advertencia", "Ingrese el Número de Póliza, Factura y Anexo para Emitir"));
 		} else {
 			existePol = srvRamoCotizacion.verificoExisteFactura(pol, fact);
 			if (existePol.equals(0)) {
@@ -4269,7 +4273,7 @@ public class ControladorEmision {
 			} else {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null,
-						new FacesMessage("Advertencia", "N�mero de P�liza y Factura Registrado en el Sistema"));
+						new FacesMessage("Advertencia", "Número de Póliza y Factura Registrado en el Sistema"));
 
 			}
 
@@ -4292,7 +4296,7 @@ public class ControladorEmision {
 			if (existePol > 0) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null,
-						new FacesMessage("Advertencia", "N�mero de P�liza y Factura Registrado en el Sistema"));
+						new FacesMessage("Advertencia", "Número de Póliza y Factura Registrado en el Sistema"));
 
 				return;
 			}
@@ -4318,14 +4322,14 @@ public class ControladorEmision {
 			} else {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Advertencia",
-						"Error al Emitir Comun�quese con el Administrador del Sistema."));
+						"Error al Emitir Comunicación con el Administrador del Sistema."));
 				return;
 			}
 
 		} else {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null,
-					new FacesMessage("Advertencia", "Ingrese el N�mero de P�liza, Factura y Anexo para Emitir"));
+					new FacesMessage("Advertencia", "Ingrese el Número de Póliza, Factura y Anexo para Emitir"));
 			return;
 		}
 		System.out.println("EJECUTO LA EMISION ETSE");
@@ -4347,12 +4351,12 @@ public class ControladorEmision {
 			if (nuevoCliente.getIdentificacion_cliente().isEmpty()
 					|| nuevoCliente.getIdentificacion_cliente() == null) {
 				FacesContext context = FacesContext.getCurrentInstance();
-				context.addMessage(null, new FacesMessage("Advertencia", "Ingrese el No. de Identificaci�n "));
+				context.addMessage(null, new FacesMessage("Advertencia", "Ingrese el No. de Identificación "));
 				return;
 			}
 		} catch (Exception e) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Ingrese el No. de Identificaci�n "));
+			context.addMessage(null, new FacesMessage("Advertencia", "Ingrese el No. de Identificación "));
 			return;
 		}
 
@@ -4403,7 +4407,7 @@ public class ControladorEmision {
 			System.out.println("ERROR INGRESO");
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Error Cliente Registrado en el Sistema",
-					"Comuniquese con el Administrador del Sistema"));
+					"Comuníquese con el Administrador del Sistema"));
 			return;
 		}
 		Integer codClie;
@@ -4730,7 +4734,7 @@ public class ControladorEmision {
 		clieAux = ((Clientes) event.getObject());
 		srvClientes.actualizaClientes(clieAux);
 		FacesContext context = FacesContext.getCurrentInstance();
-		context.addMessage(null, new FacesMessage("Advertencia", "Actualizaci�n Exitosa"));
+		context.addMessage(null, new FacesMessage("Advertencia", "Actualización Exitosa"));
 	}
 
 	public List<DetalleFormaPago> getLstDetFrmPago() {
