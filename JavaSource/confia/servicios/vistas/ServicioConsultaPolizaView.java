@@ -47,10 +47,10 @@ public class ServicioConsultaPolizaView {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ConsultaPolizaView> consultaPolizasXClienteFactPeriodica(String cliente) {
+	public List<ConsultaPolizaView> consultaPolizasXClienteFactPeriodica(String cliente, String poliza) {
 		List<ConsultaPolizaView> resultado;
 		String sql = "select * from consulta_poliza_view where cd_ramo in (select cd_ramo from ramo_tbl where periodico = 1)"
-				+ " and cliente like '%" + cliente + "%' order by cd_cliente,cd_cotizacion";
+				+ " and cliente like '" + cliente + "' and poliza like '"+poliza+"' order by cd_cliente,cd_cotizacion";
 		try {
 			Query query = em.createNativeQuery(sql, ConsultaPolizaView.class);
 			resultado = query.getResultList();

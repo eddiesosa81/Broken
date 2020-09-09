@@ -86,10 +86,13 @@ body {
 						<p:inputText id="cotizaBuscadoFactPerPol"
 							value="#{ControladorFacturaPeriodica.apellidoRazonSocial}"
 							placeholder="Apellido / Razon Social" />
+							<p:inputText id="factPerPoliza"
+							value="#{ControladorFacturaPeriodica.numPoliza}"
+							placeholder="Número póliza" />
 						<p:commandButton value="Buscar"
 							actionListener="#{ControladorFacturaPeriodica.buscaPoliza}"
 							update="frmDlgFactPerPol:listadoFactPerPol" icon="ui-icon-search"
-							process="@this,frmDlgFactPerPol:cotizaBuscadoFactPerPol" />
+							process="@this,frmDlgFactPerPol:cotizaBuscadoFactPerPol,frmDlgFactPerPol:factPerPoliza" />
 					</p:row>
 				</h:panelGrid>
 				<p:dataTable id="listadoFactPerPol" var="pol"

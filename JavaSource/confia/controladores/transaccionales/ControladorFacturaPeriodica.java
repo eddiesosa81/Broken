@@ -72,6 +72,7 @@ public class ControladorFacturaPeriodica {
 	private List<TransaccionesPeriodicas> lstTransaccionesPer;
 	private TransaccionesPeriodicas transaccionesPeriodicas;
 	private String numFactDetFrm;
+	private String numPoliza;
 
 	public ControladorFacturaPeriodica() {
 		lstConsultaPoliza = new ArrayList<ConsultaPolizaView>();
@@ -95,13 +96,32 @@ public class ControladorFacturaPeriodica {
 	}
 
 	public void buscaPoliza() {
+		System.out.println("iNGRESO");
+		
+		String clie, pol;
 		try {
-			apellidoRazonSocial = apellidoRazonSocial.trim().toUpperCase();
+			if (numPoliza.isEmpty() || numPoliza == null) {
+				pol = "%";
+			} else {
+				pol = "%";
+				pol = pol.concat(numPoliza);
+				pol = pol.concat("%");
+			}
 		} catch (Exception e) {
-			// no realiza nada y retorna
-			return;
+			pol = "%";
 		}
-		lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasXClienteFactPeriodica(apellidoRazonSocial);
+		try {
+			if (apellidoRazonSocial.isEmpty() || apellidoRazonSocial == null) {
+				clie = "%";
+			} else {
+				clie = "%";
+				clie = clie.concat(apellidoRazonSocial = apellidoRazonSocial.trim().toUpperCase());
+				clie = clie.concat("%");
+			}
+		} catch (Exception e) {
+			clie = "%";
+		}
+		lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasXClienteFactPeriodica(clie,pol);
 	}
 
 	public void seleccionaPol(ConsultaPolizaView pol) {
@@ -166,13 +186,13 @@ public class ControladorFacturaPeriodica {
 		}
 
 		lstTransaccionesPer.add(transaccionesPeriodicas);
-		System.out.println("Tamaño lista:"+lstTransaccionesPer.size());
+		System.out.println("Tamaño lista:" + lstTransaccionesPer.size());
 		transaccionesPeriodicas = new TransaccionesPeriodicas();
 	}
 
 	public void btnIngresaFact() {
 		lstSelectedAnexosPolizaProc = lstSelectedAnexosPoliza;
-		System.out.println("lstSelectedAnexosPolizaProc :"+lstSelectedAnexosPolizaProc.size());
+		System.out.println("lstSelectedAnexosPolizaProc :" + lstSelectedAnexosPolizaProc.size());
 		try {
 			numFactDetFrm = null;
 		} catch (Exception e) {
@@ -229,126 +249,126 @@ public class ControladorFacturaPeriodica {
 //		}
 		System.out.println("procesoSelected:" + procesoSelected);
 		Double valorInicial, valorFinal, primaInicial, primaFinal;
-		if (procesoSelected.equals("APLICAFACTURA")) {
-
-			valorInicial = detalleFormaPagoSeleccionado.getVALOR();
-			valorFinal = 0.0;
-			primaInicial = detalleFormaPagoSeleccionado.getPrima_neta_mensual();
-			primaFinal = 0.0;
-			System.out.println("VALOR INICIAL PRINT:" + valorInicial);
-			System.out.println("ORIMA INICIAL PRINT:" + primaInicial);
-			// sumo el valor total adicionales
-			for (TransaccionesPeriodicas adcAux : lstTransaccionesPer) {
-				valorFinal = valorFinal + adcAux.getTotal();
-				System.out.println("VALOR FINAL PRINT:" + valorFinal);
-				primaFinal = primaFinal + adcAux.getPrima_neta();
-				System.out.println("PRIMA FINAL PRINT:"+primaFinal);
-			}
-			// sumo anexos ingresados
-			System.out.println("tamaño seleccion" + lstAnexosPolizaSeleccionada.size());
-			if (lstAnexosPolizaSeleccionada.size() > 0) {
-				for (ConsultaPolizaAnexoView consultaPolizaAnexoView : lstAnexosPolizaSeleccionada) {
-					lstDetalleFormaPagoAnexo = new ArrayList<DetalleFormaPago>();
-					lstDetalleFormaPagoAnexo = srvDetalleFormaPago.recuperaDetalleFrmPago(
-							consultaPolizaAnexoView.getCd_cotizacion(), consultaPolizaAnexoView.getCd_compania());
-					for (DetalleFormaPago anexoAux : lstDetalleFormaPagoAnexo) {
-						valorFinal = valorFinal + anexoAux.getVALOR();
-						System.out.println("VALOR FINAL PRINT:" + valorFinal);
-						primaFinal = primaFinal + anexoAux.getPrima_neta_mensual();
-						System.out.println("PRIMA FINAL PRINT:"+primaFinal);
-					}
-				}
-			}
-			valorFinal = valorFinal + valorInicial;
-			primaFinal = primaFinal + primaInicial;
-			System.out.println("VALOR FINAL PRINT:" + valorFinal);
-			// actualizo los valores totales en factura mensual de la póliza
-			detalleFormaPagoSeleccionado.setFACTURA_ASEGURADORA(numFactDetFrm);
-			detalleFormaPagoSeleccionado.setVALOR(valorFinal);
-			detalleFormaPagoSeleccionado.setSALDO(valorFinal);
-			detalleFormaPagoSeleccionado.setPrima_neta_mensual(primaFinal);
-
-			srvDetalleFormaPago.actualizaDetFormaPago(detalleFormaPagoSeleccionado);
-			// ACTUALIZO COMISIÓNES BROKER Y SUBAGENTES
-			srvStoreProcedure.act_comision_pol_Asis_med(String.valueOf(detalleFormaPagoSeleccionado.getCD_COMPANIA()),
-					String.valueOf(detalleFormaPagoSeleccionado.getCD_DET_FORMA_PAGO()));
-
-			// actualizo detalle de adicionales
-			List<TransaccionesPeriodicas> lstTransFinal = new ArrayList<TransaccionesPeriodicas>();
-			TransaccionesPeriodicas transFinal = new TransaccionesPeriodicas();
-			for (TransaccionesPeriodicas adcAux : lstTransaccionesPer) {
-				transFinal = adcAux;
-				transFinal.setCd_compania(Integer.valueOf(PolizaSeleccionadaParaAnexo.getCd_compania()));
-				transFinal.setCd_det_forma_pago(detalleFormaPagoSeleccionado.getCD_DET_FORMA_PAGO());
-				transFinal.setCd_det_forma_pago_anexo(0);
-				transFinal.setTipo("ADICIONAL/RETROACTIVO");
-				transFinal.setFecha_afectacion(new Date());
-				transFinal.setTipo_transaccion(procesoSelected);
-				lstTransFinal.add(transFinal);
-				transFinal = new TransaccionesPeriodicas();
-			}
-			// actualizo detalle de endosos
-			transFinal = new TransaccionesPeriodicas();
-			if (lstAnexosPolizaSeleccionada.size() > 0) {
-				for (ConsultaPolizaAnexoView consultaPolizaAnexoView : lstAnexosPolizaSeleccionada) {
-					lstDetalleFormaPagoAnexo = new ArrayList<DetalleFormaPago>();
-					lstDetalleFormaPagoAnexo = srvDetalleFormaPago.recuperaDetalleFrmPago(
-							consultaPolizaAnexoView.getCd_cotizacion(), consultaPolizaAnexoView.getCd_compania());
-					for (DetalleFormaPago anexoAux : lstDetalleFormaPagoAnexo) {
-						transFinal.setCd_compania(Integer.valueOf(PolizaSeleccionadaParaAnexo.getCd_compania()));
-						System.out.println("P1");
-						transFinal.setCd_det_forma_pago(detalleFormaPagoSeleccionado.getCD_DET_FORMA_PAGO());
-						System.out.println("P2");
-						transFinal.setCd_det_forma_pago_anexo(anexoAux.getCD_DET_FORMA_PAGO());
-						System.out.println("P3");
-						transFinal.setTipo("ENDOSO - " + consultaPolizaAnexoView.getDesc_rubro());
-						System.out.println("P4");
-						transFinal.setFecha_afectacion(new Date());
-						System.out.println("P5");
-						transFinal.setTipo_transaccion(procesoSelected);
-						System.out.println("P6");
-						transFinal.setPrima_neta(anexoAux.getPrima_neta_mensual());
-						System.out.println("P7");
-						transFinal.setValor_financiamiento(0.00);
-						System.out.println("P8");
-						transFinal.setDerecho_emision(anexoAux.getDerechos_emision_mensual());
-						System.out.println("P9");
-						transFinal.setSeguto_campesino(anexoAux.getSeguro_campesino_mensual());
-						System.out.println("P10");
-						transFinal.setOtros(0.00);
-						System.out.println("P11");
-						transFinal.setIva(anexoAux.getIva_mensual());
-						System.out.println("P12");
-						transFinal.setTotal(anexoAux.getVALOR());
-						System.out.println("P13");
-						transFinal.setFecha_afectacion(new Date());
-						System.out.println("P13");
-						transFinal.setTipo_transaccion(procesoSelected);
-						System.out.println("P14");
-						lstTransFinal.add(transFinal);
-						transFinal = new TransaccionesPeriodicas();
-					}
-				}
-
-			}
-			// guardo registros
-			for (TransaccionesPeriodicas transaccionesPeriodicas : lstTransFinal) {
-				srvTransaccionPer.insertarTransaccionesPeriodicas(transaccionesPeriodicas);
-			}
-			// ACTUALIZA EL ENDOSO
-			if (lstAnexosPolizaSeleccionada.size() > 0) {
-				for (ConsultaPolizaAnexoView consultaPolizaAnexoView : lstAnexosPolizaSeleccionada) {
-					RamoCotizacion ramAux = new RamoCotizacion();
-					ramAux = srvRamoCot.recuperaRamoCotizacionPorCodigo(
-							Integer.valueOf(consultaPolizaAnexoView.getCd_ramo_cotizacion()),
-							Integer.valueOf(consultaPolizaAnexoView.getCd_compania()));
-					ramAux.setFactura_aseguradora("CONSOLIDADO-FACT-PERIODICA");
-					srvRamoCot.actualizaRamoCotizacion(ramAux);
-				}
-			}
-
-		}
-
+//		if (procesoSelected.equals("APLICAFACTURA")) {
+//
+//			valorInicial = detalleFormaPagoSeleccionado.getVALOR();
+//			valorFinal = 0.0;
+//			primaInicial = detalleFormaPagoSeleccionado.getPrima_neta_mensual();
+//			primaFinal = 0.0;
+//			System.out.println("VALOR INICIAL PRINT:" + valorInicial);
+//			System.out.println("ORIMA INICIAL PRINT:" + primaInicial);
+//			// sumo el valor total adicionales
+//			for (TransaccionesPeriodicas adcAux : lstTransaccionesPer) {
+//				valorFinal = valorFinal + adcAux.getTotal();
+//				System.out.println("VALOR FINAL PRINT:" + valorFinal);
+//				primaFinal = primaFinal + adcAux.getPrima_neta();
+//				System.out.println("PRIMA FINAL PRINT:" + primaFinal);
+//			}
+//			// sumo anexos ingresados
+//			System.out.println("tamaño seleccion" + lstAnexosPolizaSeleccionada.size());
+//			if (lstAnexosPolizaSeleccionada.size() > 0) {
+//				for (ConsultaPolizaAnexoView consultaPolizaAnexoView : lstAnexosPolizaSeleccionada) {
+//					lstDetalleFormaPagoAnexo = new ArrayList<DetalleFormaPago>();
+//					lstDetalleFormaPagoAnexo = srvDetalleFormaPago.recuperaDetalleFrmPago(
+//							consultaPolizaAnexoView.getCd_cotizacion(), consultaPolizaAnexoView.getCd_compania());
+//					for (DetalleFormaPago anexoAux : lstDetalleFormaPagoAnexo) {
+//						valorFinal = valorFinal + anexoAux.getVALOR();
+//						System.out.println("VALOR FINAL PRINT:" + valorFinal);
+//						primaFinal = primaFinal + anexoAux.getPrima_neta_mensual();
+//						System.out.println("PRIMA FINAL PRINT:" + primaFinal);
+//					}
+//				}
+//			}
+//			valorFinal = valorFinal + valorInicial;
+//			primaFinal = primaFinal + primaInicial;
+//			System.out.println("VALOR FINAL PRINT:" + valorFinal);
+//			// actualizo los valores totales en factura mensual de la póliza
+//			detalleFormaPagoSeleccionado.setFACTURA_ASEGURADORA(numFactDetFrm);
+//			detalleFormaPagoSeleccionado.setVALOR(valorFinal);
+//			detalleFormaPagoSeleccionado.setSALDO(valorFinal);
+//			detalleFormaPagoSeleccionado.setPrima_neta_mensual(primaFinal);
+//
+//			srvDetalleFormaPago.actualizaDetFormaPago(detalleFormaPagoSeleccionado);
+//			// ACTUALIZO COMISIÓNES BROKER Y SUBAGENTES
+//			srvStoreProcedure.act_comision_pol_Asis_med(String.valueOf(detalleFormaPagoSeleccionado.getCD_COMPANIA()),
+//					String.valueOf(detalleFormaPagoSeleccionado.getCD_DET_FORMA_PAGO()));
+//
+//			// actualizo detalle de adicionales
+//			List<TransaccionesPeriodicas> lstTransFinal = new ArrayList<TransaccionesPeriodicas>();
+//			TransaccionesPeriodicas transFinal = new TransaccionesPeriodicas();
+//			for (TransaccionesPeriodicas adcAux : lstTransaccionesPer) {
+//				transFinal = adcAux;
+//				transFinal.setCd_compania(Integer.valueOf(PolizaSeleccionadaParaAnexo.getCd_compania()));
+//				transFinal.setCd_det_forma_pago(detalleFormaPagoSeleccionado.getCD_DET_FORMA_PAGO());
+//				transFinal.setCd_det_forma_pago_anexo(0);
+//				transFinal.setTipo("ADICIONAL/RETROACTIVO");
+//				transFinal.setFecha_afectacion(new Date());
+//				transFinal.setTipo_transaccion(procesoSelected);
+//				lstTransFinal.add(transFinal);
+//				transFinal = new TransaccionesPeriodicas();
+//			}
+//			// actualizo detalle de endosos
+//			transFinal = new TransaccionesPeriodicas();
+//			if (lstAnexosPolizaSeleccionada.size() > 0) {
+//				for (ConsultaPolizaAnexoView consultaPolizaAnexoView : lstAnexosPolizaSeleccionada) {
+//					lstDetalleFormaPagoAnexo = new ArrayList<DetalleFormaPago>();
+//					lstDetalleFormaPagoAnexo = srvDetalleFormaPago.recuperaDetalleFrmPago(
+//							consultaPolizaAnexoView.getCd_cotizacion(), consultaPolizaAnexoView.getCd_compania());
+//					for (DetalleFormaPago anexoAux : lstDetalleFormaPagoAnexo) {
+//						transFinal.setCd_compania(Integer.valueOf(PolizaSeleccionadaParaAnexo.getCd_compania()));
+//						System.out.println("P1");
+//						transFinal.setCd_det_forma_pago(detalleFormaPagoSeleccionado.getCD_DET_FORMA_PAGO());
+//						System.out.println("P2");
+//						transFinal.setCd_det_forma_pago_anexo(anexoAux.getCD_DET_FORMA_PAGO());
+//						System.out.println("P3");
+//						transFinal.setTipo("ENDOSO - " + consultaPolizaAnexoView.getDesc_rubro());
+//						System.out.println("P4");
+//						transFinal.setFecha_afectacion(new Date());
+//						System.out.println("P5");
+//						transFinal.setTipo_transaccion(procesoSelected);
+//						System.out.println("P6");
+//						transFinal.setPrima_neta(anexoAux.getPrima_neta_mensual());
+//						System.out.println("P7");
+//						transFinal.setValor_financiamiento(0.00);
+//						System.out.println("P8");
+//						transFinal.setDerecho_emision(anexoAux.getDerechos_emision_mensual());
+//						System.out.println("P9");
+//						transFinal.setSeguto_campesino(anexoAux.getSeguro_campesino_mensual());
+//						System.out.println("P10");
+//						transFinal.setOtros(0.00);
+//						System.out.println("P11");
+//						transFinal.setIva(anexoAux.getIva_mensual());
+//						System.out.println("P12");
+//						transFinal.setTotal(anexoAux.getVALOR());
+//						System.out.println("P13");
+//						transFinal.setFecha_afectacion(new Date());
+//						System.out.println("P13");
+//						transFinal.setTipo_transaccion(procesoSelected);
+//						System.out.println("P14");
+//						lstTransFinal.add(transFinal);
+//						transFinal = new TransaccionesPeriodicas();
+//					}
+//				}
+//
+//			}
+//			// guardo registros
+//			for (TransaccionesPeriodicas transaccionesPeriodicas : lstTransFinal) {
+//				srvTransaccionPer.insertarTransaccionesPeriodicas(transaccionesPeriodicas);
+//			}
+//			// ACTUALIZA EL ENDOSO
+//			if (lstAnexosPolizaSeleccionada.size() > 0) {
+//				for (ConsultaPolizaAnexoView consultaPolizaAnexoView : lstAnexosPolizaSeleccionada) {
+//					RamoCotizacion ramAux = new RamoCotizacion();
+//					ramAux = srvRamoCot.recuperaRamoCotizacionPorCodigo(
+//							Integer.valueOf(consultaPolizaAnexoView.getCd_ramo_cotizacion()),
+//							Integer.valueOf(consultaPolizaAnexoView.getCd_compania()));
+//					ramAux.setFactura_aseguradora("CONSOLIDADO-FACT-PERIODICA");
+//					srvRamoCot.actualizaRamoCotizacion(ramAux);
+//				}
+//			}
+//
+//		}
+//
 		if (procesoSelected.equals("APLICARTODOS")) {
 			Integer codDetFrmPagoOri = 0, flgFact = 0;
 			codDetFrmPagoOri = detalleFormaPagoSeleccionado.getCD_DET_FORMA_PAGO();
@@ -372,8 +392,8 @@ public class ControladorFacturaPeriodica {
 					}
 					System.out.println("sumo el valor total adicionales");
 					// sumo anexos ingresados
-					System.out.println("valorFinal:"+valorFinal);
-					System.out.println("primaFinal:"+primaFinal);
+					System.out.println("valorFinal:" + valorFinal);
+					System.out.println("primaFinal:" + primaFinal);
 
 					System.out.println("tamaño seleccion" + lstAnexosPolizaSeleccionada.size());
 					if (lstAnexosPolizaSeleccionada.size() > 0) {
@@ -457,7 +477,7 @@ public class ControladorFacturaPeriodica {
 					}
 				}
 			}
-			System.out.println("TAMAÑO PENDIENTE:"+lstSelectedAnexosPolizaProc.size());
+			System.out.println("TAMAÑO PENDIENTE:" + lstSelectedAnexosPolizaProc.size());
 			// ACTUALIZA EL ENDOSO
 			if (lstSelectedAnexosPolizaProc.size() > 0) {
 				for (ConsultaPolizaAnexoView consultaPolizaAnexoView : lstSelectedAnexosPolizaProc) {
@@ -466,72 +486,72 @@ public class ControladorFacturaPeriodica {
 							Integer.valueOf(consultaPolizaAnexoView.getCd_ramo_cotizacion()),
 							Integer.valueOf(consultaPolizaAnexoView.getCd_compania()));
 					ramAux.setFactura_aseguradora("CONSOLIDADO-FACT-PERIODICA");
-					System.out.println("Integer.valueOf(consultaPolizaAnexoView.getCd_ramo_cotizacion())"+Integer.valueOf(consultaPolizaAnexoView.getCd_ramo_cotizacion()));
-					System.out.println("Integer.valueOf(consultaPolizaAnexoView.getCd_compania())"+Integer.valueOf(consultaPolizaAnexoView.getCd_compania()));
+					System.out.println("Integer.valueOf(consultaPolizaAnexoView.getCd_ramo_cotizacion())"
+							+ Integer.valueOf(consultaPolizaAnexoView.getCd_ramo_cotizacion()));
+					System.out.println("Integer.valueOf(consultaPolizaAnexoView.getCd_compania())"
+							+ Integer.valueOf(consultaPolizaAnexoView.getCd_compania()));
 					srvRamoCot.actualizaRamoCotizacion(ramAux);
 				}
 			}
 		}
-		if (procesoSelected.equals("INSERTAFACTURA")) {
-			DetalleFormaPago detFrmPagAux = new DetalleFormaPago();
-			// actualizo detalle de adicionales
-			for (TransaccionesPeriodicas adcAux : lstTransaccionesPer) {
-				detFrmPagAux.setCD_COMPANIA(Integer.valueOf(PolizaSeleccionadaParaAnexo.getCd_compania()));
-				detFrmPagAux.setCD_FORMA_PAGO(detalleFormaPagoSeleccionado.getCD_FORMA_PAGO());
-				detFrmPagAux.setFECHA_VENCIMIENTO_DATE(new Date());
-				detFrmPagAux.setVALOR(adcAux.getTotal());
-				detFrmPagAux.setSALDO(adcAux.getTotal());
-				detFrmPagAux.setFACTURA_ASEGURADORA(numFactDetFrm);
-				detFrmPagAux.setFECHA_INGRESO_FACTURA_DATE(new Date());
-				detFrmPagAux.setFLG_PAGO(0);
-				detFrmPagAux.setTipo("ADC");
-				detFrmPagAux.setFlg_comision("1");
-				detFrmPagAux.setPrima_neta_mensual(adcAux.getPrima_neta());
-				detFrmPagAux.setSuper_bancos_mensual(adcAux.getSuper_bancos());
-				detFrmPagAux.setSeguro_campesino_mensual(adcAux.getSeguto_campesino());
-				detFrmPagAux.setDerechos_emision_mensual(adcAux.getDerecho_emision());
-				detFrmPagAux.setIva_mensual(adcAux.getIva());
-				srvDetalleFormaPago.insertaDetalleFormaPago(detFrmPagAux);
-				// Inserto Comision Broker
-				DetalleFormaPago detFrmPagInsertada = new DetalleFormaPago();
-				ComisionesPoliza comAux = new ComisionesPoliza();
-				ComisionesPoliza comAuxOri = new ComisionesPoliza();
-				
-				detFrmPagInsertada = srvDetalleFormaPago.recuperaDetalleUltimoReg(detFrmPagAux.getCD_FORMA_PAGO(), detFrmPagAux.getCD_COMPANIA());
-				comAuxOri = srvComPol.comisionesPolizaAsisMed(Integer.valueOf(PolizaSeleccionadaParaAnexo.getCd_cotizacion()));
-				comAux.setCd_compania(detFrmPagAux.getCD_COMPANIA());
-				comAux.setCd_ramo_cotizacion(comAuxOri.getCd_ramo_cotizacion());
-				comAux.setTotal_asegurado(0.00);
-				comAux.setTotal_prima(detFrmPagAux.getPrima_neta_mensual());
-				comAux.setPct_com_brk(comAuxOri.getPct_com_brk());
-				comAux.setVal_com_brk(detFrmPagAux.getPrima_neta_mensual() *(comAuxOri.getPct_com_brk()/100));
-				comAux.setSaldo_com_brk(detFrmPagAux.getPrima_neta_mensual() *(comAuxOri.getPct_com_brk()/100));
-				comAux.setCd_det_forma_pago(detFrmPagInsertada.getCD_DET_FORMA_PAGO());
-				srvComPol.insertarComisionesPoliza(comAux);
-				comAux = srvComPol.comisionesPolizaxCdDetFrmPag(detFrmPagInsertada.getCD_DET_FORMA_PAGO());
-				// Inserto Comision Subagente
-				ComisionSubagentePol comSubaAux = new ComisionSubagentePol();
-				ComisionSubagentePol comSubaAuxOri = new ComisionSubagentePol();
-				comSubaAuxOri = srvComSubaPol.consultaSubagentePolAsisMed(detFrmPagInsertada.getCD_FORMA_PAGO());
-				comSubaAux.setCd_compania(comAux.getCd_compania());
-				comSubaAux.setCd_ramo_cotizacion(comAux.getCd_ramo_cotizacion());
-				comSubaAux.setTotal_prima(comAux.getTotal_prima());
-				comSubaAux.setPct_com_suba(comSubaAuxOri.getPct_com_suba());
-				comSubaAux.setVal_com_suba(comAux.getTotal_prima()*(comSubaAuxOri.getPct_com_suba()/100));
-				comSubaAux.setSaldo_com_suba(comAux.getTotal_prima()*(comSubaAuxOri.getPct_com_suba()/100));
-				comSubaAux.setCd_comision_poliza(comAux.getCd_comision_poliza());
-				srvComSubaPol.insertarComisionSubagentePol(comSubaAux);
-				detFrmPagAux = new DetalleFormaPago();
-			}
-			
-			
+//		if (procesoSelected.equals("INSERTAFACTURA")) {
+//			DetalleFormaPago detFrmPagAux = new DetalleFormaPago();
+//			// actualizo detalle de adicionales
+//			for (TransaccionesPeriodicas adcAux : lstTransaccionesPer) {
+//				detFrmPagAux.setCD_COMPANIA(Integer.valueOf(PolizaSeleccionadaParaAnexo.getCd_compania()));
+//				detFrmPagAux.setCD_FORMA_PAGO(detalleFormaPagoSeleccionado.getCD_FORMA_PAGO());
+//				detFrmPagAux.setFECHA_VENCIMIENTO_DATE(new Date());
+//				detFrmPagAux.setVALOR(adcAux.getTotal());
+//				detFrmPagAux.setSALDO(adcAux.getTotal());
+//				detFrmPagAux.setFACTURA_ASEGURADORA(numFactDetFrm);
+//				detFrmPagAux.setFECHA_INGRESO_FACTURA_DATE(new Date());
+//				detFrmPagAux.setFLG_PAGO(0);
+//				detFrmPagAux.setTipo("ADC");
+//				detFrmPagAux.setFlg_comision("1");
+//				detFrmPagAux.setPrima_neta_mensual(adcAux.getPrima_neta());
+//				detFrmPagAux.setSuper_bancos_mensual(adcAux.getSuper_bancos());
+//				detFrmPagAux.setSeguro_campesino_mensual(adcAux.getSeguto_campesino());
+//				detFrmPagAux.setDerechos_emision_mensual(adcAux.getDerecho_emision());
+//				detFrmPagAux.setIva_mensual(adcAux.getIva());
+//				srvDetalleFormaPago.insertaDetalleFormaPago(detFrmPagAux);
+//				// Inserto Comision Broker
+//				DetalleFormaPago detFrmPagInsertada = new DetalleFormaPago();
+//				ComisionesPoliza comAux = new ComisionesPoliza();
+//				ComisionesPoliza comAuxOri = new ComisionesPoliza();
+//
+//				detFrmPagInsertada = srvDetalleFormaPago.recuperaDetalleUltimoReg(detFrmPagAux.getCD_FORMA_PAGO(),
+//						detFrmPagAux.getCD_COMPANIA());
+//				comAuxOri = srvComPol
+//						.comisionesPolizaAsisMed(Integer.valueOf(PolizaSeleccionadaParaAnexo.getCd_cotizacion()));
+//				comAux.setCd_compania(detFrmPagAux.getCD_COMPANIA());
+//				comAux.setCd_ramo_cotizacion(comAuxOri.getCd_ramo_cotizacion());
+//				comAux.setTotal_asegurado(0.00);
+//				comAux.setTotal_prima(detFrmPagAux.getPrima_neta_mensual());
+//				comAux.setPct_com_brk(comAuxOri.getPct_com_brk());
+//				comAux.setVal_com_brk(detFrmPagAux.getPrima_neta_mensual() * (comAuxOri.getPct_com_brk() / 100));
+//				comAux.setSaldo_com_brk(detFrmPagAux.getPrima_neta_mensual() * (comAuxOri.getPct_com_brk() / 100));
+//				comAux.setCd_det_forma_pago(detFrmPagInsertada.getCD_DET_FORMA_PAGO());
+//				srvComPol.insertarComisionesPoliza(comAux);
+//				comAux = srvComPol.comisionesPolizaxCdDetFrmPag(detFrmPagInsertada.getCD_DET_FORMA_PAGO());
+//				// Inserto Comision Subagente
+//				ComisionSubagentePol comSubaAux = new ComisionSubagentePol();
+//				ComisionSubagentePol comSubaAuxOri = new ComisionSubagentePol();
+//				comSubaAuxOri = srvComSubaPol.consultaSubagentePolAsisMed(detFrmPagInsertada.getCD_FORMA_PAGO());
+//				comSubaAux.setCd_compania(comAux.getCd_compania());
+//				comSubaAux.setCd_ramo_cotizacion(comAux.getCd_ramo_cotizacion());
+//				comSubaAux.setTotal_prima(comAux.getTotal_prima());
+//				comSubaAux.setPct_com_suba(comSubaAuxOri.getPct_com_suba());
+//				comSubaAux.setVal_com_suba(comAux.getTotal_prima() * (comSubaAuxOri.getPct_com_suba() / 100));
+//				comSubaAux.setSaldo_com_suba(comAux.getTotal_prima() * (comSubaAuxOri.getPct_com_suba() / 100));
+//				comSubaAux.setCd_comision_poliza(comAux.getCd_comision_poliza());
+//				srvComSubaPol.insertarComisionSubagentePol(comSubaAux);
+//				detFrmPagAux = new DetalleFormaPago();
+//			}
 
-		}
+//		}
 
-//		RequestContext contextDlg = RequestContext.getCurrentInstance();
-//		contextDlg.execute("PF('wfactAdcRetroIng').hide();");
-		PrimeFaces.current().executeScript("PF('wfactAdcRetroIng').hide();");
-		salir();
+//		PrimeFaces.current().executeScript("PF('wfactAdcRetroIng').hide();");
+//		salir();
 	}
 
 	public void salir() {
@@ -657,6 +677,14 @@ public class ControladorFacturaPeriodica {
 
 	public void setNumFactDetFrm(String numFactDetFrm) {
 		this.numFactDetFrm = numFactDetFrm;
+	}
+
+	public String getNumPoliza() {
+		return numPoliza;
+	}
+
+	public void setNumPoliza(String numPoliza) {
+		this.numPoliza = numPoliza;
 	}
 
 }
