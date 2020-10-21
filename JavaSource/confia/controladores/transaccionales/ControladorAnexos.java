@@ -26,6 +26,8 @@ import org.primefaces.model.file.UploadedFile;
 
 import confia.entidades.basicos.Clientes;
 import confia.entidades.basicos.Contacto;
+import confia.entidades.basicos.Deducibles;
+import confia.entidades.basicos.DeduciblesEmitidas;
 import confia.entidades.basicos.Dispositivos;
 import confia.entidades.basicos.Marca;
 import confia.entidades.basicos.Modelo;
@@ -57,10 +59,12 @@ import confia.procedures.servicioProcedures;
 import confia.procedures.subeArchivo;
 import confia.servicios.basicos.ServicioClientes;
 import confia.servicios.basicos.ServicioContacto;
+import confia.servicios.basicos.ServicioDeducibles;
 import confia.servicios.basicos.ServicioMarca;
 import confia.servicios.basicos.ServicioModelo;
 import confia.servicios.basicos.ServicioRubros;
 import confia.servicios.basicos.ServicioUsuarios;
+import confia.servicios.basicos.ServiciosDeduciblesEmitidas;
 import confia.servicios.transaccionales.ServicioArchivos;
 import confia.servicios.transaccionales.ServicioCaracteristicasVehiculos;
 import confia.servicios.transaccionales.ServicioCorrespondencia;
@@ -145,6 +149,10 @@ public class ControladorAnexos {
 	private ServicioArchivos srvArchivos;
 	@EJB
 	private ServicioClientes srvClientes;
+	@EJB
+	private ServicioDeducibles srvDeducibles;
+	@EJB
+	private ServiciosDeduciblesEmitidas srvDeduciblesEmitidas;
 
 	private String codigoCompania;
 	private String cdRamCotPolizaAnexo;
@@ -274,6 +282,14 @@ public class ControladorAnexos {
 	private String strAnexoAclaratorio;
 
 	private String emiteAfectaPoliza;
+	public String getEspecificacionDed() {
+		return especificacionDed;
+	}
+
+	public void setEspecificacionDed(String especificacionDed) {
+		this.especificacionDed = especificacionDed;
+	}
+
 	private String polizaClieBus;
 
 	// gestion documental
@@ -287,8 +303,35 @@ public class ControladorAnexos {
 	private String objetoArchivo;
 	private String polizaGestDocu;
 	private Boolean flgPolizaDocu;
+	
+	// deducibles
+	private Double porcDedValSin;
+	private Double porcDedValAseg;
+	private Double valorDedMin;
+	private Double valorDedFijo;
+	private String especificacionDed;
+	private List<Deducibles> lstDeducibles;
+	private List<Deducibles> selectedlstDeducibles;
+	private List<Deducibles> lstFilteredDeducibles;
+
+	public List<Deducibles> getSelectedlstDeducibles() {
+		return selectedlstDeducibles;
+	}
+
+	public void setSelectedlstDeducibles(List<Deducibles> selectedlstDeducibles) {
+		this.selectedlstDeducibles = selectedlstDeducibles;
+	}
+
+	public List<Deducibles> getLstFilteredDeducibles() {
+		return lstFilteredDeducibles;
+	}
+
+	public void setLstFilteredDeducibles(List<Deducibles> lstFilteredDeducibles) {
+		this.lstFilteredDeducibles = lstFilteredDeducibles;
+	}
 
 	public ControladorAnexos() {
+		lstDeducibles = new ArrayList<Deducibles>();
 		lstConsultaPoliza = new ArrayList<ConsultaPolizaView>();
 		lstUbicacion = new ArrayList<ConsultaUbicacionPolView>();
 		lstFrmPago = new ArrayList<FormaPago>();
@@ -335,6 +378,11 @@ public class ControladorAnexos {
 		tipoArchivo = "CLIENTE";
 		lstObjetoGestDoc = srvRubros.recuperaObjetoGestionDocu(tipoArchivo);
 		flgPolizaDocu = true;
+		porcDedValSin = 0.0;
+		porcDedValAseg = 0.0;
+		valorDedMin = 0.0;
+		valorDedFijo = 0.0;
+		lstFilteredDeducibles = new ArrayList<Deducibles>();
 	}
 
 	public void enceraDocumentoGes() {
@@ -1152,7 +1200,25 @@ public class ControladorAnexos {
 		System.out.println("INGRESO ANEXO");
 
 		int res = 0;
-
+		if (tipoAnexoSelec.equals("DEDUCIBLE")) {
+			System.out.println("NUEVACOT:" + nuevaCot);
+			// RECUPERO LAS UBICACIONES DE LA P�LIZA
+			System.out.println("RAMO COTIZACION:" + PolizaSeleccionadaParaAnexo.getCd_ramo_cotizacion());
+			System.out.println("RAMO:" + PolizaSeleccionadaParaAnexo.getDesc_ramo());
+			System.out.println("RAMO COTIZACION:" + PolizaSeleccionadaParaAnexo.getPoliza());
+			PrimeFaces.current().executeScript("PF('wDlgDeducible').show();");
+			flgIngreaAnexo = true;
+			
+			porcDedValSin = 0.0;
+			porcDedValAseg = 0.0;
+			valorDedMin = 0.0;
+			valorDedFijo = 0.0;
+			lstDeducibles = new ArrayList<Deducibles>();
+			lstDeducibles = srvDeducibles.consultaDeducibles();
+			PrimeFaces.current().executeScript("PF('wDlgNuevoDeducible').show();");
+			return;
+			
+		}
 		if (tipoAnexoSelec.equals("MODVALASEG") && afectaPoliza.equals("UBICACION")) {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Advertencia", "Tipo de Anexo No Soportado por el Sistema"));
@@ -1446,6 +1512,74 @@ public class ControladorAnexos {
 		}
 		flgIngreaAnexo = true;
 	}
+	
+	public void guardaDeducible() {
+		for (Deducibles dedTmp : selectedlstDeducibles) {
+			System.out.println("DEDTMP" + dedTmp.getCd_deducible());
+			// VERIFICA SI LA COBERTURA YA SE ENCUENTRA INGRESADA
+			DeduciblesEmitidas dedAux = new DeduciblesEmitidas();
+			dedAux.setCd_deducible(dedTmp.getCd_deducible());
+			dedAux.setCd_compania(1);
+			dedAux.setCd_ramo_cotizacion(Integer.valueOf(PolizaSeleccionadaParaAnexo.getCd_ramo_cotizacion()));
+			dedAux.setDesc_deducible(dedTmp.getDesc_deducible());
+			if (porcDedValSin != 0.0)
+				dedAux.setPorcentaje_valor_siniestro(porcDedValSin);
+			if (porcDedValAseg != 0.0)
+				dedAux.setPorcentaje_valor_asegurado(porcDedValAseg);
+			if (valorDedMin != 0.0)
+				dedAux.setValor_minimo(valorDedMin);
+			if (valorDedFijo != 0.0)
+				dedAux.setValor_fijo(valorDedFijo);
+			try {
+				if(especificacionDed.isEmpty() || especificacionDed == null)
+					especificacionDed = "";
+			} catch (Exception e) {
+				especificacionDed = "";
+			}
+			dedAux.setEspecificacion(especificacionDed);
+			srvDeduciblesEmitidas.insertaDeduciblesEmitidas(dedAux);
+		}
+	}
+
+	public Double getPorcDedValSin() {
+		return porcDedValSin;
+	}
+
+	public void setPorcDedValSin(Double porcDedValSin) {
+		this.porcDedValSin = porcDedValSin;
+	}
+
+	public Double getPorcDedValAseg() {
+		return porcDedValAseg;
+	}
+
+	public void setPorcDedValAseg(Double porcDedValAseg) {
+		this.porcDedValAseg = porcDedValAseg;
+	}
+
+	public Double getValorDedMin() {
+		return valorDedMin;
+	}
+
+	public void setValorDedMin(Double valorDedMin) {
+		this.valorDedMin = valorDedMin;
+	}
+
+	public Double getValorDedFijo() {
+		return valorDedFijo;
+	}
+
+	public void setValorDedFijo(Double valorDedFijo) {
+		this.valorDedFijo = valorDedFijo;
+	}
+
+	public List<Deducibles> getLstDeducibles() {
+		return lstDeducibles;
+	}
+
+	public void setLstDeducibles(List<Deducibles> lstDeducibles) {
+		this.lstDeducibles = lstDeducibles;
+	}
 
 	public void onRowSelectAnlaAne(SelectEvent event) {
 		valAsegExcAne = Double.valueOf(((ProduccionEmitidaView) event.getObject()).getTotalAsegurado());
@@ -1484,6 +1618,11 @@ public class ControladorAnexos {
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
+		flgIngreaAnexo = false;
+	}
+	
+	public void cancelaAnexoDeducible() {
+		
 		flgIngreaAnexo = false;
 	}
 

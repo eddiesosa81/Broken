@@ -164,7 +164,7 @@ public class ControladorPreLiquida extends AbstractReportBean {
 		}
 		
 		if (numFacturaAseg.equals("") && numPoliza.equals("")) {
-			fContextObj.addMessage(null, new FacesMessage("Advertencia", "Ingrese el N�mero de Factura o P�liza"));
+			fContextObj.addMessage(null, new FacesMessage("Advertencia", "Ingrese el Número de Factura o Póliza"));
 			return;
 		}
 		System.out.println("Ingresooo");
@@ -228,7 +228,7 @@ public class ControladorPreLiquida extends AbstractReportBean {
 		}
 		System.out.println("tama�o lista:" + selectedListPagoDetallePago.size());
 		FacesContext fContextObj = FacesContext.getCurrentInstance();
-		fContextObj.addMessage(null, new FacesMessage("Advertencia", "Registro A�adido Exitosamente."));
+		fContextObj.addMessage(null, new FacesMessage("Advertencia", "Registro Añadido Exitosamente."));
 	}
 
 	public void visualizaFactSelec() {
@@ -259,7 +259,7 @@ public class ControladorPreLiquida extends AbstractReportBean {
 			flgEdita = false;
 			FacesContext fContextObj = FacesContext.getCurrentInstance();
 			fContextObj.addMessage(null, new FacesMessage("Advertencia",
-					"No tiene permisos para ejecutar este proceso o su contrase�a es incorrecta."));
+					"No tiene permisos para ejecutar este proceso o su contraseña es incorrecta."));
 			return;
 		} else {
 			flgEdita = true;
@@ -291,7 +291,7 @@ public class ControladorPreLiquida extends AbstractReportBean {
 			System.out.println("SWITHC:" + flgEdita);
 			FacesContext fContextObj = FacesContext.getCurrentInstance();
 			fContextObj.addMessage(null,
-					new FacesMessage("Advertencia", "Active la Edici�n de Comisiones para realizar este proceso"));
+					new FacesMessage("Advertencia", "Active la Edición de Comisiones para realizar este proceso"));
 			listPagoDetallePago = new ArrayList<PagoDetallePago>();
 			return;
 		} else {
@@ -302,7 +302,7 @@ public class ControladorPreLiquida extends AbstractReportBean {
 					.equals(((PagoDetallePago) event.getObject()).getValor_liquidado())) {
 				FacesContext fContextObj = FacesContext.getCurrentInstance();
 				fContextObj.addMessage(null, new FacesMessage("Advertencia",
-						"Existen Pagos Realizados. Comun�quese con el Administrador del Sistema"));
+						"Existen Pagos Realizados. Comuníquese con el Administrador del Sistema"));
 				listPagoDetallePago = new ArrayList<PagoDetallePago>();
 				return;
 			}
@@ -325,7 +325,7 @@ public class ControladorPreLiquida extends AbstractReportBean {
 				if (flgComision > 0) {
 					FacesContext fContextObj = FacesContext.getCurrentInstance();
 					fContextObj.addMessage(null, new FacesMessage("Advertencia",
-							"No puede modificar la comisi�n del broker ya que se encuentran Pre liquidaciones Realizadas"));
+							"No puede modificar la comisión del broker ya que se encuentran Pre liquidaciones Realizadas"));
 					listPagoDetallePago = new ArrayList<PagoDetallePago>();
 					return;
 				}
@@ -350,7 +350,7 @@ public class ControladorPreLiquida extends AbstractReportBean {
 			} else {
 				FacesContext fContextObj = FacesContext.getCurrentInstance();
 				fContextObj.addMessage(null, new FacesMessage("Advertencia",
-						"Error al Actualizar las comisiones. Comun�quese con el Administrador del Sistema"));
+						"Error al Actualizar las comisiones. Comuníquese con el Administrador del Sistema"));
 				listPagoDetallePago = new ArrayList<PagoDetallePago>();
 				return;
 			}
@@ -408,14 +408,14 @@ public class ControladorPreLiquida extends AbstractReportBean {
 			if (selectedListPagoDetallePago.size() == 0) {
 				FacesContext fContextObj = FacesContext.getCurrentInstance();
 				fContextObj.addMessage(null,
-						new FacesMessage("Advertencia", "Ingrese registros para Generar la pre liquidaci�n"));
+						new FacesMessage("Advertencia", "Ingrese registros para Generar la pre liquidación"));
 				return;
 
 			}
 		} catch (Exception e) {
 			FacesContext fContextObj = FacesContext.getCurrentInstance();
 			fContextObj.addMessage(null,
-					new FacesMessage("Advertencia", "Seleccione registros para Generar la pre liquidaci�n"));
+					new FacesMessage("Advertencia", "Seleccione registros para Generar la pre liquidación"));
 			return;
 		}
 		PreFactura prefac = new PreFactura();
@@ -500,7 +500,7 @@ public class ControladorPreLiquida extends AbstractReportBean {
 		listPagoDetallePago = new ArrayList<PagoDetallePago>();
 		FacesContext fContextObj = FacesContext.getCurrentInstance();
 		fContextObj.addMessage(null,
-				new FacesMessage("Transacci�n Exitosa", "Si desea imprimir el documento presione el boton Imprimir"));
+				new FacesMessage("Transacción Exitosa", "Si desea imprimir el documento presione el boton Imprimir"));
 	}
 
 	public void salir() {

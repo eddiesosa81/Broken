@@ -134,6 +134,7 @@ public class ControladorPlanes {
 	private Double porcDedValAseg;
 	private Double valorDedMin;
 	private Double valorDedFijo;
+	private String especificacionDed;
 	private String codPlan;
 	private Integer numAnioDepre;
 	
@@ -297,7 +298,7 @@ public class ControladorPlanes {
 			lstDepre = lstPlanDepreciacion.size();
 		} catch (Exception e) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Ingrese el numero de años a depreciar"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Ingrese el numero de aï¿½os a depreciar"));
 			return;
 		}
 		
@@ -357,7 +358,7 @@ public class ControladorPlanes {
 			return;
 		}
 		if (descPlan.isEmpty() || descPlan == null) {
-			context.addMessage(null, new FacesMessage("Advertencia", "Ingrese la descripción del Plan"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Ingrese la descripciï¿½n del Plan"));
 			return;
 		}
 		RamoAseguradora ramAse = new RamoAseguradora();
@@ -391,7 +392,7 @@ public class ControladorPlanes {
 		// verifica si los datos seleccionados estan registrados
 		FacesContext context = FacesContext.getCurrentInstance();
 		if (descPlan.isEmpty() || descPlan == null) {
-			context.addMessage(null, new FacesMessage("Advertencia", "Ingrese la descripción del Plan"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Ingrese la descripciï¿½n del Plan"));
 			return;
 		}
 		RamoAseguradora ramAse = new RamoAseguradora();
@@ -569,9 +570,9 @@ public class ControladorPlanes {
 			}
 			// VERIFICA SIEL DEDUCIBLE YA SE ENCUENTRA INGRESADO
 			PlanDeducible planDedAux = new PlanDeducible();
-			planDedAux = srvPlanDeducible.consultaPlanDeducible(String.valueOf(codAsegDed),
-					selectedPlanRamAseg.getCd_plan());
-			if (planDedAux == null) {
+//			planDedAux = srvPlanDeducible.consultaPlanDeducible(String.valueOf(codAsegDed),
+//					selectedPlanRamAseg.getCd_plan());
+//			if (planDedAux == null) {
 				planDedAux = new PlanDeducible();
 				planDedAux.setCd_plan(Integer.valueOf(selectedPlanRamAseg.getCd_plan()));
 				planDedAux.setCd_asegded(codAsegDed);
@@ -583,9 +584,16 @@ public class ControladorPlanes {
 					planDedAux.setValor_fijo(valorDedFijo);
 				if (valorDedMin != 0.0)
 					planDedAux.setValor_minimo(valorDedMin);
+				try {
+					if (!especificacionDed.isEmpty() || especificacionDed != null) {
+						planDedAux.setEspecificacion(especificacionDed);
+					}
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
 				planDedAux.setEstado_plandeducible("A");
 				srvPlanDeducible.insertarPlanDeducible(planDedAux);
-			}
+//			}
 		}
 		lstPlanDeducibles = new ArrayList<PlanDeduciblesView>();
 		lstPlanDeducibles = srvPlanDeducibleView.consultaDeduciblePlan(selectedPlanRamAseg.getCd_plan(),
@@ -726,14 +734,21 @@ public class ControladorPlanes {
 		planDedAux = srvPlanDeducible
 				.consultaPlanDeducibleCodPlanDe(((PlanDeduciblesView) event.getObject()).getCd_plandeducible());
 		Double valmin, valfijo, porcSin, porcASe;
+		String espe;
 		valmin = Double.valueOf(((PlanDeduciblesView) event.getObject()).getValor_minimo());
 		valfijo = Double.valueOf(((PlanDeduciblesView) event.getObject()).getValor_fijo());
 		porcSin = Double.valueOf(((PlanDeduciblesView) event.getObject()).getPorcentaje_valor_siniestro());
 		porcASe = Double.valueOf(((PlanDeduciblesView) event.getObject()).getPorcentaje_valor_asegurado());
+		try {
+			espe = ((PlanDeduciblesView) event.getObject()).getEspecificacionDed();
+		} catch (Exception e) {
+			espe = "";
+		}
 		planDedAux.setValor_minimo(valmin);
 		planDedAux.setValor_fijo(valfijo);
 		planDedAux.setPorcentaje_valor_siniestro(porcSin);
 		planDedAux.setPorcentaje_valor_asegurado(porcASe);
+		planDedAux.setEspecificacion(espe);
 		srvPlanDeducible.actualizaPlanDeducible(planDedAux);
 		FacesContext context = FacesContext.getCurrentInstance();
 		context.addMessage(null, new FacesMessage("Advertencia", "Proceso Exitoso"));
@@ -1072,5 +1087,14 @@ public class ControladorPlanes {
 	public void setInptNmCob(String inptNmCob) {
 		this.inptNmCob = inptNmCob;
 	}
+
+	public String getEspecificacionDed() {
+		return especificacionDed;
+	}
+
+	public void setEspecificacionDed(String especificacionDed) {
+		this.especificacionDed = especificacionDed;
+	}
+	
 
 }

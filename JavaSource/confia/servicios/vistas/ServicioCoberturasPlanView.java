@@ -27,6 +27,7 @@ public class ServicioCoberturasPlanView {
 			return null;
 		}
 	}
+	
 	@SuppressWarnings("unchecked")
 	public List<CoberturasPlanView> consultaCoberturasPlanAsisMed(String codSiniestro, String codAseg) {
 		List<CoberturasPlanView> resultado;

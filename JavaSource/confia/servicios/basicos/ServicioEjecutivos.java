@@ -13,48 +13,67 @@ import confia.entidades.basicos.Ejecutivos;
 public class ServicioEjecutivos {
 	@PersistenceContext
 	private EntityManager em;
-	
-	public Ejecutivos ejecutivoId(String codEje) 
-	{
-		Ejecutivos resultado;  
-		String sql = "select * from ejecutivo_tbl where estado_ejecutivo = 'A' and cd_ejecutivo = "+codEje;
-		try
-		{
-			Query query = em.createNativeQuery(sql,Ejecutivos.class);
-			
+
+	public Ejecutivos ejecutivoId(String codEje) {
+		Ejecutivos resultado;
+		String sql = "select * from ejecutivo_tbl where estado_ejecutivo = 'A' and cd_ejecutivo = " + codEje;
+		try {
+			Query query = em.createNativeQuery(sql, Ejecutivos.class);
+
 			resultado = (Ejecutivos) query.getSingleResult();
-			
-			/*for (Ejecutivos aseguradoraRamo : resultado) {
-				System.out.println(aseguradoraRamo.getPrimer_apellido_ejecutivo() + " - " + aseguradoraRamo.getCd_ejecutivo());
-			}*/
-			
+
+			/*
+			 * for (Ejecutivos aseguradoraRamo : resultado) {
+			 * System.out.println(aseguradoraRamo.getPrimer_apellido_ejecutivo() + " - " +
+			 * aseguradoraRamo.getCd_ejecutivo()); }
+			 */
+
 			return resultado;
-		}
-		catch(Exception ex)
-		{
+		} catch (Exception ex) {
 			return null;
 		}
 	}
-	
-	@SuppressWarnings("unchecked")
-	public List<Ejecutivos> listaEjecutivos() 
-	{
-		List<Ejecutivos> resultado;  
-		String sql = "select * from ejecutivo_tbl where estado_ejecutivo = 'A' order by primer_apellido_ejecutivo,segundo_apellido_ejecutivo,primer_nombre_ejecutivo,segundo_nombre_ejecutivo";
-		try
-		{
-			Query query = em.createNativeQuery(sql,Ejecutivos.class);
-			
-			resultado = query.getResultList();
-			
-			/*for (Ejecutivos aseguradoraRamo : resultado) {
-				System.out.println(aseguradoraRamo.getPrimer_apellido_ejecutivo() + " - " + aseguradoraRamo.getCd_ejecutivo());
-			}*/
-			
+
+	public Ejecutivos ejecutivoIdRamCot(Integer codRamCot, Integer codCompania) {
+		Ejecutivos resultado;
+		String sql = "select * from ejecutivo_tbl where estado_ejecutivo = 'A' "
+				+ "and cd_ejecutivo = ( select distinct cd_ejecutivo from ramo_cotizacion_tbl where cd_ramo_cotizacion = "
+				+ codRamCot + " and cd_compania = " + codCompania + ")";
+		System.out.println("SQL->"+sql);
+		try {
+			Query query = em.createNativeQuery(sql, Ejecutivos.class);
+
+			resultado = (Ejecutivos) query.getSingleResult();
+
+			/*
+			 * for (Ejecutivos aseguradoraRamo : resultado) {
+			 * System.out.println(aseguradoraRamo.getPrimer_apellido_ejecutivo() + " - " +
+			 * aseguradoraRamo.getCd_ejecutivo()); }
+			 */
+
 			return resultado;
+		} catch (Exception ex) {
+			return null;
 		}
-		catch(Exception ex)
-		{
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Ejecutivos> listaEjecutivos() {
+		List<Ejecutivos> resultado;
+		String sql = "select * from ejecutivo_tbl where estado_ejecutivo = 'A' order by primer_apellido_ejecutivo,segundo_apellido_ejecutivo,primer_nombre_ejecutivo,segundo_nombre_ejecutivo";
+		try {
+			Query query = em.createNativeQuery(sql, Ejecutivos.class);
+
+			resultado = query.getResultList();
+
+			/*
+			 * for (Ejecutivos aseguradoraRamo : resultado) {
+			 * System.out.println(aseguradoraRamo.getPrimer_apellido_ejecutivo() + " - " +
+			 * aseguradoraRamo.getCd_ejecutivo()); }
+			 */
+
+			return resultado;
+		} catch (Exception ex) {
 			return null;
 		}
 	}

@@ -733,7 +733,7 @@
 					style="width:500px; font-family:Verdana; font-size: 12px;"
 					selectionMode="single"
 					selection="#{ControladorEmision.selectedDeducibleEmitida}"
-					rowKey="#{ded.cd_deducible}"
+					rowKey="#{ded.cd_deducible_emitido}"
 					emptyMessage="No se encuentra en la busqueda"
 					filteredValue="#{ControladorEmision.lstFilteredDeducibleEmitida}"
 					editable="true">
@@ -742,6 +742,9 @@
 				        </f:facet>
 					<p:ajax event="rowEdit"
 						listener="#{ControladorEmision.onRowEditDeducible}" update="@this" />
+						<p:column headerText="Descripción Deducible" rendered="false">
+						<h:outputText value="#{ded.cd_deducible_emitido}" />
+						</p:column>
 					<p:column headerText="Descripción Deducible"
 						filterBy="#{ded.desc_deducible}" sortBy="#{ded.desc_deducible}"
 						filterMatchMode="contains">
@@ -786,6 +789,16 @@
 							</f:facet>
 							<f:facet name="input">
 								<p:inputNumber value="#{ded.valor_fijo}" style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Especificación">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{ded.especificacion}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{ded.especificacion}" style="width:100%" />
 							</f:facet>
 						</p:cellEditor>
 					</p:column>
@@ -1741,13 +1754,17 @@
 					<h:outputText value="Valor Fijo" />
 					<p:inputNumber value="#{ControladorEmision.valorDedFijo}"
 						id="inptNumValFijo"></p:inputNumber>
+					<h:outputText value="Especificación" />
+					<p:inputText value="#{ControladorEmision.especificacionDed}"
+						id="inptEspDed"></p:inputText>
 				</h:panelGrid>
 			</p:row>
 		</h:panelGrid>
 		<p:commandButton icon="ui-icon-check" value="Guardar"
 			process="@this,frm_emision:tab_emision:checkboxDTded, 
 						frm_emision:tab_emision:inptNumPorValSin,frm_emision:tab_emision:inptNumPorValAseg, 
-						frm_emision:tab_emision:inptNumValMin,frm_emision:tab_emision:inptNumValFijo"
+						frm_emision:tab_emision:inptNumValMin,frm_emision:tab_emision:inptNumValFijo,
+						frm_emision:tab_emision:inptEspDed"
 			update="@this frm_emision:tab_emision:dtDeducible"
 			action="#{ControladorEmision.guardaDeducible}">
 		</p:commandButton>

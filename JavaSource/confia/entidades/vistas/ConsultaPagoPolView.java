@@ -41,7 +41,19 @@ public class ConsultaPagoPolView {
 	private Date fecha_vencimiento_date;
 	@Column(name="cd_det_forma_pago")
 	private String cd_det_forma_pago;
+	@Column(name="observaciones")
+	private String observaciones;
+	
+	
+	
+	public String getObservaciones() {
+		return observaciones;
+	}
+	public void setObservaciones(String observaciones) {
+		this.observaciones = observaciones;
+	}
 	public String getCod() {
+		
 		return cod;
 	}
 	public void setCod(String cod) {

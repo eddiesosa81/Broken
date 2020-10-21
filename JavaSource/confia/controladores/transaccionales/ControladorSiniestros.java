@@ -14,14 +14,23 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
+import org.apache.batik.svggen.ImageHandlerPNGEncoder;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 
+import confia.entidades.basicos.Canton;
 import confia.entidades.basicos.Ciudad;
+import confia.entidades.basicos.CoberturasAdicionales;
+import confia.entidades.basicos.CoberturasEmitidas;
 import confia.entidades.basicos.Contacto;
+import confia.entidades.basicos.DeduciblesEmitidas;
 import confia.entidades.basicos.Diagnostico;
+import confia.entidades.basicos.Ejecutivos;
 import confia.entidades.basicos.GrupoContratante;
+import confia.entidades.basicos.Parroquia;
+import confia.entidades.basicos.Plan;
+import confia.entidades.basicos.Provincias;
 import confia.entidades.basicos.Rubros;
 import confia.entidades.basicos.Usuarios;
 import confia.entidades.transaccionales.CaracteristicasVehiculos;
@@ -35,22 +44,29 @@ import confia.entidades.transaccionales.PagoSiniestro;
 import confia.entidades.transaccionales.ProformaSiniestro;
 import confia.entidades.transaccionales.Reservas;
 import confia.entidades.transaccionales.Siniestros;
-import confia.entidades.vistas.CoberturasPlanView;
 import confia.entidades.vistas.ConsultaCaractPolView;
 import confia.entidades.vistas.ConsultaObjetoPolView;
 import confia.entidades.vistas.ConsultaPagoPolView;
 import confia.entidades.vistas.ConsultaPolizaView;
 import confia.entidades.vistas.ConsultaSubObjetoPolView;
 import confia.entidades.vistas.ConsultaUbicacionPolView;
-import confia.entidades.vistas.PlanDeduciblesView;
 import confia.procedures.ProcedimientosAlmacenadosDB;
 import confia.procedures.servicioProcedures;
+import confia.reportes.EmailSenderService;
+import confia.servicios.basicos.ServicioCanton;
 import confia.servicios.basicos.ServicioCiudad;
+import confia.servicios.basicos.ServicioCoberturasAdicionales;
+import confia.servicios.basicos.ServicioCoberturasEmitidas;
 import confia.servicios.basicos.ServicioContacto;
 import confia.servicios.basicos.ServicioDiagnostico;
+import confia.servicios.basicos.ServicioEjecutivos;
 import confia.servicios.basicos.ServicioGrupoContratante;
+import confia.servicios.basicos.ServicioParroquia;
+import confia.servicios.basicos.ServicioPlan;
+import confia.servicios.basicos.ServicioProvincias;
 import confia.servicios.basicos.ServicioRubros;
 import confia.servicios.basicos.ServicioUsuarios;
+import confia.servicios.basicos.ServiciosDeduciblesEmitidas;
 import confia.servicios.transaccionales.ServicioCaracteristicasVehiculos;
 import confia.servicios.transaccionales.ServicioCoberturasSiniestro;
 import confia.servicios.transaccionales.ServicioComisionesPoliza;
@@ -62,14 +78,12 @@ import confia.servicios.transaccionales.ServicioPagoSiniestro;
 import confia.servicios.transaccionales.ServicioProformaSiniestro;
 import confia.servicios.transaccionales.ServicioSiniestros;
 import confia.servicios.transaccionales.ServiciosReservas;
-import confia.servicios.vistas.ServicioCoberturasPlanView;
 import confia.servicios.vistas.ServicioConsultaCaractPolView;
 import confia.servicios.vistas.ServicioConsultaObjetoPolView;
 import confia.servicios.vistas.ServicioConsultaPagoPolView;
 import confia.servicios.vistas.ServicioConsultaPolizaView;
 import confia.servicios.vistas.ServicioConsultaSubObjetoPolView;
 import confia.servicios.vistas.ServicioConsultaUbicacionPolView;
-import confia.servicios.vistas.ServicioPlanDeduciblesView;
 
 @ManagedBean(name = "ControladorSiniestros")
 @ViewScoped
@@ -95,9 +109,9 @@ public class ControladorSiniestros {
 	@EJB
 	private ServicioDetalleSiniestro srvDetalleSiniestros;
 	@EJB
-	private ServicioCoberturasPlanView srvCoberturasPlan;
+	private ServicioCoberturasEmitidas srvCoberturasPlan;
 	@EJB
-	private ServicioPlanDeduciblesView srvDeduciblesPlan;
+	private ServiciosDeduciblesEmitidas srvDeduciblesPlan;
 	@EJB
 	private ServicioCoberturasSiniestro srvCoberturasSiniestro;
 	@EJB
@@ -128,6 +142,18 @@ public class ControladorSiniestros {
 	private ServicioDiagnostico srvDiagnostico;
 	@EJB
 	private ServicioDiagnosticoReclamo srvDiagnosticoReclamo;
+	@EJB
+	private ServicioPlan srvPlan;
+	@EJB
+	private ServicioCoberturasAdicionales srvCoberturasAdc;
+	@EJB
+	private ServicioParroquia srvParroquia;
+	@EJB
+	private ServicioProvincias srvProvincias;
+	@EJB
+	private ServicioCanton srvCanton;
+	@EJB
+	private ServicioEjecutivos srvEjecutivos;
 
 	private String numSinies;
 	private String polizaSinies;
@@ -151,14 +177,24 @@ public class ControladorSiniestros {
 	private List<CaracteristicasVehiculos> LstCaracteristicas;
 	private List<CaracteristicasVehiculos> LstCaracteristicasCab;
 	private List<ConsultaPagoPolView> lstPagoPoliza;
-	private List<CoberturasPlanView> lstCoberturasPlan;
-	private CoberturasPlanView selectedCoberturasPlan;
-	private List<PlanDeduciblesView> lstDeduciblesPlan;
-	private PlanDeduciblesView selectedDeduciblesPlan;
+	private List<CoberturasEmitidas> lstCoberturasPlan;
+	private List<CoberturasAdicionales> lstCoberturasAdcPlan;
+	private CoberturasAdicionales selectedCoberturasAdcPlan;
+	private CoberturasEmitidas selectedCoberturasPlan;
+	private List<DeduciblesEmitidas> lstDeduciblesPlan;
+	private DeduciblesEmitidas selectedDeduciblesPlan;
 	private List<CoberturasSiniestro> lstCoberturasSiniestro;
 	private CoberturasSiniestro selectedCoberturasSiniestro;
 	private String cdCiudad;
 	private List<Ciudad> lstCiudad;
+
+	private String cdProvincia;
+	private String cdCanton;
+	private String cdParroquia;
+	private List<Provincias> lstProvincia;
+	private List<Canton> lstCanton;
+	private List<Parroquia> lstParroquias;
+
 	private List<Rubros> lsRubrosDocumentos;
 	private List<Rubros> selectedLstRubDoc;
 	private List<Rubros> filteredRubrosDocumentos;
@@ -198,6 +234,8 @@ public class ControladorSiniestros {
 	private boolean flgEdita;
 	private String codGrupoContratante;
 	private List<GrupoContratante> listaGrupoContratante;
+	private GrupoContratante grupoContratante;
+	private Plan plan;
 
 	private List<DiagnosticoReclamo> lstDiagnosticoReclamo;
 	private DiagnosticoReclamo selectedDiagnosticoReclamo;
@@ -211,6 +249,17 @@ public class ControladorSiniestros {
 	private Rubros objCarta;
 	private Date fcEstadoSiniestro;
 
+	// fechas documentos
+	private String selectedTipoFechaString;
+	private Date fechaSelectDate;
+
+	// Califica Siniestro
+	private String calificaSin;
+	private String obsSinies;
+
+	// envio correo
+	private EmailSenderService email;
+
 	public ControladorSiniestros() {
 		fcEstadoSiniestro = new Date();
 		lstDiagnosticoReclamo = new ArrayList<DiagnosticoReclamo>();
@@ -221,8 +270,8 @@ public class ControladorSiniestros {
 		lstObjetosPoliza = new ArrayList<ConsultaObjetoPolView>();
 		LstCaracteristicas = new ArrayList<CaracteristicasVehiculos>();
 		siniestro = new Siniestros();
-		lstCoberturasPlan = new ArrayList<CoberturasPlanView>();
-		lstDeduciblesPlan = new ArrayList<PlanDeduciblesView>();
+		lstCoberturasPlan = new ArrayList<CoberturasEmitidas>();
+		lstDeduciblesPlan = new ArrayList<DeduciblesEmitidas>();
 		lstCoberturasSiniestro = new ArrayList<CoberturasSiniestro>();
 		lstCiudad = new ArrayList<Ciudad>();
 		lsRubrosDocumentos = new ArrayList<Rubros>();
@@ -244,11 +293,14 @@ public class ControladorSiniestros {
 		lstDiagnostico = new ArrayList<Diagnostico>();
 		LstCaracteristicasCab = new ArrayList<CaracteristicasVehiculos>();
 		panelCaracteristica = true;
+		lstCoberturasAdcPlan = new ArrayList<CoberturasAdicionales>();
+		email = new EmailSenderService();
 
 	}
 
 	@PostConstruct
 	public void recuperaInicio() {
+		fechaSelectDate = new Date();
 		lstCiudad = srvCiudad.recuperaListaCiudad();
 		docAdcSiniestro = null;
 		listaGrupoContratante = srvGrupoContratante.listaGruposContratantes();
@@ -256,9 +308,14 @@ public class ControladorSiniestros {
 		selectedSubObjetosPoliza = new ConsultaSubObjetoPolView();
 		lstDiagnostico = srvDiagnostico.consultaDiagnostico();
 		diagnosticoSlm = "0";
+		lstProvincia = srvProvincias.listaProvincias();
+		cdCanton = "0";
+		cdProvincia = "0";
+		cdParroquia = "0";
 	}
 
 	public void buscaPoliza() {
+		System.out.println("INGRESO");
 		String grpCont = null;
 		ConsultaCaractPolView consCaracPol = new ConsultaCaractPolView();
 		try {
@@ -395,6 +452,10 @@ public class ControladorSiniestros {
 			res = srvSiniestros.codigoMaxSiniestro();
 			siniestro = new Siniestros();
 			siniestro = srvSiniestros.recuperaCodSiniestros(res);
+			grupoContratante = new GrupoContratante();
+			grupoContratante = srvGrupoContratante.buscaGruposContratanteCrC(siniestro.getCdRamoCotizacion());
+			plan = new Plan();
+			plan = srvPlan.consultaPlanRamoCotizacion(siniestro.getCdRamoCotizacion());
 			Double valAsegSubobj, primaNetaSubObj;
 			String descSubobj, cdSubObje;
 
@@ -427,12 +488,42 @@ public class ControladorSiniestros {
 			detalleSiniestros = new DetalleSiniestros();
 			detalleSiniestros = srvDetalleSiniestros.recuperaDetSiniestrosxCdSini(siniestro.getCdSiniestro(),
 					siniestro.getCdCompania());
-			
+
 			LstCaracteristicasCab = new ArrayList<CaracteristicasVehiculos>();
-			LstCaracteristicasCab = srvCaracteristicaObj.recuperaCaractVHporObjCot(detalleSiniestros.getCd_obj_cotizacion(), detalleSiniestros.getCd_compania());
-			if(LstCaracteristicasCab.size() == 0){
+			LstCaracteristicasCab = srvCaracteristicaObj.recuperaCaractVHporObjCot(
+					detalleSiniestros.getCd_obj_cotizacion(), detalleSiniestros.getCd_compania());
+			if (LstCaracteristicasCab.size() == 0) {
 				panelCaracteristica = true;
 			}
+			// Envio correo al ejecutivo comercial
+			Ejecutivos ejecutivos = new Ejecutivos();
+			ejecutivos = srvEjecutivos.ejecutivoIdRamCot(siniestro.getCdRamoCotizacion(), siniestro.getCdCompania());
+			email.setReceptor(ejecutivos.getCorreo());
+			email.setSubject("Sistema Confia - Aviso de Siniestro - " + siniestro.getCdSiniestro());
+			email.setTexto("<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
+					+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Estimad@ "
+					+ ejecutivos.getPrimer_nombre_ejecutivo() + " " + ejecutivos.getPrimer_apellido_ejecutivo()
+					+ "<o:p></o:p></span></p>"
+					+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
+					+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Por medio del presente se informa que el cliente "
+					+ siniestro.getNm_cliente() + " tuvo un siniestro con fecha " + siniestro.getFcCreacion()
+					+ ", asignado el caso n√∫mero " + siniestro.getCdSiniestro()
+					+ ", adem√°s se informa que se realiza el debido "
+					+ "seguimiento con el cliente para la continuidad de su proceso." + " <o:p></o:p></span></p>"
+
+					+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
+					+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>En caso de necesitar su apoyo estaremos coment√°ndole de inmediato.<o:p></o:p></span></p>"
+
+					+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
+					+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'> Particular que pongo en su conocimiento. <o:p></o:p></span></p>"
+					+ "<p>Atentamente</p> " + "<p></p> " + "<p>Departamento de Siniestros</p> "
+
+					+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
+					+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'> " + " <o:p></o:p></span></p>"
+					+ "<p><strong>Nota: </strong>"
+					+ "Este mensaje ha sido generado autom√°ticamente, por favor no lo responda." + "</p> ");
+			email.sendEmail();
+
 			// cierra la pantalla de busqueda
 			PrimeFaces.current().executeScript("PF('wbuscaPoliza').hide();");
 			// abre la pantalla para el ingreso del siniestros
@@ -440,7 +531,7 @@ public class ControladorSiniestros {
 		} else {
 			FacesContext fContextObj = FacesContext.getCurrentInstance();
 			fContextObj.addMessage(null, new FacesMessage("Error",
-					"No se creÛ el Siniestros. ComunÌquese con el Administrador del Sistema"));
+					"No se cre√≥ el Siniestros. Comun√≠quese con el Administrador del Sistema"));
 			return;
 
 		}
@@ -449,22 +540,31 @@ public class ControladorSiniestros {
 
 	public void recuperaDatosSiniestro() {
 		// recupera datos coberturas, deducibles, siniestros
-		lstCoberturasPlan = new ArrayList<CoberturasPlanView>();
-		lstDeduciblesPlan = new ArrayList<PlanDeduciblesView>();
-		System.out.println("Recupera PLAN:"+selectedConsultaPoliza.getCd_plan());
-		if(selectedConsultaPoliza.getCd_plan().equals("0")){
-			lstCoberturasPlan = srvCoberturasPlan.consultaCoberturasPlanAsisMed(String.valueOf(siniestro.getCdSiniestro()),
-					selectedConsultaPoliza.getCd_aseguradora());
-			lstDeduciblesPlan = srvDeduciblesPlan.consultaDeduciblePlanAsisMed(String.valueOf(siniestro.getCdSiniestro()),
-					selectedConsultaPoliza.getCd_aseguradora());
-		}else{
-			lstCoberturasPlan = srvCoberturasPlan.consultaCoberturasPlan(selectedConsultaPoliza.getCd_plan(),
-					selectedConsultaPoliza.getCd_aseguradora());
+		lstCoberturasPlan = new ArrayList<CoberturasEmitidas>();
+		lstDeduciblesPlan = new ArrayList<DeduciblesEmitidas>();
+		lstCoberturasAdcPlan = new ArrayList<CoberturasAdicionales>();
+		System.out.println("Recupera PLAN:" + selectedConsultaPoliza.getCd_plan());
+		if (selectedConsultaPoliza.getCd_plan().equals("0")) {
+			lstCoberturasPlan = srvCoberturasPlan.recuperaCoberturasEmitidas(
+					Integer.valueOf(selectedConsultaPoliza.getCd_compania()),
+					Integer.valueOf(selectedConsultaPoliza.getCd_ramo_cotizacion()));
+			lstDeduciblesPlan = srvDeduciblesPlan.recuperaDeduciblesEmitidas(
+					Integer.valueOf(selectedConsultaPoliza.getCd_compania()),
+					Integer.valueOf(selectedConsultaPoliza.getCd_ramo_cotizacion()));
+			lstCoberturasAdcPlan = srvCoberturasAdc.recuperaCoberturasAdcSiniestros(detalleSiniestros.getCd_compania(),
+					detalleSiniestros.getCd_obj_cotizacion());
+		} else {
+			lstCoberturasPlan = srvCoberturasPlan.recuperaCoberturasEmitidas(
+					Integer.valueOf(selectedConsultaPoliza.getCd_compania()),
+					Integer.valueOf(selectedConsultaPoliza.getCd_ramo_cotizacion()));
 
-			lstDeduciblesPlan = srvDeduciblesPlan.consultaDeduciblePlan(selectedConsultaPoliza.getCd_plan(),
-					selectedConsultaPoliza.getCd_aseguradora());
+			lstDeduciblesPlan = srvDeduciblesPlan.recuperaDeduciblesEmitidas(
+					Integer.valueOf(selectedConsultaPoliza.getCd_compania()),
+					Integer.valueOf(selectedConsultaPoliza.getCd_ramo_cotizacion()));
+			lstCoberturasAdcPlan = srvCoberturasAdc.recuperaCoberturasAdcSiniestros(detalleSiniestros.getCd_compania(),
+					detalleSiniestros.getCd_obj_cotizacion());
 		}
-		
+
 		lstCoberturasSiniestro = new ArrayList<CoberturasSiniestro>();
 		lstCoberturasSiniestro = srvCoberturasSiniestro
 				.consultaCoberturasSiniestro(String.valueOf(siniestro.getCdSiniestro()));
@@ -491,44 +591,48 @@ public class ControladorSiniestros {
 		String asFechaHasta;
 		String asFechaOcurrencia;
 		String asFechaRecepcion;
+		String asFechaAutorizacion;
 		SimpleDateFormat formato;
 		String patron = "dd/MM/yyyy";
 
 		formato = new SimpleDateFormat(patron);
-		asFechaDesde = formato.format(siniestro.getFc_vig_pol_desde());
-		asFechaHasta = formato.format(siniestro.getFc_vig_pol_hasta());
-		asFechaOcurrencia = formato.format(siniestro.getFcSiniestro());
+
 		try {
 			asFechaRecepcion = formato.format(siniestro.getFechaRecepcion());
 			System.out.println("FC_RECEPCION:" + asFechaRecepcion);
+			asFechaDesde = formato.format(siniestro.getFc_vig_pol_desde());
+			asFechaHasta = formato.format(siniestro.getFc_vig_pol_hasta());
+			asFechaOcurrencia = formato.format(siniestro.getFcSiniestro());
+			asFechaAutorizacion = formato.format(siniestro.getFechaAutorizacion());
+			System.out.println("Fecha Autorizacion:" + asFechaAutorizacion);
+
+			System.out.println("FC_INI:" + asFechaDesde);
+			System.out.println("FC_FIN:" + asFechaHasta);
+			System.out.println("FC_OCURRENCIA:" + asFechaOcurrencia);
+
+			fcIni = spServicioProcedure.fechaJuliana(asFechaDesde);
+			fcFin = spServicioProcedure.fechaJuliana(asFechaHasta);
+			fcOcurrencia = spServicioProcedure.fechaJuliana(asFechaOcurrencia);
+
+			System.out.println("FC_INI JUL Vigencia:" + fcIni);
+			System.out.println("FC_FIN JUL Vigencia:" + fcFin);
+			System.out.println("FC_OCURRENCIA JUL:" + fcOcurrencia);
+			if (fcOcurrencia < fcIni) {
+				FacesContext fContextObj = FacesContext.getCurrentInstance();
+				fContextObj.addMessage(null, new FacesMessage("Error",
+						"La fecha de ocurrencia no puede ser menor a la fecha de inicio vigencia de la p√≥liza"));
+				return;
+			}
+			if (fcOcurrencia > fcFin) {
+				FacesContext fContextObj = FacesContext.getCurrentInstance();
+				fContextObj.addMessage(null, new FacesMessage("Error",
+						"La fecha de ocurrencia no puede ser mayor a la fecha de fin vigencia de la p√≥liza"));
+				return;
+			}
 		} catch (Exception e) {
-			// TODO: handle exception
-		}
-
-		// asFechaAutorizacion =
-		// formato.format(siniestro.getFechaAutorizacion());
-
-		System.out.println("FC_INI:" + asFechaDesde);
-		System.out.println("FC_FIN:" + asFechaHasta);
-		System.out.println("FC_OCURRENCIA:" + asFechaOcurrencia);
-
-		fcIni = spServicioProcedure.fechaJuliana(asFechaDesde);
-		fcFin = spServicioProcedure.fechaJuliana(asFechaHasta);
-		fcOcurrencia = spServicioProcedure.fechaJuliana(asFechaOcurrencia);
-
-		System.out.println("FC_INI JUL Vigencia:" + fcIni);
-		System.out.println("FC_FIN JUL Vigencia:" + fcFin);
-		System.out.println("FC_OCURRENCIA JUL:" + fcOcurrencia);
-		if (fcOcurrencia < fcIni) {
 			FacesContext fContextObj = FacesContext.getCurrentInstance();
 			fContextObj.addMessage(null, new FacesMessage("Error",
-					"La fecha de ocurrencia no puede ser menor a la fecha de inicio vigencia de la pÛliza"));
-			return;
-		}
-		if (fcOcurrencia > fcFin) {
-			FacesContext fContextObj = FacesContext.getCurrentInstance();
-			fContextObj.addMessage(null, new FacesMessage("Error",
-					"La fecha de ocurrencia no puede ser mayor a la fecha de fin vigencia de la pÛliza"));
+					"Ingrese todos los registros del siniestro, en caso de no tener la informaci√≤n escriba 'SIN DATOS'"));
 			return;
 		}
 
@@ -550,21 +654,31 @@ public class ControladorSiniestros {
 		}
 		siniestro.setCausa(aux.toUpperCase().trim());
 		try {
-			siniestro.setCd_ciudad(Integer.valueOf(cdCiudad));
-			siniestro.setNm_ciudad(srvCiudad.recuperaCiudad(cdCiudad).getNm_ciudad());
+//			siniestro.setCd_ciudad(Integer.valueOf(cdCiudad));
+//			siniestro.setNm_ciudad(srvCiudad.recuperaCiudad(cdCiudad).getNm_ciudad());
+			System.out.println("Provincia:" + cdProvincia);
+			System.out.println("Canton:" + cdCanton);
+			System.out.println("Parroquia:" + cdParroquia);
+			siniestro.setCd_provincia(Integer.valueOf(cdProvincia));
+			siniestro.setCd_canton(Integer.valueOf(cdCanton));
+			siniestro.setCd_parroquia(Integer.valueOf(cdParroquia));
 		} catch (Exception e) {
 			FacesContext fContextObj = FacesContext.getCurrentInstance();
-			fContextObj.addMessage(null, new FacesMessage("Error", "Ingrese la Ciudad de Ocurrencia del Siniestro"));
+			fContextObj.addMessage(null,
+					new FacesMessage("Error", "Ingrese la Provincia, Cant√≥n, Parroquia de Ocurrencia del Siniestro"));
+			return;
 		}
 		try {
 			srvSiniestros.actualizaSiniestros(siniestro);
 		} catch (Exception e) {
 			FacesContext fContextObj = FacesContext.getCurrentInstance();
-			fContextObj.addMessage(null, new FacesMessage("Error", "ComunÌquese con el Administrador del Sistema"));
+			fContextObj.addMessage(null, new FacesMessage("Error",
+					"Ingrese todos los registros del siniestro, en caso de no tener la informaci√≤n escriba 'SIN DATOS'"));
+			return;
 		}
 
 		FacesContext fContextObj = FacesContext.getCurrentInstance();
-		fContextObj.addMessage(null, new FacesMessage("Advertencia", "ActualizaciÛn Exitosa"));
+		fContextObj.addMessage(null, new FacesMessage("Advertencia", "Actualizaci√≥n Exitosa"));
 
 	}
 
@@ -595,7 +709,41 @@ public class ControladorSiniestros {
 		res = srvCoberturasSiniestro.insertarCoberturasSiniestro(aux);
 		if (res == 0) {
 			FacesContext fContextObj = FacesContext.getCurrentInstance();
-			fContextObj.addMessage(null, new FacesMessage("Advertencia", "ActualizaciÛn Exitosa"));
+			fContextObj.addMessage(null, new FacesMessage("Advertencia", "Actualizaci√≥n Exitosa"));
+		}
+		lstCoberturasSiniestro = new ArrayList<CoberturasSiniestro>();
+		lstCoberturasSiniestro = srvCoberturasSiniestro
+				.consultaCoberturasSiniestro(String.valueOf(siniestro.getCdSiniestro()));
+	}
+
+	public void agregaCoberturaAdcSiniestro() {
+		int res = 0;
+		try {
+			if (selectedCoberturasAdcPlan == null) {
+				return;
+			}
+		} catch (Exception e) {
+			return;
+		}
+
+		CoberturasSiniestro aux = new CoberturasSiniestro();
+		aux.setCd_cobertura(Integer.valueOf(selectedCoberturasAdcPlan.getCd_cobertura()));
+		aux.setCd_compania(Integer.valueOf(siniestro.getCdCompania()));
+		aux.setCd_obj_cotizacion(detalleSiniestros.getCd_obj_cotizacion());
+		aux.setCd_ramo_cotizacion(siniestro.getCdRamoCotizacion());
+		aux.setCd_siniestro(siniestro.getCdSiniestro());
+		aux.setNm_cobertura(selectedCoberturasAdcPlan.getDescCobertura());
+		aux.setPct_v_aseg(0.0);
+		aux.setVal_minimo(0.0);
+		try {
+			aux.setVal_limite(Double.valueOf(selectedCoberturasAdcPlan.getVal_limite()));
+		} catch (Exception e) {
+			aux.setVal_limite(0.0);
+		}
+		res = srvCoberturasSiniestro.insertarCoberturasSiniestro(aux);
+		if (res == 0) {
+			FacesContext fContextObj = FacesContext.getCurrentInstance();
+			fContextObj.addMessage(null, new FacesMessage("Advertencia", "Actualizaci√≥n Exitosa"));
 		}
 		lstCoberturasSiniestro = new ArrayList<CoberturasSiniestro>();
 		lstCoberturasSiniestro = srvCoberturasSiniestro
@@ -620,7 +768,7 @@ public class ControladorSiniestros {
 		res = srvDiagnosticoReclamo.insertarDiagnosticoReclamo(aux);
 		if (res == 0) {
 			FacesContext fContextObj = FacesContext.getCurrentInstance();
-			fContextObj.addMessage(null, new FacesMessage("Advertencia", "ActualizaciÛn Exitosa"));
+			fContextObj.addMessage(null, new FacesMessage("Advertencia", "Actualizaci√≥n Exitosa"));
 		}
 		lstDiagnosticoReclamo = new ArrayList<DiagnosticoReclamo>();
 		lstDiagnosticoReclamo = srvDiagnosticoReclamo
@@ -651,10 +799,11 @@ public class ControladorSiniestros {
 		aux.setVal_fijo(selectedDeduciblesPlan.getValor_fijo());
 		aux.setPorcentaje_valor_siniestro(selectedDeduciblesPlan.getPorcentaje_valor_siniestro());
 		aux.setPorcentaje_valor_asegurado(selectedDeduciblesPlan.getPorcentaje_valor_asegurado());
+		aux.setEspecificacionDeducible(selectedDeduciblesPlan.getEspecificacion());
 		res = srvCoberturasSiniestro.insertarCoberturasSiniestro(aux);
 		if (res == 0) {
 			FacesContext fContextObj = FacesContext.getCurrentInstance();
-			fContextObj.addMessage(null, new FacesMessage("Advertencia", "ActualizaciÛn Exitosa"));
+			fContextObj.addMessage(null, new FacesMessage("Advertencia", "Actualizaci√≥n Exitosa"));
 		}
 		lstCoberturasSiniestro = new ArrayList<CoberturasSiniestro>();
 		lstCoberturasSiniestro = srvCoberturasSiniestro
@@ -705,7 +854,7 @@ public class ControladorSiniestros {
 			if (res == 0) {
 				FacesContext fContextObj = FacesContext.getCurrentInstance();
 				fContextObj.addMessage(null,
-						new FacesMessage("Error Documentos Siniesto", "ComunÌquese con el Administrador del Sistema"));
+						new FacesMessage("Error Documentos Siniesto", "Comun√≠quese con el Administrador del Sistema"));
 				break;
 			}
 			documentosSiniestro = new DocumentoSiniestro();
@@ -723,6 +872,9 @@ public class ControladorSiniestros {
 	}
 
 	public void guardaDocAdc() {
+		System.out.println("docAdcSiniestro:"+docAdcSiniestro);
+		System.out.println("siniestro.getCdCompania()"+siniestro.getCdCompania());
+		System.out.println("siniestro.getCdSiniestro()"+siniestro.getCdSiniestro());
 		Integer res;
 		documentosSiniestro = new DocumentoSiniestro();
 		documentosSiniestro.setCd_compania(siniestro.getCdCompania());
@@ -733,7 +885,7 @@ public class ControladorSiniestros {
 		if (res == 0) {
 			FacesContext fContextObj = FacesContext.getCurrentInstance();
 			fContextObj.addMessage(null,
-					new FacesMessage("Error Documentos Siniesto", "ComunÌquese con el Administrador del Sistema"));
+					new FacesMessage("Error Documentos Siniesto", "Comun√≠quese con el Administrador del Sistema"));
 			return;
 		}
 		documentosSiniestro = new DocumentoSiniestro();
@@ -761,7 +913,145 @@ public class ControladorSiniestros {
 				.consultaDocumentosSiniestro(String.valueOf(siniestro.getCdSiniestro()));
 	}
 
-	public void onRowEditDocSinies(RowEditEvent event) {
+	public void enviaCorreoCliente() {
+		String correElecString = null;
+		;
+		try {
+			correElecString = siniestro.getCorreo();
+			if (correElecString.isEmpty() || correElecString == null) {
+				FacesContext fContextObj = FacesContext.getCurrentInstance();
+				fContextObj.addMessage(null,
+						new FacesMessage("Error", "Ingrese y Guarde el correo electr√≥nico del cliente "));
+				return;
+
+			}
+		} catch (Exception e) {
+			FacesContext fContextObj = FacesContext.getCurrentInstance();
+			fContextObj.addMessage(null,
+					new FacesMessage("Error", "Ingrese y Guarde  el correo electr√≥nico del cliente "));
+			return;
+		}
+
+		// Documentos Pendiente
+		String docuString = "";
+		Date fcReciBrk;
+
+		for (DocumentoSiniestro docuSel : lstDocumentosSiniestro) {
+			Boolean flagBoolean = false;
+
+			try {
+				fcReciBrk = docuSel.getFc_recibo_brk();
+				if (fcReciBrk == null) {
+					flagBoolean = true;
+				}
+			} catch (Exception e) {
+				flagBoolean = true;
+			}
+			if (flagBoolean) {
+				docuString = docuString + "<tr style='mso-yfti-irow:1'><td style='padding:.75pt .75pt .75pt .75pt'>"
+						+ "<p class=MsoNormal><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
+						+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:"
+						+ "Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
+						+ "mso-bidi-theme-font:minor-latin'>" + docuSel.getTp_doc_siniestro()
+						+ "<o:p></o:p></span></p></td></tr>";
+				DocumentoSiniestro aux = new DocumentoSiniestro();
+				aux = docuSel;
+				aux.setFc_rec_cli_correo(new Date());
+				srvDocumentosSiniestro.actualizaDocumentoSiniestro(aux);
+			}
+		}
+
+		email.setReceptor(correElecString);
+		email.setSubject("SOLICITUD DE DOCUMENTOS");
+		email.setTexto("<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
+				+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Estimad@ Sr./Sra. "
+				+ siniestro.getNm_cliente() + "<o:p></o:p></span></p>"
+				+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
+				+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Lamentamos mucho lo suscitado;"
+				+ " <o:p></o:p></span></p>"
+				+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
+				+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Por medio del presente, CONF√çA Tu Asesor Productor de Seguros solicita los "
+				+ "siguientes documentos que son fundamentales para continuar con el proceso de su siniestro:"
+				+ " <o:p></o:p></span></p>"
+
+				+ "<table class=MsoNormalTable border=0 cellpadding=0 width=600 style='width:450.0pt; mso-cellspacing:1.5pt;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt'>"
+
+				+ "<tr style='mso-yfti-irow:1'>"
+				+ "<td width=250 style='width:187.5pt;padding:.75pt .75pt .75pt .75pt'>"
+				+ "<p class=MsoNormal><b><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
+				+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:"
+				+ "Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
+				+ "mso-bidi-theme-font:minor-latin'>Documentos:</span></b><span style='mso-ascii-font-family:"
+				+ "Calibri;mso-ascii-theme-font:minor-latin;mso-fareast-font-family:Times New Roman;"
+				+ "mso-hansi-font-family:Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:"
+				+ "Calibri;mso-bidi-theme-font:minor-latin'><o:p></o:p></span></p>" + "</td></tr>" + docuString
+				+ "</table>"
+
+				+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
+				+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Por favor enviar la documentaci√≥n al siguiente correo: "
+				+ "vgualpa@grupoconfia.com<o:p></o:p></span></p>"
+
+				+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
+				+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Si necesita m√°s informaci√≥n comun√≠quese al siguiente contacto:<o:p></o:p></span></p>"
+				+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
+				+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>0994525315<o:p></o:p></span></p>"
+				+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
+				+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Ejecutiva de Siniestros:<o:p></o:p></span></p>"
+				+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
+				+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Viviana Gualpa<o:p></o:p></span></p>"
+
+				+ "<p></p>" + "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
+				+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Tambi√©n nos puede visitar en nuestras oficinas ubicadas en Ambato- Av. Los"
+				+ " Guaytambos y Juan Montalvo. Sector Ficoa, diagonal al Supermaxi.<o:p></o:p></span></p>"
+
+				+ "<p></p>" + "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
+				+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Estaremos gustosos de servirle<o:p></o:p></span></p>"
+
+				+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
+				+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'> " + " <o:p></o:p></span></p>"
+				+ "<p><strong>Nota: </strong>"
+				+ "Este mensaje ha sido generado autom√°ticamente, por favor no lo responda." + "</p> ");
+		email.sendEmail();
+
+		FacesContext fContextObj = FacesContext.getCurrentInstance();
+		fContextObj.addMessage(null, new FacesMessage("Advertencia", "Env√≠o Exitoso"));
+
+	}
+
+	public void actualizaFechasDocu() {
+		System.out.println("INGRESO A EDITAR");
+		try {
+			if (selectedDocumentoSiniestro.getCd_doc_siniestro() == null) {
+				FacesContext fContextObj = FacesContext.getCurrentInstance();
+				fContextObj.addMessage(null, new FacesMessage("Error", "Selecciones un Documento antes de Eliminar"));
+				return;
+			}
+		} catch (Exception e) {
+			return;
+		}
+		DocumentoSiniestro aux = new DocumentoSiniestro();
+		aux = selectedDocumentoSiniestro;
+
+		if (selectedTipoFechaString.equals("RECIBEBRK")) {
+			aux.setFc_recibo_brk(fechaSelectDate);
+		}
+		if (selectedTipoFechaString.equals("ENVIAASEG")) {
+			aux.setFc_envio_aseg(fechaSelectDate);
+		}
+		if (selectedTipoFechaString.equals("ENVIACLIE")) {
+			aux.setFc_rec_cli_correo(fechaSelectDate);
+		}
+		if (selectedTipoFechaString.equals("RECORCLIE")) {
+			aux.setFc_recuerda_cli(fechaSelectDate);
+			;
+		}
+
+		srvDocumentosSiniestro.actualizaDocumentoSiniestro(aux);
+
+	}
+
+	public void onRowEditDocSinies(RowEditEvent<DocumentoSiniestro> event) {
+		System.out.println("INGRESO");
 		String obs = null;
 		DocumentoSiniestro aux = new DocumentoSiniestro();
 		aux = ((DocumentoSiniestro) event.getObject());
@@ -781,7 +1071,7 @@ public class ControladorSiniestros {
 				&& diagnosticoSlm.equals("0")) {
 			FacesContext msg = FacesContext.getCurrentInstance();
 			msg.addMessage(null,
-					new FacesMessage("Advertencia", "Ingrese la DescripciÛn del Proveedor o Eleccione el Tealler"));
+					new FacesMessage("Advertencia", "Ingrese la Descripci√≥n del Proveedor o Eleccione el Tealler"));
 			return;
 		}
 
@@ -805,7 +1095,7 @@ public class ControladorSiniestros {
 		if (res == 0) {
 			FacesContext msg = FacesContext.getCurrentInstance();
 			msg.addMessage(null,
-					new FacesMessage("Error Ingreso Proforma", "ComunÌquese con el Administrador del Sistema"));
+					new FacesMessage("Error Ingreso Proforma", "Comun√≠quese con el Administrador del Sistema"));
 			return;
 		} else {
 			lstProformaSinies = new ArrayList<ProformaSiniestro>();
@@ -857,7 +1147,7 @@ public class ControladorSiniestros {
 		if (res == 0) {
 			FacesContext msg = FacesContext.getCurrentInstance();
 			msg.addMessage(null,
-					new FacesMessage("Error LiquidaciÛn Siniestro", "ComunÌquese con el Administrador del Sistema"));
+					new FacesMessage("Error Liquidaci√≥n Siniestro", "Comun√≠quese con el Administrador del Sistema"));
 			return;
 		}
 
@@ -865,12 +1155,14 @@ public class ControladorSiniestros {
 		res = srvReservas.codigoMaxReserva();
 		reservas = srvReservas.recuperaReserva(res, siniestro.getCdCompania());
 		pagoSiniesttro.setCd_reserva(reservas.getCd_reserva());
+		obsSinies = "";
 //		RequestContext rContextObj = RequestContext.getCurrentInstance();
 //		rContextObj.execute("PF('wDlgLiquidaSiniestro').show();");
 		PrimeFaces.current().executeScript("PF('wDlgLiquidaSiniestro').show();");
 	}
 
 	public void editaLiquidacion() {
+		
 		Double totalValorProforma = 0.0;
 		int res = 0;
 		finiq = true;
@@ -900,7 +1192,7 @@ public class ControladorSiniestros {
 		if (res == 0) {
 			FacesContext msg = FacesContext.getCurrentInstance();
 			msg.addMessage(null,
-					new FacesMessage("Error LiquidaciÛn Siniestro", "ComunÌquese con el Administrador del Sistema"));
+					new FacesMessage("Error Liquidaci√≥n Siniestro", "Comun√≠quese con el Administrador del Sistema"));
 			return;
 		}
 
@@ -976,12 +1268,12 @@ public class ControladorSiniestros {
 		if (res == 0) {
 			FacesContext msg = FacesContext.getCurrentInstance();
 			msg.addMessage(null,
-					new FacesMessage("Error LiquidaciÛn Siniestro", "ComunÌquese con el Administrador del Sistema"));
+					new FacesMessage("Error Liquidaci√≥n Siniestro", "Comun√≠quese con el Administrador del Sistema"));
 			return;
 		}
 		lstReservas = new ArrayList<Reservas>();
 		lstReservas = srvReservas.recuperaReservasSinies(siniestro.getCdSiniestro(), siniestro.getCdCompania());
-		// aÒade la COMISON DE LA RASA SI ESTA EXISTE
+		// aÔøΩade la COMISON DE LA RASA SI ESTA EXISTE
 		if (reservas.getVal_rasa() > 0) {
 			ComisionesPoliza comPol = new ComisionesPoliza();
 			String aux = "RASA - No. Siniestro: ";
@@ -1005,10 +1297,18 @@ public class ControladorSiniestros {
 		} else {
 			siniestro.setBloqueo(1);
 		}
-
+		try {
+			if (obsSinies == null || obsSinies.equals("")) {
+				obsSinies = "S/D";
+			}
+		} catch (Exception e) {
+			obsSinies = "S/D";
+		}
+		siniestro.setObservacion_atencion(obsSinies);
+		siniestro.setCalifica_atencion(calificaSin);
 		srvSiniestros.actualizaSiniestros(siniestro);
 		// en caso de que sea poliza mensualizada
-		// verifica el pago pendiente del aÒo en vigencia
+		// verifica el pago pendiente del aÔøΩo en vigencia
 		Integer resPolMen = 0;
 		Siniestros sinAux = new Siniestros();
 		sinAux = srvSiniestros.recuperaCodSiniestros(pagoSiniesttro.getCd_siniestro());
@@ -1042,22 +1342,21 @@ public class ControladorSiniestros {
 			pagoSiniesttro.setFiniquito(1);
 		}
 		pagoSiniesttro.setFc_estado_siniestro(fcEstadoSiniestro);
-		
+
 		srvReservas.actualizaReservasSiniestros(reservas);
 		lstReservas = new ArrayList<Reservas>();
 		lstReservas = srvReservas.recuperaReservasSinies(siniestro.getCdSiniestro(), siniestro.getCdSiniestro());
-		
-		
+
 		res = srvPagoSiniestro.insertarPagoSiniestro(pagoSiniesttro);
 		if (res == 0) {
 			FacesContext msg = FacesContext.getCurrentInstance();
 			msg.addMessage(null,
-					new FacesMessage("Error LiquidaciÛn Siniestro", "ComunÌquese con el Administrador del Sistema"));
+					new FacesMessage("Error Liquidaci√≥n Siniestro", "Comun√≠quese con el Administrador del Sistema"));
 			return;
 		}
 		lstReservas = new ArrayList<Reservas>();
 		lstReservas = srvReservas.recuperaReservasSinies(siniestro.getCdSiniestro(), siniestro.getCdCompania());
-		// aÒade la COMISON DE LA RASA SI ESTA EXISTE
+		// aÔøΩade la COMISON DE LA RASA SI ESTA EXISTE
 		if (reservas.getVal_rasa() > 0) {
 			ComisionesPoliza comPol = new ComisionesPoliza();
 			String aux = "RASA - No. Siniestro: ";
@@ -1081,10 +1380,19 @@ public class ControladorSiniestros {
 		} else {
 			siniestro.setBloqueo(1);
 		}
+		try {
+			if (obsSinies == null || obsSinies.equals("")) {
+				obsSinies = "S/D";
+			}
+		} catch (Exception e) {
+			obsSinies = "S/D";
+		}
+		siniestro.setObservacion_atencion(obsSinies);
+		siniestro.setCalifica_atencion(calificaSin);
 		srvSiniestros.actualizaSiniestros(siniestro);
 
 		// en caso de que sea poliza mensualizada
-		// verifica el pago pendiente del aÒo en vigencia
+		// verifica el pago pendiente del aÔøΩo en vigencia
 		Integer resPolMen = 0;
 		Siniestros sinAux = new Siniestros();
 		sinAux = srvSiniestros.recuperaCodSiniestros(siniestro.getCdSiniestro());
@@ -1234,40 +1542,71 @@ public class ControladorSiniestros {
 
 		siniestro = new Siniestros();
 		detalleSiniestros = new DetalleSiniestros();
-		cdCiudad = String.valueOf(siniestro.getCd_ciudad());
+		try {
+			cdCiudad = String.valueOf(siniestro.getCd_ciudad());
+		} catch (Exception e) {
+			cdCiudad = "0";
+		}
+
+		try {
+			cdProvincia = String.valueOf(siniestro.getCd_provincia());
+		} catch (Exception e) {
+			cdProvincia = "0";
+		}
+		try {
+			cdCanton = String.valueOf(siniestro.getCd_canton());
+		} catch (Exception e) {
+			cdCanton = "0";
+		}
+		try {
+			cdParroquia = String.valueOf(siniestro.getCd_parroquia());
+		} catch (Exception e) {
+			cdParroquia = "0";
+		}
+
 		siniestro = srvSiniestros.recuperaCodSiniestros(selectedSiniestro.getCdSiniestro());
+		grupoContratante = new GrupoContratante();
+		grupoContratante = srvGrupoContratante.buscaGruposContratanteCrC(siniestro.getCdRamoCotizacion());
+		plan = new Plan();
+		plan = srvPlan.consultaPlanRamoCotizacion(siniestro.getCdRamoCotizacion());
 		detalleSiniestros = srvDetalleSiniestros.recuperaDetSiniestrosxCdSini(siniestro.getCdSiniestro(),
 				siniestro.getCdCompania());
 		LstCaracteristicasCab = new ArrayList<CaracteristicasVehiculos>();
-		LstCaracteristicasCab = srvCaracteristicaObj.recuperaCaractVHporObjCot(detalleSiniestros.getCd_obj_cotizacion(), detalleSiniestros.getCd_compania());
-		if(LstCaracteristicasCab.size() == 0){
+		LstCaracteristicasCab = srvCaracteristicaObj.recuperaCaractVHporObjCot(detalleSiniestros.getCd_obj_cotizacion(),
+				detalleSiniestros.getCd_compania());
+		if (LstCaracteristicasCab.size() == 0) {
 			panelCaracteristica = true;
 		}
-		System.out.println("INGRESO CARACTERISTICAS DEL VEHICULO INGRESADO:"+LstCaracteristicasCab.size());
-		System.out.println("OBJETO COTIZACION:"+detalleSiniestros.getCd_obj_cotizacion());
+		System.out.println("INGRESO CARACTERISTICAS DEL VEHICULO INGRESADO:" + LstCaracteristicasCab.size());
+		System.out.println("OBJETO COTIZACION:" + detalleSiniestros.getCd_obj_cotizacion());
 		System.out.println("*********************************************************************+");
-		
+
 		// recupera diagnostico
 		lstDiagnosticoReclamo = new ArrayList<DiagnosticoReclamo>();
 		lstDiagnosticoReclamo = srvDiagnosticoReclamo
 				.consultaDiagnosticoReclamo(String.valueOf(siniestro.getCdSiniestro()));
 		// recupera datos coberturas, deducibles, siniestros
-		lstCoberturasPlan = new ArrayList<CoberturasPlanView>();
-		lstDeduciblesPlan = new ArrayList<PlanDeduciblesView>();
-		lstCoberturasPlan = srvCoberturasPlan
-				.consultaCoberturasPlanCrc(String.valueOf(siniestro.getCdRamoCotizacion()));
-		lstDeduciblesPlan = srvDeduciblesPlan.consultaDeduciblePlanCrc(String.valueOf(siniestro.getCdRamoCotizacion()));
-		
-		if (lstCoberturasPlan.size()== 0){
-			lstCoberturasPlan = new ArrayList<CoberturasPlanView>();
-			lstDeduciblesPlan = new ArrayList<PlanDeduciblesView>();
-			lstCoberturasPlan = srvCoberturasPlan.consultaCoberturasPlanAsisMed(String.valueOf(siniestro.getCdSiniestro()),
-					String.valueOf(siniestro.getCdAseguradora()));
-			lstDeduciblesPlan = srvDeduciblesPlan.consultaDeduciblePlanAsisMed(String.valueOf(siniestro.getCdSiniestro()),
-					String.valueOf(siniestro.getCdAseguradora()));
+		lstCoberturasPlan = new ArrayList<CoberturasEmitidas>();
+		lstDeduciblesPlan = new ArrayList<DeduciblesEmitidas>();
+		lstCoberturasAdcPlan = new ArrayList<CoberturasAdicionales>();
+		lstCoberturasPlan = srvCoberturasPlan.recuperaCoberturasEmitidas(Integer.valueOf(siniestro.getCdCompania()),
+				Integer.valueOf(siniestro.getCdRamoCotizacion()));
+		lstDeduciblesPlan = srvDeduciblesPlan.recuperaDeduciblesEmitidas(Integer.valueOf(siniestro.getCdCompania()),
+				Integer.valueOf(siniestro.getCdRamoCotizacion()));
+		lstCoberturasAdcPlan = srvCoberturasAdc.recuperaCoberturasAdcSiniestros(detalleSiniestros.getCd_compania(),
+				detalleSiniestros.getCd_obj_cotizacion());
+
+		if (lstCoberturasPlan.size() == 0) {
+			lstCoberturasPlan = new ArrayList<CoberturasEmitidas>();
+			lstDeduciblesPlan = new ArrayList<DeduciblesEmitidas>();
+			lstCoberturasPlan = srvCoberturasPlan.recuperaCoberturasEmitidas(Integer.valueOf(siniestro.getCdCompania()),
+					Integer.valueOf(siniestro.getCdRamoCotizacion()));
+			lstDeduciblesPlan = srvDeduciblesPlan.recuperaDeduciblesEmitidas(Integer.valueOf(siniestro.getCdCompania()),
+					Integer.valueOf(siniestro.getCdRamoCotizacion()));
+			lstCoberturasAdcPlan = srvCoberturasAdc.recuperaCoberturasAdcSiniestros(detalleSiniestros.getCd_compania(),
+					detalleSiniestros.getCd_obj_cotizacion());
 		}
 
-		
 		lstCoberturasSiniestro = new ArrayList<CoberturasSiniestro>();
 		lstCoberturasSiniestro = srvCoberturasSiniestro
 				.consultaCoberturasSiniestro(String.valueOf(siniestro.getCdSiniestro()));
@@ -1307,7 +1646,7 @@ public class ControladorSiniestros {
 			flgEdita = false;
 			FacesContext fContextObj = FacesContext.getCurrentInstance();
 			fContextObj.addMessage(null, new FacesMessage("Advertencia",
-					"No tiene permisos para ejecutar este proceso o su contraseÒa es incorrecta."));
+					"No tiene permisos para ejecutar este proceso o su contrase√±a es incorrecta."));
 			return;
 		} else {
 			flgEdita = true;
@@ -1371,8 +1710,18 @@ public class ControladorSiniestros {
 		srvCorrespondencia.insertarCorrespondencia(carta);
 		numeroCarta = srvCorrespondencia.numCartaMax(String.valueOf(usr.getUsrid()));
 		FacesContext contextMsj = FacesContext.getCurrentInstance();
-		contextMsj.addMessage(null, new FacesMessage("Registro Exitoso", "Se GenerÛ el Documento N˙mero " + numeroCarta
-				+ ". Ingrese al MÛdulo de Correspondecia para Imprimirlo"));
+		contextMsj.addMessage(null, new FacesMessage("Registro Exitoso", "Se Gener√≥ el Documento N√∫mero " + numeroCarta
+				+ ". Ingrese al M√≥dulo de Correspondecia para Imprimirlo"));
+	}
+
+	public void recuperaCanton() {
+		lstCanton = new ArrayList<Canton>();
+		lstCanton = srvCanton.listaCantones(cdProvincia);
+	}
+
+	public void recuperaParroquia() {
+		lstParroquias = new ArrayList<Parroquia>();
+		lstParroquias = srvParroquia.listaParroquia(cdCanton);
 	}
 
 	public Contacto getSelectedContactoCarta() {
@@ -1495,19 +1844,19 @@ public class ControladorSiniestros {
 		this.siniestro = siniestro;
 	}
 
-	public List<CoberturasPlanView> getLstCoberturasPlan() {
+	public List<CoberturasEmitidas> getLstCoberturasPlan() {
 		return lstCoberturasPlan;
 	}
 
-	public void setLstCoberturasPlan(List<CoberturasPlanView> lstCoberturasPlan) {
+	public void setLstCoberturasPlan(List<CoberturasEmitidas> lstCoberturasPlan) {
 		this.lstCoberturasPlan = lstCoberturasPlan;
 	}
 
-	public List<PlanDeduciblesView> getLstDeduciblesPlan() {
+	public List<DeduciblesEmitidas> getLstDeduciblesPlan() {
 		return lstDeduciblesPlan;
 	}
 
-	public void setLstDeduciblesPlan(List<PlanDeduciblesView> lstDeduciblesPlan) {
+	public void setLstDeduciblesPlan(List<DeduciblesEmitidas> lstDeduciblesPlan) {
 		this.lstDeduciblesPlan = lstDeduciblesPlan;
 	}
 
@@ -1519,19 +1868,19 @@ public class ControladorSiniestros {
 		this.lstCoberturasSiniestro = lstCoberturasSiniestro;
 	}
 
-	public CoberturasPlanView getSelectedCoberturasPlan() {
+	public CoberturasEmitidas getSelectedCoberturasPlan() {
 		return selectedCoberturasPlan;
 	}
 
-	public void setSelectedCoberturasPlan(CoberturasPlanView selectedCoberturasPlan) {
+	public void setSelectedCoberturasPlan(CoberturasEmitidas selectedCoberturasPlan) {
 		this.selectedCoberturasPlan = selectedCoberturasPlan;
 	}
 
-	public PlanDeduciblesView getSelectedDeduciblesPlan() {
+	public DeduciblesEmitidas getSelectedDeduciblesPlan() {
 		return selectedDeduciblesPlan;
 	}
 
-	public void setSelectedDeduciblesPlan(PlanDeduciblesView selectedDeduciblesPlan) {
+	public void setSelectedDeduciblesPlan(DeduciblesEmitidas selectedDeduciblesPlan) {
 		this.selectedDeduciblesPlan = selectedDeduciblesPlan;
 	}
 
@@ -1973,6 +2322,118 @@ public class ControladorSiniestros {
 
 	public void setPanelCaracteristica(Boolean panelCaracteristica) {
 		this.panelCaracteristica = panelCaracteristica;
+	}
+
+	public String getSelectedTipoFechaString() {
+		return selectedTipoFechaString;
+	}
+
+	public void setSelectedTipoFechaString(String selectedTipoFechaString) {
+		this.selectedTipoFechaString = selectedTipoFechaString;
+	}
+
+	public Date getFechaSelectDate() {
+		return fechaSelectDate;
+	}
+
+	public void setFechaSelectDate(Date fechaSelectDate) {
+		this.fechaSelectDate = fechaSelectDate;
+	}
+
+	public String getCalificaSin() {
+		return calificaSin;
+	}
+
+	public void setCalificaSin(String calificaSin) {
+		this.calificaSin = calificaSin;
+	}
+
+	public String getObsSinies() {
+		return obsSinies;
+	}
+
+	public void setObsSinies(String obsSinies) {
+		this.obsSinies = obsSinies;
+	}
+
+	public GrupoContratante getGrupoContratante() {
+		return grupoContratante;
+	}
+
+	public void setGrupoContratante(GrupoContratante grupoContratante) {
+		this.grupoContratante = grupoContratante;
+	}
+
+	public Plan getPlan() {
+		return plan;
+	}
+
+	public void setPlan(Plan plan) {
+		this.plan = plan;
+	}
+
+	public List<CoberturasAdicionales> getLstCoberturasAdcPlan() {
+		return lstCoberturasAdcPlan;
+	}
+
+	public void setLstCoberturasAdcPlan(List<CoberturasAdicionales> lstCoberturasAdcPlan) {
+		this.lstCoberturasAdcPlan = lstCoberturasAdcPlan;
+	}
+
+	public CoberturasAdicionales getSelectedCoberturasAdcPlan() {
+		return selectedCoberturasAdcPlan;
+	}
+
+	public void setSelectedCoberturasAdcPlan(CoberturasAdicionales selectedCoberturasAdcPlan) {
+		this.selectedCoberturasAdcPlan = selectedCoberturasAdcPlan;
+	}
+
+	public List<Provincias> getLstProvincia() {
+		return lstProvincia;
+	}
+
+	public void setLstProvincia(List<Provincias> lstProvincia) {
+		this.lstProvincia = lstProvincia;
+	}
+
+	public List<Canton> getLstCanton() {
+		return lstCanton;
+	}
+
+	public void setLstCanton(List<Canton> lstCanton) {
+		this.lstCanton = lstCanton;
+	}
+
+	public List<Parroquia> getLstParroquias() {
+		return lstParroquias;
+	}
+
+	public void setLstParroquias(List<Parroquia> lstParroquias) {
+		this.lstParroquias = lstParroquias;
+	}
+
+	public String getCdProvincia() {
+		return cdProvincia;
+	}
+
+	public void setCdProvincia(String cdProvincia) {
+		this.cdProvincia = cdProvincia;
+	}
+
+	public String getCdCanton() {
+		return cdCanton;
+	}
+
+	public void setCdCanton(String cdCanton) {
+		this.cdCanton = cdCanton;
+	}
+
+	public String getCdParroquia() {
+		return cdParroquia;
+	}
+
+	public void setCdParroquia(String cdParroquia) {
+		this.cdParroquia = cdParroquia;
 	}
 
 }

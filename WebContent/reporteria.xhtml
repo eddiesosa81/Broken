@@ -471,6 +471,43 @@
 						</f:facet>
 						<h:outputText value="#{report2.nm_ejecutivo}" />
 					</p:column>
+					
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Siniestralidad" />
+						</f:facet>
+						<h:outputText value="#{report2.siniestralidad}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Fecha Recepcion" />
+						</f:facet>
+						<h:outputText value="#{report2.fecha_recepcion}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Fecha Pago" />
+						</f:facet>
+						<h:outputText value="#{report2.fecha_pago}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Días Transcurridos Recepcion - Pago" />
+						</f:facet>
+						<h:outputText value="#{report2.dias_trancurridos_recep_pago}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Calificación Atención Siniestro" />
+						</f:facet>
+						<h:outputText value="#{report2.califica_atencion}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Observaciones Atención" />
+						</f:facet>
+						<h:outputText value="#{report2.observacion_atencion}" />
+					</p:column>
 
 				</p:dataTable>
 			</p:panel>

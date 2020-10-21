@@ -62,6 +62,10 @@
             <f:selectItem itemLabel="CANAL" itemValue="CANAL" />
         </p:selectOneMenu>
 	</h:panelGrid>
+	<h:panelGrid columns="4" >
+		<h:outputText value="Obs.Gestión Comercial" />
+		<p:inputTextarea rows="4" cols="72" value="#{ControladorEmision.datosCotizacion.observaciones}" id="obsGesCom" />
+	</h:panelGrid>
 	<br />
 	<!-- datos plan, aseguradora -->
 	<h:panelGrid columns="4" cellpadding="5" id="grid_emision2">
@@ -186,7 +190,8 @@
 					frm_emision:tab_emision:btnBuscaSolicitante,
 					frm_emision:tab_emision:btnInsertaSolicitante,
 					frm_emision:tab_emision:btnBuscaASegurado,
-					frm_emision:tab_emision:numRenov
+					frm_emision:tab_emision:numRenov,
+					frm_emision:tab_emision:obsGesCom
 					" />
 
 			<p:column headerText="No." visible="false">

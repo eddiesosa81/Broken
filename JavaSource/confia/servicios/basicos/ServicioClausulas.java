@@ -15,7 +15,7 @@ public class ServicioClausulas {
 	private EntityManager em;
 	
 	public List<Clausulas> consultaClausulas() {
-		String sql = "select * from clausula_tbl ";
+		String sql = "select * from clausula_tbl where estado_clausula = 'A' ";
 		System.out.println("CLAUSULAS;"+sql);
 		try {
 			Query query = em.createNativeQuery(sql, Clausulas.class);

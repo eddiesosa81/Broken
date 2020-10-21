@@ -51,6 +51,7 @@ public class ServicioConsultaPolizaView {
 		List<ConsultaPolizaView> resultado;
 		String sql = "select * from consulta_poliza_view where cd_ramo in (select cd_ramo from ramo_tbl where periodico = 1)"
 				+ " and cliente like '" + cliente + "' and poliza like '"+poliza+"' order by cd_cliente,cd_cotizacion";
+		System.out.println("SQL ->"+sql);
 		try {
 			Query query = em.createNativeQuery(sql, ConsultaPolizaView.class);
 			resultado = query.getResultList();

@@ -68,8 +68,17 @@ public class CoberturasSiniestro {
     private Double porcentaje_valor_siniestro;
     @Column(name="porcentaje_valor_asegurado")
     private Double porcentaje_valor_asegurado;
+    @Column(name="especificacion_deducible")
+	private String especificacionDeducible;
+    
 	
 	
+	public String getEspecificacionDeducible() {
+		return especificacionDeducible;
+	}
+	public void setEspecificacionDeducible(String especificacionDeducible) {
+		this.especificacionDeducible = especificacionDeducible;
+	}
 	public Integer getCd_cob_siniestro() {
 		return cd_cob_siniestro;
 	}

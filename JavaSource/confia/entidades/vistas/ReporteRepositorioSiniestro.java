@@ -85,6 +85,74 @@ public class ReporteRepositorioSiniestro {
 	public String PRIMA_NETA;
 	@Column(name="fecha_ocurrencia")
 	public String fecha_ocurrencia;
+	
+	@Column(name="SINIESTRALIDAD")
+	public String siniestralidad;
+	@Column(name="PRIMA_NETA_OBJ")
+	public String primaNetaObj;
+	@Column(name="VALOR_PAGO")
+	public String valorPago;
+	@Column(name="fecha_recepcion")
+	public String fecha_recepcion;
+	@Column(name="fecha_pago")
+	public String fecha_pago;
+	@Column(name="dias_trancurridos_recep_pago")
+	public String dias_trancurridos_recep_pago;
+	@Column(name="califica_atencion")
+	public String califica_atencion;
+	@Column(name="observacion_atencion")
+	public String observacion_atencion;
+	
+	
+	
+	public String getCalifica_atencion() {
+		return califica_atencion;
+	}
+	public void setCalifica_atencion(String califica_atencion) {
+		this.califica_atencion = califica_atencion;
+	}
+	public String getObservacion_atencion() {
+		return observacion_atencion;
+	}
+	public void setObservacion_atencion(String observacion_atencion) {
+		this.observacion_atencion = observacion_atencion;
+	}
+	public String getSiniestralidad() {
+		return siniestralidad;
+	}
+	public void setSiniestralidad(String siniestralidad) {
+		this.siniestralidad = siniestralidad;
+	}
+	public String getPrimaNetaObj() {
+		return primaNetaObj;
+	}
+	public void setPrimaNetaObj(String primaNetaObj) {
+		this.primaNetaObj = primaNetaObj;
+	}
+	public String getValorPago() {
+		return valorPago;
+	}
+	public void setValorPago(String valorPago) {
+		this.valorPago = valorPago;
+	}
+	public String getFecha_recepcion() {
+		return fecha_recepcion;
+	}
+	public void setFecha_recepcion(String fecha_recepcion) {
+		this.fecha_recepcion = fecha_recepcion;
+	}
+	public String getFecha_pago() {
+		return fecha_pago;
+	}
+	public void setFecha_pago(String fecha_pago) {
+		this.fecha_pago = fecha_pago;
+	}
+	public String getDias_trancurridos_recep_pago() {
+		return dias_trancurridos_recep_pago;
+	}
+	public void setDias_trancurridos_recep_pago(String dias_trancurridos_recep_pago) {
+		this.dias_trancurridos_recep_pago = dias_trancurridos_recep_pago;
+	}
 	public String getCodid() {
 		return codid;
 	}

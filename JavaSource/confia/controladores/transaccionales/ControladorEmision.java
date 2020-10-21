@@ -394,6 +394,7 @@ public class ControladorEmision {
 	private Double porcDedValAseg;
 	private Double valorDedMin;
 	private Double valorDedFijo;
+	private String especificacionDed;
 
 	private List<Clausulas> lstClausulas;
 	private List<Clausulas> selectedlstClausulas;
@@ -3743,10 +3744,9 @@ public class ControladorEmision {
 				ramCot.getCd_ramo_cotizacion());
 		lstDeducibleEmitida = srvDeduciblesEmitidas.recuperaDeduciblesEmitidas(ramCot.getCd_compania(),
 				ramCot.getCd_ramo_cotizacion());
+		
 		cdRamCotCobAdd = ramCot.getCd_ramo_cotizacion();
 		System.out.println("CRC COB CLA DED" + cdRamCotCobAdd);
-		// RequestContext context = RequestContext.getCurrentInstance();
-		// context.execute("PF('wvPlanesRamCot').show();");
 		PrimeFaces.current().executeScript("PF('wvPlanesRamCot').show();");
 	}
 
@@ -4545,8 +4545,8 @@ public class ControladorEmision {
 			System.out.println("DEDTMP" + dedTmp.getCd_deducible());
 			// VERIFICA SI LA COBERTURA YA SE ENCUENTRA INGRESADA
 			DeduciblesEmitidas dedAux = new DeduciblesEmitidas();
-			dedAux = srvDeduciblesEmitidas.deducibleEmitidas(1, cdRamCotCobAdd, dedTmp.getCd_deducible());
-			if (dedAux == null) {
+//			dedAux = srvDeduciblesEmitidas.deducibleEmitidas(1, cdRamCotCobAdd, dedTmp.getCd_deducible());
+//			if (dedAux == null) {
 				dedAux = new DeduciblesEmitidas();
 				dedAux.setCd_deducible(dedTmp.getCd_deducible());
 				dedAux.setCd_compania(1);
@@ -4560,8 +4560,15 @@ public class ControladorEmision {
 					dedAux.setValor_minimo(valorDedMin);
 				if (valorDedFijo != 0.0)
 					dedAux.setValor_fijo(valorDedFijo);
+				try {
+					if(especificacionDed.isEmpty() || especificacionDed == null)
+						especificacionDed = "";
+				} catch (Exception e) {
+					especificacionDed = "";
+				}
+				dedAux.setEspecificacion(especificacionDed);
 				srvDeduciblesEmitidas.insertaDeduciblesEmitidas(dedAux);
-			}
+//			}
 		}
 		lstDeducibleEmitida = new ArrayList<DeduciblesEmitidas>();
 		lstDeducibleEmitida = srvDeduciblesEmitidas.recuperaDeduciblesEmitidas(1, cdRamCotCobAdd);
@@ -6261,6 +6268,14 @@ public class ControladorEmision {
 
 	public void setUbcSelectCobAdc(Ubicacion ubcSelectCobAdc) {
 		this.ubcSelectCobAdc = ubcSelectCobAdc;
+	}
+
+	public String getEspecificacionDed() {
+		return especificacionDed;
+	}
+
+	public void setEspecificacionDed(String especificacionDed) {
+		this.especificacionDed = especificacionDed;
 	}
 
 }

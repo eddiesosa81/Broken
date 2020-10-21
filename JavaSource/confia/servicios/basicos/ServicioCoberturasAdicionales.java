@@ -14,7 +14,17 @@ public class ServicioCoberturasAdicionales {
 	@PersistenceContext
 	private EntityManager em;
 	
+	@SuppressWarnings("unchecked")
+	public List<CoberturasAdicionales> recuperaCoberturasAdcSiniestros(Integer cdCompania, Integer cdObjCot) {
+		String sql = "select * from COBERTURAS_ADICIONALES_TBL where cd_compania = "+cdCompania+" and cd_obj_cotizacion = "+ cdObjCot +
+					" union " + 
+					"select * from COBERTURAS_ADICIONALES_TBL where cd_compania = "+cdCompania+
+					" and cd_ubicacion in (select cd_ubicacion from objeto_cotizacion_tbl where cd_obj_cotizacion = "+ cdObjCot+")";
+		System.out.println("********************-----QUERY: " + sql);
+		Query q = em.createNativeQuery(sql, CoberturasAdicionales.class);
+		return q.getResultList();
 	
+	}
 	@SuppressWarnings("unchecked")
 	public List<CoberturasAdicionales> recuperaCoberturasRamoCotizacion(String cdCompania, String cdRamoCot) {
 		String sql = "SELECT * FROM COBERTURAS_ADICIONALES_TBL where cd_compania = "+cdCompania+" and cd_ramo_cotizacion = "+cdRamoCot;
@@ -23,6 +33,7 @@ public class ServicioCoberturasAdicionales {
 		return q.getResultList();
 	
 	}
+	
 	@SuppressWarnings("unchecked")
 	public List<CoberturasAdicionales> recuperaCoberturasUbicacion(Integer cdCompania, Integer cdUbc) {
 		String sql = "SELECT * FROM COBERTURAS_ADICIONALES_TBL where cd_compania = "+cdCompania+" and cd_ubicacion = "+cdUbc;

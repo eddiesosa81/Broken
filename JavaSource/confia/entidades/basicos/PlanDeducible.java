@@ -36,6 +36,10 @@ public class PlanDeducible {
 	private Double valor_minimo;
 	@Column(name="valor_fijo")
 	private Double valor_fijo;
+	@Column(name="especificacion")
+	private String especificacion;
+	
+	
 	public Integer getCd_plandeducible() {
 		return cd_plandeducible;
 	}
@@ -95,6 +99,12 @@ public class PlanDeducible {
 	}
 	public void setValor_fijo(Double valor_fijo) {
 		this.valor_fijo = valor_fijo;
+	}
+	public String getEspecificacion() {
+		return especificacion;
+	}
+	public void setEspecificacion(String especificacion) {
+		this.especificacion = especificacion;
 	}
 	
 }

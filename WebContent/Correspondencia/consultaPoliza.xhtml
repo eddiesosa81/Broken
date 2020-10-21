@@ -463,6 +463,11 @@
 						<f:convertDateTime pattern="dd/MM/yyyy" />
 					</h:outputText>
 				</p:column>
+				<p:column headerText="Observaciones">
+					<h:outputText value="#{pag.observaciones}">
+						
+					</h:outputText>
+				</p:column>
 				<p:column style="width:32px;text-align: center">
 					<p:commandButton update="@this"
 						actionListener="#{ControladorConsultaPoliza.buscarDetallePago}"

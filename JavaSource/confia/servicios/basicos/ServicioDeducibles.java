@@ -17,7 +17,7 @@ public class ServicioDeducibles {
 	
 	@SuppressWarnings("unchecked")
 	public List<Deducibles> consultaDeducibles() {
-		String sql = "select * from deducible_tbl order by desc_deducible";
+		String sql = "select * from deducible_tbl where estado_deducible = 'A' order by desc_deducible";
 		try {
 			Query query = em.createNativeQuery(sql, Deducibles.class);
 			return query.getResultList();

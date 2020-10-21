@@ -87,20 +87,53 @@
 				</p:column>
 				<f:facet name="footer">
 					<p:commandButton
-						update="@this frm_siniestros:editaSiniestro:otxtcdSini frm_siniestros:editaSiniestro:otxtcdano 
-							frm_siniestros:editaSiniestro:otxtClie frm_siniestros:editaSiniestro:otxtCedClie frm_siniestros:editaSiniestro:otxtnmAseg 
-							frm_siniestros:editaSiniestro:otxtSuba frm_siniestros:editaSiniestro:otxtPol frm_siniestros:editaSiniestro:otxtNmRamo 
-							frm_siniestros:editaSiniestro:otxtfcIni frm_siniestros:editaSiniestro:otxtfcFin frm_siniestros:editaSiniestro:otxtDscObj 
-							frm_siniestros:editaSiniestro:otxtValAsegObj frm_siniestros:editaSiniestro:otxtDeducibleMin
-							frm_siniestros:editaSiniestro:otxtDscSubObj frm_siniestros:editaSiniestro:otxtValAsegSubObj
-							frm_siniestros:editaSiniestro:tabSiniestro:inptxtNoSinies frm_siniestros:editaSiniestro:tabSiniestro:caldFcOcu 
-							 frm_siniestros:editaSiniestro:tabSiniestro:inptxtRef 
-							frm_siniestros:editaSiniestro:tabSiniestro:dtCobPol frm_siniestros:editaSiniestro:tabSiniestro:dtCobDed 
-							frm_siniestros:editaSiniestro:tabSiniestro:dtCobDedSinies frm_siniestros:editaSiniestro:tabSiniestro:dtRubDocSinies 
-							frm_siniestros:editaSiniestro:tabSiniestro:dtDocuSinies frm_siniestros:editaSiniestro:tabSiniestro:somTaller 
-							frm_siniestros:editaSiniestro:tabSiniestro:dtProformaSinies frm_siniestros:editaSiniestro:tabSiniestro:dtLiquidacion 
-							frm_siniestros:editaSiniestro:tabSiniestro:otxtNmCiudadEdit frm_siniestros:editaSiniestro:tabSiniestro:inptxtCorreoEdit 
-							frm_siniestros:editaSiniestro:tabSiniestro:caldFcRecpEdit frm_siniestros:editaSiniestro:tblCarVhCab"
+						update="@this 
+							frm_siniestros:otxtcdSiniEdt 
+							frm_siniestros:otxtcdanoEdt 
+							frm_siniestros:otxtClieEdt 
+							frm_siniestros:otxtCedClieEdt 
+							frm_siniestros:otxtnmAsegEdt 
+							frm_siniestros:otxtSubaEdt 
+							frm_siniestros:otxtPolEdt 
+							frm_siniestros:otxtNmRamoEdt 
+							frm_siniestros:otxtfcIniEdt 
+							frm_siniestros:otxtfcFinEdt 
+							frm_siniestros:otxtDscObjEdt 
+							frm_siniestros:otxtValAsegObjEdt 
+							frm_siniestros:otxtDeducibleMinEdt
+							frm_siniestros:otxtDscSubObjEdt 
+							frm_siniestros:otxtValAsegSubObjEdt
+							frm_siniestros:tabSiniestroEdt:inptxtNoSiniesEdt 
+							frm_siniestros:tabSiniestroEdt:caldFcOcuEdt 
+							frm_siniestros:tabSiniestroEdt:inptxtRefEdt 
+							frm_siniestros:tabSiniestroEdt:dtCobPol 
+							frm_siniestros:tabSiniestroEdt:dtCobAdcPol 
+							frm_siniestros:tabSiniestroEdt:dtCobDed 
+							frm_siniestros:tabSiniestroEdt:dtCobDedSinies 
+							frm_siniestros:tabSiniestroEdt:dtRubDocSinies 
+							frm_siniestros:tabSiniestroEdt:dtDocuSinies 
+							frm_siniestros:tabSiniestroEdt:somTaller 
+							frm_siniestros:tabSiniestroEdt:dtProformaSinies 
+							frm_siniestros:tabSiniestroEdt:dtLiquidacion 
+							frm_siniestros:tabSiniestroEdt:otxtNmCiudadEdit 
+							frm_siniestros:tabSiniestroEdt:otxtProvEdit 
+							frm_siniestros:tabSiniestroEdt:otxtCanEdit 
+							frm_siniestros:tabSiniestroEdt:otxtParroEdit 
+							frm_siniestros:tabSiniestroEdt:inptxtCorreoEdit 
+							frm_siniestros:tabSiniestroEdt:caldFcRecpEdit 
+							frm_siniestros:tblCarVhCabEdt 
+							frm_siniestros:otxtGContEdt 
+							frm_siniestros:otxtPlanEdt 
+							frm_siniestros:tabSiniestroEdt:inptxtConductorNmEdit 
+							frm_siniestros:tabSiniestroEdt:inptxtConductorCedEdit 
+							frm_siniestros:tabSiniestroEdt:inptxtConductorVigEdit 
+							frm_siniestros:tabSiniestroEdt:inptxtConductorLicEdit 
+							frm_siniestros:tabSiniestroEdt:inptxtConductorDirEdit 
+							frm_siniestros:tabSiniestroEdt:inptxtConductorTelfEdit 
+							frm_siniestros:tabSiniestroEdt:caldFcAutEdt
+							frm_siniestros:tabSiniestroEdt:siniesProvinciaEdt 
+							frm_siniestros:tabSiniestroEdt:siniesCantonEdt 
+							frm_siniestros:tabSiniestroEdt:siniesParroquiaEdt "
 						action="#{ControladorSiniestros.editaSiniestroExistente}"
 						value="Editar" icon="ui-icon-pencil"
 						process="@this,frm_siniestros:tbViewSinies:dtSinies">
@@ -269,17 +302,15 @@
 
 	<!-- Inicia Dialogo Liquidacion de Objeto-->
 	<p:dialog header="Registro Documento del Siniestro"
-		widgetVar="DocAdcSinies" appendTo="@(body)" modal="true"
+		widgetVar="DocAdcSinies" 
 		showEffect="fade" hideEffect="fade" resizable="false">
-		<h:form id="frmDocAdiSinies">
 			<p:inputTextarea rows="3" style="width: 100%"
 				value="#{ControladorSiniestros.docAdcSiniestro}" id="txtDocAdcSin"></p:inputTextarea>
 			<p:separator />
 			<p:commandButton value="Añadir" id="btnDocAdc"
-				update="@this frm_siniestros:editaSiniestro:tabSiniestro:dtDocuSinies frm_siniestros:ingresoSiniestro:tabSiniestro:dtDocuSinies"
+				update="@this,frm_siniestros:tabSiniestro:dtDocuSinies,frm_siniestros:tabSiniestroEdt:dtDocuSinies"
 				styleClass="ui-priority-primary" icon="ui-icon-document-b"
-				process="@this,frm_siniestros:frmDocAdiSinies:txtDocAdcSin"
+				process="@this,frm_siniestros:txtDocAdcSin"
 				action="#{ControladorSiniestros.guardaDocAdc}" />
-		</h:form>
 	</p:dialog>
 </ui:composition>

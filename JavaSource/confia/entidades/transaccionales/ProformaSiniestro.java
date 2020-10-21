@@ -40,6 +40,9 @@ public class ProformaSiniestro {
 	private Double valor_pagado;
 	@Column(name="saldo")
 	private Double saldo;
+	@Column(name="ciudad_reparacion")
+	private String ciudad_reparacion;
+	
 	public Integer getCd_proforma() {
 		return cd_proforma;
 	}
@@ -111,6 +114,12 @@ public class ProformaSiniestro {
 	}
 	public void setSaldo(Double saldo) {
 		this.saldo = saldo;
+	}
+	public String getCiudad_reparacion() {
+		return ciudad_reparacion;
+	}
+	public void setCiudad_reparacion(String ciudad_reparacion) {
+		this.ciudad_reparacion = ciudad_reparacion;
 	}
 	
 }

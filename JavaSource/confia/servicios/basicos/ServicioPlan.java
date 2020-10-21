@@ -26,6 +26,17 @@ public class ServicioPlan {
 		 return (Plan) q.getSingleResult();
 	}
 	
+	public Plan consultaPlanRamoCotizacion(Integer codRamCot)
+	{
+		String sql = "select *  from plan_tbl where cd_plan =  "
+				+ "(select distinct cd_plan from ramo_cotizacion_tbl where cd_ramo_cotizacion = " + codRamCot
+				+" )";
+		System.out.println("********************-----QUERY: " + sql);
+		 Query q = em.createNativeQuery(sql, Plan.class);
+		 return (Plan) q.getSingleResult();
+	}
+	
+	
 	@SuppressWarnings("unchecked")
 	public List<Plan> listaPlanes(String cdramo,String cdAseguradora)
 	{

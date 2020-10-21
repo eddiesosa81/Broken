@@ -83,7 +83,124 @@ public class Siniestros {
 	private Date fechaRecepcion;
 	@Column(name="caso")
 	private String caso;
+	@Column(name="califica_atencion")
+	private String califica_atencion;
+	@Column(name="observacion_atencion")
+	private String observacion_atencion;
 	
+	@Column(name="conductorNm")
+	private String conductorNm;
+	@Column(name="conductorCed")
+	private String conductorCed;
+	@Column(name="conductorVigLic")
+	private String conductorVigLic;
+	@Column(name="conductorTipoLic")
+	private String conductorTipoLic;
+	@Column(name="conductorDir")
+	private String conductorDir;
+	@Column(name="conductorTelf")
+	private String conductorTelf;
+	
+	@Column(name="cd_provincia")
+	private Integer cd_provincia;
+	@Column(name="desc_provincia")
+	private String desc_provincia;
+	@Column(name="cd_canton")
+	private Integer cd_canton;
+	@Column(name="desc_canton")
+	private String desc_canton;
+	@Column(name="cd_parroquia")
+	private Integer cd_parroquia;
+	@Column(name="desc_parroquia")
+	private String desc_parroquia;
+	
+	
+
+	
+	public Integer getCd_provincia() {
+		return cd_provincia;
+	}
+	public void setCd_provincia(Integer cd_provincia) {
+		this.cd_provincia = cd_provincia;
+	}
+	public String getDesc_provincia() {
+		return desc_provincia;
+	}
+	public void setDesc_provincia(String desc_provincia) {
+		this.desc_provincia = desc_provincia;
+	}
+	public Integer getCd_canton() {
+		return cd_canton;
+	}
+	public void setCd_canton(Integer cd_canton) {
+		this.cd_canton = cd_canton;
+	}
+	public String getDesc_canton() {
+		return desc_canton;
+	}
+	public void setDesc_canton(String desc_canton) {
+		this.desc_canton = desc_canton;
+	}
+	public Integer getCd_parroquia() {
+		return cd_parroquia;
+	}
+	public void setCd_parroquia(Integer cd_parroquia) {
+		this.cd_parroquia = cd_parroquia;
+	}
+	public String getDesc_parroquia() {
+		return desc_parroquia;
+	}
+	public void setDesc_parroquia(String desc_parroquia) {
+		this.desc_parroquia = desc_parroquia;
+	}
+	public String getConductorNm() {
+		return conductorNm;
+	}
+	public void setConductorNm(String conductorNm) {
+		this.conductorNm = conductorNm;
+	}
+	public String getConductorCed() {
+		return conductorCed;
+	}
+	public void setConductorCed(String conductorCed) {
+		this.conductorCed = conductorCed;
+	}
+	public String getConductorVigLic() {
+		return conductorVigLic;
+	}
+	public void setConductorVigLic(String conductorVigLic) {
+		this.conductorVigLic = conductorVigLic;
+	}
+	public String getConductorTipoLic() {
+		return conductorTipoLic;
+	}
+	public void setConductorTipoLic(String conductorTipoLic) {
+		this.conductorTipoLic = conductorTipoLic;
+	}
+	public String getConductorDir() {
+		return conductorDir;
+	}
+	public void setConductorDir(String conductorDir) {
+		this.conductorDir = conductorDir;
+	}
+	public String getConductorTelf() {
+		return conductorTelf;
+	}
+	public void setConductorTelf(String conductorTelf) {
+		this.conductorTelf = conductorTelf;
+	}
+	public String getCalifica_atencion() {
+		return califica_atencion;
+	}
+	public void setCalifica_atencion(String califica_atencion) {
+		this.califica_atencion = califica_atencion;
+	}
+	public String getObservacion_atencion() {
+		return observacion_atencion;
+	}
+	public void setObservacion_atencion(String observacion_atencion) {
+		this.observacion_atencion = observacion_atencion;
+	}
 	public Integer getCdSiniestro() {
 		return cdSiniestro;
 	}

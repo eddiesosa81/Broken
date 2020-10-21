@@ -2,13 +2,20 @@ package confia.entidades.basicos;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "deducibles_emitidos_tbl")
 public class DeduciblesEmitidas {
 	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO, generator = "secuencia_cd_deducible_emitido")
+	@SequenceGenerator(sequenceName = "secuencia_cd_deducible_emitido", name = "secuencia_cd_deducible_emitido", initialValue= 1, allocationSize = 1000)
+	@Column(name="cd_deducible_emitido") 
+	private Integer cd_deducible_emitido;
 	@Column(name="cd_deducible") 
 	private Integer cd_deducible;
 	@Column(name="cd_plan") 
@@ -27,6 +34,11 @@ public class DeduciblesEmitidas {
 	private Double valor_fijo;
 	@Column(name="cd_compania") 
 	private Integer cd_compania;
+	@Column(name = "especificacion")
+	private String especificacion;
+	
+	
+	
 	public Integer getCd_deducible() {
 		return cd_deducible;
 	}
@@ -80,6 +92,18 @@ public class DeduciblesEmitidas {
 	}
 	public void setCd_compania(Integer cd_compania) {
 		this.cd_compania = cd_compania;
+	}
+	public String getEspecificacion() {
+		return especificacion;
+	}
+	public void setEspecificacion(String especificacion) {
+		this.especificacion = especificacion;
+	}
+	public Integer getCd_deducible_emitido() {
+		return cd_deducible_emitido;
+	}
+	public void setCd_deducible_emitido(Integer cd_deducible_emitido) {
+		this.cd_deducible_emitido = cd_deducible_emitido;
 	}
 
 }

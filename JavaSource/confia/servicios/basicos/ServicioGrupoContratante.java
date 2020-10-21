@@ -53,4 +53,28 @@ public class ServicioGrupoContratante {
 			return null;
 		}
 	}
+	
+	public GrupoContratante buscaGruposContratanteCrC(Integer cdRamoCot)
+	{
+		GrupoContratante resultado;
+		String sql = "select * from grupo_contratante_tbl "
+				+ "where estado_grupo_contratante = 'A' and cd_grupo_contratante in ( "
+				+ " select distinct cd_grupo_contratante from ramo_cotizacion_tbl where cd_ramo_cotizacion = "+cdRamoCot
+				+" )";
+		
+		try
+		{
+			Query query = em.createNativeQuery(sql,GrupoContratante.class);
+			
+			resultado = (GrupoContratante) query.getSingleResult();
+			
+			return resultado;
+		}
+		catch(Exception ex)
+		{
+			resultado = new GrupoContratante();
+			resultado.setNombre_corto_grupo_contratante("Sin Grupo Contratante");
+			return resultado;
+		}
+	}
 }

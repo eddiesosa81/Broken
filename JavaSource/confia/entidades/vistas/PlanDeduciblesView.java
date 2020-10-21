@@ -9,6 +9,8 @@ import javax.persistence.Table;
 @Table(name = " plan_deducibles_view")
 public class PlanDeduciblesView {
 	@Id
+	@Column(name="id")
+	private String id;
 	@Column(name="cd_deducible")
 	private String cd_deducible;
 	@Column(name="cd_aseguradora")
@@ -31,6 +33,9 @@ public class PlanDeduciblesView {
 	private Double valor_minimo;
 	@Column(name="valor_fijo")
 	private Double valor_fijo;
+	@Column(name="especificacion_ded")
+	private String especificacionDed;
+	
 	public String getCd_deducible() {
 		return cd_deducible;
 	}
@@ -96,6 +101,18 @@ public class PlanDeduciblesView {
 	}
 	public void setValor_fijo(Double valor_fijo) {
 		this.valor_fijo = valor_fijo;
+	}
+	public String getEspecificacionDed() {
+		return especificacionDed;
+	}
+	public void setEspecificacionDed(String especificacionDed) {
+		this.especificacionDed = especificacionDed;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	

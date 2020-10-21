@@ -47,6 +47,8 @@
 		<class>confia.entidades.basicos.Diagnostico</class>
 		<class>confia.entidades.basicos.InclusionObjMasivaTmp</class>
 		<class>confia.entidades.basicos.Provincias</class>
+		<class>confia.entidades.basicos.Canton</class>
+		<class>confia.entidades.basicos.Parroquia</class>
 		
 		
 		

@@ -352,7 +352,7 @@ public class ControladorCotizacionComercial {
 			} catch (Exception e) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Error al Ingresar el Cliente",
-						"Comuníquese con el Administrador del sistema"));
+						"ComunÃ­quese con el Administrador del sistema"));
 				System.out.println("Error al ingresar el cliente");
 				return;
 			}
@@ -431,17 +431,17 @@ public class ControladorCotizacionComercial {
 		try {
 			if (consCed.isEmpty() || consCed == null) {
 				FacesContext context = FacesContext.getCurrentInstance();
-				context.addMessage(null, new FacesMessage("Advertencia", "Ingrese la identificación del cliente"));
+				context.addMessage(null, new FacesMessage("Advertencia", "Ingrese la identificaciÃ³n del cliente"));
 				return;
 			}
 		} catch (Exception e) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Ingrese la identificación del cliente"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Ingrese la identificaciÃ³n del cliente"));
 			return;
 		}
 
 		UploadedFile miArchivo = event.getFile();
-		long tamanio = miArchivo.getSize();// tamaño del archivo
+		long tamanio = miArchivo.getSize();// tamaï¿½o del archivo
 		byte[] contenido = miArchivo.getContent();// contenido del archivo
 		String tipoDeArchivo = miArchivo.getContentType();// que tipo de archivo
 		String nombre = miArchivo.getFileName();
@@ -453,7 +453,7 @@ public class ControladorCotizacionComercial {
 
 		System.out.println("--nombre--" + nombre);
 		System.out.println("--extension--" + extension);
-		System.out.println("-**********-------Tamaño: " + tamanio);
+		System.out.println("-**********-------Tamaï¿½o: " + tamanio);
 		System.out.println("-**********-------Contenido: " + contenido);
 		System.out.println("-********-------Tipo de Archivo: " + tipoDeArchivo);
 		String nmArchivo = getRandomImageNameFile(extension, cliente);
@@ -515,13 +515,13 @@ public class ControladorCotizacionComercial {
 			if (consCed.isEmpty() || consCed == null) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null,
-						new FacesMessage("Advertencia", "Ingrese el número de identificación del Cliente"));
+						new FacesMessage("Advertencia", "Ingrese el nÃºmero de identificaciÃ³n del Cliente"));
 				return;
 			}
 		} catch (Exception e) {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null,
-					new FacesMessage("Advertencia", "Ingrese el número de identificación del Cliente"));
+					new FacesMessage("Advertencia", "Ingrese el nÃºmero de identificaciÃ³n del Cliente"));
 			return;
 		}
 		cliente = srvClientes.listaClientesXIdentClie(consCed);
@@ -664,8 +664,8 @@ public class ControladorCotizacionComercial {
 	public void listarPlanes() {
 		Integer tpRam = 0;
 
-		// verifico configuración del ramo para el manejo del plan en la
-		// Ubicación o RamoCotizacion
+		// verifico configuraciï¿½n del ramo para el manejo del plan en la
+		// Ubicaciï¿½n o RamoCotizacion
 		tpRam = srvRamo.tipoRamo(Integer.decode(codRamo));
 		if (tpRam.equals(1)) {
 			// ramo asistencia medica no despliega plan
@@ -686,12 +686,12 @@ public class ControladorCotizacionComercial {
 		try {
 			if (consCed.isEmpty() || consCed == null) {
 				FacesContext context = FacesContext.getCurrentInstance();
-				context.addMessage(null, new FacesMessage("Advertencia", "Ingrese la identificación del cliente"));
+				context.addMessage(null, new FacesMessage("Advertencia", "Ingrese la identificaciÃ³n del cliente"));
 				return;
 			}
 		} catch (Exception e) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Ingrese la identificación del cliente"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Ingrese la identificaciÃ³n del cliente"));
 			return;
 		}
 		try {
@@ -746,14 +746,14 @@ public class ControladorCotizacionComercial {
 		// if (codGrupoEconomico.equals("0")) {
 		// FacesContext context = FacesContext.getCurrentInstance();
 		// context.addMessage(null, new FacesMessage("Advertencia", "Seleccion
-		// el Grupo Económico"));
+		// el Grupo Econï¿½mico"));
 		// return;
 		//
 		// }
 		// } catch (Exception e) {
 		// FacesContext context = FacesContext.getCurrentInstance();
 		// context.addMessage(null, new FacesMessage("Advertencia", "Seleccion
-		// el Grupo Económico"));
+		// el Grupo Econï¿½mico"));
 		// return;
 		// }
 		try {
@@ -930,7 +930,7 @@ public class ControladorCotizacionComercial {
 			} catch (Exception e) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Error al Ingresar el Cliente",
-						"Comuníquese con el Administrador del sistema"));
+						"ComunÃ­quese con el Administrador del sistema"));
 				System.out.println("Error al ingresar el cliente");
 				return;
 			}
@@ -961,7 +961,7 @@ public class ControladorCotizacionComercial {
 			}
 		}
 		System.out.println("Se cuardo datos cliente exitosamente");
-		// inserto la cotización
+		// inserto la cotizaciï¿½n
 		Integer liCompania;
 		String lsCompania = FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("COMPANIA")
 				.toString();
@@ -1014,7 +1014,7 @@ public class ControladorCotizacionComercial {
 					String.valueOf(datosCotizacion.getCd_compania()));
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null,
-					new FacesMessage("Registro Exitoso", "Se asignó la Cotización No." + numCotizacion));
+					new FacesMessage("Registro Exitoso", "Se asignÃ³ la CotizaciÃ³n No." + numCotizacion));
 		} else {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Advertencia", "Error al generar el proceso"));
@@ -1026,7 +1026,7 @@ public class ControladorCotizacionComercial {
 			archivo.setCd_cliente(String.valueOf(cliente.getCd_cliente()));
 			srvArchivos.insertaArchivos(archivo);
 		}
-		// se envía el correo al usuario seleccionado
+		// se envï¿½a el correo al usuario seleccionado
 		String nmAsegu, nmRam, nmejec;
 
 		try {
@@ -1055,7 +1055,7 @@ public class ControladorCotizacionComercial {
 		email.setTexto("<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
 				+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Estimad@<o:p></o:p></span></p>"
 				+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
-				+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Se ha generado una nueva emisión pendiente en el sistema"
+				+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Se ha generado una nueva emisiÃ³n pendiente en el sistema"
 				+ " con las siguientes referencias:" + " <o:p></o:p></span></p>"
 
 				+ "<table class=MsoNormalTable border=0 cellpadding=0 width=600 style='width:450.0pt; mso-cellspacing:1.5pt;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt'>"
@@ -1064,7 +1064,7 @@ public class ControladorCotizacionComercial {
 				+ "<p class=MsoNormal><b><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
 				+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:Calibri;"
 				+ "mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
-				+ "mso-bidi-theme-font:minor-latin'>Descripción</span></b><span "
+				+ "mso-bidi-theme-font:minor-latin'>DescripciÃ³n</span></b><span "
 				+ "style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:minor-latin;"
 				+ "mso-fareast-font-family:Times New Roman;mso-hansi-font-family:Calibri;"
 				+ "mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;mso-bidi-theme-font:"
@@ -1075,7 +1075,7 @@ public class ControladorCotizacionComercial {
 				+ "<p class=MsoNormal><b><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
 				+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:"
 				+ "Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
-				+ "mso-bidi-theme-font:minor-latin'>No. Emisión Pendiente:</span></b><span style='mso-ascii-font-family:"
+				+ "mso-bidi-theme-font:minor-latin'>No. EmisiÃ³n Pendiente:</span></b><span style='mso-ascii-font-family:"
 				+ "Calibri;mso-ascii-theme-font:minor-latin;mso-fareast-font-family:Times New Roman;"
 				+ "mso-hansi-font-family:Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:"
 				+ "Calibri;mso-bidi-theme-font:minor-latin'><o:p></o:p></span></p>" + "</td>"
@@ -1090,7 +1090,7 @@ public class ControladorCotizacionComercial {
 				+ "<p class=MsoNormal><b><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
 				+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:"
 				+ "Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
-				+ "mso-bidi-theme-font:minor-latin'>Cédula del Cliente:</span></b><span style='mso-ascii-font-family:"
+				+ "mso-bidi-theme-font:minor-latin'>CÃ©dula del Cliente:</span></b><span style='mso-ascii-font-family:"
 				+ "Calibri;mso-ascii-theme-font:minor-latin;mso-fareast-font-family:Times New Roman;"
 				+ "mso-hansi-font-family:Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:"
 				+ "Calibri;mso-bidi-theme-font:minor-latin'><o:p></o:p></span></p>" + "</td>"
@@ -1166,7 +1166,7 @@ public class ControladorCotizacionComercial {
 				+ "<p class=MsoNormal><b><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
 				+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:"
 				+ "Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
-				+ "mso-bidi-theme-font:minor-latin'>Instrucción:</span></b><span style='mso-ascii-font-family:"
+				+ "mso-bidi-theme-font:minor-latin'>InstrucciÃ³n:</span></b><span style='mso-ascii-font-family:"
 				+ "Calibri;mso-ascii-theme-font:minor-latin;mso-fareast-font-family:Times New Roman;"
 				+ "mso-hansi-font-family:Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:"
 				+ "Calibri;mso-bidi-theme-font:minor-latin'><o:p></o:p></span></p>" + "</td>"
@@ -1179,7 +1179,7 @@ public class ControladorCotizacionComercial {
 				+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
 				+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'> " + " <o:p></o:p></span></p>"
 				+ "<p><strong>Nota: </strong>"
-				+ "Este mensaje ha sido generado automáticamente, por favor no lo responda." + "</p> ");
+				+ "Este mensaje ha sido generado automÃ¡ticamente, por favor no lo responda." + "</p> ");
 		email.sendEmail();
 
 		cliente = new Clientes();
@@ -1205,12 +1205,12 @@ public class ControladorCotizacionComercial {
 		try {
 			if (consCed.isEmpty() || consCed == null) {
 				FacesContext context = FacesContext.getCurrentInstance();
-				context.addMessage(null, new FacesMessage("Advertencia", "Ingrese la identificación del cliente"));
+				context.addMessage(null, new FacesMessage("Advertencia", "Ingrese la identificaciÃ³n del cliente"));
 				return;
 			}
 		} catch (Exception e) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Ingrese la identificación del cliente"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Ingrese la identificaciÃ³n del cliente"));
 			return;
 		}
 
@@ -1227,7 +1227,7 @@ public class ControladorCotizacionComercial {
 			} catch (Exception e) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Error al Ingresar el Cliente",
-						"Comuníquese con el Administrador del sistema"));
+						"ComunÃ­quese con el Administrador del sistema"));
 				System.out.println("Error al ingresar el cliente");
 				return;
 			}

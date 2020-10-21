@@ -419,19 +419,19 @@ public class ControladorCobranzas {
 		String usrname = FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("USUARIONM")
 				.toString();
 
-		// pago exclusivo de notas de crédito sin cruce y de una sola factura
+		// pago exclusivo de notas de crï¿½dito sin cruce y de una sola factura
 		if (pagos.getForma_pago().equals("Devolucion NC")) {
 			if (listPagos.size() > 0) {
 				FacesContext fContextObj = FacesContext.getCurrentInstance();
 				fContextObj.addMessage(null, new FacesMessage("Advertencia",
-						"No puede ingresar más formas de pago para el tipo seleccionado"));
+						"No puede ingresar mï¿½s formas de pago para el tipo seleccionado"));
 				return;
 			}
 
 			if (selectedCuotasXCobrar.size() > 1) {
 				FacesContext fContextObj = FacesContext.getCurrentInstance();
 				fContextObj.addMessage(null,
-						new FacesMessage("Advertencia", "Solo puede seleccionar una Nota de Crédito"));
+						new FacesMessage("Advertencia", "Solo puede seleccionar una Nota de Crï¿½dito"));
 				return;
 			}
 
@@ -451,14 +451,14 @@ public class ControladorCobranzas {
 			if (listPagos.size() > 0) {
 				FacesContext fContextObj = FacesContext.getCurrentInstance();
 				fContextObj.addMessage(null, new FacesMessage("Advertencia",
-						"No puede ingresar más formas de pago para el tipo seleccionado"));
+						"No puede ingresar mï¿½s formas de pago para el tipo seleccionado"));
 				return;
 			}
 
 			if (valorRetencion > 0.00) {
 				FacesContext fContextObj = FacesContext.getCurrentInstance();
 				fContextObj.addMessage(null, new FacesMessage("Advertencia",
-						"Tipo de Pago seleccionado no permite el ingreso de valor de Retención"));
+						"Tipo de Pago seleccionado no permite el ingreso de valor de Retenciï¿½n"));
 				return;
 			}
 			if (totalCobranza <= 0.00) {
@@ -580,7 +580,7 @@ public class ControladorCobranzas {
 					pagoRet.setUsrid(usrcd);
 					pagoRet.setUsrlogin(usrname);
 					pagoRet.setFecha_pago(fechaPag);
-					pagoRet.setForma_pago("Retención");
+					pagoRet.setForma_pago("Retenciï¿½n");
 					cruceFacturas = "Retencion";
 					pagoRet.setNo_retencion(noRetencion);
 					pagoRet.setValor_retencion(valorRetencion);
@@ -619,7 +619,7 @@ public class ControladorCobranzas {
 		if (flgNcEfect) {
 			if (listPagos.size() > 1) {
 				FacesContext fContextObj = FacesContext.getCurrentInstance();
-				fContextObj.addMessage(null, new FacesMessage("Advertencia", "Forma Pago Seleccionada debe ser única"));
+				fContextObj.addMessage(null, new FacesMessage("Advertencia", "Forma Pago Seleccionada debe ser ï¿½nica"));
 				return;
 			}
 
@@ -676,7 +676,7 @@ public class ControladorCobranzas {
 			}
 
 		} else if (flgAplicaNc) {
-			// Aplicar pago de la nota de crédito a la cuota seleccionada no
+			// Aplicar pago de la nota de crï¿½dito a la cuota seleccionada no
 			// permite dar de baja con pago adicional
 			totalPago = 0.00;
 			saldoPago = redondear(totalPago);
@@ -688,7 +688,7 @@ public class ControladorCobranzas {
 				valTotPago = redondear(pagoAux.getValor_total_pago());
 				saldoPago = redondear(saldoPago);
 
-				// identifico el valor total de las notas de crédito a saldar
+				// identifico el valor total de las notas de crï¿½dito a saldar
 				for (CuotasXCobrar cuotaAux : lstCuotasXCobrar) {
 					DetalleFormaPago CuotasPolizaAux = new DetalleFormaPago();
 					CuotasPolizaAux = srvDetalleFormaPago.recuperaDetallexCdFrmPago(cuotaAux.getCd_det_forma_pago(),
@@ -1041,7 +1041,7 @@ public class ControladorCobranzas {
 			}
 		}
 		FacesContext fContextObj = FacesContext.getCurrentInstance();
-		fContextObj.addMessage(null, new FacesMessage("Advertencia", "Transacción Exitosa"));
+		fContextObj.addMessage(null, new FacesMessage("Advertencia", "Transacciï¿½n Exitosa"));
 	}
 
 	public void remitirPagosAseg() {

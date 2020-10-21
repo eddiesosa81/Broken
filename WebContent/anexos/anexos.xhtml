@@ -20,14 +20,15 @@
 				<p:autoUpdate></p:autoUpdate>
 			</p:growl>
 			<p:menubar>
-				<p:menuitem value="Inicio" icon="ui-icon-home" url="/Broken/index.jsf"></p:menuitem>
+				<p:menuitem value="Inicio" icon="ui-icon-home"
+					url="/Broken/index.jsf"></p:menuitem>
 				<p:submenu label="Proceso" icon="ui-icon-wrench">
 					<p:menuitem value="Inclusión Obj Masivo"
 						url="/Broken/anexos/aplicacionesMasivas.jsf" icon="ui-icon-gear" />
 					<p:menuitem value="Actualiza Provisional"
 						url="/Broken/anexos/provisionales.jsf" icon="ui-icon-contact" />
 				</p:submenu>
-				
+
 			</p:menubar>
 			<!-- Anexos -->
 			<ui:include src="/anexos/datosAnexos.xhtml" />
@@ -37,18 +38,17 @@
 				widgetVar="wbuscaPolizaAne" showEffect="fade" hideEffect="fade"
 				closable="true" maximizable="true" height="300" width="800">
 				<h:form id="frmDlgPoliza">
-					<h:panelGrid columns="2" >
-							<p:inputText id="cotizaBuscado"
-								value="#{ControladorAnexos.apellidoRazonSocial}"
-								placeholder="Apellido / Razon Social" />
-							<p:inputText id="cotizaBuscadoPol"
-								value="#{ControladorAnexos.polizaClieBus}"
-								placeholder="Póliza" />
-							<p:commandButton value="Buscar"
-								actionListener="#{ControladorAnexos.buscaPoliza}"
-								update="frm_anexos:frmDlgPoliza:listadoPoliza"
-								icon="ui-icon-search"
-								process="@this frm_anexos:frmDlgPoliza:cotizaBuscado frm_anexos:frmDlgPoliza:cotizaBuscadoPol" />
+					<h:panelGrid columns="2">
+						<p:inputText id="cotizaBuscado"
+							value="#{ControladorAnexos.apellidoRazonSocial}"
+							placeholder="Apellido / Razon Social" />
+						<p:inputText id="cotizaBuscadoPol"
+							value="#{ControladorAnexos.polizaClieBus}" placeholder="Póliza" />
+						<p:commandButton value="Buscar"
+							actionListener="#{ControladorAnexos.buscaPoliza}"
+							update="frm_anexos:frmDlgPoliza:listadoPoliza"
+							icon="ui-icon-search"
+							process="@this frm_anexos:frmDlgPoliza:cotizaBuscado frm_anexos:frmDlgPoliza:cotizaBuscadoPol" />
 					</h:panelGrid>
 					<p:dataTable id="listadoPoliza" var="pol"
 						value="#{ControladorAnexos.lstConsultaPoliza}"
@@ -231,7 +231,68 @@
 					</p:panel>
 				</h:form>
 			</p:dialog>
-			<!-- Inicia Dialogo Inclusion Objeto-->
+			<!-- Inicia Dialogo Deducible-->
+			<p:dialog header="Deducibles" widgetVar="wDlgDeducible"
+				closable="false">
+				<h:form id="frmDeducible">
+					<h:panelGrid columns="2">
+						<p:row>
+							<p:dataTable id="checkboxDTded" var="dedu"
+								value="#{ControladorAnexos.lstDeducibles}"
+								selection="#{ControladorAnexos.selectedlstDeducibles}"
+								rowKey="#{dedu.cd_deducible}" style="width:500px;"
+								scrollable="true" scrollHeight="150"
+								emptyMessage="No hay registros en la busqueda"
+								filteredValue="#{ControladorAnexos.lstFilteredDeducibles}">
+
+								<f:facet name="header">
+						            Deducibles
+						        </f:facet>
+								<p:column selectionMode="multiple"
+									style="width:16px;text-align:center" />
+
+								<p:column headerText="Descripción"
+									filterBy="#{dedu.desc_deducible}"
+									sortBy="#{dedu.desc_deducible}" filterMatchMode="contains">
+									<h:outputText value="#{dedu.desc_deducible}" />
+								</p:column>
+							</p:dataTable>
+						</p:row>
+						<p:row>
+							<h:panelGrid columns="2">
+								<h:outputText value="% Valor Siniestro" />
+								<p:inputNumber value="#{ControladorAnexos.porcDedValSin}"
+									id="inptNumPorValSin"></p:inputNumber>
+								<h:outputText value="% Valor Asegurado" />
+								<p:inputNumber value="#{ControladorAnexos.porcDedValAseg}"
+									id="inptNumPorValAseg"></p:inputNumber>
+								<h:outputText value="Valor Mínimo" />
+								<p:inputNumber value="#{ControladorAnexos.valorDedMin}"
+									id="inptNumValMin"></p:inputNumber>
+								<h:outputText value="Valor Fijo" />
+								<p:inputNumber value="#{ControladorAnexos.valorDedFijo}"
+									id="inptNumValFijo"></p:inputNumber>
+								<h:outputText value="Especificación" />
+								<p:inputText value="#{ControladorAnexos.especificacionDed}"
+									id="inptEspDed"></p:inputText>
+							</h:panelGrid>
+						</p:row>
+					</h:panelGrid>
+					<p:commandButton value="Grabar" icon="ui-icon-disk"
+						styleClass="ui-priority-primary"
+						actionListener="#{ControladorAnexos.guardaDeducible}"
+						process="@this,frm_anexos:frmDeducible:checkboxDTded,frm_anexos:frmDeducible:inptNumPorValSin,frm_anexos:frmDeducible:inptNumPorValAseg,
+						frm_anexos:frmDeducible:inptNumValMin,frm_anexos:frmDeducible:inptNumValFijo,frm_anexos:frmDeducible:inptEspDed"
+						action="/index.xhtml?faces-redirect=true" />
+
+					<p:commandButton styleClass="ui-priority-primary"
+						onclick="PF('wDlgDeducible').hide();"
+						actionListener="#{ControladorAnexos.cancelaAnexoDeducible}"
+						process="@this" icon="ui-icon-cancel" value="Cancelar"
+						title="Canela Anexo" />
+				</h:form>
+			</p:dialog>
+			<!-- Inicia Dialogo Aclaratorio-->
 			<p:dialog header="Aclaratorio" widgetVar="wDlgAclaratorio"
 				closable="false">
 				<h:form id="frmAclaratorio">
@@ -413,8 +474,9 @@
 						"
 						actionListener="#{ControladorAnexos.eliminaAnexo}">
 					</p:commandButton>
-					
-					<h:commandButton value="Salir" styleClass="ui-priority-primary" style='width:70px; height:25px'
+
+					<h:commandButton value="Salir" styleClass="ui-priority-primary"
+						style='width:70px; height:25px'
 						action="/Broken/index.xhtml?faces-redirect=true"
 						id="btnEmiteAnexoPendienteC" title="Salir Anexo Pendiente" />
 

@@ -17,7 +17,7 @@ public class ServicioCoberturas {
 
 	@SuppressWarnings("unchecked")
 	public List<Coberturas> consultaCoberturas() {
-		String sql = "select * from cobertura_tbl " + " order by desc_cobertura";
+		String sql = "select * from cobertura_tbl where estado_cobertura = 'A' order by desc_cobertura";
 		try {
 			Query query = em.createNativeQuery(sql, Coberturas.class);
 			return query.getResultList();

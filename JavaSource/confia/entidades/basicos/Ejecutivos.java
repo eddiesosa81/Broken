@@ -38,6 +38,22 @@ public class Ejecutivos implements Serializable {
 	
 	@Column(name="estado_ejecutivo")
 	private String estado_ejecutivo;
+	
+	@Column(name="CORREO")
+	private String correo;
+	
+	
+	
+	
+	
+
+	public String getCorreo() {
+		return correo;
+	}
+
+	public void setCorreo(String correo) {
+		this.correo = correo;
+	}
 
 	public Integer getCd_ejecutivo() {
 		return cd_ejecutivo;
