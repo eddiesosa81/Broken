@@ -36,6 +36,17 @@ public class ServicioPlan {
 		 return (Plan) q.getSingleResult();
 	}
 	
+	public Plan consultaPlanUbicacion(Integer cdObjCot)
+	{
+		String sql = "select *  from plan_tbl "
+				+ "where cd_plan =  (select distinct cd_plan from ubicacion_tbl "
+				+ "where cd_Ubicacion in(select cd_ubicacion from objeto_cotizacion_tbl "
+				+ "where cd_obj_cotizacion = "+cdObjCot+"))";
+		System.out.println("********************-----QUERY: " + sql);
+		 Query q = em.createNativeQuery(sql, Plan.class);
+		 return (Plan) q.getSingleResult();
+	}
+	
 	
 	@SuppressWarnings("unchecked")
 	public List<Plan> listaPlanes(String cdramo,String cdAseguradora)

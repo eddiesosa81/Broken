@@ -64,6 +64,7 @@ import confia.servicios.basicos.ServicioGrupoContratante;
 import confia.servicios.basicos.ServicioParroquia;
 import confia.servicios.basicos.ServicioPlan;
 import confia.servicios.basicos.ServicioProvincias;
+import confia.servicios.basicos.ServicioRamo;
 import confia.servicios.basicos.ServicioRubros;
 import confia.servicios.basicos.ServicioUsuarios;
 import confia.servicios.basicos.ServiciosDeduciblesEmitidas;
@@ -154,6 +155,8 @@ public class ControladorSiniestros {
 	private ServicioCanton srvCanton;
 	@EJB
 	private ServicioEjecutivos srvEjecutivos;
+	@EJB
+	private ServicioRamo srvRamo;
 
 	private String numSinies;
 	private String polizaSinies;
@@ -455,7 +458,24 @@ public class ControladorSiniestros {
 			grupoContratante = new GrupoContratante();
 			grupoContratante = srvGrupoContratante.buscaGruposContratanteCrC(siniestro.getCdRamoCotizacion());
 			plan = new Plan();
-			plan = srvPlan.consultaPlanRamoCotizacion(siniestro.getCdRamoCotizacion());
+			// verirfico si el ramo es
+			// Ubicación o RamoCotizacion
+			Integer tpRam = srvRamo.tipoRamo(siniestro.getCdRamo());
+			
+			if (tpRam.equals(1)) {
+				try {
+					plan = srvPlan.consultaPlanUbicacion(Integer.valueOf(selectedObjetosPoliza.getCd_obj_cotizacion()));
+					if(plan == null) {
+						plan = srvPlan.consultaPlanRamoCotizacion(siniestro.getCdRamoCotizacion());
+					}
+				} catch (Exception e) {
+					plan = srvPlan.consultaPlanRamoCotizacion(siniestro.getCdRamoCotizacion());
+				}
+				
+			} else {
+				plan = srvPlan.consultaPlanRamoCotizacion(siniestro.getCdRamoCotizacion());
+			}
+			
 			Double valAsegSubobj, primaNetaSubObj;
 			String descSubobj, cdSubObje;
 
@@ -1567,10 +1587,29 @@ public class ControladorSiniestros {
 		siniestro = srvSiniestros.recuperaCodSiniestros(selectedSiniestro.getCdSiniestro());
 		grupoContratante = new GrupoContratante();
 		grupoContratante = srvGrupoContratante.buscaGruposContratanteCrC(siniestro.getCdRamoCotizacion());
-		plan = new Plan();
-		plan = srvPlan.consultaPlanRamoCotizacion(siniestro.getCdRamoCotizacion());
+		
 		detalleSiniestros = srvDetalleSiniestros.recuperaDetSiniestrosxCdSini(siniestro.getCdSiniestro(),
 				siniestro.getCdCompania());
+		
+		plan = new Plan();
+		// verirfico si el ramo es
+		// Ubicación o RamoCotizacion
+		Integer tpRam = srvRamo.tipoRamo(siniestro.getCdRamo());
+		System.out.println("Tipo Siniestro:"+tpRam);
+		
+		if (tpRam.equals(1)) {
+			try {
+				plan = srvPlan.consultaPlanUbicacion(Integer.valueOf(detalleSiniestros.getCd_obj_cotizacion()));
+				if(plan == null) {
+					plan = srvPlan.consultaPlanRamoCotizacion(siniestro.getCdRamoCotizacion());
+				}
+			} catch (Exception e) {
+				plan = srvPlan.consultaPlanRamoCotizacion(siniestro.getCdRamoCotizacion());
+			}
+			
+		} else {
+			plan = srvPlan.consultaPlanRamoCotizacion(siniestro.getCdRamoCotizacion());
+		}
 		LstCaracteristicasCab = new ArrayList<CaracteristicasVehiculos>();
 		LstCaracteristicasCab = srvCaracteristicaObj.recuperaCaractVHporObjCot(detalleSiniestros.getCd_obj_cotizacion(),
 				detalleSiniestros.getCd_compania());
