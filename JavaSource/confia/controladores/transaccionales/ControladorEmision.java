@@ -446,6 +446,7 @@ public class ControladorEmision {
 	private Boolean flgPolizaDocu;
 
 	private String tipoCliente;
+	private Boolean flgCargaArchivoObj;
 
 	public ControladorEmision() {
 		lsnumRenova = 0;
@@ -565,6 +566,7 @@ public class ControladorEmision {
 		tipoArchivo = "CLIENTE";
 		lstObjetoGestDoc = srvRubros.recuperaObjetoGestionDocu(tipoArchivo);
 		flgPolizaDocu = true;
+		flgCargaArchivoObj = false;
 
 	}
 
@@ -1740,7 +1742,7 @@ public class ControladorEmision {
 		// context.execute("PF('nuevaUbicacion').hide();");
 		PrimeFaces.current().executeScript("PF('nuevaUbicacion').hide();");
 	}
-
+	
 	public void cargaArchivo() {
 		// guarda la ubicacion
 		int res;
@@ -1748,16 +1750,17 @@ public class ControladorEmision {
 		if (cotizacionPendienteSelected.getCd_plan().equals(0)) {
 			if (codPlanUbc.equals("0")) {
 				FacesContext context = FacesContext.getCurrentInstance();
-				context.addMessage(null, new FacesMessage("Advertencia", "Seleccione el plan para la UbicaciÃ³n"));
+				context.addMessage(null, new FacesMessage("Advertencia", "Seleccione el plan para la Ubicación"));
 				return;
 			} else {
 				planTemp = srvPlan.consultaPlan(Integer.valueOf(codPlanUbc));
 			}
 		}
+		System.out.println("Plan Seleccionado:"+planTemp.getDescripcion_plan());
 
 		if (dscUbicacion == null) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Digite la UbicaciÃ³n"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Digite la Ubicación"));
 			return;
 		}
 		if (auxEstadoUbicacion.equals("NuevaUbc")) {
@@ -1780,7 +1783,7 @@ public class ControladorEmision {
 			if (res != 1) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Advertencia",
-						"Error al ingresar la UbicaciÃ³n ComunÃ­quese con el Administrador del Sistema"));
+						"Error al ingresar la Ubicación Comuníquese con el Administrador del Sistema"));
 				return;
 			}
 			res = srvUbicacion.codigoMaxUbc(cotizacionPendienteSelected.getCd_ramo_cotizacion());
@@ -1793,12 +1796,12 @@ public class ControladorEmision {
 			}
 			auxEstadoUbicacion = "UsoUbc";
 		}
-		// RequestContext context = RequestContext.getCurrentInstance();
-		// context.execute("PF('wDlgCargaArchivoPrin').show();");
-		PrimeFaces.current().executeScript("PF('wDlgCargaArchivoPrin').show();");
+		flgCargaArchivoObj = true;
+		System.out.println("Fin guarda archivo");
+//		PrimeFaces.current().executeScript("PF('wDlgCargaArchivoPrin').show();");
 	}
-
 	public void subirArchivos(FileUploadEvent evt) {
+		System.out.println("Ingresa a subir archivo");
 		// UploadedFile miArchivo; // aqui se va a guardar el archivo que
 		// escogemos en el componente
 		String extension = "";
@@ -1835,10 +1838,13 @@ public class ControladorEmision {
 
 		// actualiza la lista de objetos ingresados
 		lstObjetoCot = new ArrayList<ObjetoCotizacion>();
+		System.out.println("datosUbicacion.getCd_ubicacion():"+datosUbicacion.getCd_ubicacion());
+		System.out.println("datosUbicacion.getCd_compania():"+datosUbicacion.getCd_compania());
 		lstObjetoCot = srvObjetoCotizacion.recuperaObjetosPorUbicacion(datosUbicacion.getCd_ubicacion(),
 				datosUbicacion.getCd_compania());
 		FacesMessage message = new FacesMessage("Succesful", evt.getFile().getFileName() + " is uploaded.");
 		FacesContext.getCurrentInstance().addMessage(null, message);
+		flgCargaArchivoObj = false;
 	}
 
 	public void readXLSXFile(String path) throws IOException {
@@ -6276,6 +6282,14 @@ public class ControladorEmision {
 
 	public void setEspecificacionDed(String especificacionDed) {
 		this.especificacionDed = especificacionDed;
+	}
+
+	public Boolean getFlgCargaArchivoObj() {
+		return flgCargaArchivoObj;
+	}
+
+	public void setFlgCargaArchivoObj(Boolean flgCargaArchivoObj) {
+		this.flgCargaArchivoObj = flgCargaArchivoObj;
 	}
 
 }

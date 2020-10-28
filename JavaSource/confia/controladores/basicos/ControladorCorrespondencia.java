@@ -87,7 +87,7 @@ public class ControladorCorrespondencia extends AbstractReportBean {
 	@PostConstruct
 	public void datosIniciales() {
 		listAseguradoras = srvAseguradoras.listaAseguradoras();
-		listClientes = srvCliente.listaClientesCorrespon();
+		//listClientes = srvCliente.listaClientesCorrespon();
 		listUsuarios = srvUsuario.listaUsuariosCorrespon();
 		lstTipoCarta = srvRubros.recuperaTipoModuloCarta();
 	}

@@ -219,8 +219,15 @@
 					icon="ui-icon-folder-open" styleClass="ui-priority-primary"
 					action="#{ControladorEmision.cargaArchivo}"
 					process="@this,frmUbcRamoCot:nombreUbicacion,frmUbcRamoCot:listPlanesUbc"
-					update="@this,frmUbcRamoCot:objectUbc" />
-
+					update="@this,frmUbcRamoCot:objectUbc,frmUbcRamoCot:btnArchObjPrin,frmUbcRamoCot:btnAceptaUbicacion,frmUbcRamoCot:pnlCargaArch" />
+				<p:panel visible="#{ControladorEmision.flgCargaArchivoObj}" toggleable="true" id="pnlCargaArch">
+					<p:fileUpload listener="#{ControladorEmision.subirArchivos}"
+						label="Seleccionar" uploadLabel="Adjuntar" cancelLabel="Cancelar"
+						mode="advanced" dragDropSupport="true"
+						update="@this,frmUbcRamoCot:objectUbc,,frmUbcRamoCot:pnlCargaArch" sizeLimit="9000000"
+						fileLimit="1" allowTypes="/(\.|\/)(xls)$/">
+					</p:fileUpload>
+				</p:panel>
 				<h:panelGrid columns="1">
 					<p:dataTable id="objectUbc" var="obj"
 						value="#{ControladorEmision.lstObjetoCot}" editable="true"
@@ -231,8 +238,8 @@
 						<f:facet name="header">
 						</f:facet>
 
-						<p:ajax event="rowEdit" listener="#{ControladorEmision.onRowEditObjPol}"
-							/>
+						<p:ajax event="rowEdit"
+							listener="#{ControladorEmision.onRowEditObjPol}" />
 
 						<p:ajax event="rowSelect"
 							listener="#{ControladorEmision.onRowSelect}"

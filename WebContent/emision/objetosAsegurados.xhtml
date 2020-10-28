@@ -742,9 +742,9 @@
 				        </f:facet>
 					<p:ajax event="rowEdit"
 						listener="#{ControladorEmision.onRowEditDeducible}" update="@this" />
-						<p:column headerText="Descripción Deducible" rendered="false">
+					<p:column headerText="Descripción Deducible" rendered="false">
 						<h:outputText value="#{ded.cd_deducible_emitido}" />
-						</p:column>
+					</p:column>
 					<p:column headerText="Descripción Deducible"
 						filterBy="#{ded.desc_deducible}" sortBy="#{ded.desc_deducible}"
 						filterMatchMode="contains">
@@ -1819,12 +1819,12 @@
 	<p:dialog header="Carga de Archivos" draggable="true" showEffect="fade"
 		hideEffect="fade" widgetVar="wDlgCargaArchivoPrin" closable="true"
 		appendTo="@(body)" modal="true">
-		<p:fileUpload listener="#{ControladorEmision.subirArchivos}"
-			label="Seleccionar" uploadLabel="Adjuntar" cancelLabel="Cancelar"
-			mode="advanced" dragDropSupport="true"
-			update="@this,frmUbcRamoCot:objectUbc" sizeLimit="9000000"
-			fileLimit="1" allowTypes="/(\.|\/)(xls)$/">
-		</p:fileUpload>
+			<p:fileUpload listener="#{ControladorEmision.subirArchivos}"
+				label="Seleccionar" uploadLabel="Adjuntar" cancelLabel="Cancelar"
+				mode="advanced" dragDropSupport="true"
+				update="@this,frmUbcRamoCot:objectUbc" sizeLimit="9000000"
+				fileLimit="1" allowTypes="/(\.|\/)(xls)$/">
+			</p:fileUpload>
 	</p:dialog>
 
 </ui:composition>
