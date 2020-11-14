@@ -76,8 +76,17 @@ public class ReporteCuotasIniImpaga {
 	private String fc_emision_jul;
 	@Column(name="fecha_vencimiento_jul")
 	private String fecha_vencimiento_jul;
+	@Column(name="DIAS_TARDANZA_PAGO")
+	private String dias_tardanza_pago;
 	
 	
+	
+	public String getDias_tardanza_pago() {
+		return dias_tardanza_pago;
+	}
+	public void setDias_tardanza_pago(String dias_tardanza_pago) {
+		this.dias_tardanza_pago = dias_tardanza_pago;
+	}
 	public String getFecha_vencimiento_jul() {
 		return fecha_vencimiento_jul;
 	}

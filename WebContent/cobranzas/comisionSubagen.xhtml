@@ -33,7 +33,7 @@
 			placeholder="Número de Póliza"
 			title="Busqueda en caso de Modificación de Comisión"></p:inputText>
 	</h:panelGrid>
-	<h:panelGrid columns="6" cellpadding="5">
+	<h:panelGrid columns="7" cellpadding="5">
 		<p:commandButton value="Buscar" id="btnBuscaSubagente"
 			update="frm_comiSubagen:checkboxDTComiSubagenPol"
 			styleClass="ui-priority-primary" icon="ui-icon-search"
@@ -49,6 +49,13 @@
 			styleClass="ui-priority-primary" icon="ui-icon-person"
 			process="@this,frm_comiSubagen:checkboxDTComiSubagenPol,frm_comiSubagen:subagen"
 			action="#{ControladorComisionSubagen.generaComision}" />
+			
+		<p:commandButton id="btnPAgoParcial" icon="fa fa-fw fa-list-ol"
+					title="Pago Parcial" styleClass="ui-priority-primary"
+					process="@this,frm_comiSubagen:checkboxDTComiSubagenPol,frm_comiSubagen:subagen"
+					update="frmFactSelected:dtFacSel"
+					action="#{ControladorComisionSubagen.generaPagoPArcial}" />
+					
 		<p:commandButton value="Imprimir" id="btnPrint"
 			disabled="#{ControladorComisionSubagen.btnPrint}"
 			action="#{ControladorComisionSubagen.execute()}" ajax="false"
@@ -165,6 +172,9 @@
 					<p:inputText value="#{polSuba.val_com_suba}" style="width:100%" />
 				</f:facet>
 			</p:cellEditor>
+		</p:column>
+		<p:column headerText="Saldo Comisión" style="width:80px">
+			<h:outputText value="#{polSuba.saldo_COM_SUBA}" />
 		</p:column>
 
 		<p:column style="width:32px">

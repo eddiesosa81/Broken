@@ -86,9 +86,16 @@ public class ComiSubagenPolView {
 	private String cd_comision_poliza;
 	@Column(name="flg_pago_canal")
 	private String flg_pago_canal;	
+	@Column(name="saldo_COM_SUBA")
+	private String saldo_COM_SUBA;
 	
 	
-	
+	public String getSaldo_COM_SUBA() {
+		return saldo_COM_SUBA;
+	}
+	public void setSaldo_COM_SUBA(String saldo_COM_SUBA) {
+		this.saldo_COM_SUBA = saldo_COM_SUBA;
+	}
 	public String getFlg_pago_canal() {
 		return flg_pago_canal;
 	}

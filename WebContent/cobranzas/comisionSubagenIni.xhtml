@@ -22,6 +22,64 @@
 			</p:growl>
 			<ui:include src="/cobranzas/comisionSubagen.xhtml" />
 		</h:form>
+		<p:dialog header="Comisiones Seleccionadas" widgetVar="wComSubaSelected"
+			draggable="true" showEffect="fade" hideEffect="fade" closable="true"
+			width="1200" appendTo="@(body)" modal="true" resizable="false">
+			<h:form id="frmFactSelected">
+				<h:panelGrid columns="1" style="width:100%;">
+					<p:dataTable var="preLiq" id="dtFacSel"
+						value="#{ControladorComisionSubagen.listComisionSubagenPolPArcial}"
+						scrollable="true" scrollHeight="250"
+						style="font-family:Verdana; font-size: 10px;" rowIndexVar="index"
+						editable="true">
+
+						<p:ajax event="rowEdit"
+							listener="#{ControladorComisionSubagen.onRowEditValCom}"
+							 />
+						
+						<p:column headerText="Poliza">
+							<h:outputText value="#{preLiq.poliza}" />
+						</p:column>
+						<p:column headerText="Factura">
+							<h:outputText value="#{preLiq.factura_aseguradora}" />
+						</p:column>
+						<p:column headerText="Pct.Com.Brk">
+							<h:outputText value="#{preLiq.pct_com_brk}" />
+						</p:column>
+						<p:column headerText="Val.Com.Brk">
+							<h:outputText value="#{preLiq.val_com_brk}" />
+						</p:column>
+						
+						<p:column headerText="Pct.Com.Canal">
+							<h:outputText value="#{preLiq.pct_com_suba}" />
+						</p:column>
+						<p:column headerText="Val.Com.Canal">
+							<h:outputText value="#{preLiq.val_com_suba}" />
+						</p:column>
+						<p:column headerText="Valor a Liquidar">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{preLiq.saldo_COM_SUBA}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{preLiq.saldo_COM_SUBA}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column style="width:35px">
+							<p:rowEditor />
+						</p:column>
+						<p:column style="width:32px;text-align: center">
+							<p:commandButton update="frmFactSelected:dtFacSel"
+								process="@this,frmFactSelected:dtFacSel" icon="ui-icon-minus"
+								title="Elimina Factura"
+								actionListener="#{ControladorComisionSubagen.eliminaFactConfia(preLiq)}">
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
 		<p:dialog header="Cambio Canal" widgetVar="cambiaSuba"
 			showEffect="fade" hideEffect="fade" resizable="false">
 			<h:form id="frmComiSubagenCam">
@@ -59,7 +117,7 @@
 						update="@this frm_comiSubagen:checkboxDTComiSubagenPol,frm_comiSubagen:btnPrint"
 						styleClass="ui-priority-primary" icon="ui-icon-person"
 						process="@this,frmNumFactSuba:numFactConpt
-					,frmNumFactSuba:fcFacCom"
+					,frmNumFactSuba:fcFacCom,frmFactSelected:dtFacSel"
 						action="#{ControladorComisionSubagen.guardarComiSubagenPol}" />
 				</p:panelGrid>
 			</h:form>

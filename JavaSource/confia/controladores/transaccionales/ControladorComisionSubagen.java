@@ -19,18 +19,16 @@ import javax.faces.context.FacesContext;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.RowEditEvent;
 
-import confia.entidades.basicos.AseguradoraRamo;
 import confia.entidades.basicos.Aseguradoras;
-import confia.entidades.basicos.ComisionSubagente;
 import confia.entidades.basicos.ComisionSubagentePol;
 import confia.entidades.basicos.Subagentes;
+import confia.entidades.transaccionales.DetallePagoCanal;
 import confia.entidades.vistas.ComiSubagenPolView;
-import confia.entidades.vistas.ConsultaPagoRealizadosView;
 import confia.reportes.AbstractReportBean;
-import confia.servicios.basicos.ServicioAseguradoraRamo;
 import confia.servicios.basicos.ServicioAseguradoras;
 import confia.servicios.basicos.ServicioComisionSubagenPol;
 import confia.servicios.basicos.ServicioSubagentes;
+import confia.servicios.transaccionales.ServicioDetallePagoCanal;
 import confia.servicios.transaccionales.ServicioRamoCotizacion;
 import confia.servicios.vistas.ServicioComiSubagenPolView;
 
@@ -47,10 +45,12 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 	private ServicioRamoCotizacion srvRamCot;
 	@EJB
 	private ServicioAseguradoras srvAseguradoras;
-	
+	@EJB
+	private ServicioDetallePagoCanal srvDetallePagoCanal;
 
 	private List<ComiSubagenPolView> listComisionSubagenPol;
 	private List<ComiSubagenPolView> selectedListComiaionSubagenPol;
+	private List<ComiSubagenPolView> listComisionSubagenPolPArcial;
 	private List<ComiSubagenPolView> filteredComiaionSubagenPol;
 	private ComiSubagenPolView selectedComisionSubagenPol;
 	private List<Subagentes> listSubagentes;
@@ -68,7 +68,6 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 	private List<Aseguradoras> listadoAseguradoras;
 	private String codigoAseguradora;
 
-
 	public ControladorComisionSubagen() {
 		listSubagentes = new ArrayList<Subagentes>();
 		listComisionSubagenPol = new ArrayList<ComiSubagenPolView>();
@@ -79,9 +78,7 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 	}
 
 	// --------------- PROGRAMACION IMPRESIONES ------------------//
-	
-	
-	
+
 	private final String COMPILE_FILE_NAME = "FacturaCanal";
 
 	@Override
@@ -115,20 +112,19 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 		listSubagentes = srvSubagentes.recuperaSubagente1();
 		numFactura = null;
 		listadoAseguradoras = srvAseguradoras.listaAseguradoras();
+		listComisionSubagenPolPArcial = new ArrayList<ComiSubagenPolView>();
 	}
-	
-	
 
 	public void cargarComiSubagenPol() {
 		try {
 			if (numFacturaAseg.isEmpty() || numFacturaAseg == null) {
 				numFacturaAseg = "%";
 			}
-			
+
 		} catch (Exception e) {
 			numFacturaAseg = "%";
 		}
-		System.out.println("factura:"+numFacturaAseg);
+		System.out.println("factura:" + numFacturaAseg);
 		try {
 			if (numPoliza.isEmpty() || numPoliza == null) {
 				numPoliza = "%";
@@ -136,27 +132,25 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 		} catch (Exception e) {
 			numPoliza = "%";
 		}
-		System.out.println("numPoliza:"+numPoliza);
-//		FacesContext fContextObj = FacesContext.getCurrentInstance();
-//		if (numFacturaAseg.equals("%") && numPoliza.equals("%")) {
-//			fContextObj.addMessage(null, new FacesMessage("Advertencia", "Ingrese el Número de Factura o Póliza"));
-//			return;
-//		}
+		System.out.println("numPoliza:" + numPoliza);
 
 		listComisionSubagenPol = new ArrayList<ComiSubagenPolView>();
 		System.out.println("SUBAGENTE:" + codSubagnete);
 		if (!numFacturaAseg.equals("%") && !numPoliza.equals("%")) {
 			listComisionSubagenPol = svrComisionSubagenPolView.consultaComiSubagenPolView(codSubagnete, numPoliza,
-					numFacturaAseg,codigoAseguradora);
-		} 
-		if(!numFacturaAseg.equals("%") && numPoliza.equals("%")) {
-			listComisionSubagenPol = svrComisionSubagenPolView.consultaComiSubagenPolView(codSubagnete, numPoliza,numFacturaAseg,codigoAseguradora);
+					numFacturaAseg, codigoAseguradora);
 		}
-		if(numFacturaAseg.equals("%") && !numPoliza.equals("%")) {
-			listComisionSubagenPol = svrComisionSubagenPolView.consultaComiSubagenPolizaView(codSubagnete, numPoliza,codigoAseguradora);
+		if (!numFacturaAseg.equals("%") && numPoliza.equals("%")) {
+			listComisionSubagenPol = svrComisionSubagenPolView.consultaComiSubagenPolView(codSubagnete, numPoliza,
+					numFacturaAseg, codigoAseguradora);
 		}
-		if(numFacturaAseg.equals("%") && numPoliza.equals("%")) {
-			listComisionSubagenPol = svrComisionSubagenPolView.consultaComiSubagenPolView(codSubagnete, numPoliza,numFacturaAseg,codigoAseguradora);
+		if (numFacturaAseg.equals("%") && !numPoliza.equals("%")) {
+			listComisionSubagenPol = svrComisionSubagenPolView.consultaComiSubagenPolizaView(codSubagnete, numPoliza,
+					codigoAseguradora);
+		}
+		if (numFacturaAseg.equals("%") && numPoliza.equals("%")) {
+			listComisionSubagenPol = svrComisionSubagenPolView.consultaComiSubagenPolView(codSubagnete, numPoliza,
+					numFacturaAseg, codigoAseguradora);
 		}
 	}
 
@@ -178,26 +172,21 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 		return Math.rint(numero * 100) / 100;
 	}
 
-	public void generaComision() {
-		System.out.println("TAMAÑO:" + selectedListComiaionSubagenPol.size());
-//		RequestContext context = RequestContext.getCurrentInstance();
-//		context.execute("PF('numFactSuba').show()");
-		PrimeFaces.current().executeScript("PF('numFactSuba').show()");
-	}
 	public void sumaRegistros() {
 		Double valSel = 0.0;
-		
+
 		for (ComiSubagenPolView detPagSel : selectedListComiaionSubagenPol) {
 			valSel = valSel + Double.valueOf(detPagSel.getVal_com_suba());
 		}
 
 		FacesContext fContextObj = FacesContext.getCurrentInstance();
 		fContextObj.addMessage(null,
-				new FacesMessage("Advertencia", "Total Valor Comisión Seleccionados:" + redondear(valSel)));
+				new FacesMessage("Advertencia", "Total Valor ComisiÃ³n Seleccionados:" + redondear(valSel)));
 
 	}
+
 	public void cambiaSubagente() {
-		System.out.println("TAMAÑO:" + selectedListComiaionSubagenPol.size());
+		System.out.println("TAMAï¿½O:" + selectedListComiaionSubagenPol.size());
 		try {
 			if (selectedListComiaionSubagenPol.size() == 0) {
 				FacesContext fContextObj = FacesContext.getCurrentInstance();
@@ -213,72 +202,127 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 		}
 		selectedListComiaionSubagenPolMod = new ArrayList<ComiSubagenPolView>();
 		selectedListComiaionSubagenPolMod = selectedListComiaionSubagenPol;
-//		RequestContext context = RequestContext.getCurrentInstance();
-//		context.execute("PF('cambiaSuba').show()");
 		PrimeFaces.current().executeScript("PF('cambiaSuba').show()");
 	}
 
 	public void guardarComiSubagenPol() {
-		try {
-			if (selectedListComiaionSubagenPol.size() == 0) {
+
+		if (listComisionSubagenPolPArcial.size() > 0) {
+			System.out.println("Ingreso Pago Parcial");
+			try {
+				if (numFactura.isEmpty() || numFactura == null) {
+					FacesContext fContextObj = FacesContext.getCurrentInstance();
+					fContextObj.addMessage(null, new FacesMessage("Advertencia", "Ingrese el nÃºmero de Factura "));
+					return;
+				}
+			} catch (Exception e) {
+				FacesContext fContextObj = FacesContext.getCurrentInstance();
+				fContextObj.addMessage(null, new FacesMessage("Advertencia", "Ingrese el nÃºmero de Factura "));
+				return;
+			}
+			System.out.println("TAMAï¿½O:" + selectedListComiaionSubagenPol.size());
+			System.out.println("Factura No.:" + numFactura);
+			Double valPagoDouble,saldoAnt;
+			for (ComiSubagenPolView comCanObj : listComisionSubagenPolPArcial) {
+				valPagoDouble = Double.valueOf(comCanObj.getSaldo_COM_SUBA());
+				
+				ComisionSubagentePol comSubPolAux = new ComisionSubagentePol();
+				comSubPolAux = srvComPolSuba.consultaSubagentePol(Integer.valueOf(comCanObj.getCd_comisuba_pol()));
+				saldoAnt = comSubPolAux.getSaldo_com_suba() - valPagoDouble;
+				if(saldoAnt <= 0) {
+					comSubPolAux.setFlg_pago(1);
+					comSubPolAux.setSaldo_com_suba(0.0);
+					comSubPolAux.setNum_Factura_suba(numFactura);
+					comSubPolAux.setFc_pago_suba(fcFacturaCom);
+				}else {
+					comSubPolAux.setFlg_pago(0);
+					comSubPolAux.setSaldo_com_suba(saldoAnt);
+				}
+				comSubPolAux.setNum_Factura_suba(numFactura);
+				comSubPolAux.setFc_pago_suba(fcFacturaCom);
+				srvComPolSuba.actualizaComisionSubagentePol(comSubPolAux);
+				//inserto detalle pago canal
+				DetallePagoCanal detallePagoCanal = new DetallePagoCanal();
+				detallePagoCanal.setCd_comisuba_pol(comSubPolAux.getCd_comisuba_pol());
+				detallePagoCanal.setFecha_Factura(fcFacturaCom);
+				detallePagoCanal.setNum_Factura_suba(numFactura);
+				detallePagoCanal.setValor_liquidado(valPagoDouble);
+				srvDetallePagoCanal.insertarDetallePagoCanal(detallePagoCanal);
+			}
+			
+			
+			numFacturaPrint = numFactura;
+			numFactura = null;
+			listComisionSubagenPol = new ArrayList<ComiSubagenPolView>();
+			listComisionSubagenPolPArcial = new ArrayList<ComiSubagenPolView>();
+			PrimeFaces.current().executeScript("PF('numFactSuba').hide()");
+			FacesContext fContextObj = FacesContext.getCurrentInstance();
+			fContextObj.addMessage(null, new FacesMessage("Advertencia", "Proceso exitoso"));
+			listComisionSubagenPol = new ArrayList<ComiSubagenPolView>();
+			btnPrint = false;
+			salir();
+		} else {
+			try {
+				if (selectedListComiaionSubagenPol.size() == 0) {
+					FacesContext fContextObj = FacesContext.getCurrentInstance();
+					fContextObj.addMessage(null,
+							new FacesMessage("Advertencia", "Seleccione registros para Generar el pago"));
+					return;
+
+				}
+			} catch (Exception e) {
 				FacesContext fContextObj = FacesContext.getCurrentInstance();
 				fContextObj.addMessage(null,
 						new FacesMessage("Advertencia", "Seleccione registros para Generar el pago"));
 				return;
-
 			}
-		} catch (Exception e) {
-			FacesContext fContextObj = FacesContext.getCurrentInstance();
-			fContextObj.addMessage(null, new FacesMessage("Advertencia", "Seleccione registros para Generar el pago"));
-			return;
-		}
-		try {
-			if (numFactura.isEmpty() || numFactura == null) {
+			try {
+				if (numFactura.isEmpty() || numFactura == null) {
+					FacesContext fContextObj = FacesContext.getCurrentInstance();
+					fContextObj.addMessage(null, new FacesMessage("Advertencia", "Ingrese el nÃºmero de Factura "));
+					return;
+				}
+			} catch (Exception e) {
 				FacesContext fContextObj = FacesContext.getCurrentInstance();
-				fContextObj.addMessage(null, new FacesMessage("Advertencia", "Ingrese el número de Factura "));
+				fContextObj.addMessage(null, new FacesMessage("Advertencia", "Ingrese el nÃºmero de Factura "));
 				return;
 			}
-		} catch (Exception e) {
+			System.out.println("TAMAï¿½O:" + selectedListComiaionSubagenPol.size());
+			System.out.println("Factura No.:" + numFactura);
+			for (ComiSubagenPolView comSUbPolLst : selectedListComiaionSubagenPol) {
+				ComisionSubagentePol comSubPolAux = new ComisionSubagentePol();
+				comSubPolAux = srvComPolSuba.consultaSubagentePol(Integer.valueOf(comSUbPolLst.getCd_comisuba_pol()));
+				comSubPolAux.setFlg_pago(1);
+				comSubPolAux.setSaldo_com_suba(0.0);
+				comSubPolAux.setNum_Factura_suba(numFactura);
+				comSubPolAux.setFc_pago_suba(fcFacturaCom);
+				srvComPolSuba.actualizaComisionSubagentePol(comSubPolAux);
+				
+				//inserto detalle pago canal
+				DetallePagoCanal detallePagoCanal = new DetallePagoCanal();
+				detallePagoCanal.setCd_comisuba_pol(comSubPolAux.getCd_comisuba_pol());
+				detallePagoCanal.setFecha_Factura(fcFacturaCom);
+				detallePagoCanal.setNum_Factura_suba(numFactura);
+				detallePagoCanal.setValor_liquidado(comSubPolAux.getVal_com_suba());
+				srvDetallePagoCanal.insertarDetallePagoCanal(detallePagoCanal);
+			}
+			numFacturaPrint = numFactura;
+			numFactura = null;
+			listComisionSubagenPol = new ArrayList<ComiSubagenPolView>();
+			PrimeFaces.current().executeScript("PF('numFactSuba').hide()");
 			FacesContext fContextObj = FacesContext.getCurrentInstance();
-			fContextObj.addMessage(null, new FacesMessage("Advertencia", "Ingrese el número de Factura "));
-			return;
+			fContextObj.addMessage(null, new FacesMessage("Advertencia", "Proceso exitoso"));
+			listComisionSubagenPol = new ArrayList<ComiSubagenPolView>();
+			btnPrint = false;
+			salir();
 		}
-		System.out.println("TAMAÑO:" + selectedListComiaionSubagenPol.size());
-		System.out.println("Factura No.:" + numFactura);
-		for (ComiSubagenPolView comSUbPolLst : selectedListComiaionSubagenPol) {
-			ComisionSubagentePol comSubPolAux = new ComisionSubagentePol();
-			comSubPolAux = srvComPolSuba.consultaSubagentePol(Integer.valueOf(comSUbPolLst.getCd_comisuba_pol()));
-			comSubPolAux.setFlg_pago(1);
-			comSubPolAux.setSaldo_com_suba(0.0);
-			comSubPolAux.setNum_Factura_suba(numFactura);
-			comSubPolAux.setFc_pago_suba(fcFacturaCom);
-			srvComPolSuba.actualizaComisionSubagentePol(comSubPolAux);
-		}
-		numFacturaPrint = numFactura;
-		numFactura = null;
-		listComisionSubagenPol = new ArrayList<ComiSubagenPolView>();
-//		RequestContext context = RequestContext.getCurrentInstance();
-//		context.execute("PF('numFactSuba').hide()");
-		PrimeFaces.current().executeScript("PF('numFactSuba').hide()");
-		FacesContext fContextObj = FacesContext.getCurrentInstance();
-		fContextObj.addMessage(null, new FacesMessage("Advertencia", "Proceso exitoso"));
-		listComisionSubagenPol = new ArrayList<ComiSubagenPolView>();
-		btnPrint = false;
-		salir();
 	}
 
 	public void salir() {
-		// ExternalContext ctx =
-		// FacesContext.getCurrentInstance().getExternalContext();
-		// try {
-		// ctx.redirect("./index.jsf");
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
 	}
 
 	public void modificaSubagenPol() {
-		System.out.println("Tamaño_selecicion:"+selectedListComiaionSubagenPolMod.size());
+		System.out.println("Tamaï¿½o_selecicion:" + selectedListComiaionSubagenPolMod.size());
 		for (ComiSubagenPolView auxCom : selectedListComiaionSubagenPolMod) {
 			ComisionSubagentePol comSuba = new ComisionSubagentePol();
 			comSuba = srvComPolSuba.consultaSubagentePol(Integer.valueOf(auxCom.getCd_comisuba_pol()));
@@ -286,10 +330,38 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 					codNuevoSubagnete);
 		}
 		listComisionSubagenPol = new ArrayList<ComiSubagenPolView>();
-//		RequestContext context = RequestContext.getCurrentInstance();
-//		context.execute("PF('cambiaSuba').hide()");
 		PrimeFaces.current().executeScript("PF('cambiaSuba').hide()");
 
+	}
+
+	public void visualizaFactSelec() {
+		PrimeFaces.current().executeScript("PF('wFactSelected').show();");
+	}
+
+	public void onRowEditValCom(RowEditEvent event) {
+		System.out.println("getCd_comisuba_pol:" + ((ComiSubagenPolView) event.getObject()).getCd_comisuba_pol());
+	}
+
+	public void generaComision() {
+		System.out.println("TAMAÃ±O:" + selectedListComiaionSubagenPol.size());
+		PrimeFaces.current().executeScript("PF('numFactSuba').show()");
+	}
+
+	public void generaPagoPArcial() {
+		System.out.println("TAMAÃ±O:" + selectedListComiaionSubagenPol.size());
+
+		if (selectedListComiaionSubagenPol.size() > 0) {
+			listComisionSubagenPolPArcial = new ArrayList<ComiSubagenPolView>();
+			listComisionSubagenPolPArcial = selectedListComiaionSubagenPol;
+			PrimeFaces.current().executeScript("PF('wComSubaSelected').show()");
+		} else {
+			FacesContext fContextObj = FacesContext.getCurrentInstance();
+			fContextObj.addMessage(null, new FacesMessage("Advertencia", "Seleccione Comisiones para liquidar"));
+		}
+	}
+
+	public void eliminaFactConfia(ComiSubagenPolView aux) {
+		listComisionSubagenPolPArcial.remove(aux);
 	}
 
 	public List<Subagentes> getListSubagentes() {
@@ -418,6 +490,14 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 
 	public void setCodigoAseguradora(String codigoAseguradora) {
 		this.codigoAseguradora = codigoAseguradora;
+	}
+
+	public List<ComiSubagenPolView> getListComisionSubagenPolPArcial() {
+		return listComisionSubagenPolPArcial;
+	}
+
+	public void setListComisionSubagenPolPArcial(List<ComiSubagenPolView> listComisionSubagenPolPArcial) {
+		this.listComisionSubagenPolPArcial = listComisionSubagenPolPArcial;
 	}
 
 }

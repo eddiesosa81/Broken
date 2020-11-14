@@ -134,6 +134,7 @@
 		<class>confia.entidades.transaccionales.Gestion</class>
 		<class>confia.entidades.transaccionales.Archivos</class>
 		<class>confia.entidades.transaccionales.MensualComercial</class>
+		<class>confia.entidades.transaccionales.DetallePagoCanal</class>
 		
 		<properties>
 			<property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect" />
