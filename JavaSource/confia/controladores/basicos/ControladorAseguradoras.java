@@ -30,6 +30,7 @@ import confia.servicios.basicos.ServicioDireccion;
 import confia.servicios.basicos.ServicioRubros;
 import confia.servicios.basicos.ServicioTelefono;
 
+
 @ViewScoped
 @ManagedBean
 
