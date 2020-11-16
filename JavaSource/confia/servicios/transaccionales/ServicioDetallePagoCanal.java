@@ -18,7 +18,7 @@ public class ServicioDetallePagoCanal {
 	
 	
 	@SuppressWarnings("unchecked")
-	public List<DetallePagoCanal> detallePAgoCanañ(String codComSuba ) {
+	public List<DetallePagoCanal> detallePAgoCanal(String codComSuba ) {
 		
 		String sql = "Select * from detalle_pagos_canal_Tbl where cd_comisuba_pol = "+codComSuba;
   

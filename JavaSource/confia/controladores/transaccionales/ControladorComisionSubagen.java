@@ -206,7 +206,8 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 	}
 
 	public void guardarComiSubagenPol() {
-
+		numFacturaPrint = numFactura;
+		System.out.println("Numero Factura:"+numFacturaPrint);
 		if (listComisionSubagenPolPArcial.size() > 0) {
 			System.out.println("Ingreso Pago Parcial");
 			try {
