@@ -31,6 +31,17 @@ public class CoberturasPlanView {
 	private String porcentajeplancobertura;
 	@Column(name="valor_plancobertura")
 	private String valor_plancobertura;
+	@Column(name="ESPECIFICACION_COB")
+	private String especificacion_cob;
+	
+	
+	
+	public String getEspecificacion_cob() {
+		return especificacion_cob;
+	}
+	public void setEspecificacion_cob(String especificacion_cob) {
+		this.especificacion_cob = especificacion_cob;
+	}
 	public String getCd_cobertura() {
 		return cd_cobertura;
 	}

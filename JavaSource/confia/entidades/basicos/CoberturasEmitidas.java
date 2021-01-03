@@ -23,6 +23,26 @@ public class CoberturasEmitidas {
 	private Double valor_plancobertura;
 	@Column(name="cd_compania") 
 	private Integer cd_compania;
+	@Column(name="especificacion_cob") 
+	private String especificacion_cob;
+	@Column(name="cd_ubicacion") 
+	private Integer cd_ubicacion;
+	
+	
+	
+	
+	public Integer getCd_ubicacion() {
+		return cd_ubicacion;
+	}
+	public void setCd_ubicacion(Integer cd_ubicacion) {
+		this.cd_ubicacion = cd_ubicacion;
+	}
+	public String getEspecificacion_cob() {
+		return especificacion_cob;
+	}
+	public void setEspecificacion_cob(String especificacion_cob) {
+		this.especificacion_cob = especificacion_cob;
+	}
 	public Integer getCd_cobertura() {
 		return cd_cobertura;
 	}

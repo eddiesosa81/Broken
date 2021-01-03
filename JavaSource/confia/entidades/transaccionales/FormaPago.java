@@ -38,12 +38,16 @@ public class FormaPago {
 	private Double superBanco_forma_Pago;
 	@Column(name="SEGURO_CAMPESINO")
 	private Double seguroCampesion_forma_Pago;
-	@Column(name="otro_valor")
-	private Double otro_valor_forma_Pago;
-	@Column(name="observaciones")
-	private String observaciones;
+	@Column(name="CUOTA_LETRA")
+	private Double cuotaLetraFormaPago;
 	@Column(name="sin_iva")
 	private Integer sin_iva;
+	@Column(name="observaciones")
+	private String observaciones;
+	@Column(name="otro_valor")
+	private Double otro_valor_forma_Pago;
+	
+	
 	public Integer getCd_forma_Pago() {
 		return cd_forma_Pago;
 	}
@@ -133,6 +137,12 @@ public class FormaPago {
 	}
 	public void setSin_iva(Integer sin_iva) {
 		this.sin_iva = sin_iva;
+	}
+	public Double getCuotaLetraFormaPago() {
+		return cuotaLetraFormaPago;
+	}
+	public void setCuotaLetraFormaPago(Double cuotaLetraFormaPago) {
+		this.cuotaLetraFormaPago = cuotaLetraFormaPago;
 	}
 	
 	

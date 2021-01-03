@@ -135,6 +135,8 @@ public class ControladorPlanes {
 	private Double valorDedMin;
 	private Double valorDedFijo;
 	private String especificacionDed;
+	private String especificacionCob;
+	private String especificacionCla;
 	private String codPlan;
 	private Integer numAnioDepre;
 	
@@ -499,6 +501,15 @@ public class ControladorPlanes {
 				if (valorCob != 0.0)
 					planCobAux.setValor_plancobertura(valorCob);
 				planCobAux.setEstado_plancobertura("A");
+				
+				try {
+					if (!especificacionCob.isEmpty() || especificacionCob != null) {
+						planCobAux.setEspecificacion(especificacionCob);
+					}
+				} catch (Exception e) {
+					planCobAux.setEspecificacion("-");
+				}
+				
 				srvPlanCobertura.insertarPlanCobertura(planCobAux);
 			}
 
@@ -589,7 +600,7 @@ public class ControladorPlanes {
 						planDedAux.setEspecificacion(especificacionDed);
 					}
 				} catch (Exception e) {
-					// TODO: handle exception
+					planDedAux.setEspecificacion("-");
 				}
 				planDedAux.setEstado_plandeducible("A");
 				srvPlanDeducible.insertarPlanDeducible(planDedAux);
@@ -658,6 +669,9 @@ public class ControladorPlanes {
 				asegClau.setEstado_asegclau("A");
 				asegClau.setCd_aseguradora(Integer.valueOf(selectedPlanRamAseg.getCd_aseguradora()));
 				asegClau.setCd_clausula(caluTmp.getCd_clausula());
+				
+				
+				
 				srvAsegClausula.insertarAseguradoraClausula(asegClau);
 				codAsegClau = srvAsegClausula.codigoMaxAseguradoraClausula();
 			} else {
@@ -676,6 +690,13 @@ public class ControladorPlanes {
 				if (valorClau != 0.0)
 					planClauAux.setValor_planclausula(valorClau);
 				planClauAux.setEstado_planclausula("A");
+				try {
+					if (!especificacionCla.isEmpty() || especificacionCla != null) {
+						planClauAux.setEspecificacion(especificacionCla);
+					}
+				} catch (Exception e) {
+					planClauAux.setEspecificacion("-");
+				}
 				srvPlanClausula.insertarPlanClausula(planClauAux);
 			}
 		}
@@ -720,10 +741,30 @@ public class ControladorPlanes {
 		planCobAux = srvPlanCobertura
 				.consultaPlanCoberturaCodPlanCob(((CoberturasPlanView) event.getObject()).getCd_plancobertura());
 		Double val, porc;
-		val = Double.valueOf(((CoberturasPlanView) event.getObject()).getValor_plancobertura());
-		porc = Double.valueOf(((CoberturasPlanView) event.getObject()).getPorcentajeplancobertura());
+		try {
+			val = Double.valueOf(((CoberturasPlanView) event.getObject()).getValor_plancobertura());
+		} catch (Exception e) {
+			val = 0.0;
+		}
+		
+		try {
+			porc = Double.valueOf(((CoberturasPlanView) event.getObject()).getPorcentajeplancobertura());
+		} catch (Exception e) {
+			porc = 0.0;
+		}
+		
+		
 		planCobAux.setValor_plancobertura(val);
 		planCobAux.setPorcentajeplancobertura(porc);
+		String espe;
+		try {
+			espe = ((CoberturasPlanView) event.getObject()).getEspecificacion_cob();
+			System.out.println("INGRESO espe:"+espe);
+		} catch (Exception e) {
+			espe = "-";
+		}
+		System.out.println("INGRESO espe:"+espe);
+		planCobAux.setEspecificacion(espe);
 		srvPlanCobertura.actualizaPlanCobertura(planCobAux);
 		FacesContext context = FacesContext.getCurrentInstance();
 		context.addMessage(null, new FacesMessage("Advertencia", "Proceso Exitoso"));
@@ -735,10 +776,28 @@ public class ControladorPlanes {
 				.consultaPlanDeducibleCodPlanDe(((PlanDeduciblesView) event.getObject()).getCd_plandeducible());
 		Double valmin, valfijo, porcSin, porcASe;
 		String espe;
-		valmin = Double.valueOf(((PlanDeduciblesView) event.getObject()).getValor_minimo());
-		valfijo = Double.valueOf(((PlanDeduciblesView) event.getObject()).getValor_fijo());
-		porcSin = Double.valueOf(((PlanDeduciblesView) event.getObject()).getPorcentaje_valor_siniestro());
-		porcASe = Double.valueOf(((PlanDeduciblesView) event.getObject()).getPorcentaje_valor_asegurado());
+		try {
+			valmin = Double.valueOf(((PlanDeduciblesView) event.getObject()).getValor_minimo());
+		} catch (Exception e) {
+			valmin = 0.0;
+		}
+		try {
+			valfijo = Double.valueOf(((PlanDeduciblesView) event.getObject()).getValor_fijo());
+		} catch (Exception e) {
+			valfijo = 0.0;
+		}
+		try {
+			porcSin = Double.valueOf(((PlanDeduciblesView) event.getObject()).getPorcentaje_valor_siniestro());
+		} catch (Exception e) {
+			porcSin = 0.0;
+		}
+		try {
+			porcASe = Double.valueOf(((PlanDeduciblesView) event.getObject()).getPorcentaje_valor_asegurado());
+		} catch (Exception e) {
+			porcASe = 0.0;
+		}
+		
+		
 		try {
 			espe = ((PlanDeduciblesView) event.getObject()).getEspecificacionDed();
 		} catch (Exception e) {
@@ -759,10 +818,29 @@ public class ControladorPlanes {
 		planClauAux = srvPlanClausula
 				.consultaPlanClausulaCodPlanCla(((PlanClausulasView) event.getObject()).getCd_planclausula());
 		Double val, porc;
-		val = Double.valueOf(((PlanClausulasView) event.getObject()).getValor_planclausula());
-		porc = Double.valueOf(((PlanClausulasView) event.getObject()).getPorcentaje_planclausula());
+		
+		try {
+			val = Double.valueOf(((PlanClausulasView) event.getObject()).getValor_planclausula());
+		} catch (Exception e) {
+			val = 0.00;
+		}
+		try {
+			porc = Double.valueOf(((PlanClausulasView) event.getObject()).getPorcentaje_planclausula());
+		} catch (Exception e) {
+			porc = 0.00;
+		}
+		
+		
 		planClauAux.setValor_planclausula(val);
 		planClauAux.setPorcentaje_planclausula(porc);
+		
+		String espe;
+		try {
+			espe = ((PlanClausulasView) event.getObject()).getEspecificacion_cla();
+		} catch (Exception e) {
+			espe = "";
+		}
+		planClauAux.setEspecificacion(espe);
 		srvPlanClausula.actualizaPlanClausula(planClauAux);
 		FacesContext context = FacesContext.getCurrentInstance();
 		context.addMessage(null, new FacesMessage("Advertencia", "Proceso Exitoso"));
@@ -1094,6 +1172,22 @@ public class ControladorPlanes {
 
 	public void setEspecificacionDed(String especificacionDed) {
 		this.especificacionDed = especificacionDed;
+	}
+
+	public String getEspecificacionCob() {
+		return especificacionCob;
+	}
+
+	public void setEspecificacionCob(String especificacionCob) {
+		this.especificacionCob = especificacionCob;
+	}
+
+	public String getEspecificacionCla() {
+		return especificacionCla;
+	}
+
+	public void setEspecificacionCla(String especificacionCla) {
+		this.especificacionCla = especificacionCla;
 	}
 	
 

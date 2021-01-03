@@ -114,6 +114,16 @@
 						</f:facet>
 					</p:cellEditor>
 				</p:column>
+				<p:column headerText="Especificación" >
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{cob.especificacion_cob}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputText value="#{cob.especificacion_cob}" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
 				<p:column style="width:32px">
 					<p:rowEditor />
 				</p:column>
@@ -293,6 +303,16 @@
 						</f:facet>
 					</p:cellEditor>
 				</p:column>
+				<p:column headerText="Especificación" >
+					<p:cellEditor>
+						<f:facet name="output">
+							<h:outputText value="#{cla.especificacion_cla}" />
+						</f:facet>
+						<f:facet name="input">
+							<p:inputText value="#{cla.especificacion_cla}" />
+						</f:facet>
+					</p:cellEditor>
+				</p:column>
 				<p:column style="width:32px">
 					<p:rowEditor />
 				</p:column>
@@ -404,11 +424,15 @@
 					<h:outputText value="Valor" />
 					<p:inputNumber value="#{ControladorPlanes.valorCob}"
 						id="inptNumValC"></p:inputNumber>
+					<h:outputText value="Especificación" />
+					<p:inputText value="#{ControladorPlanes.especificacionCob}"
+						id="inptEspC"></p:inputText>
 				</h:panelGrid>
 			</p:row>
 		</h:panelGrid>
 		<p:commandButton icon="ui-icon-check" value="Guardar"
-			process="@this,frm_planes:checkboxDTCob,frm_planes:inptNumPor2,frm_planes:inptNumValC,frm_planes:dtCobertura"
+			process="@this,frm_planes:checkboxDTCob,frm_planes:inptNumPor2,
+			frm_planes:inptNumValC,frm_planes:dtCobertura,frm_planes:inptEspC"
 			update="@this frm_planes:dtCobertura"
 			action="#{ControladorPlanes.guardaCobertura}">
 		</p:commandButton>
@@ -506,11 +530,14 @@
 					<h:outputText value="Valor" />
 					<p:inputNumber value="#{ControladorPlanes.valorClau}"
 						id="inptNumVal"></p:inputNumber>
+					<h:outputText value="Especificación" />
+					<p:inputText value="#{ControladorPlanes.especificacionCla}"
+						id="inptEspCla"></p:inputText>
 				</h:panelGrid>
 			</p:row>
 		</h:panelGrid>
 		<p:commandButton icon="ui-icon-check" value="Guardar"
-			process="@this,frm_planes:checkboxDTded,frm_planes:inptNumPor,frm_planes:inptNumVal"
+			process="@this,frm_planes:checkboxDTded,frm_planes:inptNumPor,frm_planes:inptNumVal,frm_planes:inptEspCla"
 			update="@this frm_planes:dtClausulas"
 			action="#{ControladorPlanes.guardaClausula}">
 		</p:commandButton>

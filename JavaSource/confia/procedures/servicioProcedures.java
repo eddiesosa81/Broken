@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 
 public class servicioProcedures {
 	
+	
+	
 	public Integer act_comision_pol_Asis_med(String codCompania,String cdDetFormaPago ) {
 		Connection conn;
 		// ejecuta el SP

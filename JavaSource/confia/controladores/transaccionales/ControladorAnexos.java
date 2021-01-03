@@ -282,6 +282,9 @@ public class ControladorAnexos {
 	private String strAnexoAclaratorio;
 
 	private String emiteAfectaPoliza;
+	private String frmObservaciones;
+	
+	
 	public String getEspecificacionDed() {
 		return especificacionDed;
 	}
@@ -3535,6 +3538,7 @@ public class ControladorAnexos {
 		lstFrmPago = new ArrayList<FormaPago>();
 		lstDetFrmPago = new ArrayList<DetalleFormaPago>();
 		System.out.println("FORMAPAGO-flgBotonoEmite:" + flgBotonoEmite);
+		frmObservaciones = "SIN OBSERVACIONES";
 		if (flgBotonoEmite == true) {
 			// anexos pendientes
 			FormaPago frmPagoAux = new FormaPago();
@@ -3845,6 +3849,13 @@ public class ControladorAnexos {
 	}
 
 	public void guardaFormaPago() {
+		try {
+			if(frmObservaciones.isEmpty() || frmObservaciones == null) {
+				frmObservaciones = "Sin Observaciones.";
+			}
+		} catch (Exception e) {
+			frmObservaciones = "Sin Observaciones.";
+		}
 		FormaPago formaPagoAux = new FormaPago();
 		if (tpFromaPago.equals("PROVISIONAL")) {
 			formaPagoAux = new FormaPago();
@@ -3867,6 +3878,7 @@ public class ControladorAnexos {
 			formaPagoAux.setNum_alternativa_formaPago(tpFromaPago);
 			formaPagoAux.setPct_cuota_Inicial_frmPago(frmPagoCuotaIni);
 			formaPagoAux.setNum_pago_formaPago(frmPagoNumPago);
+			formaPagoAux.setObservaciones(frmObservaciones);
 			if (aplicaIva) {
 				formaPagoAux.setSin_iva(0);
 			} else {
@@ -3875,6 +3887,7 @@ public class ControladorAnexos {
 		}else {
 			calculaPagoTotal();
 			formaPagoAux = new FormaPago();
+			System.out.println("flgBotonoEmite:"+flgBotonoEmite);
 			if (flgBotonoEmite == true) {
 				for (ConsultaAnexoPendienteView anex : lstAnexoPendiente) {
 					formaPagoAux.setCd_cotizacion(Integer.valueOf(anex.getCd_cotizacion()));
@@ -3884,21 +3897,46 @@ public class ControladorAnexos {
 				formaPagoAux.setCd_cotizacion(nuevaCot.getCd_cotizacion());
 				formaPagoAux.setCd_compania(nuevaCot.getCd_compania());
 			}
+			
+			
 			formaPagoAux.setTotal_prima_frmPago(frmPagoPrimaTot);
+			System.out.println("frmPagoPrimaTot:"+frmPagoPrimaTot);
+			
 			formaPagoAux.setSuperBanco_forma_Pago(frmPagoSuperBancos);
+			System.out.println("frmPagoSuperBancos"+frmPagoSuperBancos);
+			
 			formaPagoAux.setDerecho_Emision_formaPago(frmPagoDerechoEmision);
+			System.out.println("frmPagoDerechoEmision"+frmPagoDerechoEmision);
+			
 			formaPagoAux.setSeguroCampesion_forma_Pago(frmPagoSegCampesino);
+			System.out.println("frmPagoSegCampesino"+frmPagoSegCampesino);
+			
 			formaPagoAux.setOtro_valor_forma_Pago(frmPagoOtroValor);
+			System.out.println("frmPagoOtroValor"+frmPagoOtroValor);
+			
 			formaPagoAux.setIva_Forma_Pago(frmPagoIva);
+			System.out.println("frmPagoIva"+frmPagoIva);
+			
 			formaPagoAux.setTotal_Pago_FormaPago(frmPagoTotal);
+			System.out.println("frmPagoTotal"+frmPagoTotal);
+			
 			formaPagoAux.setNum_alternativa_formaPago(tpFromaPago);
+			System.out.println("tpFromaPago"+tpFromaPago);
+			
 			formaPagoAux.setPct_cuota_Inicial_frmPago(frmPagoCuotaIni);
+			System.out.println("frmPagoCuotaIni"+frmPagoCuotaIni);
+			
 			formaPagoAux.setNum_pago_formaPago(frmPagoNumPago);
+			System.out.println("frmPagoNumPago"+frmPagoNumPago);
+			
+			formaPagoAux.setObservaciones(frmObservaciones);
+			System.out.println("frmObservaciones"+frmObservaciones);
 			if (aplicaIva) {
 				formaPagoAux.setSin_iva(0);
 			} else {
 				formaPagoAux.setSin_iva(1);
 			}
+			System.out.println("aplicaIva"+aplicaIva);
 		}
 		int res = 0;
 		res = srvFormaPago.insertaFormaPago(formaPagoAux);
@@ -3907,24 +3945,42 @@ public class ControladorAnexos {
 			context.addMessage(null, new FacesMessage("Advertencia", "Error al Grabar la forma de Pago."));
 			return;
 		}
-
+		System.out.println("formaPagoAux.getCd_cotizacion():"+formaPagoAux.getCd_cotizacion());
+		res = srvFormaPago.codigoMaxFormaPagoAnexo(formaPagoAux.getCd_cotizacion());
+		System.out.println("CODIGO_FRMPAGO:"+res);		
+		
+		formaPagoAux = new FormaPago();
+		try {
+			if (flgBotonoEmite == true) {
+				System.out.println("INGRESOOOOO");
+				for (ConsultaAnexoPendienteView anex : lstAnexoPendiente) {
+					formaPagoAux = srvFormaPago.recuperaFormaPagoxCod(res, 1);
+				}
+			} else {
+				System.out.println("INGRESOOOOO 2");
+				System.out.println("Recupera forma de pago");
+				formaPagoAux = srvFormaPago.recuperaFormaPagoxCod(res, 1);
+			}
+			if(formaPagoAux == null) {
+				PrimeFaces.current().executeScript("PF('nuevaFormaPago').hide();");
+				System.out.println("Es Nulo");
+				return;
+			}
+			
+		} catch (Exception e) {
+			PrimeFaces.current().executeScript("PF('nuevaFormaPago').hide();");
+			System.out.println("ERROR Es Nulo");
+			return;
+		}
+		
 		tpFromaPago = null;
 		frmPagoPrimaTot = 0.0;
-
 		frmPagoOtroValor = 0.0;
 		frmPagoIva = 0.0;
 		frmPagoTotal = 0.0;
 		frmPagoCuotaIni = 0.0;
 		frmPagoNumPago = 1;
-		res = srvFormaPago.codigoMaxFormaPago();
-		formaPagoAux = new FormaPago();
-		if (flgBotonoEmite == true) {
-			for (ConsultaAnexoPendienteView anex : lstAnexoPendiente) {
-				formaPagoAux = srvFormaPago.recuperaFormaPagoxCod(res, Integer.valueOf(anex.getCd_compania()));
-			}
-		} else {
-			formaPagoAux = srvFormaPago.recuperaFormaPagoxCod(res, nuevaCot.getCd_compania());
-		}
+		
 		lstFrmPago = new ArrayList<FormaPago>();
 		lstFrmPago.add(formaPagoAux);
 		lstDetFrmPago = new ArrayList<DetalleFormaPago>();
@@ -4813,5 +4869,15 @@ public class ControladorAnexos {
 	public void setFilteredLstSubobjetoPol(List<ConsultaSubObjetoPolView> filteredLstSubobjetoPol) {
 		this.filteredLstSubobjetoPol = filteredLstSubobjetoPol;
 	}
+
+	public String getFrmObservaciones() {
+		return frmObservaciones;
+	}
+
+	public void setFrmObservaciones(String frmObservaciones) {
+		this.frmObservaciones = frmObservaciones;
+	}
+	
+	
 
 }

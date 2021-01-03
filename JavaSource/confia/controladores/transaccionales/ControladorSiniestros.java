@@ -19,6 +19,7 @@ import org.primefaces.PrimeFaces;
 import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 
+import confia.entidades.basicos.Aseguradoras;
 import confia.entidades.basicos.Canton;
 import confia.entidades.basicos.Ciudad;
 import confia.entidades.basicos.CoberturasAdicionales;
@@ -31,6 +32,7 @@ import confia.entidades.basicos.GrupoContratante;
 import confia.entidades.basicos.Parroquia;
 import confia.entidades.basicos.Plan;
 import confia.entidades.basicos.Provincias;
+import confia.entidades.basicos.Ramo;
 import confia.entidades.basicos.Rubros;
 import confia.entidades.basicos.Usuarios;
 import confia.entidades.transaccionales.CaracteristicasVehiculos;
@@ -53,6 +55,7 @@ import confia.entidades.vistas.ConsultaUbicacionPolView;
 import confia.procedures.ProcedimientosAlmacenadosDB;
 import confia.procedures.servicioProcedures;
 import confia.reportes.EmailSenderService;
+import confia.servicios.basicos.ServicioAseguradoras;
 import confia.servicios.basicos.ServicioCanton;
 import confia.servicios.basicos.ServicioCiudad;
 import confia.servicios.basicos.ServicioCoberturasAdicionales;
@@ -89,6 +92,8 @@ import confia.servicios.vistas.ServicioConsultaUbicacionPolView;
 @ManagedBean(name = "ControladorSiniestros")
 @ViewScoped
 public class ControladorSiniestros {
+	@EJB
+	private ServicioAseguradoras srvAseguradoras;
 	@EJB
 	private ServicioUsuarios srvUsuario;
 	@EJB
@@ -175,12 +180,14 @@ public class ControladorSiniestros {
 	private List<ConsultaObjetoPolView> filteredLstObjetosPoliza;
 	private List<ConsultaObjetoPolView> lstObjetosPoliza;
 	private List<ConsultaSubObjetoPolView> lstSubObjetosPoliza;
+	private List<ConsultaSubObjetoPolView> filteredlstSubObjetosPoliza;
 	private ConsultaSubObjetoPolView selectedSubObjetosPoliza;
 	private ConsultaObjetoPolView selectedObjetosPoliza;
 	private List<CaracteristicasVehiculos> LstCaracteristicas;
 	private List<CaracteristicasVehiculos> LstCaracteristicasCab;
 	private List<ConsultaPagoPolView> lstPagoPoliza;
 	private List<CoberturasEmitidas> lstCoberturasPlan;
+	private List<CoberturasEmitidas> filteredlstCoberturasPlan;
 	private List<CoberturasAdicionales> lstCoberturasAdcPlan;
 	private CoberturasAdicionales selectedCoberturasAdcPlan;
 	private CoberturasEmitidas selectedCoberturasPlan;
@@ -262,6 +269,14 @@ public class ControladorSiniestros {
 
 	// envio correo
 	private EmailSenderService email;
+	
+	private List<Aseguradoras> listAseguradoras;
+	private List<Ramo> lstRamo;
+	
+	private String lscdAseguradora;
+	private String lscdRamo;
+	
+	private boolean caduca; 
 
 	public ControladorSiniestros() {
 		fcEstadoSiniestro = new Date();
@@ -298,6 +313,8 @@ public class ControladorSiniestros {
 		panelCaracteristica = true;
 		lstCoberturasAdcPlan = new ArrayList<CoberturasAdicionales>();
 		email = new EmailSenderService();
+		listAseguradoras = new ArrayList<Aseguradoras>();
+		lstRamo = new ArrayList<Ramo>();
 
 	}
 
@@ -315,6 +332,8 @@ public class ControladorSiniestros {
 		cdCanton = "0";
 		cdProvincia = "0";
 		cdParroquia = "0";
+		listAseguradoras = srvAseguradoras.BuscaAseguradoras();
+		lstRamo = srvRamo.listaRamos();
 	}
 
 	public void buscaPoliza() {
@@ -363,18 +382,64 @@ public class ControladorSiniestros {
 		System.out.println("grupo contratante:" + grpCont);
 		System.out.println("Titular: " + nmTitular);
 		if (placa.equals("%") && motor.equals("%") && nmTitular.equals("%")) {
-			lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasXClienteGrpCont(nmCliente, grpCont, poliza);
+			if(caduca) {
+				lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasXClienteGrpCont(nmCliente, grpCont, poliza,"%",lscdAseguradora,lscdRamo);
+			}else {
+				lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasXClienteGrpContVig(nmCliente, grpCont, poliza,"%",lscdAseguradora,lscdRamo);
+			}
+			
 		} else {
 			if (!placa.equals("%")) {
-				consCaracPol = srvConsCaractPolView.consultaCaracteristicaObjPol(placa.trim().toUpperCase(), "%");
-				lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasXRamoCot(consCaracPol.getCd_ramo_cotizacion());
+				String lsPlacaString,LsPlacaFinal = "%";
+				lsPlacaString = placa.toUpperCase();
+				lsPlacaString = lsPlacaString.trim();
+				for (int n = 0;n <lsPlacaString.length(); n++) {
+					char c = lsPlacaString.charAt(n);
+					if(n == 3) {
+						LsPlacaFinal = LsPlacaFinal.concat("%");
+						LsPlacaFinal = LsPlacaFinal.concat(String.valueOf(c));
+					}else {
+						LsPlacaFinal = LsPlacaFinal.concat(String.valueOf(c));
+					}
+				}
+				LsPlacaFinal = LsPlacaFinal.concat("%");
+				System.out.println("PLACA A BUSCAR:"+LsPlacaFinal);
+				List<ConsultaCaractPolView> lstconsCaracPol = new ArrayList<ConsultaCaractPolView>();
+				lstconsCaracPol = srvConsCaractPolView.consultaCaracteristicaObjPolPlaca(LsPlacaFinal);
+				
+				String varString="";
+				Integer sizeListInteger = lstconsCaracPol.size();
+				System.out.println("Tamaño lista:"+sizeListInteger);
+				Integer contadorInteger = 0;
+				
+				for (ConsultaCaractPolView auxCRC : lstconsCaracPol) {
+					contadorInteger = contadorInteger +1;
+					if(contadorInteger == sizeListInteger) {
+						varString = varString.concat(auxCRC.getCd_ramo_cotizacion());
+					}else {
+						varString = varString.concat(auxCRC.getCd_ramo_cotizacion());
+						varString = varString.concat(",");
+					}
+				}
+				System.out.println("varString:"+varString);
+				if(caduca) {
+					lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasXRamoCotPlaca(varString);
+				}else {
+					lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasXRamoCotPlacaVig(varString);
+				}
+				
 			}
 			if (!motor.equals("%")) {
 				consCaracPol = srvConsCaractPolView.consultaCaracteristicaObjPol("%", motor.trim().toUpperCase());
 				lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasXRamoCot(consCaracPol.getCd_ramo_cotizacion());
 			}
 			if (!nmTitular.equals("%")) {
-				lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasXDescObj(nmTitular);
+				if(caduca) {
+					lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasXDescObj(nmTitular);
+				}else {
+					lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasXDescObjVig(nmTitular);
+				}
+				
 			}
 		}
 	}
@@ -461,21 +526,21 @@ public class ControladorSiniestros {
 			// verirfico si el ramo es
 			// Ubicación o RamoCotizacion
 			Integer tpRam = srvRamo.tipoRamo(siniestro.getCdRamo());
-			
+
 			if (tpRam.equals(1)) {
 				try {
 					plan = srvPlan.consultaPlanUbicacion(Integer.valueOf(selectedObjetosPoliza.getCd_obj_cotizacion()));
-					if(plan == null) {
+					if (plan == null) {
 						plan = srvPlan.consultaPlanRamoCotizacion(siniestro.getCdRamoCotizacion());
 					}
 				} catch (Exception e) {
 					plan = srvPlan.consultaPlanRamoCotizacion(siniestro.getCdRamoCotizacion());
 				}
-				
+
 			} else {
 				plan = srvPlan.consultaPlanRamoCotizacion(siniestro.getCdRamoCotizacion());
 			}
-			
+
 			Double valAsegSubobj, primaNetaSubObj;
 			String descSubobj, cdSubObje;
 
@@ -514,6 +579,40 @@ public class ControladorSiniestros {
 					detalleSiniestros.getCd_obj_cotizacion(), detalleSiniestros.getCd_compania());
 			if (LstCaracteristicasCab.size() == 0) {
 				panelCaracteristica = true;
+			}
+			// coberturas
+			lstCoberturasPlan = new ArrayList<CoberturasEmitidas>();
+			lstDeduciblesPlan = new ArrayList<DeduciblesEmitidas>();
+			lstCoberturasAdcPlan = new ArrayList<CoberturasAdicionales>();
+			System.out.println("Ingresoooooooooo tipo de ramo:"+tpRam);
+			System.out.println("*******************************************");
+			if (tpRam.equals(1)) {
+				lstCoberturasPlan = srvCoberturasPlan.recuperaCoberturasSiniestroUbicacion(Integer.valueOf(siniestro.getCdCompania()),
+						Integer.valueOf(siniestro.getCdRamoCotizacion()),Integer.valueOf(detalleSiniestros.getCd_obj_cotizacion()));
+				lstDeduciblesPlan = srvDeduciblesPlan.recuperaDeduciblesSiniestroUbicacion(Integer.valueOf(siniestro.getCdCompania()),
+						Integer.valueOf(siniestro.getCdRamoCotizacion()),Integer.valueOf(detalleSiniestros.getCd_obj_cotizacion()));
+				
+				lstCoberturasAdcPlan = srvCoberturasAdc.recuperaCoberturasAdcSiniestros(detalleSiniestros.getCd_compania(),
+						detalleSiniestros.getCd_obj_cotizacion());
+			}else {
+				lstCoberturasPlan = srvCoberturasPlan.recuperaCoberturasSiniestro(Integer.valueOf(siniestro.getCdCompania()),
+						Integer.valueOf(siniestro.getCdRamoCotizacion()));
+				lstDeduciblesPlan = srvDeduciblesPlan.recuperaDeduciblesSiniestro(Integer.valueOf(siniestro.getCdCompania()),
+						Integer.valueOf(siniestro.getCdRamoCotizacion()));
+				
+				lstCoberturasAdcPlan = srvCoberturasAdc.recuperaCoberturasAdcSiniestros(detalleSiniestros.getCd_compania(),
+						detalleSiniestros.getCd_obj_cotizacion());
+				
+			}
+			if (lstCoberturasPlan.size() == 0) {
+				lstCoberturasPlan = new ArrayList<CoberturasEmitidas>();
+				lstDeduciblesPlan = new ArrayList<DeduciblesEmitidas>();
+				lstCoberturasPlan = srvCoberturasPlan.recuperaCoberturasSiniestro(
+						Integer.valueOf(siniestro.getCdCompania()), Integer.valueOf(siniestro.getCdRamoCotizacion()));
+				lstDeduciblesPlan = srvDeduciblesPlan.recuperaDeduciblesSiniestro(
+						Integer.valueOf(siniestro.getCdCompania()), Integer.valueOf(siniestro.getCdRamoCotizacion()));
+				lstCoberturasAdcPlan = srvCoberturasAdc.recuperaCoberturasAdcSiniestros(detalleSiniestros.getCd_compania(),
+						detalleSiniestros.getCd_obj_cotizacion());
 			}
 			// Envio correo al ejecutivo comercial
 			Ejecutivos ejecutivos = new Ejecutivos();
@@ -565,20 +664,20 @@ public class ControladorSiniestros {
 		lstCoberturasAdcPlan = new ArrayList<CoberturasAdicionales>();
 		System.out.println("Recupera PLAN:" + selectedConsultaPoliza.getCd_plan());
 		if (selectedConsultaPoliza.getCd_plan().equals("0")) {
-			lstCoberturasPlan = srvCoberturasPlan.recuperaCoberturasEmitidas(
+			lstCoberturasPlan = srvCoberturasPlan.recuperaCoberturasSiniestro(
 					Integer.valueOf(selectedConsultaPoliza.getCd_compania()),
 					Integer.valueOf(selectedConsultaPoliza.getCd_ramo_cotizacion()));
-			lstDeduciblesPlan = srvDeduciblesPlan.recuperaDeduciblesEmitidas(
+			lstDeduciblesPlan = srvDeduciblesPlan.recuperaDeduciblesSiniestro(
 					Integer.valueOf(selectedConsultaPoliza.getCd_compania()),
 					Integer.valueOf(selectedConsultaPoliza.getCd_ramo_cotizacion()));
 			lstCoberturasAdcPlan = srvCoberturasAdc.recuperaCoberturasAdcSiniestros(detalleSiniestros.getCd_compania(),
 					detalleSiniestros.getCd_obj_cotizacion());
 		} else {
-			lstCoberturasPlan = srvCoberturasPlan.recuperaCoberturasEmitidas(
+			lstCoberturasPlan = srvCoberturasPlan.recuperaCoberturasSiniestro(
 					Integer.valueOf(selectedConsultaPoliza.getCd_compania()),
 					Integer.valueOf(selectedConsultaPoliza.getCd_ramo_cotizacion()));
 
-			lstDeduciblesPlan = srvDeduciblesPlan.recuperaDeduciblesEmitidas(
+			lstDeduciblesPlan = srvDeduciblesPlan.recuperaDeduciblesSiniestro(
 					Integer.valueOf(selectedConsultaPoliza.getCd_compania()),
 					Integer.valueOf(selectedConsultaPoliza.getCd_ramo_cotizacion()));
 			lstCoberturasAdcPlan = srvCoberturasAdc.recuperaCoberturasAdcSiniestros(detalleSiniestros.getCd_compania(),
@@ -892,9 +991,9 @@ public class ControladorSiniestros {
 	}
 
 	public void guardaDocAdc() {
-		System.out.println("docAdcSiniestro:"+docAdcSiniestro);
-		System.out.println("siniestro.getCdCompania()"+siniestro.getCdCompania());
-		System.out.println("siniestro.getCdSiniestro()"+siniestro.getCdSiniestro());
+		System.out.println("docAdcSiniestro:" + docAdcSiniestro);
+		System.out.println("siniestro.getCdCompania()" + siniestro.getCdCompania());
+		System.out.println("siniestro.getCdSiniestro()" + siniestro.getCdSiniestro());
 		Integer res;
 		documentosSiniestro = new DocumentoSiniestro();
 		documentosSiniestro.setCd_compania(siniestro.getCdCompania());
@@ -1182,7 +1281,7 @@ public class ControladorSiniestros {
 	}
 
 	public void editaLiquidacion() {
-		
+
 		Double totalValorProforma = 0.0;
 		int res = 0;
 		finiq = true;
@@ -1587,29 +1686,68 @@ public class ControladorSiniestros {
 		siniestro = srvSiniestros.recuperaCodSiniestros(selectedSiniestro.getCdSiniestro());
 		grupoContratante = new GrupoContratante();
 		grupoContratante = srvGrupoContratante.buscaGruposContratanteCrC(siniestro.getCdRamoCotizacion());
-		
+
 		detalleSiniestros = srvDetalleSiniestros.recuperaDetSiniestrosxCdSini(siniestro.getCdSiniestro(),
 				siniestro.getCdCompania());
-		
+
 		plan = new Plan();
 		// verirfico si el ramo es
 		// Ubicación o RamoCotizacion
 		Integer tpRam = srvRamo.tipoRamo(siniestro.getCdRamo());
-		System.out.println("Tipo Siniestro:"+tpRam);
-		
+		System.out.println("Tipo Siniestro:" + tpRam);
+
 		if (tpRam.equals(1)) {
 			try {
 				plan = srvPlan.consultaPlanUbicacion(Integer.valueOf(detalleSiniestros.getCd_obj_cotizacion()));
-				if(plan == null) {
+				if (plan == null) {
 					plan = srvPlan.consultaPlanRamoCotizacion(siniestro.getCdRamoCotizacion());
 				}
 			} catch (Exception e) {
 				plan = srvPlan.consultaPlanRamoCotizacion(siniestro.getCdRamoCotizacion());
 			}
-			
+
 		} else {
 			plan = srvPlan.consultaPlanRamoCotizacion(siniestro.getCdRamoCotizacion());
 		}
+		// recupera datos coberturas, deducibles, siniestros
+		lstCoberturasPlan = new ArrayList<CoberturasEmitidas>();
+		lstDeduciblesPlan = new ArrayList<DeduciblesEmitidas>();
+		lstCoberturasAdcPlan = new ArrayList<CoberturasAdicionales>();
+		if (tpRam.equals(1)) {
+			lstCoberturasPlan = srvCoberturasPlan.recuperaCoberturasSiniestroUbicacion(Integer.valueOf(siniestro.getCdCompania()),
+					Integer.valueOf(siniestro.getCdRamoCotizacion()),Integer.valueOf(detalleSiniestros.getCd_obj_cotizacion()));
+			lstDeduciblesPlan = srvDeduciblesPlan.recuperaDeduciblesSiniestroUbicacion(Integer.valueOf(siniestro.getCdCompania()),
+					Integer.valueOf(siniestro.getCdRamoCotizacion()),Integer.valueOf(detalleSiniestros.getCd_obj_cotizacion()));
+			
+			lstCoberturasAdcPlan = srvCoberturasAdc.recuperaCoberturasAdcSiniestros(detalleSiniestros.getCd_compania(),
+					detalleSiniestros.getCd_obj_cotizacion());
+		}else {
+			lstCoberturasPlan = srvCoberturasPlan.recuperaCoberturasSiniestro(Integer.valueOf(siniestro.getCdCompania()),
+					Integer.valueOf(siniestro.getCdRamoCotizacion()));
+			lstDeduciblesPlan = srvDeduciblesPlan.recuperaDeduciblesSiniestro(Integer.valueOf(siniestro.getCdCompania()),
+					Integer.valueOf(siniestro.getCdRamoCotizacion()));
+			
+			lstCoberturasAdcPlan = srvCoberturasAdc.recuperaCoberturasAdcSiniestros(detalleSiniestros.getCd_compania(),
+					detalleSiniestros.getCd_obj_cotizacion());
+			
+		}
+		
+		if (lstCoberturasPlan.size() == 0) {
+			lstCoberturasPlan = new ArrayList<CoberturasEmitidas>();
+			lstDeduciblesPlan = new ArrayList<DeduciblesEmitidas>();
+			lstCoberturasPlan = srvCoberturasPlan.recuperaCoberturasSiniestro(
+					Integer.valueOf(siniestro.getCdCompania()), Integer.valueOf(siniestro.getCdRamoCotizacion()));
+			lstDeduciblesPlan = srvDeduciblesPlan.recuperaDeduciblesSiniestro(
+					Integer.valueOf(siniestro.getCdCompania()), Integer.valueOf(siniestro.getCdRamoCotizacion()));
+			lstCoberturasAdcPlan = srvCoberturasAdc.recuperaCoberturasAdcSiniestros(detalleSiniestros.getCd_compania(),
+					detalleSiniestros.getCd_obj_cotizacion());
+		}
+		
+
+		lstCoberturasSiniestro = new ArrayList<CoberturasSiniestro>();
+		lstCoberturasSiniestro = srvCoberturasSiniestro
+				.consultaCoberturasSiniestro(String.valueOf(siniestro.getCdSiniestro()));
+
 		LstCaracteristicasCab = new ArrayList<CaracteristicasVehiculos>();
 		LstCaracteristicasCab = srvCaracteristicaObj.recuperaCaractVHporObjCot(detalleSiniestros.getCd_obj_cotizacion(),
 				detalleSiniestros.getCd_compania());
@@ -1624,31 +1762,7 @@ public class ControladorSiniestros {
 		lstDiagnosticoReclamo = new ArrayList<DiagnosticoReclamo>();
 		lstDiagnosticoReclamo = srvDiagnosticoReclamo
 				.consultaDiagnosticoReclamo(String.valueOf(siniestro.getCdSiniestro()));
-		// recupera datos coberturas, deducibles, siniestros
-		lstCoberturasPlan = new ArrayList<CoberturasEmitidas>();
-		lstDeduciblesPlan = new ArrayList<DeduciblesEmitidas>();
-		lstCoberturasAdcPlan = new ArrayList<CoberturasAdicionales>();
-		lstCoberturasPlan = srvCoberturasPlan.recuperaCoberturasEmitidas(Integer.valueOf(siniestro.getCdCompania()),
-				Integer.valueOf(siniestro.getCdRamoCotizacion()));
-		lstDeduciblesPlan = srvDeduciblesPlan.recuperaDeduciblesEmitidas(Integer.valueOf(siniestro.getCdCompania()),
-				Integer.valueOf(siniestro.getCdRamoCotizacion()));
-		lstCoberturasAdcPlan = srvCoberturasAdc.recuperaCoberturasAdcSiniestros(detalleSiniestros.getCd_compania(),
-				detalleSiniestros.getCd_obj_cotizacion());
 
-		if (lstCoberturasPlan.size() == 0) {
-			lstCoberturasPlan = new ArrayList<CoberturasEmitidas>();
-			lstDeduciblesPlan = new ArrayList<DeduciblesEmitidas>();
-			lstCoberturasPlan = srvCoberturasPlan.recuperaCoberturasEmitidas(Integer.valueOf(siniestro.getCdCompania()),
-					Integer.valueOf(siniestro.getCdRamoCotizacion()));
-			lstDeduciblesPlan = srvDeduciblesPlan.recuperaDeduciblesEmitidas(Integer.valueOf(siniestro.getCdCompania()),
-					Integer.valueOf(siniestro.getCdRamoCotizacion()));
-			lstCoberturasAdcPlan = srvCoberturasAdc.recuperaCoberturasAdcSiniestros(detalleSiniestros.getCd_compania(),
-					detalleSiniestros.getCd_obj_cotizacion());
-		}
-
-		lstCoberturasSiniestro = new ArrayList<CoberturasSiniestro>();
-		lstCoberturasSiniestro = srvCoberturasSiniestro
-				.consultaCoberturasSiniestro(String.valueOf(siniestro.getCdSiniestro()));
 		lsRubrosDocumentos = new ArrayList<Rubros>();
 		lsRubrosDocumentos = srvRubros.listadoDocumentosSiniestro("103", String.valueOf(siniestro.getCdRamo()));
 		lstDocumentosSiniestro = new ArrayList<DocumentoSiniestro>();
@@ -2474,5 +2588,62 @@ public class ControladorSiniestros {
 	public void setCdParroquia(String cdParroquia) {
 		this.cdParroquia = cdParroquia;
 	}
+
+	public List<Aseguradoras> getListAseguradoras() {
+		return listAseguradoras;
+	}
+
+	public void setListAseguradoras(List<Aseguradoras> listAseguradoras) {
+		this.listAseguradoras = listAseguradoras;
+	}
+
+	public List<Ramo> getLstRamo() {
+		return lstRamo;
+	}
+
+	public void setLstRamo(List<Ramo> lstRamo) {
+		this.lstRamo = lstRamo;
+	}
+
+	public String getLscdAseguradora() {
+		return lscdAseguradora;
+	}
+
+	public void setLscdAseguradora(String lscdAseguradora) {
+		this.lscdAseguradora = lscdAseguradora;
+	}
+
+	public String getLscdRamo() {
+		return lscdRamo;
+	}
+
+	public void setLscdRamo(String lscdRamo) {
+		this.lscdRamo = lscdRamo;
+	}
+
+	public boolean isCaduca() {
+		return caduca;
+	}
+
+	public void setCaduca(boolean caduca) {
+		this.caduca = caduca;
+	}
+
+	public List<ConsultaSubObjetoPolView> getFilteredlstSubObjetosPoliza() {
+		return filteredlstSubObjetosPoliza;
+	}
+
+	public void setFilteredlstSubObjetosPoliza(List<ConsultaSubObjetoPolView> filteredlstSubObjetosPoliza) {
+		this.filteredlstSubObjetosPoliza = filteredlstSubObjetosPoliza;
+	}
+
+	public List<CoberturasEmitidas> getFilteredlstCoberturasPlan() {
+		return filteredlstCoberturasPlan;
+	}
+
+	public void setFilteredlstCoberturasPlan(List<CoberturasEmitidas> filteredlstCoberturasPlan) {
+		this.filteredlstCoberturasPlan = filteredlstCoberturasPlan;
+	}
+	
 
 }

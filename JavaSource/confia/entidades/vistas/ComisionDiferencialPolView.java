@@ -72,9 +72,17 @@ public class ComisionDiferencialPolView {
 	private String num_factura_brk;
 	@Column(name = "cd_plan")
 	private String cd_plan;
+	@Column(name = "plan")
+	private String plan;
 	
 	
 	
+	public String getPlan() {
+		return plan;
+	}
+	public void setPlan(String plan) {
+		this.plan = plan;
+	}
 	public String getCd_plan() {
 		return cd_plan;
 	}

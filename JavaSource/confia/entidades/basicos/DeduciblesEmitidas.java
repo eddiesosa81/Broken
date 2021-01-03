@@ -36,9 +36,17 @@ public class DeduciblesEmitidas {
 	private Integer cd_compania;
 	@Column(name = "especificacion")
 	private String especificacion;
+	@Column(name="cd_ubicacion") 
+	private Integer cd_ubicacion;
 	
 	
 	
+	public Integer getCd_ubicacion() {
+		return cd_ubicacion;
+	}
+	public void setCd_ubicacion(Integer cd_ubicacion) {
+		this.cd_ubicacion = cd_ubicacion;
+	}
 	public Integer getCd_deducible() {
 		return cd_deducible;
 	}

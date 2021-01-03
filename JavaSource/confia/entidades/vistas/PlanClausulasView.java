@@ -31,6 +31,17 @@ public class PlanClausulasView {
 	private String porcentaje_planclausula;
 	@Column(name="valor_planclausula")
 	private String valor_planclausula;
+	@Column(name="ESPECIFICACION_CLA")
+	private String especificacion_cla;
+	
+	
+	
+	public String getEspecificacion_cla() {
+		return especificacion_cla;
+	}
+	public void setEspecificacion_cla(String especificacion_cla) {
+		this.especificacion_cla = especificacion_cla;
+	}
 	public String getCd_clausula() {
 		return cd_clausula;
 	}

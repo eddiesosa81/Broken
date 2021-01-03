@@ -42,5 +42,22 @@ public class ServicioConsultaPagoRealizadosView {
 			return null;
 		}
 	}
+	@SuppressWarnings("unchecked")
+	public List<ConsultaPagoRealizadosView> consultaliquidacionesGen(String codAseg,String fcDesde,String fcHasta,String numRecibo) {
+		List<ConsultaPagoRealizadosView> resultado;
+		String sql = "select * from consulta_pagos_realizados_view where cd_aseguradora = " + codAseg
+				+" and fechajuliana_func(to_char(fecha_pago,'dd/mm/yyyy')) >= fechajuliana_func('"+fcDesde+"')"
+				+" and fechajuliana_func(to_char(fecha_pago,'dd/mm/yyyy')) <= fechajuliana_func('"+fcHasta+"')"
+				+" and nvl(num_recibo,'*') <> '*'"
+				+" and num_recibo like '%"+numRecibo+"%'" ;
+		try {
+			Query query = em.createNativeQuery(sql, ConsultaPagoRealizadosView.class);
+			resultado = query.getResultList();
+			return resultado;
+		} catch (Exception ex) {
+			return null;
+		}
+	}
+	
 
 }

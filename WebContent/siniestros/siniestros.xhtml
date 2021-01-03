@@ -46,6 +46,26 @@
 										itemLabel="#{gcontratante.nombre_corto_grupo_contratante}"
 										itemValue="#{gcontratante.cd_grupo_contratante}" />
 								</p:selectOneMenu>
+								<p:selectOneMenu id="repAseg"
+									value="#{ControladorSiniestros.lscdAseguradora}"
+									style="width:150px" autoWidth="false">
+									<f:selectItem itemLabel="Aseguradora" itemValue="%" />
+									<f:selectItems
+										value="#{ControladorSiniestros.listAseguradoras}"
+										var="correspAseg"
+										itemLabel=" #{correspAseg.nombre_corto_aseguradora}"
+										itemValue="#{correspAseg.cd_aseguradora}" />
+								</p:selectOneMenu>
+								<p:selectOneMenu id="repRamo"
+									value="#{ControladorSiniestros.lscdRamo}" style="width:150px"
+									autoWidth="false">
+									<f:selectItem itemLabel="Ramo" itemValue="%" />
+									<f:selectItems value="#{ControladorSiniestros.lstRamo}"
+										var="ramo" itemLabel="#{ramo.desc_ramo}"
+										itemValue="#{ramo.cd_ramo}" />
+								</p:selectOneMenu>
+								<p:selectBooleanCheckbox id="chkCaduca"
+									value="#{ControladorSiniestros.caduca}" itemLabel="Caducas" />
 							</p:panelGrid>
 							<p:row>
 								<p:panelGrid columns="2">
@@ -67,7 +87,10 @@
 						frm_siniestros:intxtbuscaPlaca,
 						frm_siniestros:intxtbuscaMotor,
 						frm_siniestros:intxtbuscaTitular,
-						frm_siniestros:gContratante" />
+						frm_siniestros:gContratante,
+						frm_siniestros:repAseg,
+						frm_siniestros:repRamo,
+						frm_siniestros:chkCaduca" />
 								<p:commandButton value="Aceptar"
 									actionListener="#{ControladorSiniestros.aceptaNuevoSiniestro}"
 									update="@this frm_siniestros:otxtcdSini frm_siniestros:otxtcdano frm_siniestros:otxtClie frm_siniestros:otxtCedClie frm_siniestros:otxtnmAseg frm_siniestros:otxtSuba frm_siniestros:otxtGCont frm_siniestros:otxtPlan frm_siniestros:otxtPol frm_siniestros:otxtNmRamo frm_siniestros:otxtfcIni frm_siniestros:otxtfcFin frm_siniestros:otxtDscObj 
@@ -90,7 +113,7 @@
 							selectionMode="single"
 							selection="#{ControladorSiniestros.selectedConsultaPoliza}"
 							rowKey="#{pol.cd_ramo_cotizacion}"
-							style="width:500px; font-family:Verdana; font-size: 10px;">
+							style="width:700px; font-family:Verdana; font-size: 10px;">
 							<f:facet name="header">
 								  Seleccione la Póliza
 								</f:facet>
@@ -170,7 +193,7 @@
 							selectionMode="single"
 							selection="#{ControladorSiniestros.selectedObjetosPoliza}"
 							rowKey="#{obj.cd_obj_cotizacion}"
-							style="width:500px; font-family:Verdana; font-size: 12px;"
+							style="width:700px; font-family:Verdana; font-size: 12px;"
 							emptyMessage="No found with given criteria"
 							filteredValue="#{ControladorSiniestros.filteredLstObjetosPoliza}">
 							<f:facet name="header">
@@ -183,8 +206,7 @@
 								<h:outputText value="#{obj.cd_obj_cotizacion}" />
 							</p:column>
 							<p:column filterBy="#{obj.descripcion_objeto}"
-								headerText="Descripción" filterMatchMode="contains"
-								style="width:150px;">
+								headerText="Descripción" filterMatchMode="contains">
 								<h:outputText value="#{obj.descripcion_objeto}" />
 							</p:column>
 							<p:column headerText="Fecha Nacimiento">
@@ -199,6 +221,12 @@
 								<h:outputText value="#{obj.fc_ini_obj_cot_date}">
 									<f:convertDateTime pattern="dd/MM/yyyy" />
 								</h:outputText>
+							</p:column>
+							<p:column headerText="Valor Asegurador">
+								<h:outputText value="#{obj.valor_asegurador_objeto}" />
+							</p:column>
+							<p:column headerText="Deducible Mínimo">
+								<h:outputText value="#{obj.deducible_Minimo}" />
 							</p:column>
 							<p:column headerText="Estado">
 								<h:outputText value="#{obj.estado_Objeto}" />
@@ -232,7 +260,9 @@
 							scrollHeight="80"
 							value="#{ControladorSiniestros.lstSubObjetosPoliza}"
 							selectionMode="single" rowKey="#{subObj.cd_subobj_cotizacion}"
-							style="width:500px; font-family:Verdana; font-size: 10px;">
+							style="width:700px; font-family:Verdana; font-size: 10px;"
+							emptyMessage="No found with given criteria"
+							filteredValue="#{ControladorSiniestros.filteredlstSubObjetosPoliza}">
 							<f:facet name="header">
 				            Seleccione el Sub Objetos
 				        </f:facet>
@@ -242,7 +272,8 @@
 							<p:column headerText="Cod." style="width:40px;text-align:center">
 								<h:outputText value="#{subObj.cd_subobj_cotizacion}" />
 							</p:column>
-							<p:column headerText="Descripción">
+							<p:column filterBy="#{subObj.descripcion_subobjeto}"
+								headerText="Descripción" filterMatchMode="contains">
 								<h:outputText value="#{subObj.descripcion_subobjeto}" />
 							</p:column>
 							<p:column headerText="Parentesco">
@@ -513,11 +544,15 @@
 											selectionMode="single"
 											selection="#{ControladorSiniestros.selectedCoberturasPlan}"
 											rowKey="#{cobPol.cd_cobertura}"
-											style="font-family:Verdana; font-size: 10px;">
+											style="font-family:Verdana; font-size: 10px;"
+											emptyMessage="No found with given criteria"
+											filteredValue="#{ControladorSiniestros.filteredlstCoberturasPlan}">
 											<f:facet name="header">
 										            Coberturas Póliza
 										        </f:facet>
-											<p:column headerText="Cobertura">
+
+											<p:column filterBy="#{cobPol.desc_cobertura}"
+												headerText="Cobertura" filterMatchMode="contains">
 												<h:outputText value="#{cobPol.desc_cobertura}" />
 											</p:column>
 											<p:column headerText="Porcentaje"
@@ -527,6 +562,10 @@
 											<p:column headerText="Valor"
 												style="width:40px;text-align:center">
 												<h:outputText value="#{cobPol.valor_plancobertura}" />
+											</p:column>
+											<p:column headerText="Especificación"
+												style="width:40px;text-align:center">
+												<h:outputText value="#{cobPol.especificacion_cob}" />
 											</p:column>
 											<f:facet name="footer">
 												<p:commandButton
@@ -1119,7 +1158,7 @@
 						id="inptxLiqBanco"></p:inputText>
 					<h:outputText value="Cheque:" />
 					<p:inputText value="#{ControladorSiniestros.pagoSiniesttro.cheque}"
-						id="inptxLiqCheq"></p:inputText>
+						id="inptxLiqCheq" disabled="true"></p:inputText>
 					<h:outputText value="Cta:" />
 					<p:inputText
 						value="#{ControladorSiniestros.pagoSiniesttro.cta_cte}"
@@ -1449,11 +1488,15 @@
 											selectionMode="single"
 											selection="#{ControladorSiniestros.selectedCoberturasPlan}"
 											rowKey="#{cobPol.cd_cobertura}"
-											style="font-family:Verdana; font-size: 10px;">
+											style="font-family:Verdana; font-size: 10px;"
+											emptyMessage="No found with given criteria"
+											filteredValue="#{ControladorSiniestros.filteredlstCoberturasPlan}">
 											<f:facet name="header">
 										            Coberturas Póliza
 										        </f:facet>
-											<p:column headerText="Cobertura">
+											<p:column filterBy="#{cobPol.desc_cobertura}"
+												headerText="Cobertura" filterMatchMode="contains"
+												style="width:150px;">
 												<h:outputText value="#{cobPol.desc_cobertura}" />
 											</p:column>
 											<p:column headerText="Porcentaje"
@@ -1463,6 +1506,10 @@
 											<p:column headerText="Valor"
 												style="width:40px;text-align:center">
 												<h:outputText value="#{cobPol.valor_plancobertura}" />
+											</p:column>
+											<p:column headerText="Especificación"
+												style="width:40px;text-align:center">
+												<h:outputText value="#{cobPol.especificacion_cob}" />
 											</p:column>
 											<f:facet name="footer">
 												<p:commandButton
@@ -2057,7 +2104,7 @@
 						id="inptxLiqBancoEdt"></p:inputText>
 					<h:outputText value="Cheque:" />
 					<p:inputText value="#{ControladorSiniestros.pagoSiniesttro.cheque}"
-						id="inptxLiqCheqEdt"></p:inputText>
+						id="inptxLiqCheqEdt" disabled="true"></p:inputText>
 					<h:outputText value="Cta:" />
 					<p:inputText
 						value="#{ControladorSiniestros.pagoSiniesttro.cta_cte}"
@@ -2099,7 +2146,7 @@
 					<h:outputText value="Observaciones de la Atención del Siniestro:" />
 					<p:inputTextarea rows="6" cols="15"
 						value="#{ControladorSiniestros.obsSinies}" id="imptObsSinEd" />
-					
+
 					<p:commandButton
 						update="@this frm_siniestros:tabSiniestroEdt:dtLiquidacion 
 						frm_siniestros:inptxLiqValorEdt 
@@ -2180,7 +2227,7 @@
 						frm_siniestros:imptObsSinEd">
 					</p:commandButton>
 
-					
+
 
 
 				</p:panelGrid>

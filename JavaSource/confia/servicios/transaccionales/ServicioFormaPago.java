@@ -27,7 +27,7 @@ public class ServicioFormaPago {
 	}
 	public FormaPago recuperaFormaPagoxCdCot(int cdcot, int cdCompania) {
 		String sql = "select * from forma_pago_tbl where cd_cotizacion = "+cdcot+" and cd_compania = "+cdCompania;
-		 System.out.println("********************-----QUERY: " + sql);
+		 System.out.println("********-----QUERY: " + sql);
 		 Query q = em.createNativeQuery(sql, FormaPago.class);
 		 return (FormaPago) q.getSingleResult();
 	}
@@ -35,19 +35,20 @@ public class ServicioFormaPago {
 		try {
 			em.persist(obj);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return 0;
 		}
 		
 		return 1;
 	}
-	
-	public int codigoMaxFormaPago() {
+	public int codigoMaxFormaPagoAnexo(Integer codCotiza) {
 		Connection conn;
 		String sql;
 		String resultado = "0";
 		try {
 			conn = ConectarBase.getOracleConnection();
-			sql = "select nvl(max(cd_forma_pago),1) as cd_forma_pago from forma_pago_tbl";
+			sql = "select nvl(max(cd_forma_pago),1) as cd_forma_pago from forma_pago_tbl where cd_cotizacion = "+codCotiza;
+			System.out.println("SQL ->"+sql);
 			PreparedStatement a = conn.prepareStatement(sql);
 			ResultSet res = a.executeQuery();
 			if (res.next()) {
@@ -62,6 +63,30 @@ public class ServicioFormaPago {
 		}
 		return Integer.parseInt(resultado);
 	}
+	
+	public int codigoMaxFormaPago() {
+		Connection conn;
+		String sql;
+		String resultado = "0";
+		try {
+			conn = ConectarBase.getOracleConnection();
+			sql = "select nvl(max(cd_forma_pago),1) as cd_forma_pago from forma_pago_tbl";
+			System.out.println("SQL ->"+sql);
+			PreparedStatement a = conn.prepareStatement(sql);
+			ResultSet res = a.executeQuery();
+			if (res.next()) {
+				resultado = res.getString("cd_forma_pago");
+			}
+			res.close();
+			a.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			resultado = "0";
+		}
+		return Integer.parseInt(resultado);
+	}
+	
 	
 	public int numeroAniosVigencia(Date fcDesde, Date fcHasta) {
 		Connection conn;

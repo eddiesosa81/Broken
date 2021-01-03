@@ -32,6 +32,17 @@ public class PlanClausula {
 	private Double valor_planclausula;
 	@Column(name = "estado_planclausula")
 	private String estado_planclausula;
+	@Column(name="especificacion")
+	private String especificacion;
+	
+	
+	
+	public String getEspecificacion() {
+		return especificacion;
+	}
+	public void setEspecificacion(String especificacion) {
+		this.especificacion = especificacion;
+	}
 	public Integer getCd_planclausula() {
 		return cd_planclausula;
 	}

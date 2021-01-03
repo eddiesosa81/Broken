@@ -1,0 +1,128 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/templates/Template.xhtml">
+	<ui:define name="tituloPagina">Imprime Expedición de Comprobantes de Pago</ui:define>
+	<ui:define name="contenido">
+		<p:ajaxStatus
+			style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+			<f:facet name="start">
+				<p:graphicImage value="/images/ajax-loadercircle.gif" />
+			</f:facet>
+			<f:facet name="complete">
+				<h:outputText value="" />
+			</f:facet>
+		</p:ajaxStatus>
+		<h:form id="frmExpidePago">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<h:panelGrid columns="2">
+				<h:outputText value="Aseguradora: " />
+
+				<p:selectOneMenu id="somAseg"
+					value="#{ControladorExpedicionPagos.remiteAseguradora}">
+					<f:selectItem itemLabel="Seleccione" itemValue="0" />
+					<f:selectItems
+						value="#{ControladorExpedicionPagos.listAseguradoras}" var="ase"
+						itemLabel="#{ase.razon_social_aseguradora}"
+						itemValue="#{ase.cd_aseguradora}" />
+				</p:selectOneMenu>
+
+
+				<h:outputText value="Fecha Pago Desde: " />
+				<p:calendar id="fcDesde"
+					value="#{ControladorExpedicionPagos.pagoFcDesde}" locale="de"
+					navigator="true" pattern="dd-MM-yyyy" />
+				<h:outputText value="Fecha Pago Hasta " />
+				<p:row>
+					<p:calendar id="fcHasta"
+						value="#{ControladorExpedicionPagos.pagoFcHasta}" locale="de"
+						navigator="true" pattern="dd-MM-yyyy" />
+				</p:row>
+				<p:row>
+				</p:row>
+				<p:inputText id="txtNumLiqCanal"
+					value="#{ControladorExpedicionPagos.ls_num_liq}"
+					placeholder="Número de Recibo "></p:inputText>
+			</h:panelGrid>
+
+			<p:row>
+			</p:row>
+			<p:row>
+			</p:row>
+
+			<p:commandButton id="btnBuscaCobranza" icon="fa fa-fw fa-search"
+				value="Buscar" title="Buscar "
+				update="frmExpidePago:dtCobranzaComisionPagos"
+				styleClass="ui-priority-primary"
+				action="#{ControladorExpedicionPagos.consultaLiquidacionGenerada}"
+				process="@this,frmExpidePago:somAseg,frmExpidePago:fcDesde,frmExpidePago:fcHasta,frmExpidePago:txtNumLiqCanal" />
+
+			<p:commandButton value="Imprimir" id="btnPrint"
+				action="#{ControladorExpedicionPagos.executeLiquidados()}" ajax="false"
+				styleClass="ui-priority-primary" icon="ui-icon-script"
+				style="width:100px; font-family:Verdana; font-size: 12px;"></p:commandButton>
+			<p:commandButton value="Salir" id="btnSalir" icon="ui-icon-cancel"
+				styleClass="ui-priority-primary"
+				action="/index.xhtml?faces-redirect=true"
+				actionListener="#{ControladorExpedicionPagos.salir}" process="@this"
+				update="@this" />
+
+			<p:row>
+			</p:row>
+			<p:row>
+			</p:row>
+
+			<p:panel>
+				<p:dataTable id="dtCobranzaComisionPagos" var="pdp"
+					value="#{ControladorExpedicionPagos.lstConsPagoRealView}"
+					scrollable="true" scrollHeight="250"
+					style="font-family:Verdana; font-size: 10px;"
+					selection="#{ControladorExpedicionPagos.selectedlstConsPagoRealView}"
+					rowKey="#{pdp.cd_pago}">
+					<f:facet name="header">
+				        Pólizas
+				    </f:facet>
+
+					<p:column headerText="No. Recibo">
+						<h:outputText value="#{pdp.cd_pago}" />
+					</p:column>
+					<p:column headerText="Cliente">
+						<h:outputText value="#{pdp.CLIENTE}" />
+					</p:column>
+					<p:column headerText="Aseguradora">
+						<h:outputText value="#{pdp.ASEGURADORA}" />
+					</p:column>
+
+					<p:column headerText="Póliza" style="width:150px">
+						<h:outputText value="#{pdp.poliza}" />
+					</p:column>
+
+					<p:column headerText="Factura" style="width:150px">
+						<h:outputText value="#{pdp.facturas}" />
+					</p:column>
+
+					<p:column headerText="Forma de Pago">
+						<h:outputText value="#{pdp.forma_pago}" />
+					</p:column>
+
+					<p:column headerText="No. Retención">
+						<h:outputText value="#{pdp.no_retencion}" />
+					</p:column>
+					<p:column headerText="Valor">
+						<h:outputText value="#{pdp.valor_pago}" />
+					</p:column>
+					<p:column headerText="Fecha Pago">
+						<h:outputText value="#{pdp.fecha_pago}" />
+					</p:column>
+				</p:dataTable>
+			</p:panel>
+		</h:form>
+	</ui:define>
+	<ui:define name="tituloFormulario">Imprime Expedición de Comprobantes de Pago</ui:define>
+</ui:composition>
+</html>

@@ -16,6 +16,7 @@ import javax.faces.context.FacesContext;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 
+import confia.entidades.basicos.Aseguradoras;
 import confia.entidades.basicos.Ciudad;
 import confia.entidades.basicos.ClausulasEmitidas;
 import confia.entidades.basicos.Clientes;
@@ -25,6 +26,7 @@ import confia.entidades.basicos.DeduciblesEmitidas;
 import confia.entidades.basicos.Direccion;
 import confia.entidades.basicos.GrupoContratante;
 import confia.entidades.basicos.Provincias;
+import confia.entidades.basicos.Ramo;
 import confia.entidades.basicos.Rubros;
 import confia.entidades.basicos.Telefono;
 import confia.entidades.basicos.TipoModuloCarta;
@@ -34,6 +36,8 @@ import confia.entidades.transaccionales.CaracteristicasVehiculos;
 import confia.entidades.transaccionales.Correspondencia;
 import confia.entidades.transaccionales.Gestion;
 import confia.entidades.transaccionales.NotasAclaratorias;
+import confia.entidades.transaccionales.RamoCotizacion;
+import confia.entidades.transaccionales.Ubicacion;
 import confia.entidades.vistas.ConsultaCaractPolView;
 import confia.entidades.vistas.ConsultaObjetoPolView;
 import confia.entidades.vistas.ConsultaPagoPolView;
@@ -41,11 +45,13 @@ import confia.entidades.vistas.ConsultaPagoRealizadosView;
 import confia.entidades.vistas.ConsultaPolizaView;
 import confia.entidades.vistas.ConsultaSubObjetoPolView;
 import confia.entidades.vistas.ConsultaUbicacionPolView;
+import confia.entidades.vistas.CotizacionesPendientes;
 import confia.entidades.vistas.PlanRamoAseguradoraView;
 import confia.entidades.vistas.TransaccionPolizaView;
 import confia.procedures.servicioProcedures;
 import confia.reportes.EmailSenderService;
 import confia.reportes.MeetingSenderService;
+import confia.servicios.basicos.ServicioAseguradoras;
 import confia.servicios.basicos.ServicioCiudad;
 import confia.servicios.basicos.ServicioClausulasEmitidas;
 import confia.servicios.basicos.ServicioClientes;
@@ -54,6 +60,7 @@ import confia.servicios.basicos.ServicioContacto;
 import confia.servicios.basicos.ServicioDireccion;
 import confia.servicios.basicos.ServicioGrupoContratante;
 import confia.servicios.basicos.ServicioProvincias;
+import confia.servicios.basicos.ServicioRamo;
 import confia.servicios.basicos.ServicioRubros;
 import confia.servicios.basicos.ServicioTelefono;
 import confia.servicios.basicos.ServicioUsuarios;
@@ -63,6 +70,7 @@ import confia.servicios.transaccionales.ServicioCaracteristicasVehiculos;
 import confia.servicios.transaccionales.ServicioCorrespondencia;
 import confia.servicios.transaccionales.ServicioGestion;
 import confia.servicios.transaccionales.ServicioNotasAclaratorias;
+import confia.servicios.transaccionales.ServicioRamoCotizacion;
 import confia.servicios.vistas.ServicioConsultaCaractPolView;
 import confia.servicios.vistas.ServicioConsultaObjetoPolView;
 import confia.servicios.vistas.ServicioConsultaPagoPolView;
@@ -76,6 +84,14 @@ import confia.servicios.vistas.ServicioTransaccionPolizaView;
 @ViewScoped
 @ManagedBean(name = "ControladorConsultaPoliza")
 public class ControladorConsultaPoliza {
+	@EJB
+	private ServicioCoberturasEmitidas srvCoberturasEmitidas;
+	@EJB
+	private ServicioClausulasEmitidas srvClausulasEmitidas;
+	@EJB
+	private ServiciosDeduciblesEmitidas srvDeduciblesEmitidas;
+	@EJB
+	private ServicioAseguradoras srvAseguradoras;
 	@EJB
 	private ServicioPlanesRamoAseg srvPlanesRamoAseg;
 	@EJB
@@ -133,6 +149,10 @@ public class ControladorConsultaPoliza {
 	private ServiciosDeduciblesEmitidas srvDeducibles;
 	@EJB
 	private ServicioArchivos srvArchivos;
+	@EJB
+	private ServicioRamo srvRamo;
+	@EJB
+	private ServicioRamoCotizacion srvRamoCotizacion;
 
 	private String numPoliza;
 	private String numFactura;
@@ -144,12 +164,14 @@ public class ControladorConsultaPoliza {
 	private List<ConsultaPolizaView> lstConsultaPoliza;
 	private ConsultaPolizaView selectedConsultaPoliza;
 	private List<ConsultaObjetoPolView> lstObjetosPoliza;
+	private List<ConsultaObjetoPolView> filteredLstlstObjetosPoliza;
 	private List<ConsultaUbicacionPolView> lstUbicacionPoliza;
 	private List<CaracteristicasVehiculos> LstCaracteristicas;
 	private List<ConsultaPagoPolView> lstPagoPoliza;
 	private ConsultaUbicacionPolView selectedUbicacionPoliza;
 	private ConsultaObjetoPolView selectedObjetosPoliza;
 	private List<ConsultaSubObjetoPolView> lstSubObjetosPoliza;
+	private List<ConsultaSubObjetoPolView> filteredLstSubObjetosPoliza;
 	private List<TransaccionPolizaView> lstTransaccionPoliza;
 
 	// CARTAS
@@ -165,7 +187,7 @@ public class ControladorConsultaPoliza {
 	private String objAsegurado;
 	// PAGOS
 	private List<ConsultaPagoRealizadosView> lstPagoRealizado;
-	// gestión
+	// gestiï¿½n
 	private Clientes cliente;
 	private Direccion direccion;
 	private Telefono telefono;
@@ -202,6 +224,25 @@ public class ControladorConsultaPoliza {
 	private List<TipoModuloCarta> lstTipoGestDoc;
 	private List<Archivos> lstArchivos;
 
+	private List<Aseguradoras> listAseguradoras;
+	private List<Ramo> lstRamo;
+
+	private String lscdAseguradora;
+	private String lscdRamo;
+
+	private boolean caduca;
+
+	// coberturas Emitidas
+	private List<CoberturasEmitidas> lstCoberturasEmitidas;
+	private CoberturasEmitidas selectedCoberturasEmitidas;
+	private List<CoberturasEmitidas> lstFilteredCoberturasEmitidas;
+	private List<DeduciblesEmitidas> lstDeducibleEmitida;
+	private DeduciblesEmitidas selectedDeducibleEmitida;
+	private List<DeduciblesEmitidas> lstFilteredDeducibleEmitida;
+	private List<ClausulasEmitidas> lstCalusulaEmitida;
+	private ClausulasEmitidas selectedClausulaEmitida;
+	private List<ClausulasEmitidas> lstFilteredCalusulaEmitida;
+
 	public ControladorConsultaPoliza() {
 		listaGrupoContratante = new ArrayList<GrupoContratante>();
 		lstConsultaPoliza = new ArrayList<ConsultaPolizaView>();
@@ -237,10 +278,15 @@ public class ControladorConsultaPoliza {
 		email = new EmailSenderService();
 		lstTipoGestDoc = new ArrayList<TipoModuloCarta>();
 		lstArchivos = new ArrayList<Archivos>();
+		listAseguradoras = new ArrayList<Aseguradoras>();
+		lstRamo = new ArrayList<Ramo>();
 	}
 
 	@PostConstruct
 	public void recuperaInicio() {
+		listAseguradoras = srvAseguradoras.BuscaAseguradoras();
+		lstRamo = srvRamo.listaRamos();
+
 		listaGrupoContratante = srvGrupoContratante.listaGruposContratantes();
 		lstRubrosCarta = srvRubrosCartas.listadoCartasPorModulo("POLIZAS_EMITIDAS");
 		lstCiudad = srvCiudad.recuperaListaCiudad();
@@ -258,23 +304,24 @@ public class ControladorConsultaPoliza {
 
 		lstTipoGestDoc = srvRubros.recuperaTipoGestionDocu();
 		tipoArchivo = "CLIENTE";
+
 	}
 
 	public void consultaArchivosGuardados() {
-		String codCotiza = null,codCliente = null;
-		
+		String codCotiza = null, codCliente = null;
+
 		System.out.println("tipoArchivo:" + tipoArchivo);
-		
+
 		try {
 			codCotiza = selectedConsultaPoliza.getCd_cotizacion();
 			codCliente = selectedConsultaPoliza.getCd_cliente();
 		} catch (Exception e) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Seleccione la póliza"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Seleccione la pï¿½liza"));
 			return;
 		}
-		
-		if(tipoArchivo.equals("CLIENTE")){
+
+		if (tipoArchivo.equals("CLIENTE")) {
 			codCotiza = "%";
 		}
 		lstArchivos = new ArrayList<Archivos>();
@@ -289,12 +336,12 @@ public class ControladorConsultaPoliza {
 			if (selectedConsultaPoliza.getCd_cotizacion().isEmpty()
 					|| selectedConsultaPoliza.getCd_cotizacion() == null) {
 				FacesContext context = FacesContext.getCurrentInstance();
-				context.addMessage(null, new FacesMessage("Advertencia", "Seleccione la póliza"));
+				context.addMessage(null, new FacesMessage("Advertencia", "Seleccione la pï¿½liza"));
 				return;
 			}
 		} catch (Exception e) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Seleccione la póliza"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Seleccione la pï¿½liza"));
 			return;
 		}
 
@@ -309,11 +356,11 @@ public class ControladorConsultaPoliza {
 		res = srvProcedimientos.renuevaPoliza(selectedConsultaPoliza.getCd_cotizacion(),
 				selectedConsultaPoliza.getCd_compania());
 		FacesContext context = FacesContext.getCurrentInstance();
-		context.addMessage(null, new FacesMessage("Advertencia", "Renovación Número:" + res));
+		context.addMessage(null, new FacesMessage("Advertencia", "Renovaciï¿½n Nï¿½mero:" + res));
 		// } else {
 		// FacesContext context = FacesContext.getCurrentInstance();
 		// context.addMessage(null,
-		// new FacesMessage("Advertencia", "Usted puede renovar 30 días antes
+		// new FacesMessage("Advertencia", "Usted puede renovar 30 dï¿½as antes
 		// del fin de vigencia."));
 		// }
 	}
@@ -376,16 +423,37 @@ public class ControladorConsultaPoliza {
 		System.out.println("motor:" + motor);
 		System.out.println("grupo contratante:" + grpCont);
 		System.out.println("Objeto Asegurado:" + objAsegurado);
+		System.out.println("lscdAseguradora:" + lscdAseguradora);
+		System.out.println("lscdRamo:" + lscdRamo);
+
 		if (placa.equals("%") && motor.equals("%") && objAsegurado.equals("%")) {
 			if (rBotonPolAne.equals("anexo")) {
-				lstConsultaPoliza = srvConsultaPolizaView.consultaPolizaAnexoXClienteGrpCont(nmCliente, grpCont,
-						numPoliza, numFactura);
+				if (caduca) {
+					lstConsultaPoliza = srvConsultaPolizaView.consultaPolizaAnexoXClienteGrpCont(nmCliente, grpCont,
+							numPoliza, numFactura, lscdAseguradora, lscdRamo);
+				} else {
+					lstConsultaPoliza = srvConsultaPolizaView.consultaPolizaAnexoXClienteGrpContVig(nmCliente, grpCont,
+							numPoliza, numFactura, lscdAseguradora, lscdRamo);
+				}
+
 			} else if (rBotonPolAne.equals("poliza")) {
-				lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasXClienteGrpCont(nmCliente, grpCont, numPoliza,
-						numFactura);
+				if (caduca) {
+					lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasXClienteGrpCont(nmCliente, grpCont,
+							numPoliza, numFactura, lscdAseguradora, lscdRamo);
+				} else {
+					lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasXClienteGrpContVig(nmCliente, grpCont,
+							numPoliza, numFactura, lscdAseguradora, lscdRamo);
+				}
+
 			} else {
-				lstConsultaPoliza = srvConsultaPolizaView.consultaAnulaCancelXClienteGrpCont(nmCliente, grpCont,
-						numPoliza, numFactura);
+				if (caduca) {
+					lstConsultaPoliza = srvConsultaPolizaView.consultaAnulaCancelXClienteGrpCont(nmCliente, grpCont,
+							numPoliza, numFactura, lscdAseguradora, lscdRamo);
+				} else {
+					lstConsultaPoliza = srvConsultaPolizaView.consultaAnulaCancelXClienteGrpContVig(nmCliente, grpCont,
+							numPoliza, numFactura, lscdAseguradora, lscdRamo);
+				}
+
 			}
 		} else {
 			if (rBotonPolAne.equals("anulaCancela")) {
@@ -393,17 +461,47 @@ public class ControladorConsultaPoliza {
 				context.addMessage(null, new FacesMessage("Advertencia", "Consulta no disponible en el Sistema"));
 				nmCarta = "0";
 			} else {
-				crcCara= "";
+				crcCara = "";
 				if (!placa.equals("%")) {
-					consCaracPol = srvConsCaractPolView.consultaCaracteristicaPol(placa.trim().toUpperCase(), "%");
-					for (ConsultaCaractPolView auxCar : consCaracPol) {
-						crcCara = crcCara.concat(auxCar.getCd_ramo_cotizacion());
-						crcCara = crcCara.concat(",");
+					String lsPlacaString, LsPlacaFinal = "%";
+					lsPlacaString = placa.toUpperCase();
+					lsPlacaString = lsPlacaString.trim();
+					for (int n = 0; n < lsPlacaString.length(); n++) {
+						char c = lsPlacaString.charAt(n);
+						if (n == 3) {
+							LsPlacaFinal = LsPlacaFinal.concat("%");
+							LsPlacaFinal = LsPlacaFinal.concat(String.valueOf(c));
+						} else {
+							LsPlacaFinal = LsPlacaFinal.concat(String.valueOf(c));
+						}
 					}
-					crcCara = crcCara.substring(1, crcCara.length() -1);
-					System.out.println("INGRE cxc:"+crcCara);
-					lstConsultaPoliza = srvConsultaPolizaView
-							.consultaPolizasCaracteObj(crcCara);
+					LsPlacaFinal = LsPlacaFinal.concat("%");
+					System.out.println("PLACA A BUSCAR:" + LsPlacaFinal);
+					List<ConsultaCaractPolView> lstconsCaracPol = new ArrayList<ConsultaCaractPolView>();
+					lstconsCaracPol = srvConsCaractPolView.consultaCaracteristicaObjPolPlaca(LsPlacaFinal);
+
+					String varString = "";
+					Integer sizeListInteger = lstconsCaracPol.size();
+					System.out.println("TamaÃ±o lista:" + sizeListInteger);
+					Integer contadorInteger = 0;
+
+					for (ConsultaCaractPolView auxCRC : lstconsCaracPol) {
+						contadorInteger = contadorInteger + 1;
+						if (contadorInteger == sizeListInteger) {
+							varString = varString.concat(auxCRC.getCd_ramo_cotizacion());
+						} else {
+							varString = varString.concat(auxCRC.getCd_ramo_cotizacion());
+							varString = varString.concat(",");
+						}
+					}
+					System.out.println("varString:" + varString);
+
+					if (caduca) {
+						lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasCaracteObj(crcCara);
+					} else {
+						lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasCaracteObjVig(crcCara);
+					}
+
 				}
 				if (!motor.equals("%")) {
 					consCaracPol = srvConsCaractPolView.consultaCaracteristicaPol("%", motor.trim().toUpperCase());
@@ -411,13 +509,24 @@ public class ControladorConsultaPoliza {
 						crcCara = crcCara.concat(auxCar.getCd_ramo_cotizacion());
 						crcCara = crcCara.concat(",");
 					}
-					crcCara = crcCara.substring(1, crcCara.length() -1);
-					System.out.println("INGRE cxc:"+crcCara);
-					lstConsultaPoliza = srvConsultaPolizaView
-							.consultaPolizasCaracteObj(crcCara);
+					crcCara = crcCara.substring(1, crcCara.length() - 1);
+					System.out.println("INGRE cxc:" + crcCara);
+
+					if (caduca) {
+						lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasCaracteObj(crcCara);
+
+					} else {
+						lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasCaracteObjVig(crcCara);
+					}
+
 				}
 				if (!objAsegurado.equals("%")) {
-					lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasXDescObj(objAsegurado);
+					if (caduca) {
+						lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasXDescObj(objAsegurado);
+					} else {
+						lstConsultaPoliza = srvConsultaPolizaView.consultaPolizasXDescObjVig(objAsegurado);
+					}
+
 				}
 			}
 		}
@@ -436,12 +545,70 @@ public class ControladorConsultaPoliza {
 		}
 		lstTransaccionPoliza = srvTransaccionPoliza.recuperaTransaccionesPol(codRamCotAux);
 		lbTransaccion = true;
-		
+
 	}
 
 	public void onRowNotaAclaratoria(ConsultaPolizaView polAux) {
 		lstNotaAclaratoria = new ArrayList<NotasAclaratorias>();
 		lstNotaAclaratoria = srvNotaAcaratoria.consultaNotasAclaratorias(polAux.getCd_ramo_cotizacion());
+	}
+
+	public void onRowPlanRamCot(ConsultaPolizaView ramCot) {
+		lstCoberturasEmitidas = new ArrayList<CoberturasEmitidas>();
+		lstDeducibleEmitida = new ArrayList<DeduciblesEmitidas>();
+		lstCalusulaEmitida = new ArrayList<ClausulasEmitidas>();
+		
+		// bloquea si se trata de VAM
+		Integer tpRam = srvRamo.tipoRamo(Integer.valueOf(ramCot.getCd_ramo()));
+		
+		if (tpRam.equals(0)) {
+			lstCalusulaEmitida = srvClausulasEmitidas.recuperaClausulasEmitidas(Integer.valueOf(ramCot.getCd_compania()),
+					Integer.valueOf(ramCot.getCd_ramo_cotizacion()));
+			System.out.println("lstCalusulaEmitida:" + lstCalusulaEmitida.size());
+			lstCoberturasEmitidas = srvCoberturasEmitidas.recuperaCoberturasEmitidas(Integer.valueOf(ramCot.getCd_compania()),
+					Integer.valueOf(ramCot.getCd_ramo_cotizacion()));
+			System.out.println("lstCoberturasEmitidas:" + lstCoberturasEmitidas.size());
+			lstDeducibleEmitida = srvDeduciblesEmitidas.recuperaDeduciblesEmitidas(Integer.valueOf(ramCot.getCd_compania()),
+					Integer.valueOf(ramCot.getCd_ramo_cotizacion()));
+			System.out.println("lstDeducibleEmitida:" + lstDeducibleEmitida.size());
+
+			PrimeFaces.current().executeScript("PF('wvPlanesRamCot').show();");
+		} else {
+			FacesContext context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Advertencia",
+					"Planes no habilitados para este tipo de Ramo, revise a nivel de ubicaciÃ³n"));
+			return;
+		}
+
+	}
+	
+	public void onRowPlanUbc(ConsultaUbicacionPolView ubicaTot) {
+		lstCoberturasEmitidas = new ArrayList<CoberturasEmitidas>();
+		lstDeducibleEmitida = new ArrayList<DeduciblesEmitidas>();
+		lstCalusulaEmitida = new ArrayList<ClausulasEmitidas>();
+		
+		//bloquea si se trata de VAM
+		RamoCotizacion crcTemp = srvRamoCotizacion.recuperaRamoCotizacionPorCodigo(Integer.valueOf(ubicaTot.getCd_ramo_cotizacion()),
+				Integer.valueOf(ubicaTot.getCd_compania()));
+		Integer tpRam = srvRamo.tipoRamo(crcTemp.getCd_ramo());
+		if (tpRam.equals(0)) {
+			FacesContext context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Advertencia", "Planes no habilitados para este tipo de UbicaciÃ³n, revise a nivel de Ramo"));
+			return;
+		} else {
+			
+			lstCalusulaEmitida = srvClausulasEmitidas.recuperaClausulasEmitidasUbc(Integer.valueOf(ubicaTot.getCd_compania()),
+					Integer.valueOf(ubicaTot.getCd_ramo_cotizacion()),Integer.valueOf(ubicaTot.getCd_ubicacion()));
+			
+			lstCoberturasEmitidas = srvCoberturasEmitidas.recuperaCoberturasEmitidasUbc(Integer.valueOf(ubicaTot.getCd_compania()),
+					Integer.valueOf(ubicaTot.getCd_ramo_cotizacion()),Integer.valueOf(ubicaTot.getCd_ubicacion()));
+			
+			lstDeducibleEmitida = srvDeduciblesEmitidas.recuperaDeduciblesEmitidasUbicacion(Integer.valueOf(ubicaTot.getCd_compania()),
+					Integer.valueOf(ubicaTot.getCd_ramo_cotizacion()),Integer.valueOf(ubicaTot.getCd_ubicacion()));
+			
+			PrimeFaces.current().executeScript("PF('wvPlanesRamCot').show();");
+		}
+		
 	}
 
 	public void onRowSelectPago() {
@@ -513,7 +680,7 @@ public class ControladorConsultaPoliza {
 			String tamano = selectedConsultaPoliza.getPoliza();
 		} catch (Exception e) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Póliza antes de generar la carta"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Pï¿½liza antes de generar la carta"));
 			nmCarta = "0";
 			return;
 		}
@@ -576,8 +743,8 @@ public class ControladorConsultaPoliza {
 		}
 
 		FacesContext contextMsj = FacesContext.getCurrentInstance();
-		contextMsj.addMessage(null, new FacesMessage("Registro Exitoso", "Se Generó el Documento Número " + numeroCarta
-				+ ". Ingrese al Módulo de Correspondecia para Imprimirlo"));
+		contextMsj.addMessage(null, new FacesMessage("Registro Exitoso", "Se Generï¿½ el Documento Nï¿½mero " + numeroCarta
+				+ ". Ingrese al Mï¿½dulo de Correspondecia para Imprimirlo"));
 	}
 
 	public void buscarDetallePago() {
@@ -593,7 +760,7 @@ public class ControladorConsultaPoliza {
 		} catch (Exception ex) {
 			//
 		}
-		System.out.println("TAMAÑO:" + lstPagoRealizado.size());
+		System.out.println("TAMAï¿½O:" + lstPagoRealizado.size());
 
 		// RequestContext context = RequestContext.getCurrentInstance();
 		// context.execute("PF('pagoDialog').show()");
@@ -608,7 +775,7 @@ public class ControladorConsultaPoliza {
 		} catch (Exception e) {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null,
-					new FacesMessage("Advertencia", "Seleccione la Póliza antes de realizar la gestión del Cliente"));
+					new FacesMessage("Advertencia", "Seleccione la Pï¿½liza antes de realizar la gestiï¿½n del Cliente"));
 			nmCarta = "0";
 			return;
 		}
@@ -622,7 +789,7 @@ public class ControladorConsultaPoliza {
 		try {
 			direccion = srvDireccion.BuscaDireccionCodCliente(selectedConsultaPoliza.getCd_cliente());
 		} catch (Exception e) {
-			System.out.println("No existe dirección ingresada");
+			System.out.println("No existe direcciï¿½n ingresada");
 		}
 		try {
 			telefono = srvTelefono.BuscaTelefonoCodCliente(selectedConsultaPoliza.getCd_cliente());
@@ -709,10 +876,10 @@ public class ControladorConsultaPoliza {
 
 		try {
 			if (gestion.getInstruccion().isEmpty() || gestion.getInstruccion() == null) {
-				gestion.setInstruccion("Sin Instrucción");
+				gestion.setInstruccion("Sin Instrucciï¿½n");
 			}
 		} catch (Exception e) {
-			gestion.setInstruccion("Sin Instrucción");
+			gestion.setInstruccion("Sin Instrucciï¿½n");
 		}
 		try {
 			System.out.println("ID:USUARIO:" + usuarioId);
@@ -726,7 +893,7 @@ public class ControladorConsultaPoliza {
 
 		gestion.setCd_cotizacion(Integer.valueOf(selectedConsultaPoliza.getCd_cotizacion()));
 		gestion.setCd_ramo_cotizacion(Integer.valueOf(selectedConsultaPoliza.getCd_ramo_cotizacion()));
-		System.out.println("Pasa Validación");
+		System.out.println("Pasa Validaciï¿½n");
 		srvGestion.insertarGestion(gestion);
 		System.out.println("INSERTO GESTION");
 
@@ -784,7 +951,7 @@ public class ControladorConsultaPoliza {
 				cont = cont + 1;
 			}
 
-			ubc = "Gestión Sistema - Póliza: ";
+			ubc = "Gestiï¿½n Sistema - Pï¿½liza: ";
 			ubc = ubc.concat(selectedConsultaPoliza.getPoliza());
 			ubc = ubc.concat(" Factura:");
 			ubc = ubc.concat(selectedConsultaPoliza.getFactura_aseguradora());
@@ -794,7 +961,7 @@ public class ControladorConsultaPoliza {
 			email.setTexto("<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
 					+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Estimad@<o:p></o:p></span></p>"
 					+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
-					+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Se ha generado una nueva gestión en el sistema"
+					+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Se ha generado una nueva gestiï¿½n en el sistema"
 					+ " con las siguientes referencias:" + " <o:p></o:p></span></p>"
 
 					+ "<table class=MsoNormalTable border=0 cellpadding=0 width=600 style='width:450.0pt; mso-cellspacing:1.5pt;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt'>"
@@ -803,7 +970,7 @@ public class ControladorConsultaPoliza {
 					+ "<p class=MsoNormal><b><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
 					+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:Calibri;"
 					+ "mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
-					+ "mso-bidi-theme-font:minor-latin'>Descripción</span></b><span "
+					+ "mso-bidi-theme-font:minor-latin'>Descripciï¿½n</span></b><span "
 					+ "style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:minor-latin;"
 					+ "mso-fareast-font-family:Times New Roman;mso-hansi-font-family:Calibri;"
 					+ "mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;mso-bidi-theme-font:"
@@ -862,7 +1029,7 @@ public class ControladorConsultaPoliza {
 					+ "<p class=MsoNormal><b><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
 					+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:"
 					+ "Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
-					+ "mso-bidi-theme-font:minor-latin'>Póliza:</span></b><span style='mso-ascii-font-family:"
+					+ "mso-bidi-theme-font:minor-latin'>Pï¿½liza:</span></b><span style='mso-ascii-font-family:"
 					+ "Calibri;mso-ascii-theme-font:minor-latin;mso-fareast-font-family:Times New Roman;"
 					+ "mso-hansi-font-family:Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:"
 					+ "Calibri;mso-bidi-theme-font:minor-latin'><o:p></o:p></span></p>" + "</td>"
@@ -894,7 +1061,7 @@ public class ControladorConsultaPoliza {
 					+ "<p class=MsoNormal><b><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
 					+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:"
 					+ "Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
-					+ "mso-bidi-theme-font:minor-latin'>Tipo Instrucción:</span></b><span style='mso-ascii-font-family:"
+					+ "mso-bidi-theme-font:minor-latin'>Tipo Instrucciï¿½n:</span></b><span style='mso-ascii-font-family:"
 					+ "Calibri;mso-ascii-theme-font:minor-latin;mso-fareast-font-family:Times New Roman;"
 					+ "mso-hansi-font-family:Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:"
 					+ "Calibri;mso-bidi-theme-font:minor-latin'><o:p></o:p></span></p>" + "</td>"
@@ -925,7 +1092,7 @@ public class ControladorConsultaPoliza {
 					+ "<p class=MsoNormal><b><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
 					+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:"
 					+ "Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
-					+ "mso-bidi-theme-font:minor-latin'>Instrucción:</span></b><span style='mso-ascii-font-family:"
+					+ "mso-bidi-theme-font:minor-latin'>Instrucciï¿½n:</span></b><span style='mso-ascii-font-family:"
 					+ "Calibri;mso-ascii-theme-font:minor-latin;mso-fareast-font-family:Times New Roman;"
 					+ "mso-hansi-font-family:Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:"
 					+ "Calibri;mso-bidi-theme-font:minor-latin'><o:p></o:p></span></p>" + "</td>"
@@ -939,18 +1106,18 @@ public class ControladorConsultaPoliza {
 					+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
 					+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'> " + " <o:p></o:p></span></p>"
 					+ "<p><strong>Nota: </strong>"
-					+ "Este mensaje ha sido generado automáticamente, por favor no lo responda." + "</p> ");
+					+ "Este mensaje ha sido generado automï¿½ticamente, por favor no lo responda." + "</p> ");
 			email.sendEmail();
 
 		} else {
 			System.out.println("---- ENVIO MEETING REQUEST ORGANIZADOR----");
-			// eMeeting.setSubject("Planificación de Reuniones");
+			// eMeeting.setSubject("Planificaciï¿½n de Reuniones");
 			try {
 				if (asunto.isEmpty() || asunto == null) {
-					asunto = "Gestión Sistema";
+					asunto = "Gestiï¿½n Sistema";
 				}
 			} catch (Exception e) {
-				asunto = "Gestión Sistema";
+				asunto = "Gestiï¿½n Sistema";
 			}
 			eMeeting.setSubject(asunto);
 			System.out.println("********* tema_subject*********" + asunto);
@@ -967,7 +1134,7 @@ public class ControladorConsultaPoliza {
 				cont = cont + 1;
 			}
 			eMeeting.setReceptor(user);
-			ubc = "Gestión Sistema - Póliza: ";
+			ubc = "Gestiï¿½n Sistema - Pï¿½liza: ";
 			ubc = ubc.concat(selectedConsultaPoliza.getPoliza());
 			ubc = ubc.concat(" Factura:");
 			ubc = ubc.concat(selectedConsultaPoliza.getFactura_aseguradora());
@@ -983,12 +1150,12 @@ public class ControladorConsultaPoliza {
 			}
 
 			if (fec) {
-				eMeeting.setCuerpo("<p> Este mensaje ha sido generado automáticamente, por favor no lo responda. </p>"
+				eMeeting.setCuerpo("<p> Este mensaje ha sido generado automï¿½ticamente, por favor no lo responda. </p>"
 						+ "<p>Estimad@,</p>" + "Se ha planificado un nuevo evento " + " con la siguiente referencia:"
-						+ " " + "<p><strong>Asunto: </strong>" + asunto + "</p> " + "<p><strong>Descripción: </strong>"
+						+ " " + "<p><strong>Asunto: </strong>" + asunto + "</p> " + "<p><strong>Descripciï¿½n: </strong>"
 						+ " " + gestion.getInstruccion() + "</p> " + "<p><strong>Fecha Pago: </strong>"
 						+ gestion.getFecha_pago() + "</p> " + "<p><strong>Cliente: </strong>"
-						+ selectedConsultaPoliza.getCliente() + "</p> " + "<p><strong>Póliza: </strong>"
+						+ selectedConsultaPoliza.getCliente() + "</p> " + "<p><strong>Pï¿½liza: </strong>"
 						+ selectedConsultaPoliza.getPoliza() + "</p> " + "<p><strong>Factura: </strong>"
 						+ selectedConsultaPoliza.getFactura_aseguradora() + "</p> " + "<p><strong>Ramo: </strong>"
 						+ selectedConsultaPoliza.getDesc_ramo() + "</p> " + "<p><strong>Aseguradora: </strong>"
@@ -1007,12 +1174,12 @@ public class ControladorConsultaPoliza {
 				System.out.println("FECHA AUMENTA HORA:" + fcMeeting);
 				System.out.println("FECHA FIN HORA:" + fcFin);
 			} else {
-				eMeeting.setCuerpo("<p> Este mensaje ha sido generado automáticamente, por favor no lo responda. </p>"
+				eMeeting.setCuerpo("<p> Este mensaje ha sido generado automï¿½ticamente, por favor no lo responda. </p>"
 						+ "<p>Estimad@,</p>" + "Se ha planificado un nuevo evento " + " con la siguiente referencia:"
-						+ " " + "<p><strong>Asunto: </strong>" + asunto + "</p> " + "<p><strong>Descripción: </strong>"
+						+ " " + "<p><strong>Asunto: </strong>" + asunto + "</p> " + "<p><strong>Descripciï¿½n: </strong>"
 						+ " " + gestion.getInstruccion() + "</p> " + "<p><strong>Fecha Seguimiento: </strong>"
 						+ gestion.getFecha_seguimiento() + "</p> " + "<p><strong>Cliente: </strong>"
-						+ selectedConsultaPoliza.getCliente() + "</p> " + "<p><strong>Póliza: </strong>"
+						+ selectedConsultaPoliza.getCliente() + "</p> " + "<p><strong>Pï¿½liza: </strong>"
 						+ selectedConsultaPoliza.getPoliza() + "</p> " + "<p><strong>Factura: </strong>"
 						+ selectedConsultaPoliza.getFactura_aseguradora() + "</p> " + "<p><strong>Ramo: </strong>"
 						+ selectedConsultaPoliza.getDesc_ramo() + "</p> " + "<p><strong>Aseguradora: </strong>"
@@ -1500,6 +1667,134 @@ public class ControladorConsultaPoliza {
 
 	public void setLstArchivos(List<Archivos> lstArchivos) {
 		this.lstArchivos = lstArchivos;
+	}
+
+	public List<Aseguradoras> getListAseguradoras() {
+		return listAseguradoras;
+	}
+
+	public void setListAseguradoras(List<Aseguradoras> listAseguradoras) {
+		this.listAseguradoras = listAseguradoras;
+	}
+
+	public List<Ramo> getLstRamo() {
+		return lstRamo;
+	}
+
+	public void setLstRamo(List<Ramo> lstRamo) {
+		this.lstRamo = lstRamo;
+	}
+
+	public String getLscdAseguradora() {
+		return lscdAseguradora;
+	}
+
+	public void setLscdAseguradora(String lscdAseguradora) {
+		this.lscdAseguradora = lscdAseguradora;
+	}
+
+	public String getLscdRamo() {
+		return lscdRamo;
+	}
+
+	public void setLscdRamo(String lscdRamo) {
+		this.lscdRamo = lscdRamo;
+	}
+
+	public boolean isCaduca() {
+		return caduca;
+	}
+
+	public void setCaduca(boolean caduca) {
+		this.caduca = caduca;
+	}
+
+	public List<ConsultaObjetoPolView> getFilteredLstlstObjetosPoliza() {
+		return filteredLstlstObjetosPoliza;
+	}
+
+	public void setFilteredLstlstObjetosPoliza(List<ConsultaObjetoPolView> filteredLstlstObjetosPoliza) {
+		this.filteredLstlstObjetosPoliza = filteredLstlstObjetosPoliza;
+	}
+
+	public List<ConsultaSubObjetoPolView> getFilteredLstSubObjetosPoliza() {
+		return filteredLstSubObjetosPoliza;
+	}
+
+	public void setFilteredLstSubObjetosPoliza(List<ConsultaSubObjetoPolView> filteredLstSubObjetosPoliza) {
+		this.filteredLstSubObjetosPoliza = filteredLstSubObjetosPoliza;
+	}
+
+	public List<CoberturasEmitidas> getLstCoberturasEmitidas() {
+		return lstCoberturasEmitidas;
+	}
+
+	public void setLstCoberturasEmitidas(List<CoberturasEmitidas> lstCoberturasEmitidas) {
+		this.lstCoberturasEmitidas = lstCoberturasEmitidas;
+	}
+
+	public CoberturasEmitidas getSelectedCoberturasEmitidas() {
+		return selectedCoberturasEmitidas;
+	}
+
+	public void setSelectedCoberturasEmitidas(CoberturasEmitidas selectedCoberturasEmitidas) {
+		this.selectedCoberturasEmitidas = selectedCoberturasEmitidas;
+	}
+
+	public List<CoberturasEmitidas> getLstFilteredCoberturasEmitidas() {
+		return lstFilteredCoberturasEmitidas;
+	}
+
+	public void setLstFilteredCoberturasEmitidas(List<CoberturasEmitidas> lstFilteredCoberturasEmitidas) {
+		this.lstFilteredCoberturasEmitidas = lstFilteredCoberturasEmitidas;
+	}
+
+	public List<DeduciblesEmitidas> getLstDeducibleEmitida() {
+		return lstDeducibleEmitida;
+	}
+
+	public void setLstDeducibleEmitida(List<DeduciblesEmitidas> lstDeducibleEmitida) {
+		this.lstDeducibleEmitida = lstDeducibleEmitida;
+	}
+
+	public DeduciblesEmitidas getSelectedDeducibleEmitida() {
+		return selectedDeducibleEmitida;
+	}
+
+	public void setSelectedDeducibleEmitida(DeduciblesEmitidas selectedDeducibleEmitida) {
+		this.selectedDeducibleEmitida = selectedDeducibleEmitida;
+	}
+
+	public List<DeduciblesEmitidas> getLstFilteredDeducibleEmitida() {
+		return lstFilteredDeducibleEmitida;
+	}
+
+	public void setLstFilteredDeducibleEmitida(List<DeduciblesEmitidas> lstFilteredDeducibleEmitida) {
+		this.lstFilteredDeducibleEmitida = lstFilteredDeducibleEmitida;
+	}
+
+	public List<ClausulasEmitidas> getLstCalusulaEmitida() {
+		return lstCalusulaEmitida;
+	}
+
+	public void setLstCalusulaEmitida(List<ClausulasEmitidas> lstCalusulaEmitida) {
+		this.lstCalusulaEmitida = lstCalusulaEmitida;
+	}
+
+	public ClausulasEmitidas getSelectedClausulaEmitida() {
+		return selectedClausulaEmitida;
+	}
+
+	public void setSelectedClausulaEmitida(ClausulasEmitidas selectedClausulaEmitida) {
+		this.selectedClausulaEmitida = selectedClausulaEmitida;
+	}
+
+	public List<ClausulasEmitidas> getLstFilteredCalusulaEmitida() {
+		return lstFilteredCalusulaEmitida;
+	}
+
+	public void setLstFilteredCalusulaEmitida(List<ClausulasEmitidas> lstFilteredCalusulaEmitida) {
+		this.lstFilteredCalusulaEmitida = lstFilteredCalusulaEmitida;
 	}
 
 }

@@ -23,6 +23,25 @@ public class ClausulasEmitidas {
 	private Double valor_planclausula;
 	@Column(name="cd_compania") 
 	private Integer cd_compania;
+	@Column(name="especificacion_cla") 
+	private String especificacion_cla;
+	@Column(name="cd_ubicacion") 
+	private Integer cd_ubicacion;
+	
+	
+	
+	public Integer getCd_ubicacion() {
+		return cd_ubicacion;
+	}
+	public void setCd_ubicacion(Integer cd_ubicacion) {
+		this.cd_ubicacion = cd_ubicacion;
+	}
+	public String getEspecificacion_cla() {
+		return especificacion_cla;
+	}
+	public void setEspecificacion_cla(String especificacion_cla) {
+		this.especificacion_cla = especificacion_cla;
+	}
 	public Integer getCd_clausula() {
 		return cd_clausula;
 	}

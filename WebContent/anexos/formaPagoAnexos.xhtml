@@ -196,22 +196,27 @@
 			<h:outputText value="Num. Pagos: " />
 			<p:inputText value="#{ControladorAnexos.frmPagoNumPago}"
 				id="iptFrmNumPago" />
+			<h:outputText value="Observaciones: " />
+				<p:inputTextarea rows="3" style="width: 78%" id="iptFrmObs"
+					value="#{ControladorAnexos.frmObservaciones}"></p:inputTextarea>
 
 
 		</h:panelGrid>
 		<p:commandButton value="Aceptar" id="btnFrmPagoSave"
 			icon="ui-icon-plus" styleClass="ui-priority-primary"
 			action="#{ControladorAnexos.guardaFormaPago}"
-			process="@this frm_anexos:tbViewInclUbc:iptFrmPrimTot  
-				frm_anexos:tbViewInclUbc:iptFrmPDerEmi  
-				frm_anexos:tbViewInclUbc:iptFrmSupBanco 
-				frm_anexos:tbViewInclUbc:iptFrmSegCamp 
-				frm_anexos:tbViewInclUbc:iptFrmOtroVal 
-				frm_anexos:tbViewInclUbc:iptFrmIva 
-				frm_anexos:tbViewInclUbc:iptFrmCuotaIni  
-				frm_anexos:tbViewInclUbc:iptFrmNumPago 
-				frm_anexos:tbViewInclUbc:iptFrmTotla 
-				frm_anexos:tbViewInclUbc:slomFrmPago"
+			process="@this,frm_anexos:tbViewInclUbc:iptFrmPrimTot,  
+				frm_anexos:tbViewInclUbc:iptFrmPDerEmi,  
+				frm_anexos:tbViewInclUbc:iptFrmSupBanco, 
+				frm_anexos:tbViewInclUbc:iptFrmSegCamp, 
+				frm_anexos:tbViewInclUbc:iptFrmOtroVal, 
+				frm_anexos:tbViewInclUbc:iptFrmIva, 
+				frm_anexos:tbViewInclUbc:iptFrmCuotaIni,  
+				frm_anexos:tbViewInclUbc:iptFrmNumPago, 
+				frm_anexos:tbViewInclUbc:iptFrmTotla, 
+				frm_anexos:tbViewInclUbc:slomFrmPago,
+				frm_anexos:tbViewInclUbc:iptFrmObs 
+				"
 			update="frm_anexos:tbViewInclUbc:dtFrmpFinal,
 				frm_anexos:tbViewInclUbc:dtDetFrmpFinal,
 				frm_anexos:tbViewInclUbc:iptFrmPrimTot  ,
@@ -225,6 +230,7 @@
 				frm_anexos:tbViewInclUbc:iptFrmTotla ,
 				frm_anexos:tbViewInclUbc:slomFrmPago ,
 				frm_anexos:tbViewInclUbc:sbmAplicaIva ,
-				frm_anexos:tbViewInclUbc:sbmCalculaIva" />
+				frm_anexos:tbViewInclUbc:sbmCalculaIva ,
+				frm_anexos:tbViewInclUbc:iptFrmObs" />
 	</p:dialog>
 </ui:composition>

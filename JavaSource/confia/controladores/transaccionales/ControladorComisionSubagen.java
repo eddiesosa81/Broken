@@ -16,6 +16,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import org.jboss.resteasy.plugins.interceptors.encoding.GZIPEncodingInterceptor.EndableGZIPOutputStream;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.RowEditEvent;
 
@@ -24,6 +25,7 @@ import confia.entidades.basicos.ComisionSubagentePol;
 import confia.entidades.basicos.Subagentes;
 import confia.entidades.transaccionales.DetallePagoCanal;
 import confia.entidades.vistas.ComiSubagenPolView;
+import confia.entidades.vistas.liquidacionCanalPolView;
 import confia.reportes.AbstractReportBean;
 import confia.servicios.basicos.ServicioAseguradoras;
 import confia.servicios.basicos.ServicioComisionSubagenPol;
@@ -31,6 +33,7 @@ import confia.servicios.basicos.ServicioSubagentes;
 import confia.servicios.transaccionales.ServicioDetallePagoCanal;
 import confia.servicios.transaccionales.ServicioRamoCotizacion;
 import confia.servicios.vistas.ServicioComiSubagenPolView;
+import confia.servicios.vistas.ServicioLiquidacionCanalPolView;
 
 @ManagedBean(name = "ControladorComisionSubagen")
 @ViewScoped
@@ -47,6 +50,8 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 	private ServicioAseguradoras srvAseguradoras;
 	@EJB
 	private ServicioDetallePagoCanal srvDetallePagoCanal;
+	@EJB
+	private ServicioLiquidacionCanalPolView srvLiquidacionesCanal;
 
 	private List<ComiSubagenPolView> listComisionSubagenPol;
 	private List<ComiSubagenPolView> selectedListComiaionSubagenPol;
@@ -67,6 +72,12 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 	private Boolean btnPrint;
 	private List<Aseguradoras> listadoAseguradoras;
 	private String codigoAseguradora;
+	
+	// Imprime
+	
+	private String ls_num_liq;
+	private List<liquidacionCanalPolView> lstDetallePagoCanal;
+	private liquidacionCanalPolView selectedDetallePAgoCanal;
 
 	public ControladorComisionSubagen() {
 		listSubagentes = new ArrayList<Subagentes>();
@@ -74,12 +85,13 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 		fcFacturaCom = new Date();
 		btnPrint = true;
 		listadoAseguradoras = new ArrayList<Aseguradoras>();
+		ls_num_liq = "";
 
 	}
 
 	// --------------- PROGRAMACION IMPRESIONES ------------------//
 
-	private final String COMPILE_FILE_NAME = "FacturaCanal";
+	private  String COMPILE_FILE_NAME ;
 
 	@Override
 	protected String getCompileFileName() {
@@ -95,6 +107,7 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 	}
 
 	public String execute() {
+		COMPILE_FILE_NAME = "FacturaCanal";
 		System.out.println("---------------------------- NUMERO factura:" + numFacturaPrint);
 		try {
 			super.prepareReport();
@@ -103,6 +116,23 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 			e.printStackTrace();
 		}
 		btnPrint = true;
+		return null;
+	}
+	public String executeLiquidacion() {
+		COMPILE_FILE_NAME = "FacturaCanalLiquidado";
+		try {
+			if(selectedDetallePAgoCanal != null)
+				numFacturaPrint = selectedDetallePAgoCanal.getNum_factura_canal();
+		} catch (Exception e) {
+			return null;
+		}
+		System.out.println("---------------------------- NUMERO factura:" + numFacturaPrint);
+		try {
+			super.prepareReport();
+		} catch (Exception e) {
+			// logger.error("Error execute Exception "+e.getMessage());
+			e.printStackTrace();
+		}
 		return null;
 	}
 	// -----------------------------------------------------------//
@@ -158,14 +188,24 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 		ComiSubagenPolView comSuba = new ComiSubagenPolView();
 		comSuba = (ComiSubagenPolView) event.getObject();
 		ComisionSubagentePol comPol = new ComisionSubagentePol();
+		
 		comPol = srvComPolSuba.consultaSubagentePol(Integer.valueOf(comSuba.getCd_comisuba_pol()));
-		comPol.setVal_com_suba(Double.valueOf(comSuba.getVal_com_suba()));
-		comPol.setPct_com_suba(Double.valueOf(comSuba.getPct_com_suba()));
-		comPol.setSaldo_com_suba(Double.valueOf(comSuba.getVal_com_suba()));
-		srvComPolSuba.actualizaComisionSubagentePol(comPol);
-		listComisionSubagenPol = new ArrayList<ComiSubagenPolView>();
-		cargarComiSubagenPol();
-
+		System.out.println("comPol.getVal_com_suba():"+comPol.getVal_com_suba());
+		System.out.println("comPol.getSaldo_com_suba():"+comPol.getSaldo_com_suba());
+		if(comPol.getVal_com_suba().equals(comPol.getSaldo_com_suba())) {
+			comPol.setVal_com_suba(Double.valueOf(comSuba.getVal_com_suba()));
+			comPol.setPct_com_suba(Double.valueOf(comSuba.getPct_com_suba()));
+			comPol.setSaldo_com_suba(Double.valueOf(comSuba.getVal_com_suba()));
+			srvComPolSuba.actualizaComisionSubagentePol(comPol);
+			listComisionSubagenPol = new ArrayList<ComiSubagenPolView>();
+			cargarComiSubagenPol();	
+		}else {
+			FacesContext fContextObj = FacesContext.getCurrentInstance();
+			fContextObj.addMessage(null,
+					new FacesMessage("Advertencia", "No se puede modificar el valor." ));
+			
+			listComisionSubagenPol = new ArrayList<ComiSubagenPolView>();
+		}
 	}
 
 	public double redondear(double numero) {
@@ -360,6 +400,19 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 			fContextObj.addMessage(null, new FacesMessage("Advertencia", "Seleccione Comisiones para liquidar"));
 		}
 	}
+	
+	public void consultaLiquidacionCanal() {
+		try {
+			if (ls_num_liq.isEmpty() || ls_num_liq == null) {
+				ls_num_liq = "%";
+			}
+		} catch (Exception e) {
+			ls_num_liq = "%";
+		}
+		
+		lstDetallePagoCanal = new ArrayList<liquidacionCanalPolView>();
+		lstDetallePagoCanal = srvLiquidacionesCanal.consultaLiquidacionCanalView(ls_num_liq);
+	}
 
 	public void eliminaFactConfia(ComiSubagenPolView aux) {
 		listComisionSubagenPolPArcial.remove(aux);
@@ -500,5 +553,31 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 	public void setListComisionSubagenPolPArcial(List<ComiSubagenPolView> listComisionSubagenPolPArcial) {
 		this.listComisionSubagenPolPArcial = listComisionSubagenPolPArcial;
 	}
+
+	public String getLs_num_liq() {
+		return ls_num_liq;
+	}
+
+	public void setLs_num_liq(String ls_num_liq) {
+		this.ls_num_liq = ls_num_liq;
+	}
+
+	public List<liquidacionCanalPolView> getLstDetallePagoCanal() {
+		return lstDetallePagoCanal;
+	}
+
+	public void setLstDetallePagoCanal(List<liquidacionCanalPolView> lstDetallePagoCanal) {
+		this.lstDetallePagoCanal = lstDetallePagoCanal;
+	}
+
+	public liquidacionCanalPolView getSelectedDetallePAgoCanal() {
+		return selectedDetallePAgoCanal;
+	}
+
+	public void setSelectedDetallePAgoCanal(liquidacionCanalPolView selectedDetallePAgoCanal) {
+		this.selectedDetallePAgoCanal = selectedDetallePAgoCanal;
+	}
+	
+	
 
 }

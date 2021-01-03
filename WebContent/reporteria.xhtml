@@ -119,7 +119,8 @@
 					frm_correspondencia:tblRepo10 frm_correspondencia:panel10
 					frm_correspondencia:tblRepo11 frm_correspondencia:panel11
 					frm_correspondencia:tblRepo12 frm_correspondencia:panel12 
-					frm_correspondencia:tblRepo13 frm_correspondencia:panel13 " />
+					frm_correspondencia:tblRepo13 frm_correspondencia:panel13
+					frm_correspondencia:tblRepo14 frm_correspondencia:panel14 " />
 				<p:commandButton value="Salir" id="btnSalir" icon="ui-icon-cancel"
 					styleClass="ui-priority-primary"
 					action="#{ControladorReporteria.salir}" update="@this" />
@@ -507,6 +508,24 @@
 							<h:outputText value="Observaciones Atención" />
 						</f:facet>
 						<h:outputText value="#{report2.observacion_atencion}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Proveedor" />
+						</f:facet>
+						<h:outputText value="#{report2.descripcion_proveedor}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Ciudad Reparación" />
+						</f:facet>
+						<h:outputText value="#{report2.ciudad_reparacion}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Taller" />
+						</f:facet>
+						<h:outputText value="#{report2.taller}" />
 					</p:column>
 
 				</p:dataTable>
@@ -2862,6 +2881,103 @@
 							<h:outputText value="Cuota" />
 						</f:facet>
 						<h:outputText value="#{report.cuota}" />
+					</p:column>
+				</p:dataTable>
+			</p:panel>
+			
+			<p:panel header="Exportar Datos" id="panel14"
+				visible="#{ControladorReporteria.flgPreFacturaDetalleBoolean}"
+				toggleable="true">
+				<h:commandLink>
+					<p:graphicImage value="/images/excel.png" width="24" />
+					<p:dataExporter type="xls" target="tblRepo14" fileName="reporte" />
+				</h:commandLink>
+
+				<h:commandLink>
+					<p:graphicImage value="/images/csv.png" width="24" />
+					<p:dataExporter type="csv" target="tblRepo14" fileName="reporte" />
+				</h:commandLink>
+				<p:dataTable id="tblRepo14" var="report"
+					value="#{ControladorReporteria.lstprefacturadetalleView}"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+					paginator="true" rows="5"
+					style="font-family:Verdana; font-size: 12px;" scrollable="true"
+					scrollWidth="1200">
+
+
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Cliente" />
+						</f:facet>
+						<h:outputText value="#{report.cliente}" />
+					</p:column>
+
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Cédula Cliente" />
+						</f:facet>
+						<h:outputText value="#{report.identificacion_cliente}" />
+					</p:column>
+
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Aseguradora" />
+						</f:facet>
+						<h:outputText value="#{report.nombre_aseguradora}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Ramo" />
+						</f:facet>
+						<h:outputText value="#{report.desc_ramo}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Póliza" />
+						</f:facet>
+						<h:outputText value="#{report.poliza}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Factura Aseguradora" />
+						</f:facet>
+						<h:outputText value="#{report.factura}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Prima" />
+						</f:facet>
+						<h:outputText value="#{report.tot_prima}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Porcentaje Comisión" />
+						</f:facet>
+						<h:outputText value="#{report.pct_com_broker}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Valor Comisión" />
+						</f:facet>
+						<h:outputText value="#{report.val_com_broker}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="No. Pre Liquidación" />
+						</f:facet>
+						<h:outputText value="#{report.cd_pre_factura}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Fecha Preliquidación" />
+						</f:facet>
+						<h:outputText value="#{report.fc_pre_factura}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Preliquidación Facturada" />
+						</f:facet>
+						<h:outputText value="#{report.facturado}" />
 					</p:column>
 				</p:dataTable>
 			</p:panel>

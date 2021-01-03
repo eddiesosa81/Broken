@@ -32,6 +32,18 @@ public class PlanCobertura {
 	private Double valor_plancobertura;
 	@Column(name = "estado_plancobertura")
 	private String estado_plancobertura;
+	@Column(name="especificacion")
+	private String especificacion;
+	
+	
+	
+	
+	public String getEspecificacion() {
+		return especificacion;
+	}
+	public void setEspecificacion(String especificacion) {
+		this.especificacion = especificacion;
+	}
 	public Integer getCd_plancobertura() {
 		return cd_plancobertura;
 	}

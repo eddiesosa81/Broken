@@ -32,7 +32,7 @@
 			value="#{controladorDiferencialesPol.fechaHasta}"
 			pattern="dd-MM-yyyy" mask="true" />
 	</h:panelGrid>
-	<h:panelGrid columns="4" cellpadding="6">
+	<h:panelGrid columns="6" cellpadding="6">
 		<p:commandButton value="Buscar" id="btnasegDif"
 			update="@this,frmDifPol:dtDifAsegComiPol"
 			styleClass="ui-priority-primary"
@@ -79,6 +79,9 @@
 
 		<p:column headerText="Aseguradora" style="width:80px">
 			<h:outputText value="#{acpv.nombre_corto_aseguradora}" />
+		</p:column>
+		<p:column headerText="Plan" style="width:80px">
+			<h:outputText value="#{acpv.plan}" />
 		</p:column>
 		<p:column headerText="Canal" style="width:80px">
 			<h:outputText value="#{acpv.nm_subagente}" />

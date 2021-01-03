@@ -11,7 +11,7 @@ public class ConectarBase {
 //	    String url = "jdbc:oracle:thin:@10.142.0.2:1521:confia";
 	    
 	   
-	    String username = "broken";
+	    String username = "BROKEN";
 	    String password = "broken";
 
 	    Class.forName(driver).newInstance();

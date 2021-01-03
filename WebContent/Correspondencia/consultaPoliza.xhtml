@@ -24,6 +24,26 @@
 						itemLabel="#{gcontratante.nombre_corto_grupo_contratante}"
 						itemValue="#{gcontratante.cd_grupo_contratante}" />
 				</p:selectOneMenu>
+
+				<p:selectOneMenu id="repAseg"
+					value="#{ControladorConsultaPoliza.lscdAseguradora}"
+					style="width:150px" autoWidth="false">
+					<f:selectItem itemLabel="Aseguradora" itemValue="%" />
+					<f:selectItems
+						value="#{ControladorConsultaPoliza.listAseguradoras}"
+						var="correspAseg"
+						itemLabel=" #{correspAseg.nombre_corto_aseguradora}"
+						itemValue="#{correspAseg.cd_aseguradora}" />
+				</p:selectOneMenu>
+				<p:selectOneMenu id="repRamo"
+					value="#{ControladorConsultaPoliza.lscdRamo}" style="width:150px"
+					autoWidth="false">
+					<f:selectItem itemLabel="Ramo" itemValue="%" />
+					<f:selectItems value="#{ControladorConsultaPoliza.lstRamo}"
+						var="ramo" itemLabel="#{ramo.desc_ramo}"
+						itemValue="#{ramo.cd_ramo}" />
+				</p:selectOneMenu>
+
 				<p:inputText value="#{ControladorConsultaPoliza.objAsegurado}"
 					placeholder="Descripción Obj" id="intxtbuscaPolObjAseg"
 					style="text-transform:uppercase;"
@@ -38,6 +58,10 @@
 					<f:selectItem itemLabel="Anexo" itemValue="anexo" />
 					<f:selectItem itemLabel="Anula/Cancela" itemValue="anulaCancela" />
 				</p:selectOneRadio>
+				<p:selectBooleanCheckbox id="chkCaduca"
+					value="#{ControladorConsultaPoliza.caduca}" itemLabel="Caducas" />
+				<p:row></p:row>
+				<p:row></p:row>
 				<p:commandButton value="Buscar" styleClass="ui-priority-primary"
 					actionListener="#{ControladorConsultaPoliza.buscaPoliza}"
 					update="@this frm_consultas:tab_consulta:listadoPolizaBusca"
@@ -46,7 +70,10 @@
 						frm_consultas:tab_consulta:iptnumFactura,frm_consultas:tab_consulta:cotizaBuscaPol,
 						frm_consultas:tab_consulta:gCtrtBusc,frm_consultas:tab_consulta:intxtbuscaPolPlaca,
 						frm_consultas:tab_consulta:intxtbuscaPolMotor,
-						frm_consultas:tab_consulta:intxtbuscaPolObjAseg" />
+						frm_consultas:tab_consulta:intxtbuscaPolObjAseg,
+						frm_consultas:tab_consulta:repRamo,
+						frm_consultas:tab_consulta:repAseg,
+						frm_consultas:tab_consulta:chkCaduca" />
 				<p:commandButton value="Renueva Póliza"
 					styleClass="ui-priority-primary"
 					actionListener="#{ControladorConsultaPoliza.renuevaPol}"
@@ -147,6 +174,13 @@
 				onclick="PF('notaAclaDialog').show();"
 				actionListener="#{ControladorConsultaPoliza.onRowNotaAclaratoria(pol)}"
 				update="@this,frm_consultas:tab_consulta:dtDetAcla"
+				icon="ui-icon-suitcase" style="width:19px" process="@this">
+			</p:commandButton>
+		</p:column>
+		<p:column style="width:22px">
+			<p:commandButton title="Plan Emitido"
+				actionListener="#{ControladorConsultaPoliza.onRowPlanRamCot(pol)}"
+				update="frm_consultas:tab_consulta:dtCobertura,frm_consultas:tab_consulta:dtDeducible,frm_consultas:tab_consulta:dtClausulas"
 				icon="ui-icon-suitcase" style="width:19px" process="@this">
 			</p:commandButton>
 		</p:column>
@@ -335,6 +369,13 @@
 				<p:column headerText="Descripción">
 					<h:outputText value="#{ubc.dsc_ubicacion}" />
 				</p:column>
+				<p:column style="width:22px">
+					<p:commandButton title="Edita Plan"
+						actionListener="#{ControladorConsultaPoliza.onRowPlanUbc(ubc)}"
+						update="frm_consultas:tab_consulta:dtCobertura,frm_consultas:tab_consulta:dtDeducible,frm_consultas:tab_consulta:dtClausulas"
+						icon="ui-icon-suitcase" style="width:19px" process="@this">
+					</p:commandButton>
+				</p:column>
 			</p:dataTable>
 		</p:row>
 		<p:row>
@@ -344,7 +385,10 @@
 				selectionMode="single"
 				selection="#{ControladorConsultaPoliza.selectedObjetosPoliza}"
 				rowKey="#{obj.cd_obj_cotizacion}"
-				style="width:500px; font-family:Verdana; font-size: 12px;">
+				style="width:500px; font-family:Verdana; font-size: 12px;"
+				emptyMessage="No found with given criteria"
+				filteredValue="#{ControladorConsultaPoliza.filteredLstlstObjetosPoliza}">
+
 				<f:facet name="header">
 				            Seleccione el Objeto
 				        </f:facet>
@@ -354,9 +398,13 @@
 				<p:column headerText="Cod." style="width:40px;text-align:center">
 					<h:outputText value="#{obj.cd_obj_cotizacion}" />
 				</p:column>
-				<p:column headerText="Descripción">
+				<p:column filterBy="#{obj.descripcion_objeto}"
+					headerText="Descripción" filterMatchMode="contains"
+					style="width:150px;">
 					<h:outputText value="#{obj.descripcion_objeto}" />
 				</p:column>
+
+
 				<p:column headerText="Valor Asegurado">
 					<h:outputText value="#{obj.valor_asegurador_objeto}" />
 				</p:column>
@@ -365,6 +413,9 @@
 				</p:column>
 				<p:column headerText="Estado">
 					<h:outputText value="#{obj.estado_Objeto}" />
+				</p:column>
+				<p:column headerText="Deducible Mínimo">
+					<h:outputText value="#{obj.deducible_Minimo}" />
 				</p:column>
 			</p:dataTable>
 		</p:row>
@@ -376,7 +427,7 @@
 				<f:facet name="header">
 				            Caracteristicas del Objeto
 				    </f:facet>
-				<p:column headerText="Cod."  width="80">
+				<p:column headerText="Cod." width="80">
 					<h:outputText value="#{caract.cd_carac_vh}" />
 				</p:column>
 				<p:column headerText="Placa" width="100">
@@ -412,23 +463,28 @@
 				<p:column headerText="Uso del Vehículo" width="100">
 					<h:outputText value="#{caract.uso_vehiculo}" />
 				</p:column>
-				
+
 			</p:dataTable>
 		</p:row>
 		<p:row>
 			<p:dataTable id="dtPolSubObjeto" var="subObj" scrollable="true"
 				scrollHeight="80"
 				value="#{ControladorConsultaPoliza.lstSubObjetosPoliza}"
-				style="width:500px; font-family:Verdana; font-size: 10px;">
+				style="width:500px; font-family:Verdana; font-size: 10px;"
+				emptyMessage="No found with given criteria"
+				filteredValue="#{ControladorConsultaPoliza.filteredLstSubObjetosPoliza}">
 				<f:facet name="header">
 				            Sub Objetos
 				        </f:facet>
 				<p:column headerText="Cod." style="width:40px;text-align:center">
 					<h:outputText value="#{subObj.cd_subobj_cotizacion}" />
 				</p:column>
-				<p:column headerText="Descripción">
+				<p:column filterBy="#{subObj.descripcion_subobjeto}"
+					headerText="Descripción" filterMatchMode="contains"
+					style="width:150px;">
 					<h:outputText value="#{subObj.descripcion_subobjeto}" />
 				</p:column>
+
 				<p:column headerText="Valor Asegurado">
 					<h:outputText value="#{subObj.valor_asegurador_subobjeto}" />
 				</p:column>
@@ -465,7 +521,7 @@
 				</p:column>
 				<p:column headerText="Observaciones">
 					<h:outputText value="#{pag.observaciones}">
-						
+
 					</h:outputText>
 				</p:column>
 				<p:column style="width:32px;text-align: center">
@@ -565,6 +621,201 @@
 		<p:commandButton value="Cerrar" icon="ui-icon-cancel"
 			onclick="PF('notaAclaDialog').hide();" update="@this" process="@this">
 		</p:commandButton>
+	</p:dialog>
+	<!-- Planes Coberturas Clausulas Deducibles -->
+	<p:dialog header="Planes" draggable="true" widgetVar="wvPlanesRamCot"
+		showEffect="fade" hideEffect="fade" closable="true">
+		<h:panelGrid columns="2" cellpadding="5">
+			<p:row>
+				<p:dataTable id="dtCobertura" var="cob"
+					value="#{ControladorConsultaPoliza.lstCoberturasEmitidas}"
+					scrollable="true" scrollHeight="150"
+					style="width:500px; font-family:Verdana; font-size: 12px;"
+					selectionMode="single"
+					selection="#{ControladorConsultaPoliza.selectedCoberturasEmitidas}"
+					rowKey="#{cob.cd_cobertura}"
+					emptyMessage="No se encuentra en la busqueda"
+					filteredValue="#{ControladorConsultaPoliza.lstFilteredCoberturasEmitidas}"
+					editable="true">
+					<f:facet name="header">
+				            Coberturas
+				    </f:facet>
+
+					<p:column headerText="Descripción Cobertura"
+						filterBy="#{cob.desc_cobertura}" sortBy="#{cob.desc_cobertura}"
+						filterMatchMode="contains">
+						<h:outputText value="#{cob.desc_cobertura}" />
+					</p:column>
+					<p:column headerText="Porcentaje">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{cob.porcentajeplancobertura}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputNumber value="#{cob.porcentajeplancobertura}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Valor">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{cob.valor_plancobertura}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputNumber value="#{cob.valor_plancobertura}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Especificación">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{cob.especificacion_cob}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{cob.especificacion_cob}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+				</p:dataTable>
+			</p:row>
+			<p:row>
+				<p:dataTable id="dtDeducible" var="ded"
+					value="#{ControladorConsultaPoliza.lstDeducibleEmitida}"
+					scrollable="true" scrollHeight="150"
+					style="width:500px; font-family:Verdana; font-size: 12px;"
+					selectionMode="single"
+					selection="#{ControladorConsultaPoliza.selectedDeducibleEmitida}"
+					rowKey="#{ded.cd_deducible_emitido}"
+					emptyMessage="No se encuentra en la busqueda"
+					filteredValue="#{ControladorConsultaPoliza.lstFilteredDeducibleEmitida}"
+					editable="true">
+					<f:facet name="header">
+				            Deducibles
+				     </f:facet>
+					<p:column headerText="Descripción Deducible" rendered="false">
+						<h:outputText value="#{ded.cd_deducible_emitido}" />
+					</p:column>
+					<p:column headerText="Descripción Deducible"
+						filterBy="#{ded.desc_deducible}" sortBy="#{ded.desc_deducible}"
+						filterMatchMode="contains">
+						<h:outputText value="#{ded.desc_deducible}" />
+					</p:column>
+					<p:column headerText="% Valor Siniestro">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{ded.porcentaje_valor_siniestro}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputNumber value="#{ded.porcentaje_valor_siniestro}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="% Valor Asegurado">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{ded.porcentaje_valor_asegurado}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputNumber value="#{ded.porcentaje_valor_asegurado}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Valor Mínimo">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{ded.valor_minimo}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputNumber value="#{ded.valor_minimo}" style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Valor Fijo">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{ded.valor_fijo}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputNumber value="#{ded.valor_fijo}" style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Especificación">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{ded.especificacion}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{ded.especificacion}" style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+				</p:dataTable>
+			</p:row>
+			<p:row>
+				<p:dataTable id="dtClausulas" var="cla"
+					value="#{ControladorConsultaPoliza.lstCalusulaEmitida}"
+					scrollable="true" scrollHeight="150"
+					style="width:500px; font-family:Verdana; font-size: 12px;"
+					selectionMode="single"
+					selection="#{ControladorConsultaPoliza.selectedClausulaEmitida}"
+					rowKey="#{cla.cd_clausula}"
+					emptyMessage="No se encuentra en la busqueda"
+					filteredValue="#{ControladorConsultaPoliza.lstFilteredCalusulaEmitida}"
+					editable="true">
+					<f:facet name="header">
+				            Clausulas
+				        </f:facet>
+
+					<p:column headerText="Descripción Clausula"
+						filterBy="#{cla.desc_clausula}" sortBy="#{cla.desc_clausula}"
+						filterMatchMode="contains">
+						<h:outputText value="#{cla.desc_clausula}" />
+					</p:column>
+					<p:column headerText="Porcentaje">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{cla.porcentaje_planclausula}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputNumber value="#{cla.porcentaje_planclausula}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Valor">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{cla.valor_planclausula}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputNumber value="#{cla.valor_planclausula}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Especificación">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{cla.especificacion_cla}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{cla.especificacion_cla}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column style="width:32px">
+						<p:rowEditor />
+					</p:column>
+				</p:dataTable>
+			</p:row>
+		</h:panelGrid>
 	</p:dialog>
 
 </ui:composition>

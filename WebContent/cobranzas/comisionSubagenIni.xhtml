@@ -20,11 +20,18 @@
 			<p:growl showDetail="true" sticky="true">
 				<p:autoUpdate></p:autoUpdate>
 			</p:growl>
+			<p:menubar>
+				<p:submenu  label="Menú" icon="ui-icon-document" >
+					<p:menuitem value="Re Impresión" url="/Broken/cobranzas/imprimeLiqCanal.jsf" />
+				</p:submenu>
+			</p:menubar>
+			
 			<ui:include src="/cobranzas/comisionSubagen.xhtml" />
 		</h:form>
-		<p:dialog header="Comisiones Seleccionadas" widgetVar="wComSubaSelected"
-			draggable="true" showEffect="fade" hideEffect="fade" closable="true"
-			width="1200" appendTo="@(body)" modal="true" resizable="false">
+		<p:dialog header="Comisiones Seleccionadas"
+			widgetVar="wComSubaSelected" draggable="true" showEffect="fade"
+			hideEffect="fade" closable="true" width="1200" appendTo="@(body)"
+			modal="true" resizable="false">
 			<h:form id="frmFactSelected">
 				<h:panelGrid columns="1" style="width:100%;">
 					<p:dataTable var="preLiq" id="dtFacSel"
@@ -34,9 +41,8 @@
 						editable="true">
 
 						<p:ajax event="rowEdit"
-							listener="#{ControladorComisionSubagen.onRowEditValCom}"
-							 />
-						
+							listener="#{ControladorComisionSubagen.onRowEditValCom}" />
+
 						<p:column headerText="Poliza">
 							<h:outputText value="#{preLiq.poliza}" />
 						</p:column>
@@ -49,7 +55,7 @@
 						<p:column headerText="Val.Com.Brk">
 							<h:outputText value="#{preLiq.val_com_brk}" />
 						</p:column>
-						
+
 						<p:column headerText="Pct.Com.Canal">
 							<h:outputText value="#{preLiq.pct_com_suba}" />
 						</p:column>
@@ -62,7 +68,8 @@
 									<h:outputText value="#{preLiq.saldo_COM_SUBA}" />
 								</f:facet>
 								<f:facet name="input">
-									<p:inputText value="#{preLiq.saldo_COM_SUBA}" style="width:100%" />
+									<p:inputText value="#{preLiq.saldo_COM_SUBA}"
+										style="width:100%" />
 								</f:facet>
 							</p:cellEditor>
 						</p:column>

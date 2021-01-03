@@ -104,6 +104,7 @@ public class ServicioConsultaPolizaView {
 			return null;
 		}
 	}
+	
 
 	@SuppressWarnings("unchecked")
 	public List<ConsultaPolizaView> consultaPolizasCodCotiza(String codCotizacion) {
@@ -122,9 +123,11 @@ public class ServicioConsultaPolizaView {
 
 	@SuppressWarnings("unchecked")
 	public List<ConsultaPolizaView> consultaPolizasXClienteGrpCont(String cliente, String grpContratante, String pol,
-			String fact) {
+			String fact, String cdAseguradora, String cdRamo) {
 		List<ConsultaPolizaView> resultado;
-		String sql = "select * from consulta_poliza_view where cliente like '%" + cliente
+		String sql = "select * from consulta_poliza_view where "
+				+"to_char(cd_aseguradora) like '"+cdAseguradora+"' and to_char(cd_ramo) like '"+cdRamo+"' and "
+				+ "cliente like '%" + cliente
 				+ "%' and to_char(cd_grupo_contratante) like '" + grpContratante + "' and poliza like '" + pol
 				+ "' and factura_aseguradora like '" + fact + "'  order by cd_cliente,fc_ini_vig_date DESC";
 		try {
@@ -135,6 +138,25 @@ public class ServicioConsultaPolizaView {
 			return null;
 		}
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<ConsultaPolizaView> consultaPolizasXClienteGrpContVig(String cliente, String grpContratante, String pol,
+			String fact, String cdAseguradora, String cdRamo) {
+		List<ConsultaPolizaView> resultado;
+		String sql = "select * from consulta_poliza_view where "
+				+"to_char(cd_aseguradora) like '"+cdAseguradora+"' and to_char(cd_ramo) like '"+cdRamo+"' and "
+				+ "desc_rubro != 'CADUCA' and cliente like '%" + cliente
+				+ "%' and to_char(cd_grupo_contratante) like '" + grpContratante + "' and poliza like '" + pol
+				+ "' and factura_aseguradora like '" + fact + "'  order by cd_cliente,fc_ini_vig_date DESC";
+		try {
+			Query query = em.createNativeQuery(sql, ConsultaPolizaView.class);
+			resultado = query.getResultList();
+			return resultado;
+		} catch (Exception ex) {
+			return null;
+		}
+	}
+	
 
 	@SuppressWarnings("unchecked")
 	public List<ConsultaPolizaView> consultaPolizasRenovacion(String codEjecutivo, String grpContratante,
@@ -173,9 +195,29 @@ public class ServicioConsultaPolizaView {
 
 	@SuppressWarnings("unchecked")
 	public List<ConsultaPolizaView> consultaPolizaAnexoXClienteGrpCont(String cliente, String grpContratante,
-			String pol, String fact) {
+			String pol, String fact, String cdAseguradora, String cdRamo) {
 		List<ConsultaPolizaView> resultado;
-		String sql = "select * from consulta_anexo_poliza_view where cliente like '%" + cliente
+		String sql = "select * from consulta_anexo_poliza_view where "
+				+"to_char(cd_aseguradora) like '"+cdAseguradora+"' and to_char(cd_ramo) like '"+cdRamo+"' and "
+				+ "cliente like '%" + cliente
+				+ "%' and to_char(cd_grupo_contratante) like '" + grpContratante + "' and poliza like '" + pol
+				+ "' and factura_aseguradora like '" + fact + "' order by cd_cliente,cd_cotizacion";
+		try {
+			Query query = em.createNativeQuery(sql, ConsultaPolizaView.class);
+			resultado = query.getResultList();
+			return resultado;
+		} catch (Exception ex) {
+			return null;
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<ConsultaPolizaView> consultaPolizaAnexoXClienteGrpContVig(String cliente, String grpContratante,
+			String pol, String fact, String cdAseguradora, String cdRamo) {
+		List<ConsultaPolizaView> resultado;
+		String sql = "select * from consulta_anexo_poliza_view where "
+				+"to_char(cd_aseguradora) like '"+cdAseguradora+"' and to_char(cd_ramo) like '"+cdRamo+"' and "
+				+ "desc_rubro != 'CADUCA' and cliente like '%" + cliente
 				+ "%' and to_char(cd_grupo_contratante) like '" + grpContratante + "' and poliza like '" + pol
 				+ "' and factura_aseguradora like '" + fact + "' order by cd_cliente,cd_cotizacion";
 		try {
@@ -189,9 +231,11 @@ public class ServicioConsultaPolizaView {
 
 	@SuppressWarnings("unchecked")
 	public List<ConsultaPolizaView> consultaAnulaCancelXClienteGrpCont(String cliente, String grpContratante,
-			String pol, String fact) {
+			String pol, String fact, String cdAseguradora, String cdRamo) {
 		List<ConsultaPolizaView> resultado;
-		String sql = "select * from consulta_anula_cancela_view where cliente like '%" + cliente
+		String sql = "select * from consulta_anula_cancela_view where "
+				+"to_char(cd_aseguradora) like '"+cdAseguradora+"' and to_char(cd_ramo) like '"+cdRamo+"' and "
+				+ "cliente like '%" + cliente
 				+ "%' and to_char(cd_grupo_contratante) like '" + grpContratante + "' and poliza like '" + pol
 				+ "' and factura_aseguradora like '" + fact + "' order by cd_cliente,cd_cotizacion";
 		try {
@@ -202,7 +246,53 @@ public class ServicioConsultaPolizaView {
 			return null;
 		}
 	}
-
+	
+	@SuppressWarnings("unchecked")
+	public List<ConsultaPolizaView> consultaAnulaCancelXClienteGrpContVig(String cliente, String grpContratante,
+			String pol, String fact, String cdAseguradora, String cdRamo) {
+		List<ConsultaPolizaView> resultado;
+		String sql = "select * from consulta_anula_cancela_view where "
+				+"to_char(cd_aseguradora) like '"+cdAseguradora+"' and to_char(cd_ramo) like '"+cdRamo+"' and "
+				+ "desc_rubro != 'CADUCA' and cliente like '%" + cliente
+				+ "%' and to_char(cd_grupo_contratante) like '" + grpContratante + "' and poliza like '" + pol
+				+ "' and factura_aseguradora like '" + fact + "' order by cd_cliente,cd_cotizacion";
+		try {
+			Query query = em.createNativeQuery(sql, ConsultaPolizaView.class);
+			resultado = query.getResultList();
+			return resultado;
+		} catch (Exception ex) {
+			return null;
+		}
+	}
+	
+	
+	
+	@SuppressWarnings("unchecked")
+	public List<ConsultaPolizaView> consultaPolizasXRamoCotPlaca(String cdRamCot) {
+		List<ConsultaPolizaView> resultado;
+		String sql = "select * from consulta_poliza_view where cd_ramo_cotizacion in ( " + cdRamCot
+				+ ") order by cd_cliente,cd_cotizacion";
+		try {
+			Query query = em.createNativeQuery(sql, ConsultaPolizaView.class);
+			resultado = query.getResultList();
+			return resultado;
+		} catch (Exception ex) {
+			return null;
+		}
+	}
+	@SuppressWarnings("unchecked")
+	public List<ConsultaPolizaView> consultaPolizasXRamoCotPlacaVig(String cdRamCot) {
+		List<ConsultaPolizaView> resultado;
+		String sql = "select * from consulta_poliza_view where desc_rubro != 'CADUCA' and cd_ramo_cotizacion in ( " + cdRamCot
+				+ ") order by cd_cliente,cd_cotizacion";
+		try {
+			Query query = em.createNativeQuery(sql, ConsultaPolizaView.class);
+			resultado = query.getResultList();
+			return resultado;
+		} catch (Exception ex) {
+			return null;
+		}
+	}
 	@SuppressWarnings("unchecked")
 	public List<ConsultaPolizaView> consultaPolizasXRamoCot(String cdRamCot) {
 		List<ConsultaPolizaView> resultado;
@@ -230,11 +320,43 @@ public class ServicioConsultaPolizaView {
 			return null;
 		}
 	}
+	
+	
+	@SuppressWarnings("unchecked")
+	public List<ConsultaPolizaView> consultaPolizasCaracteObjVig(String cdRamCot) {
+		List<ConsultaPolizaView> resultado;
+		String sql = "select * from consulta_poliza_view where desc_rubro != 'CADUCA' and cd_ramo_cotizacion in( " + cdRamCot
+				+ ")  order by cd_cliente,fc_ini_vig_date DESC";
+		try {
+			Query query = em.createNativeQuery(sql, ConsultaPolizaView.class);
+			resultado = query.getResultList();
+			return resultado;
+		} catch (Exception ex) {
+			return null;
+		}
+	}
+	
 
 	@SuppressWarnings("unchecked")
 	public List<ConsultaPolizaView> consultaPolizasXDescObj(String descObj) {
 		List<ConsultaPolizaView> resultado;
 		String sql = "select * from consulta_poliza_view where cd_ramo_cotizacion "
+				+ "in( select distinct cd_ramo_cotizacion from CONSULTA_OBJETO_POL_VIEW where descripcion_objeto like '%"
+				+ descObj + "%')  order by cd_cliente,fc_ini_vig_date DESC";
+		System.out.println("SQL -->" + sql);
+		try {
+			Query query = em.createNativeQuery(sql, ConsultaPolizaView.class);
+			resultado = query.getResultList();
+			return resultado;
+		} catch (Exception ex) {
+			return null;
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<ConsultaPolizaView> consultaPolizasXDescObjVig(String descObj) {
+		List<ConsultaPolizaView> resultado;
+		String sql = "select * from consulta_poliza_view where  desc_rubro != 'CADUCA' and cd_ramo_cotizacion "
 				+ "in( select distinct cd_ramo_cotizacion from CONSULTA_OBJETO_POL_VIEW where descripcion_objeto like '%"
 				+ descObj + "%')  order by cd_cliente,fc_ini_vig_date DESC";
 		System.out.println("SQL -->" + sql);

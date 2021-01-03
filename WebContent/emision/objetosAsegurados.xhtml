@@ -108,7 +108,7 @@
 				  Ubicaciones
 				</f:facet>
 				<p:ajax event="rowSelect"
-					listener="#{ControladorEmision.onRowSelectUbc}"
+					listener="#{ControladorEmision.onRowSelectUbc(ubicaTot)}"
 					update="@this frm_emision:tab_emision:dtCoberAdcUbc,frm_emision:tab_emision:dtObjTot,
 						frm_emision:tab_emision:dtSubObjTot"
 					process="@this" />
@@ -133,6 +133,14 @@
 					<h:outputText value="#{ubicaTot.descripcion_plan}">
 						<f:convertNumber type="currency" />
 					</h:outputText>
+				</p:column>
+				<p:column style="width:22px">
+					<p:commandButton title="Edita Plan"
+						actionListener="#{ControladorEmision.onRowPlanUbc(ubicaTot)}"
+						update="@this,frm_emision:tab_emision:dtCobertura,frm_emision:tab_emision:dtDeducible,
+						frm_emision:tab_emision:dtClausulas"
+						icon="ui-icon-suitcase" style="width:19px" process="@this">
+					</p:commandButton>
 				</p:column>
 				<p:column style="width:22px">
 					<p:commandButton title="Editar Ubicación"
@@ -707,6 +715,17 @@
 							</f:facet>
 						</p:cellEditor>
 					</p:column>
+					<p:column headerText="Especificación">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{cob.especificacion_cob}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{cob.especificacion_cob}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
 					<p:column style="width:32px">
 						<p:rowEditor />
 					</p:column>
@@ -861,6 +880,17 @@
 							</f:facet>
 							<f:facet name="input">
 								<p:inputNumber value="#{cla.valor_planclausula}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Especificación">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{cla.especificacion_cla}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{cla.especificacion_cla}"
 									style="width:100%" />
 							</f:facet>
 						</p:cellEditor>
@@ -1703,11 +1733,16 @@
 					<h:outputText value="Valor" />
 					<p:inputNumber value="#{ControladorEmision.valorCob}"
 						id="inptNumVal"></p:inputNumber>
+					<h:outputText value="Especificación" />
+					<p:inputText value="#{ControladorEmision.especificacionCob}"
+						id="inptEspCob"></p:inputText>
 				</h:panelGrid>
 			</p:row>
 		</h:panelGrid>
 		<p:commandButton icon="ui-icon-check" value="Guardar"
-			process="@this,frm_emision:tab_emision:checkboxDTCob,frm_emision:tab_emision:inptNumPor,frm_emision:tab_emision:inptNumVal"
+			process="@this,frm_emision:tab_emision:checkboxDTCob,
+			frm_emision:tab_emision:inptNumPor,frm_emision:tab_emision:inptNumVal
+			,frm_emision:tab_emision:inptEspCob"
 			update="@this,frm_emision:tab_emision:dtCobertura"
 			action="#{ControladorEmision.guardaCobertura}">
 		</p:commandButton>
@@ -1805,11 +1840,16 @@
 					<h:outputText value="Valor" />
 					<p:inputNumber value="#{ControladorEmision.valorClau}"
 						id="inptNumValCla"></p:inputNumber>
+					<h:outputText value="Especificación" />
+					<p:inputText value="#{ControladorEmision.especificacionDCla}"
+						id="inptEspCla"></p:inputText>
 				</h:panelGrid>
 			</p:row>
 		</h:panelGrid>
 		<p:commandButton icon="ui-icon-check" value="Guardar"
-			process="@this,frm_emision:tab_emision:checkboxDTclau,frm_emision:tab_emision:inptNumPorCla,frm_emision:tab_emision:inptNumValCla"
+			process="@this,frm_emision:tab_emision:checkboxDTclau,
+			frm_emision:tab_emision:inptNumPorCla,frm_emision:tab_emision:inptNumValCla
+			,frm_emision:tab_emision:inptEspCla"
 			update="@this frm_emision:tab_emision:dtClausulas"
 			action="#{ControladorEmision.guardaClausula}">
 		</p:commandButton>

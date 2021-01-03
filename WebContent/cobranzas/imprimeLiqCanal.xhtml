@@ -1,0 +1,74 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/templates/Template.xhtml">
+	<ui:define name="tituloPagina">Liquidaciones Canal</ui:define>
+	<ui:define name="contenido">
+		<p:ajaxStatus
+			style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+			<f:facet name="start">
+				<p:graphicImage value="/images/ajax-loadercircle.gif" />
+			</f:facet>
+
+			<f:facet name="complete">
+				<h:outputText value="" />
+			</f:facet>
+		</p:ajaxStatus>
+		<h:form id="frm_imprimeCanal">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+
+			<h:panelGrid columns="4" cellpadding="5">
+				<p:inputText id="txtNumLiqCanal"
+					value="#{ControladorComisionSubagen.ls_num_liq}"
+					placeholder="Número de Factura "></p:inputText>
+				<p:commandButton value="Buscar" id="btnBuscaSubagente"
+					update="@this,frm_imprimeCanal:canalDt"
+					styleClass="ui-priority-primary" icon="ui-icon-search"
+					action="#{ControladorComisionSubagen.consultaLiquidacionCanal}"
+					process="@this,frm_imprimeCanal:txtNumLiqCanal" />
+
+				<p:commandButton value="Imprimir" id="btnPrintCan"
+					action="#{ControladorComisionSubagen.executeLiquidacion()}" ajax="false"
+					styleClass="ui-priority-primary" icon="ui-icon-script"
+					style="width:100px; font-family:Verdana; font-size: 12px;">
+				</p:commandButton>
+				<p:commandButton value="Salir" id="btnSalir" icon="ui-icon-cancel"
+					styleClass="ui-priority-primary"
+					action="/index.xhtml?faces-redirect=true" process="@this"
+					update="@this" />
+			</h:panelGrid>
+
+			<p:dataTable id="canalDt" var="canla"
+				value="#{ControladorComisionSubagen.lstDetallePagoCanal}"
+				selectionMode="single"
+				selection="#{ControladorComisionSubagen.selectedDetallePAgoCanal}"
+				rowKey="#{canla.numrow}"
+				style="font-family:Verdana; font-size: 10px;">
+				<f:facet name="header">
+		            Seleccione la liquidación antes de Imprimir
+		        </f:facet>
+				<p:column headerText="Canal">
+					<h:outputText value="#{canla.datos_subagente}" />
+				</p:column>
+				<p:column headerText="Factura Confia">
+					<h:outputText value="#{canla.num_factura_canal}" />
+				</p:column>
+				<p:column headerText="Fecha">
+					<h:outputText value="#{canla.fc_pago_canal}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Valor Liquidado">
+					<h:outputText value="#{canla.valor_liquidado}" />
+				</p:column>
+			</p:dataTable>
+		</h:form>
+	</ui:define>
+	<ui:define name="tituloFormulario">Liquidaciones Canal</ui:define>
+</ui:composition>
+</html>
+

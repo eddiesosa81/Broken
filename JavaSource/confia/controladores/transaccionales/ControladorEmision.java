@@ -390,11 +390,14 @@ public class ControladorEmision {
 	private List<Deducibles> selectedlstDeducibles;
 	private List<Deducibles> lstFilteredDeducibles;
 	private Integer cdRamCotCobAdd;
+	private Integer cdUbcCotCobAdd;
 	private Double porcDedValSin;
 	private Double porcDedValAseg;
 	private Double valorDedMin;
 	private Double valorDedFijo;
 	private String especificacionDed;
+	private String especificacionCob;
+	private String especificacionDCla;
 
 	private List<Clausulas> lstClausulas;
 	private List<Clausulas> selectedlstClausulas;
@@ -1750,7 +1753,7 @@ public class ControladorEmision {
 		if (cotizacionPendienteSelected.getCd_plan().equals(0)) {
 			if (codPlanUbc.equals("0")) {
 				FacesContext context = FacesContext.getCurrentInstance();
-				context.addMessage(null, new FacesMessage("Advertencia", "Seleccione el plan para la Ubicación"));
+				context.addMessage(null, new FacesMessage("Advertencia", "Seleccione el plan para la Ubicaciï¿½n"));
 				return;
 			} else {
 				planTemp = srvPlan.consultaPlan(Integer.valueOf(codPlanUbc));
@@ -1760,7 +1763,7 @@ public class ControladorEmision {
 
 		if (dscUbicacion == null) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Digite la Ubicación"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Digite la Ubicaciï¿½n"));
 			return;
 		}
 		if (auxEstadoUbicacion.equals("NuevaUbc")) {
@@ -1783,7 +1786,7 @@ public class ControladorEmision {
 			if (res != 1) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Advertencia",
-						"Error al ingresar la Ubicación Comuníquese con el Administrador del Sistema"));
+						"Error al ingresar la Ubicaciï¿½n Comunï¿½quese con el Administrador del Sistema"));
 				return;
 			}
 			res = srvUbicacion.codigoMaxUbc(cotizacionPendienteSelected.getCd_ramo_cotizacion());
@@ -3743,17 +3746,62 @@ public class ControladorEmision {
 		lstCoberturasEmitidas = new ArrayList<CoberturasEmitidas>();
 		lstDeducibleEmitida = new ArrayList<DeduciblesEmitidas>();
 		lstCalusulaEmitida = new ArrayList<ClausulasEmitidas>();
-
-		lstCalusulaEmitida = srvClausulasEmitidas.recuperaClausulasEmitidas(ramCot.getCd_compania(),
-				ramCot.getCd_ramo_cotizacion());
-		lstCoberturasEmitidas = srvCoberturasEmitidas.recuperaCoberturasEmitidas(ramCot.getCd_compania(),
-				ramCot.getCd_ramo_cotizacion());
-		lstDeducibleEmitida = srvDeduciblesEmitidas.recuperaDeduciblesEmitidas(ramCot.getCd_compania(),
-				ramCot.getCd_ramo_cotizacion());
+		//bloquea si se trata de VAM
+		Integer tpRam = srvRamo.tipoRamo(ramCot.getCd_ramo());
+		if (tpRam.equals(0)) {
+			lstCalusulaEmitida = srvClausulasEmitidas.recuperaClausulasEmitidas(ramCot.getCd_compania(),
+					ramCot.getCd_ramo_cotizacion());
+			System.out.println("lstCalusulaEmitida:"+lstCalusulaEmitida.size());
+			lstCoberturasEmitidas = srvCoberturasEmitidas.recuperaCoberturasEmitidas(ramCot.getCd_compania(),
+					ramCot.getCd_ramo_cotizacion());
+			System.out.println("lstCoberturasEmitidas:"+lstCoberturasEmitidas.size());
+			lstDeducibleEmitida = srvDeduciblesEmitidas.recuperaDeduciblesEmitidas(ramCot.getCd_compania(),
+					ramCot.getCd_ramo_cotizacion());
+			System.out.println("lstDeducibleEmitida:"+lstDeducibleEmitida.size());
+			
+			cdRamCotCobAdd = ramCot.getCd_ramo_cotizacion();
+			cdUbcCotCobAdd = 0;
+			System.out.println("CRC COB CLA DED" + cdRamCotCobAdd);
+			System.out.println("UBC COB CLA DED" + cdUbcCotCobAdd);
+			PrimeFaces.current().executeScript("PF('wvPlanesRamCot').show();");
+		} else {
+			FacesContext context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Advertencia", "Planes no habilitados para este tipo de Ramo, revise a nivel de ubicaciÃ³n"));
+			return;
+		}
 		
-		cdRamCotCobAdd = ramCot.getCd_ramo_cotizacion();
-		System.out.println("CRC COB CLA DED" + cdRamCotCobAdd);
-		PrimeFaces.current().executeScript("PF('wvPlanesRamCot').show();");
+	}
+	
+	public void onRowPlanUbc(Ubicacion ubicaTot) {
+		lstCoberturasEmitidas = new ArrayList<CoberturasEmitidas>();
+		lstDeducibleEmitida = new ArrayList<DeduciblesEmitidas>();
+		lstCalusulaEmitida = new ArrayList<ClausulasEmitidas>();
+		//bloquea si se trata de VAM
+		RamoCotizacion crcTemp = srvRamoCotizacion.recuperaRamoCotizacionPorCodigo(ubicaTot.getCd_ramo_cotizacion(),
+				ubicaTot.getCd_compania());
+		Integer tpRam = srvRamo.tipoRamo(crcTemp.getCd_ramo());
+		if (tpRam.equals(0)) {
+			FacesContext context = FacesContext.getCurrentInstance();
+			context.addMessage(null, new FacesMessage("Advertencia", "Planes no habilitados para este tipo de UbicaciÃ³n, revise a nivel de Ramo"));
+			return;
+		} else {
+			
+			lstCalusulaEmitida = srvClausulasEmitidas.recuperaClausulasEmitidasUbc(ubicaTot.getCd_compania(),
+					ubicaTot.getCd_ramo_cotizacion(),ubicaTot.getCd_ubicacion());
+			
+			lstCoberturasEmitidas = srvCoberturasEmitidas.recuperaCoberturasEmitidasUbc(ubicaTot.getCd_compania(),
+					ubicaTot.getCd_ramo_cotizacion(),ubicaTot.getCd_ubicacion());
+			
+			lstDeducibleEmitida = srvDeduciblesEmitidas.recuperaDeduciblesEmitidasUbicacion(ubicaTot.getCd_compania(),
+					ubicaTot.getCd_ramo_cotizacion(),ubicaTot.getCd_ubicacion());
+			
+			cdRamCotCobAdd = ubicaTot.getCd_ramo_cotizacion();
+			cdUbcCotCobAdd = ubicaTot.getCd_ubicacion();
+			System.out.println("CRC COB CLA DED" + cdRamCotCobAdd);
+			System.out.println("UBC COB CLA DED" + cdUbcCotCobAdd);
+			PrimeFaces.current().executeScript("PF('wvPlanesRamCot').show();");
+		}
+		
 	}
 
 	public void onRowGrpContRamCot(CotizacionesPendientes ramCot) {
@@ -4479,6 +4527,9 @@ public class ControladorEmision {
 		CobAux.setCd_cobertura(((CoberturasEmitidas) event.getObject()).getCd_cobertura());
 		CobAux.setCd_compania(((CoberturasEmitidas) event.getObject()).getCd_compania());
 		CobAux.setCd_ramo_cotizacion(((CoberturasEmitidas) event.getObject()).getCd_ramo_cotizacion());
+		if(!cdUbcCotCobAdd.equals(0))
+			CobAux.setCd_ubicacion(cdUbcCotCobAdd);
+		
 		try {
 			CobAux.setPorcentajeplancobertura(((CoberturasEmitidas) event.getObject()).getPorcentajeplancobertura());
 		} catch (Exception e) {
@@ -4488,6 +4539,11 @@ public class ControladorEmision {
 			CobAux.setValor_plancobertura(((CoberturasEmitidas) event.getObject()).getValor_plancobertura());
 		} catch (Exception e) {
 			CobAux.setValor_plancobertura(0.0);
+		}
+		try {
+			CobAux.setEspecificacion_cob(((CoberturasEmitidas) event.getObject()).getEspecificacion_cob());
+		} catch (Exception e) {
+			CobAux.setEspecificacion_cob("-");
 		}
 		Integer res;
 		res = srvCoberturasEmitidas.actualizaCoberturasEmitidas(CobAux);
@@ -4513,17 +4569,33 @@ public class ControladorEmision {
 			System.out.println("COBTMP" + cobTmp.getCd_cobertura());
 			// VERIFICA SI LA COBERTURA YA SE ENCUENTRA INGRESADA
 			CoberturasEmitidas cobAux = new CoberturasEmitidas();
-			cobAux = srvCoberturasEmitidas.coberturasEmitidas(1, cdRamCotCobAdd, cobTmp.getCd_cobertura());
+			Integer tpRam = srvRamo.tipoRamo(Integer.decode(codRamo));
+			if (tpRam.equals(0)) {
+				cobAux = srvCoberturasEmitidas.coberturasEmitidas(1, cdRamCotCobAdd, cobTmp.getCd_cobertura());
+			} else {
+				cobAux = srvCoberturasEmitidas.coberturasEmitidasUbicacion(1, cdRamCotCobAdd, cobTmp.getCd_cobertura(),cdUbcCotCobAdd);
+			}
+			
 			if (cobAux == null) {
 				cobAux = new CoberturasEmitidas();
 				cobAux.setCd_cobertura(cobTmp.getCd_cobertura());
 				cobAux.setCd_compania(1);
 				cobAux.setCd_ramo_cotizacion(cdRamCotCobAdd);
 				cobAux.setDesc_cobertura(cobTmp.getDesc_cobertura());
+				if(!cdUbcCotCobAdd.equals(0))
+					cobAux.setCd_ubicacion(cdUbcCotCobAdd);
 				if (porcCob != 0.0)
 					cobAux.setPorcentajeplancobertura(porcCob);
 				if (valorCob != 0.0)
 					cobAux.setValor_plancobertura(valorCob);
+				
+				try {
+					if(especificacionCob.isEmpty() || especificacionCob == null)
+						especificacionCob = "-";
+				} catch (Exception e) {
+					especificacionCob = "-";
+				}
+				cobAux.setEspecificacion_cob(especificacionCob);
 				srvCoberturasEmitidas.insertaCoberturasEmitidas(cobAux);
 			}
 		}
@@ -4558,6 +4630,8 @@ public class ControladorEmision {
 				dedAux.setCd_compania(1);
 				dedAux.setCd_ramo_cotizacion(cdRamCotCobAdd);
 				dedAux.setDesc_deducible(dedTmp.getDesc_deducible());
+				if(!cdUbcCotCobAdd.equals(0))
+					dedAux.setCd_ubicacion(cdUbcCotCobAdd);
 				if (porcDedValSin != 0.0)
 					dedAux.setPorcentaje_valor_siniestro(porcDedValSin);
 				if (porcDedValAseg != 0.0)
@@ -4566,6 +4640,7 @@ public class ControladorEmision {
 					dedAux.setValor_minimo(valorDedMin);
 				if (valorDedFijo != 0.0)
 					dedAux.setValor_fijo(valorDedFijo);
+				
 				try {
 					if(especificacionDed.isEmpty() || especificacionDed == null)
 						especificacionDed = "";
@@ -4599,17 +4674,32 @@ public class ControladorEmision {
 			System.out.println("clauTMP" + clauTmp.getCd_clausula());
 			// VERIFICA SI LA COBERTURA YA SE ENCUENTRA INGRESADA
 			ClausulasEmitidas clauAux = new ClausulasEmitidas();
-			clauAux = srvClausulasEmitidas.clausulaEmitidas(1, cdRamCotCobAdd, clauAux.getCd_clausula());
+			
+			Integer tpRam = srvRamo.tipoRamo(Integer.decode(codRamo));
+			if (tpRam.equals(0)) {
+				clauAux = srvClausulasEmitidas.clausulaEmitidas(1, cdRamCotCobAdd, clauAux.getCd_clausula());
+			} else {
+				clauAux = srvClausulasEmitidas.clausulaEmitidasUbicacion(1, cdRamCotCobAdd, clauAux.getCd_clausula(),cdUbcCotCobAdd);
+			}
 			if (clauAux == null) {
 				clauAux = new ClausulasEmitidas();
 				clauAux.setCd_clausula(clauTmp.getCd_clausula());
 				clauAux.setCd_compania(1);
 				clauAux.setCd_ramo_cotizacion(cdRamCotCobAdd);
 				clauAux.setDesc_clausula(clauTmp.getDesc_clausula());
+				if(!cdUbcCotCobAdd.equals(0))
+					clauAux.setCd_ubicacion(cdUbcCotCobAdd);
 				if (porcClau != 0.0)
 					clauAux.setPorcentaje_planclausula(porcClau);
 				if (valorClau != 0.0)
 					clauAux.setValor_planclausula(valorClau);
+				try {
+					if(especificacionDCla.isEmpty() || especificacionDCla == null)
+						especificacionDCla = "-";
+				} catch (Exception e) {
+					especificacionDCla = "-";
+				}
+				clauAux.setEspecificacion_cla(especificacionDCla);
 				srvClausulasEmitidas.insertaClausulasEmitidas(clauAux);
 			}
 		}
@@ -4645,6 +4735,8 @@ public class ControladorEmision {
 		dedAux.setCd_compania(((DeduciblesEmitidas) event.getObject()).getCd_compania());
 		dedAux.setCd_deducible(((DeduciblesEmitidas) event.getObject()).getCd_deducible());
 		dedAux.setCd_ramo_cotizacion(((DeduciblesEmitidas) event.getObject()).getCd_ramo_cotizacion());
+		if(!cdUbcCotCobAdd.equals(0))
+			dedAux.setCd_ubicacion(cdUbcCotCobAdd);
 		try {
 			dedAux.setValor_fijo(((DeduciblesEmitidas) event.getObject()).getValor_fijo());
 		} catch (Exception e) {
@@ -4666,6 +4758,13 @@ public class ControladorEmision {
 					((DeduciblesEmitidas) event.getObject()).getPorcentaje_valor_siniestro());
 		} catch (Exception e) {
 			dedAux.setPorcentaje_valor_siniestro(0.0);
+		}
+		
+		try {
+			dedAux.setEspecificacion(
+					((DeduciblesEmitidas) event.getObject()).getEspecificacion());
+		} catch (Exception e) {
+			dedAux.setEspecificacion("-");
 		}
 
 		Integer res;
@@ -4701,6 +4800,8 @@ public class ControladorEmision {
 		clauAux.setCd_compania(((ClausulasEmitidas) event.getObject()).getCd_compania());
 		clauAux.setCd_clausula(((ClausulasEmitidas) event.getObject()).getCd_clausula());
 		clauAux.setCd_ramo_cotizacion(((ClausulasEmitidas) event.getObject()).getCd_ramo_cotizacion());
+		if(!cdUbcCotCobAdd.equals(0))
+			clauAux.setCd_ubicacion(cdUbcCotCobAdd);
 		try {
 			clauAux.setPorcentaje_planclausula(((ClausulasEmitidas) event.getObject()).getPorcentaje_planclausula());
 		} catch (Exception e) {
@@ -4710,6 +4811,11 @@ public class ControladorEmision {
 			clauAux.setValor_planclausula(((ClausulasEmitidas) event.getObject()).getValor_planclausula());
 		} catch (Exception e) {
 			clauAux.setValor_planclausula(0.0);
+		}
+		try {
+			clauAux.setEspecificacion_cla(((ClausulasEmitidas) event.getObject()).getEspecificacion_cla());
+		} catch (Exception e) {
+			clauAux.setEspecificacion_cla("-");
 		}
 
 		Integer res;
@@ -6290,6 +6396,22 @@ public class ControladorEmision {
 
 	public void setFlgCargaArchivoObj(Boolean flgCargaArchivoObj) {
 		this.flgCargaArchivoObj = flgCargaArchivoObj;
+	}
+
+	public String getEspecificacionCob() {
+		return especificacionCob;
+	}
+
+	public void setEspecificacionCob(String especificacionCob) {
+		this.especificacionCob = especificacionCob;
+	}
+
+	public String getEspecificacionDCla() {
+		return especificacionDCla;
+	}
+
+	public void setEspecificacionDCla(String especificacionDCla) {
+		this.especificacionDCla = especificacionDCla;
 	}
 
 }

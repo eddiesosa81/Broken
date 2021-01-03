@@ -38,6 +38,34 @@ public class PreFacturaDetalleView {
 	private String identificacion_cliente;
 	@Column(name="desc_ramo")
 	private String desc_ramo;
+	@Column(name="Facturado")
+	private String facturado;
+	@Column(name="cd_aseguradora")
+	private String cd_aseguradora;
+	@Column(name="nombre_aseguradora")
+	private String nombre_aseguradora;
+	@Column(name="fc_pre_factura")
+	private String fc_pre_factura;
+	
+	
+	public String getCd_aseguradora() {
+		return cd_aseguradora;
+	}
+	public void setCd_aseguradora(String cd_aseguradora) {
+		this.cd_aseguradora = cd_aseguradora;
+	}
+	public String getNombre_aseguradora() {
+		return nombre_aseguradora;
+	}
+	public void setNombre_aseguradora(String nombre_aseguradora) {
+		this.nombre_aseguradora = nombre_aseguradora;
+	}
+	public String getFacturado() {
+		return facturado;
+	}
+	public void setFacturado(String facturado) {
+		this.facturado = facturado;
+	}
 	public Integer getCd_detalle_pre_factura() {
 		return cd_detalle_pre_factura;
 	}
@@ -121,6 +149,12 @@ public class PreFacturaDetalleView {
 	}
 	public void setDesc_ramo(String desc_ramo) {
 		this.desc_ramo = desc_ramo;
+	}
+	public String getFc_pre_factura() {
+		return fc_pre_factura;
+	}
+	public void setFc_pre_factura(String fc_pre_factura) {
+		this.fc_pre_factura = fc_pre_factura;
 	}
 	
 

@@ -102,7 +102,12 @@ public class ReporteRepositorioSiniestro {
 	public String califica_atencion;
 	@Column(name="observacion_atencion")
 	public String observacion_atencion;
-	
+	@Column(name="descripcion_proveedor")
+	public String descripcion_proveedor;
+	@Column(name="ciudad_reparacion")
+	public String ciudad_reparacion;
+	@Column(name="taller")
+	public String taller;
 	
 	
 	public String getCalifica_atencion() {
@@ -374,6 +379,24 @@ public class ReporteRepositorioSiniestro {
 	}
 	public void setFecha_ocurrencia(String fecha_ocurrencia) {
 		this.fecha_ocurrencia = fecha_ocurrencia;
+	}
+	public String getDescripcion_proveedor() {
+		return descripcion_proveedor;
+	}
+	public void setDescripcion_proveedor(String descripcion_proveedor) {
+		this.descripcion_proveedor = descripcion_proveedor;
+	}
+	public String getCiudad_reparacion() {
+		return ciudad_reparacion;
+	}
+	public void setCiudad_reparacion(String ciudad_reparacion) {
+		this.ciudad_reparacion = ciudad_reparacion;
+	}
+	public String getTaller() {
+		return taller;
+	}
+	public void setTaller(String taller) {
+		this.taller = taller;
 	}
 	
 	
