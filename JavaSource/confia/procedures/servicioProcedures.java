@@ -171,6 +171,28 @@ public class servicioProcedures {
 			return 1;
 		}
 	}
+	public Integer elimina_cob_clau_ded_sp(String codRamCot, String codCompania) {
+		System.out.println("** cdRamoCotizacion:" + codRamCot);
+		System.out.println("** cdCompania:" + codCompania);
+		Connection conn;
+		// ejecuta el SP
+		try {
+			System.out.println("ORACLE PROCEDURE-> elimina_cob_clau_ded_sp( codRamCot IN number, codCompania IN number)");
+			conn = ConectarBase.getOracleConnection();
+			String proc3StoredProcedure = "{ call elimina_cob_clau_ded_sp(?,?) }";
+			CallableStatement cs = conn.prepareCall(proc3StoredProcedure);
+			cs.setString(1, codRamCot);
+			cs.setString(2, codCompania);
+			cs.execute();
+			cs.close();
+			conn.close();
+			return 0;
+		} catch (Exception e) {
+			System.out.println("error " + e.getMessage());
+			return 1;
+		}
+	}
+	
 	
 	public Integer generaCobeDedClauPolizasUbc(String codUbc, String codCompania) {
 		System.out.println("** cdUbicacion:" + codUbc);

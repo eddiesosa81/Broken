@@ -1753,7 +1753,7 @@ public class ControladorEmision {
 		if (cotizacionPendienteSelected.getCd_plan().equals(0)) {
 			if (codPlanUbc.equals("0")) {
 				FacesContext context = FacesContext.getCurrentInstance();
-				context.addMessage(null, new FacesMessage("Advertencia", "Seleccione el plan para la Ubicaci�n"));
+				context.addMessage(null, new FacesMessage("Advertencia", "Seleccione el plan para la Ubicación"));
 				return;
 			} else {
 				planTemp = srvPlan.consultaPlan(Integer.valueOf(codPlanUbc));

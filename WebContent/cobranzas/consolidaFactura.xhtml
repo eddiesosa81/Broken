@@ -1,0 +1,95 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/templates/Template.xhtml">
+	<ui:define name="tituloPagina">Consolida Facturas</ui:define>
+	<ui:define name="contenido">
+		<p:ajaxStatus
+			style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+			<f:facet name="start">
+				<p:graphicImage value="/images/ajax-loadercircle.gif" />
+			</f:facet>
+			<f:facet name="complete">
+				<h:outputText value="" />
+			</f:facet>
+		</p:ajaxStatus>
+		<h:form id="frmConsolidaFact">
+			<p:growl showDetail="true" sticky="true">
+				<p:autoUpdate></p:autoUpdate>
+			</p:growl>
+			<h:panelGrid columns="2">
+				<h:outputText value="Número Factura: " />
+				<p:inputMask value="#{ControladorConsolidaFactura.numFact}"
+					mask="999-999-999999999" style="width:100%" id="numFactConpt" />
+			</h:panelGrid>
+			<p:selectOneRadio id="console"
+				value="#{ControladorConsolidaFactura.tipo}" unselectable="false">
+				<f:selectItem itemLabel="Pendiente" itemValue="Pendiente" />
+				<f:selectItem itemLabel="Consolidado" itemValue="Consolidado" />
+			</p:selectOneRadio>
+			<h:panelGrid columns="4">
+				<p:commandButton id="btnBuscaCobranza" icon="fa fa-fw fa-search"
+					value="Buscar Facturas" 
+					update="frmConsolidaFact:dtFacturas"
+					styleClass="ui-priority-primary"
+					action="#{ControladorConsolidaFactura.consultaFactura}"
+					process="@this,frmConsolidaFact:numFactConpt,frmConsolidaFact:console" />
+				<p:commandButton id="btnBuscaCobranzaP" icon="fa fa-save"
+					value="Consolidar" 
+					update="frmConsolidaFact:dtFacturas"
+					styleClass="ui-priority-primary"
+					action="#{ControladorConsolidaFactura.consolidaFactura}"
+					process="@this,frmConsolidaFact:dtFacturas,frmConsolidaFact:numFactConpt,frmConsolidaFact:console" />
+				<p:commandButton value="Total Factura" icon="ui-icon-calculator"
+					styleClass="ui-priority-primary"
+					title="Total Registros Seleccionados"
+					process="@this,frmConsolidaFact:dtFacturas"
+					action="#{ControladorConsolidaFactura.sumaRegistros}">
+				</p:commandButton>
+				<p:commandButton value="Salir" id="btnSalir" icon="ui-icon-cancel"
+					styleClass="ui-priority-primary"
+					action="/index.xhtml?faces-redirect=true" process="@this"
+					update="@this" />
+			</h:panelGrid>
+			<p:row>
+			</p:row>
+			<p:row>
+			</p:row>
+
+
+			<p:panel>
+				<p:dataTable var="car" id="dtFacturas"
+					value="#{ControladorConsolidaFactura.listFactura}">
+					<p:column headerText="Num.Factura">
+						<h:outputText value="#{car.num_factura}" />
+					</p:column>
+
+					<p:column headerText="Fc.Factura">
+						<h:outputText value="#{car.fc_factura}" />
+					</p:column>
+
+					<p:column headerText="Sub Total">
+						<h:outputText value="#{car.val_factura}" />
+					</p:column>
+
+					<p:column headerText="IVA">
+						<h:outputText value="#{car.iva}" />
+					</p:column>
+
+					<p:column headerText="Total">
+						<h:outputText value="#{car.tot_factura}" />
+					</p:column>
+
+					<p:column headerText="Fc.Consolidación">
+						<h:outputText value="#{car.fc_consolidacion}" />
+					</p:column>
+				</p:dataTable>
+
+			</p:panel>
+		</h:form>
+	</ui:define>
+	<ui:define name="tituloFormulario">Consolida Facturas </ui:define>
+</ui:composition>
+</html>

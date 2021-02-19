@@ -6,6 +6,7 @@ package confia.servicios.transaccionales;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -57,6 +58,24 @@ public class ServicioFactura {
 			resultado = "0";
 		}
 		return Integer.parseInt(resultado);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Factura> recuperaFacturaPorNumeroPend(String numFact) {
+		String sql = "select * from facturas_tbl where fc_anula is null and fc_consolidacion is null "
+				+ "and num_factura = '"+numFact+"'";
+		 System.out.println("********************-----QUERY: " + sql);
+		 Query q = em.createNativeQuery(sql, Factura.class);
+		 return q.getResultList();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Factura> recuperaFacturaPorNumeroConso(String numFact) {
+		String sql = "select * from facturas_tbl where fc_anula is null and fc_consolidacion is not null "
+				+ "and num_factura = '"+numFact+"'";
+		 System.out.println("********************-----QUERY: " + sql);
+		 Query q = em.createNativeQuery(sql, Factura.class);
+		 return q.getResultList();
 	}
 
 	public void actualizaFactura(Factura obj) {

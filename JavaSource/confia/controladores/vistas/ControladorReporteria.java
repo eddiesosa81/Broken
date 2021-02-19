@@ -28,6 +28,7 @@ import confia.entidades.vistas.ProduccionEmitidaView;
 import confia.entidades.vistas.ProduccionGeneralView;
 import confia.entidades.vistas.ProduccionPagadaView;
 import confia.entidades.vistas.ProduccionPendientePagoView;
+import confia.entidades.vistas.ProspeccionesView;
 import confia.entidades.vistas.ReporteCanalesPendienteView;
 import confia.entidades.vistas.ReporteCanalesView;
 import confia.entidades.vistas.ReporteComisionPendteView;
@@ -52,6 +53,7 @@ import confia.servicios.vistas.ServicioProduccionGeneralView;
 import confia.servicios.vistas.ServicioProduccionPagadaView;
 import confia.servicios.vistas.ServicioProduccionPendienteEmisionView;
 import confia.servicios.vistas.ServicioProduccionPendientePagoView;
+import confia.servicios.vistas.ServicioProspecciones;
 import confia.servicios.vistas.ServicioReporteCanalesPendView;
 import confia.servicios.vistas.ServicioReporteCanalesView;
 import confia.servicios.vistas.ServicioReporteComisionPendteView;
@@ -112,6 +114,8 @@ public class ControladorReporteria {
 	private ServicioReporteVencimientoMenView srvVencimientoViewMen;
 	@EJB
 	private ServicioPreFacturaDetalleView srvPreFacturaDetalleView;
+	@EJB
+	private ServicioProspecciones srvProspecciones;
 
 	public String lscdAseguradora;
 	private List<Aseguradoras> listAseguradoras;
@@ -165,6 +169,10 @@ public class ControladorReporteria {
 	public Boolean flgPreFacturaDetalleBoolean;
 	public List<PreFacturaDetalleView> lstprefacturadetalleView;
 	
+	
+	public Boolean flgProspeccionBoolean;
+	public List<ProspeccionesView> lstProspeccionesViews;
+	
 
 	public ControladorReporteria() {
 		listAseguradoras = new ArrayList<Aseguradoras>();
@@ -206,6 +214,8 @@ public class ControladorReporteria {
 		lstRepVencimientoMen = new ArrayList<ReporteVencimientoMenView>();
 		flgPreFacturaDetalleBoolean = false;
 		lstprefacturadetalleView = new ArrayList<PreFacturaDetalleView>();
+		flgProspeccionBoolean = false;
+		lstProspeccionesViews = new ArrayList<ProspeccionesView>();
 	}
 
 	@PostConstruct
@@ -264,6 +274,7 @@ public class ControladorReporteria {
 				flgRepVencimiento = false;
 				flgRepVencimientoMens = false;
 				flgPreFacturaDetalleBoolean = false;
+				flgProspeccionBoolean = false;
 
 				List<ProduccionEmitidaView> lstRepProdEmi = new ArrayList<ProduccionEmitidaView>();
 				lstRepProdEmi = srvProduccionEmitida.recuperaPRoduccionEmitida(lscdCliente, lscdGrupoContratante,
@@ -326,6 +337,7 @@ public class ControladorReporteria {
 				flgRepVencimiento = false;
 				flgRepVencimientoMens = false;
 				flgPreFacturaDetalleBoolean = false;
+				flgProspeccionBoolean = false;
 
 				lstProdEmiMEnsualizado = new ArrayList<ProduccionEmitidaMensualizadoView>();
 				lstProdEmiMEnsualizado = srvProdEmitidaMensual.recuperaPRoduccionEmitidaMensualizada(lscdCliente,
@@ -352,6 +364,7 @@ public class ControladorReporteria {
 			flgRepVencimiento = false;
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
+			flgProspeccionBoolean = false;
 
 			List<ProduccionPagadaView> lstRepProdPag = new ArrayList<ProduccionPagadaView>();
 			lstRepProdPag = srvProdPagada.recuperaProduccionPagadaView(lscdCliente, lscdGrupoContratante,
@@ -411,6 +424,7 @@ public class ControladorReporteria {
 			flgRepVencimiento = false;
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
+			flgProspeccionBoolean = false;
 
 			List<ProduccionPendientePagoView> lstRepProdPenPago = new ArrayList<ProduccionPendientePagoView>();
 			lstRepProdPenPago = srvProdPrenPago.recuperaProduccionPendientePago(lscdCliente, lscdGrupoContratante,
@@ -471,6 +485,7 @@ public class ControladorReporteria {
 			flgRepVencimiento = false;
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
+			flgProspeccionBoolean = false;
 
 			List<ReporteRepositorioSiniestro> lstRepGenSinies = new ArrayList<ReporteRepositorioSiniestro>();
 			lstRepGenSinies = srvRepGeneralSiniestro.recuperaReporteRepositorioSiniestro(lscdCliente,
@@ -500,6 +515,7 @@ public class ControladorReporteria {
 			flgRepVencimiento = false;
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
+			flgProspeccionBoolean = false;
 
 			List<ReporteSiniestralidadView> lstRepSiniesAux = new ArrayList<ReporteSiniestralidadView>();
 			lstRepSiniesAux = srvRepSiniestralidad.recuperaReporteSiniestralidad(lscdCliente, lscdGrupoContratante,
@@ -528,6 +544,7 @@ public class ControladorReporteria {
 			flgRepVencimiento = false;
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
+			flgProspeccionBoolean = false;
 
 			List<ProduccionGeneralView> lstRepGenAux = new ArrayList<ProduccionGeneralView>();
 			lstRepGenAux = srvProduccionGeneral.recuperaProduccionGeneralView(lscdCliente, lscdGrupoContratante,
@@ -556,6 +573,7 @@ public class ControladorReporteria {
 			flgRepVencimiento = false;
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
+			flgProspeccionBoolean = false;
 
 			lstCuotaIniImpaga = new ArrayList<ReporteCuotasIniImpaga>();
 			lstCuotaIniImpaga = srvCuotaIniImpaga.recuperaReporteCuotasIniImp(lscdCliente, lscdGrupoContratante,
@@ -581,6 +599,7 @@ public class ControladorReporteria {
 			flgRepVencimiento = false;
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
+			flgProspeccionBoolean = false;
 
 			lstReporteComisionPendteView = new ArrayList<ReporteComisionPendteView>();
 			lstReporteComisionPendteView = srvReporteComisionPendteView.recuperaReporteComisionesPendientes(lscdCliente,
@@ -607,6 +626,7 @@ public class ControladorReporteria {
 			flgRepVencimiento = false;
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
+			flgProspeccionBoolean = false;
 
 			lstReporteComisionesLiquidadasView = new ArrayList<ReporteComisionesLiquidadasView>();
 			lstReporteComisionesLiquidadasView = srvReporteComisionesLiquidadasView
@@ -633,6 +653,7 @@ public class ControladorReporteria {
 			flgRepVencimiento = false;
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
+			flgProspeccionBoolean = false;
 
 			lstReporteCanalesView = new ArrayList<ReporteCanalesView>();
 			lstReporteCanalesView = srvReporteCanalesView.recuperaReporteCanalesView(lscdCliente, lscdGrupoContratante,
@@ -658,6 +679,7 @@ public class ControladorReporteria {
 			flgRepVencimiento = false;
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
+			flgProspeccionBoolean = false;
 
 			lstProdPendEmi = new ArrayList<ProduccionEmisionesPendientesView>();
 			lstProdPendEmi = srvProdePendEmiView.recuperaEmisionesPendientesView(lscdCliente, lscdGrupoContratante,
@@ -683,6 +705,7 @@ public class ControladorReporteria {
 			flgRepVencimiento = false;
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
+			flgProspeccionBoolean = false;
 
 			lstCanalesPend = new ArrayList<ReporteCanalesPendienteView>();
 			lstCanalesPend = srvCanalPendView.recuperaReporteCanalesPenView(lscdCliente, lscdGrupoContratante,
@@ -709,6 +732,7 @@ public class ControladorReporteria {
 				flgRepVencimiento = true;
 				flgRepVencimientoMens = false;
 				flgPreFacturaDetalleBoolean = false;
+				flgProspeccionBoolean = false;
 
 				lstRepVencimiento = new ArrayList<ReporteVencimientoView>();
 				lstRepVencimiento = srvVencimientoView.recuperaVencimiento(lscdCliente, lscdGrupoContratante,
@@ -732,6 +756,7 @@ public class ControladorReporteria {
 				flgRepVencimiento = false;
 				flgRepVencimientoMens = true;
 				flgPreFacturaDetalleBoolean = false;
+				flgProspeccionBoolean = false;
 
 				lstRepVencimientoMen = new ArrayList<ReporteVencimientoMenView>();
 				lstRepVencimientoMen = srvVencimientoViewMen.recuperaVencimientoMensual(lscdCliente, lscdGrupoContratante,
@@ -759,12 +784,40 @@ public class ControladorReporteria {
 			flgRepVencimiento = false;
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = true;
+			flgProspeccionBoolean = false;
 
 			lstprefacturadetalleView = new ArrayList<PreFacturaDetalleView>();
 			lstprefacturadetalleView = srvPreFacturaDetalleView.lstPreFacturaDetalleViewLiq(lscdCliente, lscdAseguradora, lscdRamo, asFechaDesde, asFechaHasta);
 			
 
 			FacesMessage msg = new FacesMessage("Advertencia", "Fecha de corte - Preliquidación - ");
+			FacesContext.getCurrentInstance().addMessage(null, msg);
+		}
+		
+		if (lscdRubro.equals("REPORTEPROSPECCION")) {
+			flgRepProd = false;
+			flgRepProdPag = false;
+			flgRepSiniestro = false;
+			flgRepSiniestralidad = false;
+			flgRepProdGeneral = false;
+			flgRepProdMens = false;
+			flgRepCuotaIniImpaga = false;
+			flgComisionesPendienteConfia = false;
+			flgComisionesLiquidadas = false;
+			flgReporteCanales = false;
+			flgRepProdPendEmi = false;
+			flgReporteCanalesPend = false;
+			flgRepVencimiento = false;
+			flgRepVencimientoMens = false;
+			flgPreFacturaDetalleBoolean = false;
+			flgProspeccionBoolean = true;
+
+			lstProspeccionesViews = new ArrayList<ProspeccionesView>();
+			lstProspeccionesViews = srvProspecciones.recuperaProspeccionView(lscdCliente, lscdGrupoContratante,
+					lscdAseguradora, lscdRamo, lscdSubagente, lscdEjecutivo, asFechaDesde, asFechaHasta, tipo);
+			
+
+			FacesMessage msg = new FacesMessage("Advertencia", "Fecha de Creación - Prospección - ");
 			FacesContext.getCurrentInstance().addMessage(null, msg);
 		}
 
@@ -1146,6 +1199,22 @@ public class ControladorReporteria {
 
 	public void setLstprefacturadetalleView(List<PreFacturaDetalleView> lstprefacturadetalleView) {
 		this.lstprefacturadetalleView = lstprefacturadetalleView;
+	}
+
+	public Boolean getFlgProspeccionBoolean() {
+		return flgProspeccionBoolean;
+	}
+
+	public void setFlgProspeccionBoolean(Boolean flgProspeccionBoolean) {
+		this.flgProspeccionBoolean = flgProspeccionBoolean;
+	}
+
+	public List<ProspeccionesView> getLstProspeccionesViews() {
+		return lstProspeccionesViews;
+	}
+
+	public void setLstProspeccionesViews(List<ProspeccionesView> lstProspeccionesViews) {
+		this.lstProspeccionesViews = lstProspeccionesViews;
 	}
 
 }

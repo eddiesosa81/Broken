@@ -74,6 +74,10 @@ public class ComisionDiferencialPolView {
 	private String cd_plan;
 	@Column(name = "plan")
 	private String plan;
+	@Column(name = "total_asegurado")
+	private String total_asegurado;
+	
+	
 	
 	
 	
@@ -257,6 +261,12 @@ public class ComisionDiferencialPolView {
 	}
 	public void setFlg_pre_factura(String flg_pre_factura) {
 		this.flg_pre_factura = flg_pre_factura;
+	}
+	public String getTotal_asegurado() {
+		return total_asegurado;
+	}
+	public void setTotal_asegurado(String total_asegurado) {
+		this.total_asegurado = total_asegurado;
 	}
 	
 	

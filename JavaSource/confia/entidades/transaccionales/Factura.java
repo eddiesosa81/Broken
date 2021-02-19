@@ -44,6 +44,10 @@ public class Factura {
 	private Double tot_factura;
 	@Column(name="fc_anula")
 	private Date fc_anula;
+	@Column(name="fc_consolidacion")
+	private Date fc_consolidacion;
+	
+	
 	
 	@Transient
 	private String nom_aseguradora;
@@ -103,6 +107,12 @@ public class Factura {
 		this.fc_anula = fc_anula;
 	}
 	
+	public Date getFc_consolidacion() {
+		return fc_consolidacion;
+	}
+	public void setFc_consolidacion(Date fc_consolidacion) {
+		this.fc_consolidacion = fc_consolidacion;
+	}
 	@Transient
 	public String getNom_aseguradora() {
 		return nom_aseguradora;

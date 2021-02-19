@@ -119,4 +119,43 @@ public class ProcedimientosAlmacenadosDB {
 		}
 		return 1;
 	}
+	
+	public int actualizaMarcaModelo() {
+		Connection conn;
+		// ejecuta el SP
+		try {
+			System.out.println("Ingreso datos ORACLE -> actualiza_modelo_marca()");
+			conn = ConectarBase.getOracleConnection();
+			String proc3StoredProcedure = "{ call actualiza_modelo_marca() }";
+			CallableStatement cs = conn.prepareCall(proc3StoredProcedure);
+			cs.execute();
+			cs.close();
+			conn.close();
+		} catch (Exception e) {
+			System.out.println("error " + e.getMessage());
+			return 0;
+		}
+		return 1;
+	}
+	
+	public int copiaProspeccion(String codCot, String  codCompania ) {
+		Connection conn;
+		// ejecuta el SP
+		try {
+			System.out.println("Ingreso datos ORACLE -> copia_prospeccion_sp(codCotizacion: " + codCot
+					+ ", codCompania:" + codCompania +  ")");
+			conn = ConectarBase.getOracleConnection();
+			String proc3StoredProcedure = "{ call copia_prospeccion_sp(?,?) }";
+			CallableStatement cs = conn.prepareCall(proc3StoredProcedure);
+			cs.setString(1, codCot);
+			cs.setString(2, codCompania);
+			cs.execute();
+			cs.close();
+			conn.close();
+		} catch (Exception e) {
+			System.out.println("error " + e.getMessage());
+			return 0;
+		}
+		return 1;
+	}
 }

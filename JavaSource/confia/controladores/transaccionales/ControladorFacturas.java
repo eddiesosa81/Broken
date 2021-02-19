@@ -67,6 +67,7 @@ public class ControladorFacturas extends AbstractReportBean {
 	private Boolean flgBotonImprime;
 	private String numFacturaPrint;
 	private Date fcFacturaCom;
+	private boolean conIva;
 
 	public ControladorFacturas() {
 		listAseguradoras = new ArrayList<Aseguradoras>();
@@ -74,6 +75,7 @@ public class ControladorFacturas extends AbstractReportBean {
 		lstPreFactDetaView = new ArrayList<PreFacturaDetalleView>();
 		flgBotonImprime = true;
 		fcFacturaCom = new Date();
+		conIva = true;
 	}
 
 	@PostConstruct
@@ -81,42 +83,45 @@ public class ControladorFacturas extends AbstractReportBean {
 		listAseguradoras = srvAseguradoras.listaAseguradoras();
 		numFactura = null;
 	}
-	
-	//--------------- PROGRAMACION IMPRESIONES ------------------//
-		private final String COMPILE_FILE_NAME = "factura";
 
-		@Override
-		protected String getCompileFileName() {
-			return COMPILE_FILE_NAME;
-		}
-		@Override
-		protected Map<String, Object> getReportParameters() {
-			Map<String, Object> parametros = new HashMap<String, Object>();
-			parametros.put("numFact", numFacturaPrint);
-			return parametros;
+	// --------------- PROGRAMACION IMPRESIONES ------------------//
+	private final String COMPILE_FILE_NAME = "factura";
 
-		}
-		public String execute() {
-				System.out.println("---------------------------- NUMERO factura:"+numFacturaPrint);
-			try {
-				super.prepareReport();
-			} catch (Exception e) {
-				// logger.error("Error execute Exception "+e.getMessage());
-				e.printStackTrace();
-			}
-			return null;
-		}
-		//-----------------------------------------------------------//
+	@Override
+	protected String getCompileFileName() {
+		return COMPILE_FILE_NAME;
+	}
 
-		public void sumaPreFacturaSel() {
-			Double valPreFac= 0.0;
-			for (PrefacturarView preFac : selectedlstPreFactView) {
-				valPreFac = valPreFac + preFac.getVal_pre_factura();
-			}
-			FacesContext fContextObj = FacesContext.getCurrentInstance();
-			fContextObj.addMessage(null,
-					new FacesMessage("Advertencia", "Total Comisiones Seleccionadas:"+redondear(valPreFac)));
+	@Override
+	protected Map<String, Object> getReportParameters() {
+		Map<String, Object> parametros = new HashMap<String, Object>();
+		parametros.put("numFact", numFacturaPrint);
+		return parametros;
+
+	}
+
+	public String execute() {
+		System.out.println("---------------------------- NUMERO factura:" + numFacturaPrint);
+		try {
+			super.prepareReport();
+		} catch (Exception e) {
+			// logger.error("Error execute Exception "+e.getMessage());
+			e.printStackTrace();
 		}
+		return null;
+	}
+	// -----------------------------------------------------------//
+
+	public void sumaPreFacturaSel() {
+		Double valPreFac = 0.0;
+		for (PrefacturarView preFac : selectedlstPreFactView) {
+			valPreFac = valPreFac + preFac.getVal_pre_factura();
+		}
+		FacesContext fContextObj = FacesContext.getCurrentInstance();
+		fContextObj.addMessage(null,
+				new FacesMessage("Advertencia", "Total Comisiones Seleccionadas:" + redondear(valPreFac)));
+	}
+
 	public void consultaPreFactura() {
 		lstPreFactView = srvPreFactView.lstPrefacturarView(remiteAseguradora);
 	}
@@ -126,14 +131,14 @@ public class ControladorFacturas extends AbstractReportBean {
 			if (selectedlstPreFactView.size() == 0) {
 				FacesContext fContextObj = FacesContext.getCurrentInstance();
 				fContextObj.addMessage(null,
-						new FacesMessage("Advertencia", "Seleccione registros para Generar la pre liquidaci髇"));
+						new FacesMessage("Advertencia", "Seleccione registros para Generar la pre liquidaci贸n"));
 				return;
 			}
 
 		} catch (Exception e) {
 			FacesContext fContextObj = FacesContext.getCurrentInstance();
 			fContextObj.addMessage(null,
-					new FacesMessage("Advertencia", "Seleccione registros para Generar la pre liquidaci髇"));
+					new FacesMessage("Advertencia", "Seleccione registros para Generar la pre liquidaci贸n"));
 			return;
 		}
 		lstPreFactViewFact = new ArrayList<PrefacturarView>();
@@ -147,23 +152,23 @@ public class ControladorFacturas extends AbstractReportBean {
 		try {
 			if (numFactura.isEmpty() || numFactura == null) {
 				FacesContext fContextObj = FacesContext.getCurrentInstance();
-				fContextObj.addMessage(null, new FacesMessage("Advertencia", "Ingrese el n鷐ero de Factura "));
+				fContextObj.addMessage(null, new FacesMessage("Advertencia", "Ingrese el n贸mero de Factura "));
 				return;
 			}
 		} catch (Exception e) {
 			FacesContext fContextObj = FacesContext.getCurrentInstance();
-			fContextObj.addMessage(null, new FacesMessage("Advertencia", "Ingrese el n鷐ero de Factura "));
+			fContextObj.addMessage(null, new FacesMessage("Advertencia", "Ingrese el n贸mero de Factura "));
 			return;
 		}
 		System.out.println("INGRESOOOO");
-		System.out.println("SIZE:"+lstPreFactViewFact.size());
+		System.out.println("SIZE:" + lstPreFactViewFact.size());
 		Factura factAux = new Factura();
 		factAux.setCd_compania(lstPreFactViewFact.get(0).getCd_compania());
 		factAux.setCd_aseguradora(lstPreFactViewFact.get(0).getCd_aseguradora());
 		factAux.setNum_factura(numFactura);
 		factAux.setFc_factura(fcFacturaCom);
 		numFacturaPrint = numFactura;
-		System.out.println("FACTURA A IMPRIMIR:"+numFacturaPrint);
+		System.out.println("FACTURA A IMPRIMIR:" + numFacturaPrint);
 		srvFactura.insertarFactura(factAux);
 		Integer codFac = 0;
 		codFac = srvFactura.codigoMaxFactura();
@@ -175,7 +180,7 @@ public class ControladorFacturas extends AbstractReportBean {
 		List<PreFacturaDetalle> lstDetPreFact = new ArrayList<PreFacturaDetalle>();
 		Integer cd_comision_pol;
 		ComisionesPoliza comisionPoliza = new ComisionesPoliza();
-		
+
 		for (PrefacturarView prefactAux : lstPreFactViewFact) {
 			factDetAxus = new FacturaDetalle();
 			factDetAxus.setCd_compania(factAux.getCd_compania());
@@ -204,22 +209,31 @@ public class ControladorFacturas extends AbstractReportBean {
 		factAux.setVal_factura(valor);
 		String rubroAux = srvRubros.recuperaIva();
 		Double iva = Double.valueOf(rubroAux);
-		iva = iva / 100;
-		iva = redondear(iva);
-		iva = iva * valor;
+		System.out.println("IVA:"+conIva);
+		
+		if (conIva) {
+			iva = iva / 100;
+			iva = redondear(iva);
+			iva = iva * valor;
+		} else {
+			iva = 0.0;
+		}
+		
+		System.out.println("VAL-IVA:"+iva);
+		
 		factAux.setIva(iva);
 		valor = iva + valor;
 		factAux.setTot_factura(valor);
 		srvFactura.actualizaFactura(factAux);
 		flgBotonImprime = false;
 		FacesContext fContextObj = FacesContext.getCurrentInstance();
-		fContextObj.addMessage(null, new FacesMessage("Trasnacci髇 Exitosa",
-				"Si desea imprimir el documento presione el boton Imprimir"));
+		fContextObj.addMessage(null,
+				new FacesMessage("Trasnacci贸n Exitosa", "Si desea imprimir el documento presione el boton Imprimir"));
 //		RequestContext context = RequestContext.getCurrentInstance();
 //		context.execute("PF('numFactConfia').hide()");
 		PrimeFaces.current().executeScript("PF('numFactConfia').hide()");
 		lstPreFactView = new ArrayList<PrefacturarView>();
-		
+
 	}
 
 	public void salir() {
@@ -315,6 +329,12 @@ public class ControladorFacturas extends AbstractReportBean {
 		this.fcFacturaCom = fcFacturaCom;
 	}
 
+	public boolean isConIva() {
+		return conIva;
+	}
 
+	public void setConIva(boolean conIva) {
+		this.conIva = conIva;
+	}
 
 }

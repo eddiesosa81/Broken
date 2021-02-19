@@ -34,7 +34,7 @@
 						<f:selectItem itemLabel="RUC" itemValue="RUC" />
 						<f:selectItem itemLabel="PASAPORTE" itemValue="PAS" />
 					</p:selectOneMenu>
-					<h:outputText value="Primer Apellido" />
+					<h:outputText value="*Primer Apellido" />
 					<p:inputText id="clienteApePrimer"
 						value="#{ControladorCotizacionComercial.cliente.primer_apellido_cliente}"
 						style="text-transform:uppercase;"
@@ -71,7 +71,10 @@
 					</p:selectOneMenu>
 					<h:outputText value="Fecha Nacimiento" />
 					<p:calendar id="clienteFecNaci"
-						value="#{ControladorCotizacionComercial.cliente.fecha_nacimiento_cliente}" />
+						value="#{ControladorCotizacionComercial.cliente.fecha_nacimiento_cliente}"
+						pattern="dd/MM/yyyy" mask="true" locale="de" navigator="true">
+					</p:calendar>
+
 					<h:outputText value="Tipo:" />
 					<p:selectOneMenu id="clienteTipo"
 						value="#{ControladorCotizacionComercial.cliente.tipo_cliente}"
@@ -181,92 +184,610 @@
 			</p:panel>
 		</p:row>
 		<p:row>
-			<p:panel header="Datos de Ingreso">
-				<h:panelGrid columns="4" style="width:100%;text-align:center;">
-					<h:outputText value="Aseguradora " />
-					<p:selectOneMenu id="aseguradoras"
-						value="#{ControladorCotizacionComercial.codAseguradora}"
-						style="width:125px" autoWidth="false">
-						<p:ajax event="change"
-							listener="#{ControladorCotizacionComercial.listarRamosAseguradora}"
-							update=":frm_cotComercial:listaRamos" process="@this" />
-						<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
-						<f:selectItems var="aseguradoras"
-							value="#{ControladorCotizacionComercial.listadoAseguradoras}"
-							itemLabel="#{aseguradoras.nombre_corto_aseguradora}"
-							itemValue="#{aseguradoras.cd_aseguradora}" />
-					</p:selectOneMenu>
-					<h:outputText value="Ramo " />
-					<p:selectOneMenu id="listaRamos"
-						value="#{ControladorCotizacionComercial.codRamo}"
-						style="width:125px" autoWidth="false">
-						<p:ajax event="change"
-							listener="#{ControladorCotizacionComercial.listarPlanes}"
-							update=":frm_cotComercial:listPlanes,:frm_cotComercial:listCanal"
-							process="@this,:frm_cotComercial:aseguradoras,:frm_cotComercial:listaRamos" />
-						<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
-						<f:selectItems var="ramos"
-							value="#{ControladorCotizacionComercial.listadoAsegRamo}"
-							itemLabel="#{ramos.desc_ramo}" itemValue="#{ramos.cd_ramo}" />
-					</p:selectOneMenu>
-					<h:outputText value="Plan " />
-					<p:selectOneMenu id="listPlanes"
-						value="#{ControladorCotizacionComercial.codPlan}"
-						style="width:125px" autoWidth="false">
-						<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
-						<f:selectItems var="planes"
-							value="#{ControladorCotizacionComercial.listaPlan}"
-							itemLabel="#{planes.descripcion_plan}"
-							itemValue="#{planes.cd_plan}" />
-					</p:selectOneMenu>
-					<h:outputText value="Canal " />
-					<p:selectOneMenu id="listCanal"
-						value="#{ControladorCotizacionComercial.codCanal}"
-						style="width:125px" autoWidth="false">
-						<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
-						<f:selectItems var="suba"
-							value="#{ControladorCotizacionComercial.lstSubagentes}"
-							itemLabel="#{suba.razonSocial_subagente} #{suba.primer_apellido_subagente} #{suba.primer_nombre_subagente}"
-							itemValue="#{suba.cd_subagente}" />
-					</p:selectOneMenu>
-					<h:outputText value="Grupo Económico " />
-					<p:selectOneMenu id="geconomico"
-						value="#{ControladorCotizacionComercial.codGrupoEconomico}"
-						style="width:125px" autoWidth="false">
-						<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
-						<f:selectItems var="gcontratante"
-							value="#{ControladorCotizacionComercial.listaGrupoContratante}"
-							itemLabel="#{gcontratante.nombre_corto_grupo_contratante}"
-							itemValue="#{gcontratante.cd_grupo_contratante}" />
-					</p:selectOneMenu>
-					<h:outputText value="Ejecutivo " />
-					<p:selectOneMenu id="listaEjecutivos"
-						value="#{ControladorCotizacionComercial.codEjecutivo}"
-						style="width:125px" autoWidth="false">
-						<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
-						<f:selectItems var="ejecutivos"
-							value="#{ControladorCotizacionComercial.listaEjecutivos}"
-							itemLabel="#{ejecutivos.primer_apellido_ejecutivo} #{ejecutivos.primer_nombre_ejecutivo}"
-							itemValue="#{ejecutivos.cd_ejecutivo}" />
-					</p:selectOneMenu>
-				</h:panelGrid>
-				<h:panelGrid columns="4">
-					<h:outputText value="Vigencia desde " />
-					<p:calendar id="vDesde"
-						value="#{ControladorCotizacionComercial.fcDesde}"
-						pattern="dd/MM/yyyy" mask="true" mode="inline" locale="de"
-						navigator="true">
-					</p:calendar>
-					<h:outputText value="Vigencia hasta " />
-					<p:calendar id="vHasta"
-						value="#{ControladorCotizacionComercial.fcHasta}"
-						pattern="dd/MM/yyyy" mask="true" mode="inline" locale="de"
-						navigator="true">
-					</p:calendar>
-				</h:panelGrid>
-			</p:panel>
+			<p:tabView id="tbViewDatos">
+				<p:tab title="Datos">
+					<h:panelGrid columns="4" style="width:100%;text-align:center;">
+						<h:outputText value="Aseguradora " />
+						<p:selectOneMenu id="aseguradoras"
+							value="#{ControladorCotizacionComercial.codAseguradora}"
+							style="width:125px" autoWidth="false">
+							<p:ajax event="change"
+								listener="#{ControladorCotizacionComercial.listarRamosAseguradora}"
+								update="frm_cotComercial:tbViewDatos:listaRamos,
+								frm_cotComercial:tbViewDatos:listPlanes,
+								frm_cotComercial:tbViewDatos:dtCobertura,
+								frm_cotComercial:tbViewDatos:dtDeducible,
+								frm_cotComercial:tbViewDatos:dtClausulas"
+								process="@this" />
+							<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+							<f:selectItems var="aseguradoras"
+								value="#{ControladorCotizacionComercial.listadoAseguradoras}"
+								itemLabel="#{aseguradoras.nombre_corto_aseguradora}"
+								itemValue="#{aseguradoras.cd_aseguradora}" />
+						</p:selectOneMenu>
+						<h:outputText value="Ramo " />
+						<p:selectOneMenu id="listaRamos"
+							value="#{ControladorCotizacionComercial.codRamo}"
+							style="width:125px" autoWidth="false">
+							<p:ajax event="change"
+								listener="#{ControladorCotizacionComercial.listarPlanes}"
+								update=":frm_cotComercial:tbViewDatos:listPlanes,:frm_cotComercial:tbViewDatos:listCanal,
+								frm_cotComercial:tbViewDatos:dtCobertura,
+								frm_cotComercial:tbViewDatos:dtDeducible,
+								frm_cotComercial:tbViewDatos:dtClausulas"
+								process="@this,:frm_cotComercial:tbViewDatos:aseguradoras,:frm_cotComercial:tbViewDatos:listaRamos" />
+							<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+							<f:selectItems var="ramos"
+								value="#{ControladorCotizacionComercial.listadoAsegRamo}"
+								itemLabel="#{ramos.desc_ramo}" itemValue="#{ramos.cd_ramo}" />
+						</p:selectOneMenu>
+						<h:outputText value="Plan " />
+						<p:selectOneMenu id="listPlanes"
+							value="#{ControladorCotizacionComercial.codPlan}"
+							style="width:125px" autoWidth="false">
+							<p:ajax event="change"
+								listener="#{ControladorCotizacionComercial.listarPlanesCambio}"
+								update=":frm_cotComercial:tbViewDatos:listPlanes,:frm_cotComercial:tbViewDatos:listCanal,
+								frm_cotComercial:tbViewDatos:dtCobertura,
+								frm_cotComercial:tbViewDatos:dtDeducible,
+								frm_cotComercial:tbViewDatos:dtClausulas"
+								process="@this,:frm_cotComercial:tbViewDatos:aseguradoras,:frm_cotComercial:tbViewDatos:listaRamos" />
+							<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+							<f:selectItems var="planes"
+								value="#{ControladorCotizacionComercial.listaPlan}"
+								itemLabel="#{planes.descripcion_plan}"
+								itemValue="#{planes.cd_plan}" />
+						</p:selectOneMenu>
+						<h:outputText value="Canal " />
+						<p:selectOneMenu id="listCanal"
+							value="#{ControladorCotizacionComercial.codCanal}"
+							style="width:125px" autoWidth="false">
+							<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+							<f:selectItems var="suba"
+								value="#{ControladorCotizacionComercial.lstSubagentes}"
+								itemLabel="#{suba.razonSocial_subagente} #{suba.primer_apellido_subagente} #{suba.primer_nombre_subagente}"
+								itemValue="#{suba.cd_subagente}" />
+						</p:selectOneMenu>
+						<h:outputText value="Grupo Económico " />
+						<p:selectOneMenu id="geconomico"
+							value="#{ControladorCotizacionComercial.codGrupoEconomico}"
+							style="width:125px" autoWidth="false">
+							<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+							<f:selectItems var="gcontratante"
+								value="#{ControladorCotizacionComercial.listaGrupoContratante}"
+								itemLabel="#{gcontratante.nombre_corto_grupo_contratante}"
+								itemValue="#{gcontratante.cd_grupo_contratante}" />
+						</p:selectOneMenu>
+						<h:outputText value="Ejecutivo " />
+						<p:selectOneMenu id="listaEjecutivos"
+							value="#{ControladorCotizacionComercial.codEjecutivo}"
+							style="width:125px" autoWidth="false">
+							<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+							<f:selectItems var="ejecutivos"
+								value="#{ControladorCotizacionComercial.listaEjecutivos}"
+								itemLabel="#{ejecutivos.primer_apellido_ejecutivo} #{ejecutivos.primer_nombre_ejecutivo}"
+								itemValue="#{ejecutivos.cd_ejecutivo}" />
+						</p:selectOneMenu>
+					</h:panelGrid>
+					<h:panelGrid columns="4">
+						<h:outputText value="Vigencia desde " />
+						<p:calendar id="vDesde"
+							value="#{ControladorCotizacionComercial.fcDesde}"
+							pattern="dd/MM/yyyy" mask="true" mode="inline" locale="de"
+							navigator="true">
+						</p:calendar>
+						<h:outputText value="Vigencia hasta " />
+						<p:calendar id="vHasta"
+							value="#{ControladorCotizacionComercial.fcHasta}"
+							pattern="dd/MM/yyyy" mask="true" mode="inline" locale="de"
+							navigator="true">
+						</p:calendar>
+					</h:panelGrid>
+				</p:tab>
+
+				<p:tab title="Objeto">
+					<h:panelGrid columns="6" cellpadding="5">
+						<h:outputText value="Descripción" />
+						<p:inputText id="selOmItemAseg"
+							value="#{ControladorCotizacionComercial.datosObjetoCotizacion.descripcion_objeto}"
+							style="text-transform:uppercase;width:125px;"
+							onkeyup="javascript:this.value=this.value.toUpperCase();" />
+						<h:outputText value="Monto Asegurado " />
+						<p:inputNumber id="vhMonto" style="width:125px"
+							value="#{ControladorCotizacionComercial.datosObjetoCotizacion.valor_asegurador_objeto}">
+							<p:ajax event="change"
+								listener="#{ControladorCotizacionComercial.calculaPrimaObjeto}"
+								update="frm_cotComercial:tbViewDatos:vhPrima,frm_cotComercial:tbViewDatos:iptFrmPrimTot"
+								process="@this,frm_cotComercial:tbViewDatos:vDesde,frm_cotComercial:tbViewDatos:vHasta,
+									frm_cotComercial:tbViewDatos:vhMonto, frm_cotComercial:tbViewDatos:vhTasa, frm_cotComercial:tbViewDatos:vhFactor,
+									frm_cotComercial:tbViewDatos:iptFrmPrimTot,frm_cotComercial:tbViewDatos:vhMontoExt" />
+						</p:inputNumber>
+						<h:outputText value="Tasa" />
+						<p:inputNumber id="vhTasa" style="width:125px"
+							value="#{ControladorCotizacionComercial.datosObjetoCotizacion.tasa_objeto}">
+							<p:ajax event="change"
+								listener="#{ControladorCotizacionComercial.calculaPrimaObjeto}"
+								update="frm_cotComercial:tbViewDatos:vhPrima,frm_cotComercial:tbViewDatos:iptFrmPrimTot"
+								process="@this,frm_cotComercial:tbViewDatos:vDesde,frm_cotComercial:tbViewDatos:vHasta,
+								frm_cotComercial:tbViewDatos:vhMonto,frm_cotComercial:tbViewDatos:vhTasa,
+								frm_cotComercial:tbViewDatos:vhFactor,frm_cotComercial:tbViewDatos:iptFrmPrimTot,frm_cotComercial:tbViewDatos:vhMontoExt" />
+						</p:inputNumber>
+						<h:outputText value="Factor" />
+						<p:selectOneRadio id="vhFactor" style="width:125px"
+							value="#{ControladorCotizacionComercial.factorObjeto}">
+							<f:selectItem itemLabel="100%" itemValue="100" />
+							<f:selectItem itemLabel="1000%" itemValue="1000" />
+							<p:ajax event="change"
+								listener="#{ControladorCotizacionComercial.calculaPrimaObjeto}"
+								update="frm_cotComercial:tbViewDatos:vhPrima,frm_cotComercial:tbViewDatos:iptFrmPrimTot"
+								process="@this, frm_cotComercial:tbViewDatos:vDesde,frm_cotComercial:tbViewDatos:vHasta,
+								frm_cotComercial:tbViewDatos:vhMonto, frm_cotComercial:tbViewDatos:vhTasa, 
+								frm_cotComercial:tbViewDatos:vhFactor,frm_cotComercial:tbViewDatos:iptFrmPrimTot,frm_cotComercial:tbViewDatos:vhMontoExt" />
+						</p:selectOneRadio>
+						<h:outputText value="Prima" />
+						<p:row>
+							<p:inputNumber id="vhPrima" style="width:125px"
+								value="#{ControladorCotizacionComercial.datosObjetoCotizacion.prima_objeto}">
+							</p:inputNumber>
+							<p:commandButton icon="ui-icon-refresh"
+								action="#{ControladorCotizacionComercial.calculaPrimaObjeto}"
+								id="btnActDato"
+								update="@this, frm_cotComercial:tbViewDatos:vhPrima,frm_cotComercial:tbViewDatos:iptFrmPrimTot"
+								title="Calcular"
+								process="@this, frm_cotComercial:tbViewDatos:vDesde,frm_cotComercial:tbViewDatos:vHasta,
+								frm_cotComercial:tbViewDatos:vhMonto, frm_cotComercial:tbViewDatos:vhTasa, 
+								frm_cotComercial:tbViewDatos:vhFactor,frm_cotComercial:tbViewDatos:iptFrmPrimTot,frm_cotComercial:tbViewDatos:vhMontoExt" />
+						</p:row>
+						<h:outputText value="Monto Aseg.Extras" />
+						<p:inputNumber id="vhMontoExt" style="width:125px"
+							value="#{ControladorCotizacionComercial.valorAseguradorExtra}">
+							<p:ajax event="change"
+								listener="#{ControladorCotizacionComercial.calculaPrimaObjeto}"
+								update="frm_cotComercial:tbViewDatos:vhPrima,frm_cotComercial:tbViewDatos:iptFrmPrimTot"
+								process="@this,frm_cotComercial:tbViewDatos:vDesde,frm_cotComercial:tbViewDatos:vHasta,
+								frm_cotComercial:tbViewDatos:vhMonto,frm_cotComercial:tbViewDatos:vhTasa,
+								frm_cotComercial:tbViewDatos:vhFactor,frm_cotComercial:tbViewDatos:iptFrmPrimTot,frm_cotComercial:tbViewDatos:vhMontoExt" />
+						</p:inputNumber>
+						<h:outputText value="Marca " />
+						<p:selectOneMenu id="vhMarca"
+							value="#{ControladorCotizacionComercial.datosCaracteristicasVehiculos.cd_marca}"
+							style="width:125px" autoWidth="false">
+							<p:ajax event="change"
+								listener="#{ControladorCotizacionComercial.listaModelos}"
+								update="frm_cotComercial:tbViewDatos:vhModelo" />
+							<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+							<f:selectItems var="marcas"
+								value="#{ControladorCotizacionComercial.listadoMarcas}"
+								itemLabel="#{marcas.desc_marca}" itemValue="#{marcas.cd_marca}" />
+						</p:selectOneMenu>
+						<h:outputText value="Modelo " />
+						<p:selectOneMenu id="vhModelo"
+							value="#{ControladorCotizacionComercial.datosCaracteristicasVehiculos.cd_modelo}"
+							style="width:125px" autoWidth="false">
+							<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
+							<f:selectItems var="modelo"
+								value="#{ControladorCotizacionComercial.listadoModelos}"
+								itemLabel="#{modelo.desc_modelo}"
+								itemValue="#{modelo.cd_modelo}" />
+						</p:selectOneMenu>
+						<h:outputText value="Año " />
+
+						<p:inputMask id="vhAnio"
+							value="#{ControladorCotizacionComercial.datosCaracteristicasVehiculos.anio_de_fabricacion}"
+							mask="9999" validateMask="true" style="width:125px" />
+
+					</h:panelGrid>
+				</p:tab>
+				<p:tab title="Forma Pago">
+					<h:panelGrid columns="4" cellpadding="5">
+						<h:outputText value="Forma de Pago: " />
+						<p:selectOneMenu id="slomFrmPago"
+							value="#{ControladorCotizacionComercial.tpFromaPago}"
+							style="width:175px">
+							<f:selectItem itemLabel="Contado" itemValue="CONTADO" />
+							<f:selectItem itemLabel="Tarjeta Crédito" itemValue="TARJETA" />
+							<f:selectItem itemLabel="Crédito" itemValue="CREDITO" />
+							<f:selectItem itemLabel="Débito Bancario" itemValue="DEBITO" />
+							<f:selectItem itemLabel="Cortesía" itemValue="CORTESIA" />
+						</p:selectOneMenu>
+						<h:outputText value="Prima Neta: " />
+						<h:outputText
+							value="#{ControladorCotizacionComercial.frmPagoPrimaTot}"
+							id="iptFrmPrimTot" />
+						<h:outputText value="Derecho de Emisión: " />
+						<p:inputText
+							value="#{ControladorCotizacionComercial.frmPagoDerechoEmision}"
+							id="iptFrmPDerEmi" />
+						<h:outputText value="Super de Bancos: " />
+						<p:inputText
+							value="#{ControladorCotizacionComercial.frmPagoSuperBancos}"
+							id="iptFrmSupBanco" />
+						<h:outputText value="Seguro Campesino: " />
+						<p:inputText
+							value="#{ControladorCotizacionComercial.frmPagoSegCampesino}"
+							id="iptFrmSegCamp" />
+						<h:outputText value="IVA: " />
+						<p:inputText value="#{ControladorCotizacionComercial.frmPagoIva}"
+							id="iptFrmIva" />
+						<h:outputText value="TOTAL: " />
+						<p:row>
+							<h:outputText
+								value="#{ControladorCotizacionComercial.frmPagoTotal}"
+								id="iptFrmTotla" />
+
+							<p:commandButton icon="ui-icon-refresh"
+								action="#{ControladorCotizacionComercial.calculaPagoTotal}"
+								id="btnfrmPagAct"
+								update="@this frm_cotComercial:tbViewDatos:iptFrmPrimTot,frm_cotComercial:tbViewDatos:iptFrmPDerEmi,
+										frm_cotComercial:tbViewDatos:iptFrmSegCamp,
+										frm_cotComercial:tbViewDatos:iptFrmSupBanco,
+										frm_cotComercial:tbViewDatos:iptFrmIva,
+										frm_cotComercial:tbViewDatos:iptFrmTotla,
+										frm_cotComercial:tbViewDatos:iptFrmCuotaIni,
+										frm_cotComercial:tbViewDatos:iptFrmNumPago,
+										frm_cotComercial:tbViewDatos:iptFrmCuotaIni,
+										frm_cotComercial:tbViewDatos:iptFrmNumPago,
+										frm_cotComercial:tbViewDatos:iptFrmPrimTot"
+								title="Calcular"
+								process="@this frm_cotComercial:tbViewDatos:iptFrmPrimTot,frm_cotComercial:tbViewDatos:iptFrmPDerEmi,
+										frm_cotComercial:tbViewDatos:iptFrmSegCamp,
+										frm_cotComercial:tbViewDatos:iptFrmSupBanco,
+										frm_cotComercial:tbViewDatos:iptFrmIva,
+										frm_cotComercial:tbViewDatos:iptFrmTotla,
+										frm_cotComercial:tbViewDatos:iptFrmCuotaIni,
+										frm_cotComercial:tbViewDatos:iptFrmNumPago,
+										frm_cotComercial:tbViewDatos:iptFrmCuotaIni,
+										frm_cotComercial:tbViewDatos:vhPrima,
+										,frm_cotComercial:tbViewDatos:vhMontoExt" />
+						</p:row>
+						<h:outputText value="%Cuota Inicial: " />
+						<p:inputText
+							value="#{ControladorCotizacionComercial.frmPagoCuotaIni}"
+							id="iptFrmCuotaIni" />
+						<h:outputText value="Num. Pagos: " />
+						<p:inputText
+							value="#{ControladorCotizacionComercial.frmPagoNumPago}"
+							id="iptFrmNumPago" />
+					</h:panelGrid>
+
+				</p:tab>
+				<p:tab title="Coberturas">
+					<p:dataTable id="dtCobertura" var="cob"
+						value="#{ControladorCotizacionComercial.lstCoberturasEmitidas}"
+						scrollable="true" scrollHeight="150"
+						style="font-family:Verdana; font-size: 10px;"
+						selectionMode="single"
+						selection="#{ControladorCotizacionComercial.selectedCoberturasEmitidas}"
+						rowKey="#{cob.cd_cobertura}"
+						emptyMessage="No se encuentra en la busqueda"
+						filteredValue="#{ControladorCotizacionComercial.lstFilteredCoberturasEmitidas}"
+						editable="true">
+						<f:facet name="header">
+						            Coberturas
+						        </f:facet>
+						<p:ajax event="rowEdit"
+							listener="#{ControladorCotizacionComercial.onRowEditCobertura}"
+							update="@this" />
+						<p:column headerText="Descripción Cobertura"
+							filterBy="#{cob.desc_cobertura}" sortBy="#{cob.desc_cobertura}"
+							filterMatchMode="contains">
+							<h:outputText value="#{cob.desc_cobertura}" />
+						</p:column>
+						<p:column headerText="Porcentaje">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{cob.porcentajeplancobertura}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputNumber value="#{cob.porcentajeplancobertura}"
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Valor">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{cob.valor_plancobertura}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputNumber value="#{cob.valor_plancobertura}"
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Especificación">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{cob.especificacion_cob}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{cob.especificacion_cob}"
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column style="width:32px">
+							<p:rowEditor />
+						</p:column>
+					</p:dataTable>
+					<p:commandButton value="Agregar" icon="ui-icon-plusthick"
+						id="btnNuevoaCobertura"
+						update="@this,frm_cotComercial:checkboxDTCob,frm_cotComercial:inptNumPor,frm_cotComercial:inptNumVal,frm_cotComercial:inptEspCob"
+						styleClass="ui-priority-primary"
+						actionListener="#{ControladorCotizacionComercial.nuevaCobertura}"
+						process="@this" />
+					<p:commandButton value="Desactivar" icon="ui-icon-minusthick"
+						id="btnEliminaCobertura"
+						update="@this,frm_cotComercial:tbViewDatos:dtCobertura"
+						styleClass="ui-priority-primary"
+						actionListener="#{ControladorCotizacionComercial.eliminaCobertura}"
+						process="@this,frm_cotComercial:tbViewDatos:dtCobertura">
+					</p:commandButton>
+				</p:tab>
+				<p:tab title="Deducibles">
+					<p:dataTable id="dtDeducible" var="ded"
+						value="#{ControladorCotizacionComercial.lstDeducibleEmitida}"
+						scrollable="true" scrollHeight="150"
+						style="font-family:Verdana; font-size: 10px;"
+						selectionMode="single"
+						selection="#{ControladorCotizacionComercial.selectedDeducibleEmitida}"
+						rowKey="#{ded.cd_deducible_emitido}"
+						emptyMessage="No se encuentra en la busqueda"
+						filteredValue="#{ControladorCotizacionComercial.lstFilteredDeducibleEmitida}"
+						editable="true">
+						<f:facet name="header">
+				            Deducibles
+				        </f:facet>
+						<p:ajax event="rowEdit"
+							listener="#{ControladorCotizacionComercial.onRowEditDeducible}"
+							update="@this" />
+						<p:column headerText="Descripción Deducible" rendered="false">
+							<h:outputText value="#{ded.cd_deducible_emitido}" />
+						</p:column>
+						<p:column headerText="Descripción Deducible"
+							filterBy="#{ded.desc_deducible}" sortBy="#{ded.desc_deducible}"
+							filterMatchMode="contains">
+							<h:outputText value="#{ded.desc_deducible}" />
+						</p:column>
+						<p:column headerText="% Valor Siniestro">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{ded.porcentaje_valor_siniestro}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputNumber value="#{ded.porcentaje_valor_siniestro}"
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="% Valor Asegurado">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{ded.porcentaje_valor_asegurado}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputNumber value="#{ded.porcentaje_valor_asegurado}"
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Valor Mínimo">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{ded.valor_minimo}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputNumber value="#{ded.valor_minimo}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Valor Fijo">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{ded.valor_fijo}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputNumber value="#{ded.valor_fijo}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Especificación">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{ded.especificacion}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{ded.especificacion}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column style="width:32px">
+							<p:rowEditor />
+						</p:column>
+					</p:dataTable>
+					<p:commandButton value="Agregar" icon="ui-icon-plusthick"
+						id="btnNuevoDeducible"
+						update="@this,frm_cotComercial:checkboxDTded,frm_cotComercial:inptNumPorValSin,frm_cotComercial:inptNumPorValAseg,
+						frm_cotComercial:inptNumValFijo,frm_cotComercial:inptNumValMin,frm_cotComercial:inptEspDed"
+						styleClass="ui-priority-primary"
+						actionListener="#{ControladorCotizacionComercial.nuevoDeducible}"
+						process="@this" />
+					<p:commandButton value="Desactivar" icon="ui-icon-minusthick"
+						id="btnEliminaDeducible"
+						update="@this,frm_cotComercial:tbViewDatos:dtDeducible"
+						styleClass="ui-priority-primary"
+						actionListener="#{ControladorCotizacionComercial.eliminaDeducible}"
+						process="@this,frm_cotComercial:tbViewDatos:dtDeducible">
+					</p:commandButton>
+				</p:tab>
+				<p:tab title="Cláusulas">
+					<p:dataTable id="dtClausulas" var="cla"
+						value="#{ControladorCotizacionComercial.lstCalusulaEmitida}"
+						scrollable="true" scrollHeight="150"
+						style="font-family:Verdana; font-size: 10px;"
+						selectionMode="single"
+						selection="#{ControladorCotizacionComercial.selectedClausulaEmitida}"
+						rowKey="#{cla.cd_clausula}"
+						emptyMessage="No se encuentra en la busqueda"
+						filteredValue="#{ControladorCotizacionComercial.lstFilteredCalusulaEmitida}"
+						editable="true">
+						<f:facet name="header">
+						            Clausulas
+						        </f:facet>
+						<p:ajax event="rowEdit"
+							listener="#{ControladorCotizacionComercial.onRowEditClausula}"
+							update="@this" />
+						<p:column headerText="Descripción Clausula"
+							filterBy="#{cla.desc_clausula}" sortBy="#{cla.desc_clausula}"
+							filterMatchMode="contains">
+							<h:outputText value="#{cla.desc_clausula}" />
+						</p:column>
+						<p:column headerText="Porcentaje">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{cla.porcentaje_planclausula}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputNumber value="#{cla.porcentaje_planclausula}"
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Valor">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{cla.valor_planclausula}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputNumber value="#{cla.valor_planclausula}"
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Especificación">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{cla.especificacion_cla}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{cla.especificacion_cla}"
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column style="width:32px">
+							<p:rowEditor />
+						</p:column>
+					</p:dataTable>
+					<p:commandButton value="Agregar" icon="ui-icon-plusthick"
+						id="btnNuevaClausula"
+						update="@this,frm_cotComercial:checkboxDTclau,frm_cotComercial:inptNumPorCla,frm_cotComercial:inptNumValCla,frm_cotComercial:inptEspCla"
+						styleClass="ui-priority-primary"
+						actionListener="#{ControladorCotizacionComercial.nuevaClausula}"
+						process="@this" />
+					<p:commandButton value="Desactivar" icon="ui-icon-minusthick"
+						id="btnEliminaClausula"
+						update="@this,frm_cotComercial:tbViewDatos:dtClausulas"
+						styleClass="ui-priority-primary"
+						actionListener="#{ControladorCotizacionComercial.eliminaClausula}"
+						process="@this,frm_cotComercial:tbViewDatos:dtClausulas">
+					</p:commandButton>
+				</p:tab>
+
+			</p:tabView>
 			<p:tabView id="tab">
-				<p:tab title="Datos Adicionales">
+				<p:tab title="Prospecciones">
+					<h:panelGrid columns="1" style="width:100%;text-align:center;">
+						<p:row>
+							<p:inputText id="numCotizaBuscado"
+								value="#{ControladorCotizacionComercial.numCotGen}"
+								placeholder="No.Prospección" />
+							<p:inputText id="cotizaBuscado"
+								value="#{ControladorCotizacionComercial.apellidoRazonSocial}"
+								placeholder="Apellido / Razon Social" />
+							<p:commandButton value="Buscar"
+								action="#{ControladorCotizacionComercial.buscaProspeccion}"
+								update="frm_cotComercial:tab:listadoCotizaciones"
+								icon="ui-icon-search"
+								process="@this,frm_cotComercial:tab:numCotizaBuscado,frm_cotComercial:tab:cotizaBuscado" />
+						</p:row>
+					</h:panelGrid>
+					<p:dataTable id="listadoCotizaciones" var="cotiza"
+						scrollable="true" scrollHeight="150"
+						value="#{ControladorCotizacionComercial.lstProspeccion}"
+						style="font-family:Verdana; font-size: 10px;" rows="5"
+						paginator="true"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						selectionMode="single"
+						selection="#{ControladorCotizacionComercial.selectedProspeccion}"
+						rowKey="#{cotiza.id}">
+						<f:facet name="header">
+				            Seleccione la Prospección
+				        </f:facet>
+						<p:ajax event="rowSelect"
+							listener="#{ControladorCotizacionComercial.seleccionaProspeccion}"
+							update="@this,:frm_cotComercial:clienteIdentif,:frm_cotComercial:clienteTipID,
+							:frm_cotComercial:clienteApePrimer,:frm_cotComercial:clienteApeSeg,:frm_cotComercial:clienteNomPrimer,
+							:frm_cotComercial:clienteNomSeg,:frm_cotComercial:clienteRazSoc,:frm_cotComercial:clienteEstCiv,
+							:frm_cotComercial:clienteFecNaci,:frm_cotComercial:clienteDir,:frm_cotComercial:clienteCiudad,
+							:frm_cotComercial:clienteSector,:frm_cotComercial:clienteProvincia,:frm_cotComercial:clienteProvincia,
+							:frm_cotComercial:clienteRef,:frm_cotComercial:clienteCiudadTelf,:frm_cotComercial:impNumTelf,
+							:frm_cotComercial:impNumTelfOfi,:frm_cotComercial:impExtTelf,:frm_cotComercial:impNumTelfCel,
+							:frm_cotComercial:impCorreoP,:frm_cotComercial:impNmConta,:frm_cotComercial:impNumTelfCont,
+							:frm_cotComercial:impNumCelCont,:frm_cotComercial:impCorreoPCont,:frm_cotComercial:impCargoCont,
+							:frm_cotComercial:impDepCont,frm_cotComercial:tab:dtArchExiste
+							:frm_cotComercial:tbViewDatos:aseguradoras,:frm_cotComercial:tbViewDatos:listaRamos,:frm_cotComercial:tbViewDatos:listPlanes,
+							:frm_cotComercial:tbViewDatos:listCanal,:frm_cotComercial:tbViewDatos:geconomico,:frm_cotComercial:tbViewDatos:listaEjecutivos,
+							:frm_cotComercial:tbViewDatos:vDesde,:frm_cotComercial:tbViewDatos:vHasta,:frm_cotComercial:tab:txtAsunto,
+							:frm_cotComercial:tab:intxtDescGes,:frm_cotComercial:tab:scmUsr,:frm_cotComercial:btnCotiza2,
+							
+							frm_cotComercial:tbViewDatos:selOmItemAseg,frm_cotComercial:tbViewDatos:vhMonto,frm_cotComercial:tbViewDatos:vhTasa,
+							frm_cotComercial:tbViewDatos:vhFactor,frm_cotComercial:tbViewDatos:vhPrima,frm_cotComercial:tbViewDatos:vhMontoExt,
+							frm_cotComercial:tbViewDatos:vhMarca,frm_cotComercial:tbViewDatos:vhModelo,frm_cotComercial:tbViewDatos:vhAnio,
+							frm_cotComercial:tbViewDatos:slomFrmPago,frm_cotComercial:tbViewDatos:iptFrmPrimTot,frm_cotComercial:tbViewDatos:iptFrmPDerEmi,
+							frm_cotComercial:tbViewDatos:iptFrmSupBanco,frm_cotComercial:tbViewDatos:iptFrmSegCamp,frm_cotComercial:tbViewDatos:iptFrmIva,
+							frm_cotComercial:tbViewDatos:iptFrmCuotaIni,frm_cotComercial:tbViewDatos:iptFrmNumPago,
+							
+							frm_cotComercial:tbViewDatos:dtCobertura,frm_cotComercial:tbViewDatos:dtDeducible,frm_cotComercial:tbViewDatos:dtClausulas" />
+
+
+						<p:column headerText="No." visible="false">
+							<h:outputText value="#{cotiza.id}" />
+						</p:column>
+
+						<p:column headerText="No.">
+							<h:outputText value="#{cotiza.num_cotizacion}" />
+						</p:column>
+						<p:column headerText="Cliente">
+							<h:outputText value="#{cotiza.datosCliente}" />
+						</p:column>
+						<p:column headerText="Aseguradora">
+							<h:outputText value="#{cotiza.nombre_corto_aseguradora}" />
+						</p:column>
+
+						<p:column headerText="Ramo">
+							<h:outputText value="#{cotiza.desc_ramo}" />
+						</p:column>
+						<p:column headerText="Fc.Creación">
+							<h:outputText value="#{cotiza.fc_creacion}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</p:column>
+
+						<p:column headerText="Tipo">
+							<h:outputText value="#{cotiza.desc_rubro}" />
+						</p:column>
+						<p:column style="width:22px">
+							<p:commandButton title="Borrar Prospección"
+								actionListener="#{ControladorCotizacionComercial.onRowDeletePros(cotiza)}"
+								update="frm_cotComercial:tab:listadoCotizaciones"
+								icon="ui-icon-circle-minus" style="width:19px" process="@this">
+							</p:commandButton>
+						</p:column>
+
+					</p:dataTable>
+				</p:tab>
+				<p:tab title="Adicionales">
 					<h:panelGrid columns="4">
 						<h:outputText value="Asunto" />
 						<p:inputText id="txtAsunto"
@@ -286,7 +807,7 @@
 							value="#{ControladorCotizacionComercial.observaciones}" />
 					</h:panelGrid>
 				</p:tab>
-				<p:tab title="Archivos Adjuntos">
+				<p:tab title="Archivos">
 					<h:panelGrid columns="2">
 						<p:row>
 							<p:row>
@@ -325,6 +846,7 @@
 								update="@this,frm_cotComercial:tab:dtArch" />
 							<p:panel id="photo">
 								<p:dataTable var="docu" id="dtArch"
+									style="font-family:Verdana; font-size: 10px;"
 									value="#{ControladorCotizacionComercial.lstArchivos}" rows="3"
 									paginator="true"
 									paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
@@ -355,8 +877,9 @@
 						</p:row>
 					</h:panelGrid>
 				</p:tab>
-				<p:tab title="Documentos Existentes">
+				<p:tab title="Documentos ">
 					<p:dataTable var="docu" id="dtArchExiste"
+						style="font-family:Verdana; font-size: 10px;"
 						value="#{ControladorCotizacionComercial.lstArchivosEx}" rows="3"
 						paginator="true"
 						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
@@ -368,10 +891,116 @@
 						</p:column>
 					</p:dataTable>
 				</p:tab>
+				<p:tab title="Correspondencia">
+					<p:panelGrid columns="4">
+						<h:outputText value="Tipo de Carta:" />
+						<p:selectOneMenu id="somTpCarta"
+							value="#{ControladorCotizacionComercial.nmCarta}">
+							<f:selectItem itemLabel="-- Seleccione --" itemValue="0" />
+							<f:selectItems
+								value="#{ControladorCotizacionComercial.lstRubrosCarta}"
+								var="cartaTp" itemValue="#{cartaTp.objeto_rubro}"
+								itemLabel="#{cartaTp.desc_rubro}">
+							</f:selectItems>
+							<p:ajax event="change" update="@this"
+								listener="#{ControladorCotizacionComercial.recuperaContactosCarta}"
+								process="@this" />
+						</p:selectOneMenu>
+						<h:outputText value="Notas:" />
+						<p:inputTextarea rows="3" cols="60" maxlength="2000"
+							autoResize="false" id="notAdeTxt"
+							value="#{ControladorCotizacionComercial.notasAdicionalesCarta}" />
+						<p:commandButton value="Generar Documento" id="btnSaveCarta"
+							update="@this" icon="ui-icon-document"
+							styleClass="ui-priority-primary"
+							process="@this,frm_cotComercial:tab:somTpCarta,frm_cotComercial:tab:notAdeTxt,frm_cotComercial:tab:cartaDt"
+							action="#{ControladorCotizacionComercial.guardaCarta}" />
+					</p:panelGrid>
+					<p:panel>
+						<p:dataTable id="cartaDt" var="contacto"
+							style="font-family:Verdana; font-size: 10px;"
+							value="#{ControladorCotizacionComercial.lstContactoCarta}"
+							paginator="true" rows="5"
+							paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+							rowsPerPageTemplate="5,10,15" widgetVar="marcaTable"
+							emptyMessage="No se encuentra datos relacionados"
+							selectionMode="single"
+							selection="#{ControladorCotizacionComercial.selectedContactoCarta}"
+							rowKey="#{contacto.cd_contacto}">
+							<f:facet name="header">
+					            Seleccione el Contacto para Generación del Documento
+					        </f:facet>
+							<p:column headerText="Nombre">
+								<h:outputText value="#{contacto.nombre_contacto}" />
+							</p:column>
+							<p:column headerText="Departamento">
+								<h:outputText value="#{contacto.departamento_contacto}" />
+							</p:column>
+							<p:column headerText="Cargo">
+								<h:outputText value="#{contacto.cargo_contacto}" />
+							</p:column>
+							<p:column headerText="Teléfono">
+								<h:outputText value="#{contacto.telefono_contacto}" />
+							</p:column>
+							<p:column headerText="Celular">
+								<h:outputText value="#{contacto.celular_contacto}" />
+							</p:column>
+							<p:column headerText="Correo">
+								<h:outputText value="#{contacto.mail_contacto}" />
+							</p:column>
+						</p:dataTable>
+					</p:panel>
+				</p:tab>
 			</p:tabView>
-			<h:panelGrid columns="2">
-				<p:commandButton value="Procesar" id="btnCotiza" icon="ui-icon-plus"
-					styleClass="ui-priority-primary"
+			<h:panelGrid columns="4">
+
+				<p:commandButton value="Enviar Upp/Actualiza" id="btnUpp"
+					icon="ui-icon-plus" styleClass="ui-priority-primary"
+					actionListener="#{ControladorCotizacionComercial.guardaProspecion}"
+					update="@this,:frm_cotComercial:clienteIdentif,:frm_cotComercial:clienteTipID,
+							:frm_cotComercial:clienteApePrimer,:frm_cotComercial:clienteApeSeg,:frm_cotComercial:clienteNomPrimer,
+							:frm_cotComercial:clienteNomSeg,:frm_cotComercial:clienteRazSoc,:frm_cotComercial:clienteEstCiv,
+							:frm_cotComercial:clienteFecNaci,:frm_cotComercial:clienteDir,:frm_cotComercial:clienteCiudad,
+							:frm_cotComercial:clienteSector,:frm_cotComercial:clienteProvincia,:frm_cotComercial:clienteProvincia,
+							:frm_cotComercial:clienteRef,:frm_cotComercial:clienteCiudadTelf,:frm_cotComercial:impNumTelf,
+							:frm_cotComercial:impNumTelfOfi,:frm_cotComercial:impExtTelf,:frm_cotComercial:impNumTelfCel,
+							:frm_cotComercial:impCorreoP,:frm_cotComercial:impNmConta,:frm_cotComercial:impNumTelfCont,
+							:frm_cotComercial:impNumCelCont,:frm_cotComercial:impCorreoPCont,:frm_cotComercial:impCargoCont,
+							:frm_cotComercial:impDepCont
+							:frm_cotComercial:tbViewDatos:aseguradoras,:frm_cotComercial:tbViewDatos:listaRamos,:frm_cotComercial:tbViewDatos:listPlanes,
+							:frm_cotComercial:tbViewDatos:listCanal,:frm_cotComercial:tbViewDatos:geconomico,:frm_cotComercial:tbViewDatos:listaEjecutivos,
+							:frm_cotComercial:tbViewDatos:vDesde,:frm_cotComercial:tbViewDatos:vHasta,:frm_cotComercial:tab:txtAsunto,
+							:frm_cotComercial:tab:intxtDescGes,:frm_cotComercial:tab:scmUsr,:frm_cotComercial:btnCotiza2,
+							frm_cotComercial:tbViewDatos:selOmItemAseg,frm_cotComercial:tbViewDatos:vhMonto,frm_cotComercial:tbViewDatos:vhTasa,
+							frm_cotComercial:tbViewDatos:vhFactor,frm_cotComercial:tbViewDatos:vhPrima,frm_cotComercial:tbViewDatos:vhMontoExt,
+							frm_cotComercial:tbViewDatos:vhMarca,frm_cotComercial:tbViewDatos:vhModelo,frm_cotComercial:tbViewDatos:vhAnio,
+							frm_cotComercial:tbViewDatos:slomFrmPago,frm_cotComercial:tbViewDatos:iptFrmPrimTot,frm_cotComercial:tbViewDatos:iptFrmPDerEmi,
+							frm_cotComercial:tbViewDatos:iptFrmSupBanco,frm_cotComercial:tbViewDatos:iptFrmSegCamp,frm_cotComercial:tbViewDatos:iptFrmIva,
+							frm_cotComercial:tbViewDatos:iptFrmCuotaIni,frm_cotComercial:tbViewDatos:iptFrmNumPago,frm_cotComercial:tab:listadoCotizaciones"
+					process="@this,:frm_cotComercial:clienteIdentif,:frm_cotComercial:clienteTipID,
+							:frm_cotComercial:clienteApePrimer,:frm_cotComercial:clienteApeSeg,:frm_cotComercial:clienteNomPrimer,
+							:frm_cotComercial:clienteNomSeg,:frm_cotComercial:clienteRazSoc,:frm_cotComercial:clienteEstCiv,
+							:frm_cotComercial:clienteFecNaci,:frm_cotComercial:clienteDir,:frm_cotComercial:clienteCiudad,
+							:frm_cotComercial:clienteSector,:frm_cotComercial:clienteProvincia,:frm_cotComercial:clienteProvincia,
+							:frm_cotComercial:clienteRef,:frm_cotComercial:clienteCiudadTelf,:frm_cotComercial:impNumTelf,
+							:frm_cotComercial:impNumTelfOfi,:frm_cotComercial:impExtTelf,:frm_cotComercial:impNumTelfCel,
+							:frm_cotComercial:impCorreoP,:frm_cotComercial:impNmConta,:frm_cotComercial:impNumTelfCont,
+							:frm_cotComercial:impNumCelCont,:frm_cotComercial:impCorreoPCont,:frm_cotComercial:impCargoCont,
+							:frm_cotComercial:impDepCont
+							:frm_cotComercial:tbViewDatos:aseguradoras,:frm_cotComercial:tbViewDatos:listaRamos,:frm_cotComercial:tbViewDatos:listPlanes,
+							:frm_cotComercial:tbViewDatos:listCanal,:frm_cotComercial:tbViewDatos:geconomico,:frm_cotComercial:tbViewDatos:listaEjecutivos,
+							:frm_cotComercial:tbViewDatos:vDesde,:frm_cotComercial:tbViewDatos:vHasta,:frm_cotComercial:tab:txtAsunto,
+							:frm_cotComercial:tab:intxtDescGes,:frm_cotComercial:tab:scmUsr,frm_cotComercial:clienteTipo,
+							
+							frm_cotComercial:tbViewDatos:selOmItemAseg,frm_cotComercial:tbViewDatos:vhMonto,frm_cotComercial:tbViewDatos:vhTasa,
+							frm_cotComercial:tbViewDatos:vhFactor,frm_cotComercial:tbViewDatos:vhPrima,frm_cotComercial:tbViewDatos:vhMontoExt,
+							frm_cotComercial:tbViewDatos:vhMarca,frm_cotComercial:tbViewDatos:vhModelo,frm_cotComercial:tbViewDatos:vhAnio,
+							frm_cotComercial:tbViewDatos:slomFrmPago,frm_cotComercial:tbViewDatos:iptFrmPrimTot,frm_cotComercial:tbViewDatos:iptFrmPDerEmi,
+							frm_cotComercial:tbViewDatos:iptFrmSupBanco,frm_cotComercial:tbViewDatos:iptFrmSegCamp,frm_cotComercial:tbViewDatos:iptFrmIva,
+							frm_cotComercial:tbViewDatos:iptFrmCuotaIni,frm_cotComercial:tbViewDatos:iptFrmNumPago
+							" />
+				<p:commandButton value="Enviar Emisión" id="btnCotiza"
+					icon="ui-icon-disk" styleClass="ui-priority-primary"
 					actionListener="#{ControladorCotizacionComercial.guardaCotizacion}"
 					update="@this,:frm_cotComercial:clienteIdentif,:frm_cotComercial:clienteTipID,
 							:frm_cotComercial:clienteApePrimer,:frm_cotComercial:clienteApeSeg,:frm_cotComercial:clienteNomPrimer,
@@ -383,10 +1012,17 @@
 							:frm_cotComercial:impCorreoP,:frm_cotComercial:impNmConta,:frm_cotComercial:impNumTelfCont,
 							:frm_cotComercial:impNumCelCont,:frm_cotComercial:impCorreoPCont,:frm_cotComercial:impCargoCont,
 							:frm_cotComercial:impDepCont
-							:frm_cotComercial:aseguradoras,:frm_cotComercial:listaRamos,:frm_cotComercial:listPlanes,
-							:frm_cotComercial:listCanal,:frm_cotComercial:geconomico,:frm_cotComercial:listaEjecutivos,
-							:frm_cotComercial:vDesde,:frm_cotComercial:vHasta,:frm_cotComercial:tab:txtAsunto,
-							:frm_cotComercial:tab:intxtDescGes,:frm_cotComercial:tab:scmUsr,:frm_cotComercial:btnCotiza2"
+							:frm_cotComercial:tbViewDatos:aseguradoras,:frm_cotComercial:tbViewDatos:listaRamos,:frm_cotComercial:tbViewDatos:listPlanes,
+							:frm_cotComercial:tbViewDatos:listCanal,:frm_cotComercial:tbViewDatos:geconomico,:frm_cotComercial:tbViewDatos:listaEjecutivos,
+							:frm_cotComercial:tbViewDatos:vDesde,:frm_cotComercial:tbViewDatos:vHasta,:frm_cotComercial:tab:txtAsunto,
+							:frm_cotComercial:tab:intxtDescGes,:frm_cotComercial:tab:scmUsr,:frm_cotComercial:btnCotiza2,
+							frm_cotComercial:tab:listadoCotizaciones,frm_cotComercial:tbViewDatos:selOmItemAseg,frm_cotComercial:tbViewDatos:vhMonto,
+							frm_cotComercial:tbViewDatos:vhTasa,
+							frm_cotComercial:tbViewDatos:vhFactor,frm_cotComercial:tbViewDatos:vhPrima,frm_cotComercial:tbViewDatos:vhMontoExt,
+							frm_cotComercial:tbViewDatos:vhMarca,frm_cotComercial:tbViewDatos:vhModelo,frm_cotComercial:tbViewDatos:vhAnio,
+							frm_cotComercial:tbViewDatos:slomFrmPago,frm_cotComercial:tbViewDatos:iptFrmPrimTot,frm_cotComercial:tbViewDatos:iptFrmPDerEmi,
+							frm_cotComercial:tbViewDatos:iptFrmSupBanco,frm_cotComercial:tbViewDatos:iptFrmSegCamp,frm_cotComercial:tbViewDatos:iptFrmIva,
+							frm_cotComercial:tbViewDatos:iptFrmCuotaIni,frm_cotComercial:tbViewDatos:iptFrmNumPago,frm_cotComercial:tab:listadoCotizaciones"
 					process="@this,:frm_cotComercial:clienteIdentif,:frm_cotComercial:clienteTipID,
 							:frm_cotComercial:clienteApePrimer,:frm_cotComercial:clienteApeSeg,:frm_cotComercial:clienteNomPrimer,
 							:frm_cotComercial:clienteNomSeg,:frm_cotComercial:clienteRazSoc,:frm_cotComercial:clienteEstCiv,
@@ -397,15 +1033,67 @@
 							:frm_cotComercial:impCorreoP,:frm_cotComercial:impNmConta,:frm_cotComercial:impNumTelfCont,
 							:frm_cotComercial:impNumCelCont,:frm_cotComercial:impCorreoPCont,:frm_cotComercial:impCargoCont,
 							:frm_cotComercial:impDepCont
-							:frm_cotComercial:aseguradoras,:frm_cotComercial:listaRamos,:frm_cotComercial:listPlanes,
-							:frm_cotComercial:listCanal,:frm_cotComercial:geconomico,:frm_cotComercial:listaEjecutivos,
-							:frm_cotComercial:vDesde,:frm_cotComercial:vHasta,:frm_cotComercial:tab:txtAsunto,
-							:frm_cotComercial:tab:intxtDescGes,:frm_cotComercial:tab:scmUsr,frm_cotComercial:clienteTipo
+							:frm_cotComercial:tbViewDatos:aseguradoras,:frm_cotComercial:tbViewDatos:listaRamos,:frm_cotComercial:tbViewDatos:listPlanes,
+							:frm_cotComercial:tbViewDatos:listCanal,:frm_cotComercial:tbViewDatos:geconomico,:frm_cotComercial:tbViewDatos:listaEjecutivos,
+							:frm_cotComercial:tbViewDatos:vDesde,:frm_cotComercial:tbViewDatos:vHasta,:frm_cotComercial:tab:txtAsunto,
+							:frm_cotComercial:tab:intxtDescGes,:frm_cotComercial:tab:scmUsr,frm_cotComercial:clienteTipo,frm_cotComercial:tbViewDatos:selOmItemAseg,
+							frm_cotComercial:tbViewDatos:vhMonto,frm_cotComercial:tbViewDatos:vhTasa,
+							frm_cotComercial:tbViewDatos:vhFactor,frm_cotComercial:tbViewDatos:vhPrima,frm_cotComercial:tbViewDatos:vhMontoExt,
+							frm_cotComercial:tbViewDatos:vhMarca,frm_cotComercial:tbViewDatos:vhModelo,frm_cotComercial:tbViewDatos:vhAnio,
+							frm_cotComercial:tbViewDatos:slomFrmPago,frm_cotComercial:tbViewDatos:iptFrmPrimTot,frm_cotComercial:tbViewDatos:iptFrmPDerEmi,
+							frm_cotComercial:tbViewDatos:iptFrmSupBanco,frm_cotComercial:tbViewDatos:iptFrmSegCamp,frm_cotComercial:tbViewDatos:iptFrmIva,
+							frm_cotComercial:tbViewDatos:iptFrmCuotaIni,frm_cotComercial:tbViewDatos:iptFrmNumPago
 							" />
-				<p:commandButton value="Guardar" id="btnCotiza2" icon="ui-icon-disk"
+				<p:commandButton value="Copiar" id="btnCopyCotiza"
+					icon="ui-icon-transferthick-e-w" styleClass="ui-priority-primary"
+					actionListener="#{ControladorCotizacionComercial.copyProspeccion}"
+					update="@this,:frm_cotComercial:clienteIdentif,:frm_cotComercial:clienteTipID,
+							:frm_cotComercial:clienteApePrimer,:frm_cotComercial:clienteApeSeg,:frm_cotComercial:clienteNomPrimer,
+							:frm_cotComercial:clienteNomSeg,:frm_cotComercial:clienteRazSoc,:frm_cotComercial:clienteEstCiv,
+							:frm_cotComercial:clienteFecNaci,:frm_cotComercial:clienteDir,:frm_cotComercial:clienteCiudad,
+							:frm_cotComercial:clienteSector,:frm_cotComercial:clienteProvincia,:frm_cotComercial:clienteProvincia,
+							:frm_cotComercial:clienteRef,:frm_cotComercial:clienteCiudadTelf,:frm_cotComercial:impNumTelf,
+							:frm_cotComercial:impNumTelfOfi,:frm_cotComercial:impExtTelf,:frm_cotComercial:impNumTelfCel,
+							:frm_cotComercial:impCorreoP,:frm_cotComercial:impNmConta,:frm_cotComercial:impNumTelfCont,
+							:frm_cotComercial:impNumCelCont,:frm_cotComercial:impCorreoPCont,:frm_cotComercial:impCargoCont,
+							:frm_cotComercial:impDepCont
+							:frm_cotComercial:tbViewDatos:aseguradoras,:frm_cotComercial:tbViewDatos:listaRamos,:frm_cotComercial:tbViewDatos:listPlanes,
+							:frm_cotComercial:tbViewDatos:listCanal,:frm_cotComercial:tbViewDatos:geconomico,:frm_cotComercial:tbViewDatos:listaEjecutivos,
+							:frm_cotComercial:tbViewDatos:vDesde,:frm_cotComercial:tbViewDatos:vHasta,:frm_cotComercial:tab:txtAsunto,
+							:frm_cotComercial:tab:intxtDescGes,:frm_cotComercial:tab:scmUsr,:frm_cotComercial:btnCotiza2,
+							frm_cotComercial:tab:listadoCotizaciones,frm_cotComercial:tbViewDatos:selOmItemAseg,frm_cotComercial:tbViewDatos:vhMonto,
+							frm_cotComercial:tbViewDatos:vhTasa,
+							frm_cotComercial:tbViewDatos:vhFactor,frm_cotComercial:tbViewDatos:vhPrima,frm_cotComercial:tbViewDatos:vhMontoExt,
+							frm_cotComercial:tbViewDatos:vhMarca,frm_cotComercial:tbViewDatos:vhModelo,frm_cotComercial:tbViewDatos:vhAnio,
+							frm_cotComercial:tbViewDatos:slomFrmPago,frm_cotComercial:tbViewDatos:iptFrmPrimTot,frm_cotComercial:tbViewDatos:iptFrmPDerEmi,
+							frm_cotComercial:tbViewDatos:iptFrmSupBanco,frm_cotComercial:tbViewDatos:iptFrmSegCamp,frm_cotComercial:tbViewDatos:iptFrmIva,
+							frm_cotComercial:tbViewDatos:iptFrmCuotaIni,frm_cotComercial:tbViewDatos:iptFrmNumPago,frm_cotComercial:tab:numCotizaBuscado"
+					process="@this,:frm_cotComercial:clienteIdentif,:frm_cotComercial:clienteTipID,
+							:frm_cotComercial:clienteApePrimer,:frm_cotComercial:clienteApeSeg,:frm_cotComercial:clienteNomPrimer,
+							:frm_cotComercial:clienteNomSeg,:frm_cotComercial:clienteRazSoc,:frm_cotComercial:clienteEstCiv,
+							:frm_cotComercial:clienteFecNaci,:frm_cotComercial:clienteDir,:frm_cotComercial:clienteCiudad,
+							:frm_cotComercial:clienteSector,:frm_cotComercial:clienteProvincia,:frm_cotComercial:clienteProvincia,
+							:frm_cotComercial:clienteRef,:frm_cotComercial:clienteCiudadTelf,:frm_cotComercial:impNumTelf,
+							:frm_cotComercial:impNumTelfOfi,:frm_cotComercial:impExtTelf,:frm_cotComercial:impNumTelfCel,
+							:frm_cotComercial:impCorreoP,:frm_cotComercial:impNmConta,:frm_cotComercial:impNumTelfCont,
+							:frm_cotComercial:impNumCelCont,:frm_cotComercial:impCorreoPCont,:frm_cotComercial:impCargoCont,
+							:frm_cotComercial:impDepCont
+							:frm_cotComercial:tbViewDatos:aseguradoras,:frm_cotComercial:tbViewDatos:listaRamos,:frm_cotComercial:tbViewDatos:listPlanes,
+							:frm_cotComercial:tbViewDatos:listCanal,:frm_cotComercial:tbViewDatos:geconomico,:frm_cotComercial:tbViewDatos:listaEjecutivos,
+							:frm_cotComercial:tbViewDatos:vDesde,:frm_cotComercial:tbViewDatos:vHasta,:frm_cotComercial:tab:txtAsunto,
+							:frm_cotComercial:tab:intxtDescGes,:frm_cotComercial:tab:scmUsr,frm_cotComercial:clienteTipo,frm_cotComercial:tbViewDatos:selOmItemAseg,
+							frm_cotComercial:tbViewDatos:vhMonto,frm_cotComercial:tbViewDatos:vhTasa,
+							frm_cotComercial:tbViewDatos:vhFactor,frm_cotComercial:tbViewDatos:vhPrima,frm_cotComercial:tbViewDatos:vhMontoExt,
+							frm_cotComercial:tbViewDatos:vhMarca,frm_cotComercial:tbViewDatos:vhModelo,frm_cotComercial:tbViewDatos:vhAnio,
+							frm_cotComercial:tbViewDatos:slomFrmPago,frm_cotComercial:tbViewDatos:iptFrmPrimTot,frm_cotComercial:tbViewDatos:iptFrmPDerEmi,
+							frm_cotComercial:tbViewDatos:iptFrmSupBanco,frm_cotComercial:tbViewDatos:iptFrmSegCamp,frm_cotComercial:tbViewDatos:iptFrmIva,
+							frm_cotComercial:tbViewDatos:iptFrmCuotaIni,frm_cotComercial:tbViewDatos:iptFrmNumPago,frm_cotComercial:tab:listadoCotizaciones
+							" />
+				<p:commandButton value="Salir" id="btnCotiza2" icon="ui-icon-home"
 					styleClass="ui-priority-primary"
 					disabled="#{ControladorCotizacionComercial.lbbtn}" process="@this"
 					action="/index.xhtml?faces-redirect=true" />
+
 			</h:panelGrid>
 		</p:row>
 	</h:panelGrid>

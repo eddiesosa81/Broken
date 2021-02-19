@@ -6,11 +6,31 @@
 <ui:composition template="/templates/Template.xhtml">
 	<ui:define name="tituloPagina">Facturación</ui:define>
 	<ui:define name="contenido">
+		<p:ajaxStatus
+			style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+			<f:facet name="start">
+				<p:graphicImage value="/images/ajax-loadercircle.gif" />
+			</f:facet>
+			<f:facet name="complete">
+				<h:outputText value="" />
+			</f:facet>
+		</p:ajaxStatus>
+		
 		<!-- FACTURAS -->
 		<h:form id="frm_Factura">
 			<p:growl showDetail="true" sticky="true">
 				<p:autoUpdate></p:autoUpdate>
 			</p:growl>
+			<p:menubar>
+				<p:menuitem value="Inicio" icon="ui-icon-home" url="/index.jsf"></p:menuitem>
+				<p:submenu label="Proceso" icon="ui-icon-wrench">
+					<p:menuitem value="Consolida Facturas"
+						url="/Broken/cobranzas/consolidaFactura.jsf"
+						icon="ui-icon-locked" />
+					
+				</p:submenu>
+
+			</p:menubar>
 			<ui:include src="/cobranzas/facturacion.xhtml" />
 		</h:form>
 		<p:dialog header="No. Factura Confia" widgetVar="numFactConfia"
@@ -20,12 +40,14 @@
 				<p:panelGrid columns="1">
 					<p:inputMask value="#{ControladorFacturas.numFactura}"
 						mask="999-999-999999999" style="width:100%" id="numFactConpt" />
+					<p:selectBooleanCheckbox value="#{ControladorFacturas.conIva}"
+						id="flgIva" itemLabel="IVA" />
 					<p:calendar id="fcFacCom"
 						value="#{ControladorFacturas.fcFacturaCom}" />
 					<p:commandButton value="Facturar" id="btnNumfact"
 						update="@this,frm_Factura:btnPrint,frm_Factura:dtCobranzaComisionFactura"
 						process="@this,frmNumFact:numFactConpt,frmNumFact:fcFacCom,
-					frm_Factura:dtCobranzaComisionFactura"
+					frm_Factura:dtCobranzaComisionFactura,frmNumFact:flgIva"
 						styleClass="ui-priority-primary" icon="ui-icon-clipboard"
 						action="#{ControladorFacturas.facturar}" />
 				</p:panelGrid>

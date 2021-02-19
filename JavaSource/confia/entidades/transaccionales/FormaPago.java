@@ -40,12 +40,14 @@ public class FormaPago {
 	private Double seguroCampesion_forma_Pago;
 	@Column(name="CUOTA_LETRA")
 	private Double cuotaLetraFormaPago;
-	@Column(name="sin_iva")
+	@Column(name="SIN_IVA")
 	private Integer sin_iva;
-	@Column(name="observaciones")
+	@Column(name="OBSERVACIONES")
 	private String observaciones;
-	@Column(name="otro_valor")
+	@Column(name="OTRO_VALOR")
 	private Double otro_valor_forma_Pago;
+	
+	
 	
 	
 	public Integer getCd_forma_Pago() {

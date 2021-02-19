@@ -12,13 +12,15 @@
 				var="ase" itemLabel="#{ase.razon_social_aseguradora}"
 				itemValue="#{ase.cd_aseguradora}" />
 		</p:selectOneMenu>
-
+	</h:panelGrid>
+	<h:panelGrid columns="3" cellpadding="5">
 		<p:commandButton value="Consultar" id="btnprefacturarAseg"
 			update="@this frm_Factura:dtCobranzaComisionFactura"
 			styleClass="ui-priority-primary" process="@this,frm_Factura:somAseg"
 			action="#{ControladorFacturas.consultaPreFactura}" />
-		<p:commandButton value="Total Comisiones Seleccionadas" id="btnprefactSum"
-			styleClass="ui-priority-primary" process="@this,frm_Factura:dtCobranzaComisionFactura"
+		<p:commandButton value="Total Comisiones Seleccionadas"
+			id="btnprefactSum" styleClass="ui-priority-primary"
+			process="@this,frm_Factura:dtCobranzaComisionFactura"
 			action="#{ControladorFacturas.sumaPreFacturaSel}" />
 		<p:commandButton value="Imprimir" id="btnPrint"
 			action="#{ControladorFacturas.execute()}" ajax="false"

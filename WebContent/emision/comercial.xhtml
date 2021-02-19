@@ -6,6 +6,15 @@
 <ui:composition template="/templates/Template.xhtml">
 	<ui:define name="tituloPagina">Módulo Comercial</ui:define>
 	<ui:define name="contenido">
+		<p:ajaxStatus
+			style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+			<f:facet name="start">
+				<p:graphicImage value="/images/ajax-loadercircle.gif" />
+			</f:facet>
+			<f:facet name="complete">
+				<h:outputText value="" />
+			</f:facet>
+		</p:ajaxStatus>
 		<h:form id="frm_cotComercial">
 			<p:growl showDetail="true" sticky="true">
 				<p:autoUpdate></p:autoUpdate>
@@ -15,7 +24,7 @@
 					url="/Broken/index.jsf"></p:menuitem>
 				<p:menuitem value="Salir" icon="ui-icon-cancel"
 					url="/Broken/index.jsf"></p:menuitem>
-					
+
 			</p:menubar>
 			<!-- CABECERA COTIZACION -->
 			<h:panelGroup layout="block">
@@ -24,6 +33,159 @@
 				</ui:fragment>
 			</h:panelGroup>
 			<!-- Fin CABECERA COTIZACION -->
+			<!-- Inicia Dialogo Coberturas -->
+			<p:dialog header="Coberturas" draggable="true" showEffect="fade"
+				hideEffect="fade" widgetVar="wDlgNuevaCobertura" closable="true">
+				<h:panelGrid columns="2">
+					<p:row>
+						<p:dataTable id="checkboxDTCob" var="cob"
+							value="#{ControladorCotizacionComercial.lstCoberturas}"
+							selection="#{ControladorCotizacionComercial.selectedLstCoberturas}"
+							rowKey="#{cob.cd_cobertura}" style="width:500px;"
+							scrollable="true" scrollHeight="150"
+							emptyMessage="No hay registros en la busqueda"
+							filteredValue="#{ControladorCotizacionComercial.lstFilteredCoberturas}">
+
+							<f:facet name="header">
+					            Coberturas
+					        </f:facet>
+							<p:column selectionMode="multiple"
+								style="width:16px;text-align:center" />
+
+							<p:column headerText="Descripción"
+								filterBy="#{cob.desc_cobertura}" sortBy="#{cob.desc_cobertura}"
+								filterMatchMode="contains">
+								<h:outputText value="#{cob.desc_cobertura}" />
+							</p:column>
+						</p:dataTable>
+					</p:row>
+					<p:row>
+						<h:panelGrid columns="2">
+							<h:outputText value="Porcentaje" />
+							<p:inputNumber value="#{ControladorCotizacionComercial.porcCob}"
+								id="inptNumPor"></p:inputNumber>
+							<h:outputText value="Valor" />
+							<p:inputNumber value="#{ControladorCotizacionComercial.valorCob}"
+								id="inptNumVal"></p:inputNumber>
+							<h:outputText value="Especificación" />
+							<p:inputText
+								value="#{ControladorCotizacionComercial.especificacionCob}"
+								id="inptEspCob"></p:inputText>
+						</h:panelGrid>
+					</p:row>
+				</h:panelGrid>
+				<p:commandButton icon="ui-icon-check" value="Guardar"
+					process="@this,frm_cotComercial:checkboxDTCob,frm_cotComercial:inptNumPor,frm_cotComercial:inptNumVal,frm_cotComercial:inptEspCob"
+					update="@this,frm_cotComercial:tbViewDatos:dtCobertura"
+					action="#{ControladorCotizacionComercial.guardaCobertura}">
+				</p:commandButton>
+			</p:dialog>
+			<p:dialog header="Deducibles" draggable="true" showEffect="fade"
+				hideEffect="fade" widgetVar="wDlgNuevoDeducible" closable="true">
+				<h:panelGrid columns="2">
+					<p:row>
+
+						<p:dataTable id="checkboxDTded" var="dedu"
+							value="#{ControladorCotizacionComercial.lstDeducibles}"
+							selection="#{ControladorCotizacionComercial.selectedlstDeducibles}"
+							rowKey="#{dedu.cd_deducible}" style="width:500px;"
+							scrollable="true" scrollHeight="150"
+							emptyMessage="No hay registros en la busqueda"
+							filteredValue="#{ControladorCotizacionComercial.lstFilteredDeducibles}">
+
+							<f:facet name="header">
+					            Deducibles
+					        </f:facet>
+							<p:column selectionMode="multiple"
+								style="width:16px;text-align:center" />
+
+							<p:column headerText="Descripción"
+								filterBy="#{dedu.desc_deducible}"
+								sortBy="#{dedu.desc_deducible}" filterMatchMode="contains">
+								<h:outputText value="#{dedu.desc_deducible}" />
+							</p:column>
+						</p:dataTable>
+					</p:row>
+					<p:row>
+						<h:panelGrid columns="2">
+							<h:outputText value="% Valor Siniestro" />
+							<p:inputNumber
+								value="#{ControladorCotizacionComercial.porcDedValSin}"
+								id="inptNumPorValSin"></p:inputNumber>
+							<h:outputText value="% Valor Asegurado" />
+							<p:inputNumber
+								value="#{ControladorCotizacionComercial.porcDedValAseg}"
+								id="inptNumPorValAseg"></p:inputNumber>
+							<h:outputText value="Valor Mínimo" />
+							<p:inputNumber
+								value="#{ControladorCotizacionComercial.valorDedMin}"
+								id="inptNumValMin"></p:inputNumber>
+							<h:outputText value="Valor Fijo" />
+							<p:inputNumber
+								value="#{ControladorCotizacionComercial.valorDedFijo}"
+								id="inptNumValFijo"></p:inputNumber>
+							<h:outputText value="Especificación" />
+							<p:inputText
+								value="#{ControladorCotizacionComercial.especificacionDed}"
+								id="inptEspDed"></p:inputText>
+						</h:panelGrid>
+					</p:row>
+				</h:panelGrid>
+				<p:commandButton icon="ui-icon-check" value="Guardar"
+					process="@this,,frm_cotComercial:checkboxDTded,frm_cotComercial:inptNumPorValSin,frm_cotComercial:inptNumPorValAseg,
+						frm_cotComercial:inptNumValFijo,frm_cotComercial:inptNumValMin,frm_cotComercial:inptEspDed"
+						 update="frm_cotComercial:tbViewDatos:dtDeducible"
+					action="#{ControladorCotizacionComercial.guardaDeducible}">
+				</p:commandButton>
+			</p:dialog>
+			<!-- Inicia Dialogo Clausulas -->
+			<p:dialog header="Cláusulas" draggable="true" showEffect="fade"
+				hideEffect="fade" widgetVar="wDlgNuevaClausula" closable="true">
+				<h:panelGrid columns="2">
+					<p:row>
+
+						<p:dataTable id="checkboxDTclau" var="clausu"
+							value="#{ControladorCotizacionComercial.lstClausulas}"
+							selection="#{ControladorCotizacionComercial.selectedlstClausulas}"
+							rowKey="#{clausu.cd_clausula}" style="width:500px;"
+							scrollable="true" scrollHeight="150"
+							emptyMessage="No hay registros en la busqueda"
+							filteredValue="#{ControladorCotizacionComercial.lstFilteredClausulas}">
+
+							<f:facet name="header">
+				            Cláusula
+				        </f:facet>
+							<p:column selectionMode="multiple"
+								style="width:16px;text-align:center" />
+
+							<p:column headerText="Descripción"
+								filterBy="#{clausu.desc_clausula}"
+								sortBy="#{clausu.desc_clausula}" filterMatchMode="contains">
+								<h:outputText value="#{clausu.desc_clausula}" />
+							</p:column>
+						</p:dataTable>
+					</p:row>
+					<p:row>
+						<h:panelGrid columns="2">
+							<h:outputText value="Porcentaje" />
+							<p:inputNumber value="#{ControladorCotizacionComercial.porcClau}"
+								id="inptNumPorCla"></p:inputNumber>
+							<h:outputText value="Valor" />
+							<p:inputNumber value="#{ControladorCotizacionComercial.valorClau}"
+								id="inptNumValCla"></p:inputNumber>
+							<h:outputText value="Especificación" />
+							<p:inputText value="#{ControladorCotizacionComercial.especificacionDCla}"
+								id="inptEspCla"></p:inputText>
+						</h:panelGrid>
+					</p:row>
+				</h:panelGrid>
+				<p:commandButton icon="ui-icon-check" value="Guardar"
+					process="@this,frm_cotComercial:checkboxDTclau,frm_cotComercial:inptNumPorCla,frm_cotComercial:inptNumValCla,frm_cotComercial:inptEspCla"
+					update="frm_cotComercial:tbViewDatos:dtClausulas"
+					action="#{ControladorCotizacionComercial.guardaClausula}">
+				</p:commandButton>
+			</p:dialog>
+
 		</h:form>
 	</ui:define>
 	<ui:define name="tituloFormulario">Módulo Comercial</ui:define>

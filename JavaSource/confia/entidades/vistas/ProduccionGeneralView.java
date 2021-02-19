@@ -105,8 +105,14 @@ public class ProduccionGeneralView {
 	@Column(name="FACTURADO_ASEGURADORA")
 	public String FACTURADO_ASEGURADORA;
 	
-	
-	
+	@Column(name="porcentaje_comision_canal")
+	public String porcentaje_comision_canal;
+	@Column(name="valor_comision_canal")
+	public String valor_comision_canal;
+	@Column(name="saldo_comision_canal")
+	public String saldo_comision_canal;
+	@Column(name="fecha_pago_comision_canal")
+	public String fecha_pago_comision_canal;
 	
 	
 	
@@ -386,6 +392,30 @@ public class ProduccionGeneralView {
 	}
 	public void setCd_comision_poliza(String cd_comision_poliza) {
 		this.cd_comision_poliza = cd_comision_poliza;
+	}
+	public String getPorcentaje_comision_canal() {
+		return porcentaje_comision_canal;
+	}
+	public void setPorcentaje_comision_canal(String porcentaje_comision_canal) {
+		this.porcentaje_comision_canal = porcentaje_comision_canal;
+	}
+	public String getValor_comision_canal() {
+		return valor_comision_canal;
+	}
+	public void setValor_comision_canal(String valor_comision_canal) {
+		this.valor_comision_canal = valor_comision_canal;
+	}
+	public String getSaldo_comision_canal() {
+		return saldo_comision_canal;
+	}
+	public void setSaldo_comision_canal(String saldo_comision_canal) {
+		this.saldo_comision_canal = saldo_comision_canal;
+	}
+	public String getFecha_pago_comision_canal() {
+		return fecha_pago_comision_canal;
+	}
+	public void setFecha_pago_comision_canal(String fecha_pago_comision_canal) {
+		this.fecha_pago_comision_canal = fecha_pago_comision_canal;
 	}
 	
 	

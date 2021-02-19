@@ -29,6 +29,14 @@ public class ServicioCaracteristicasVehiculos {
 	
 	}
 	
+	public CaracteristicasVehiculos recuperaCaractVH(int cdObjCo, int cdCompania) {
+		String sql = "select * from caracteristica_vehiculos_tbl where cd_compania = "+cdCompania+" and cd_obj_cotizacion = "+cdObjCo;
+		System.out.println("********************-----QUERY: " + sql);
+		Query q = em.createNativeQuery(sql, CaracteristicasVehiculos.class);
+		return (CaracteristicasVehiculos) q.getSingleResult();
+	
+	}
+	
 	public int existeCaracteristica(String codObjCot) {
 		Connection conn;
 		String sql;
