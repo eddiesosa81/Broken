@@ -256,6 +256,7 @@ public class ControladorCotizacionComercial {
 	private Double frmPagoTotal;
 	private Double frmPagoCuotaIni;
 	private Integer frmPagoNumPago;
+	private String frmObservaciones;
 
 	private CaracteristicasVehiculos datosCaracteristicasVehiculos;
 	private Ubicacion datosUbicacion;
@@ -1340,6 +1341,7 @@ public class ControladorCotizacionComercial {
 				formaPagoAux.setNum_alternativa_formaPago(tpFromaPago);
 				formaPagoAux.setPct_cuota_Inicial_frmPago(frmPagoCuotaIni);
 				formaPagoAux.setNum_pago_formaPago(frmPagoNumPago);
+				formaPagoAux.setObservaciones(frmObservaciones);
 
 				res = srvFormaPago.insertaFormaPago(formaPagoAux);
 				if (res == 0) {
@@ -1445,6 +1447,7 @@ public class ControladorCotizacionComercial {
 				formaPagoAux.setNum_alternativa_formaPago(tpFromaPago);
 				formaPagoAux.setPct_cuota_Inicial_frmPago(frmPagoCuotaIni);
 				formaPagoAux.setNum_pago_formaPago(frmPagoNumPago);
+				formaPagoAux.setObservaciones(frmObservaciones);
 
 				res = srvFormaPago.insertaFormaPago(formaPagoAux);
 				if (res == 0) {
@@ -1671,6 +1674,7 @@ public class ControladorCotizacionComercial {
 		frmPagoTotal = 0.00;
 		frmPagoCuotaIni = 0.00;
 		frmPagoNumPago = 0;
+		frmObservaciones = "";
 		srvStorePRocedure.actualizaMarcaModelo();
 		lstProspeccion = new ArrayList<ProspeccionesView>();
 	}
@@ -1771,6 +1775,7 @@ public class ControladorCotizacionComercial {
 		frmPagoIva = 0.00;
 		frmPagoTotal = 0.00;
 		frmPagoCuotaIni = 0.00;
+		frmObservaciones = "";
 		frmPagoNumPago = 0;
 
 		FacesContext context = FacesContext.getCurrentInstance();
@@ -2287,6 +2292,7 @@ public class ControladorCotizacionComercial {
 				formaPagoAux.setNum_alternativa_formaPago(tpFromaPago);
 				formaPagoAux.setPct_cuota_Inicial_frmPago(frmPagoCuotaIni);
 				formaPagoAux.setNum_pago_formaPago(frmPagoNumPago);
+				formaPagoAux.setObservaciones(frmObservaciones);
 
 				res = srvFormaPago.insertaFormaPago(formaPagoAux);
 				if (res == 0) {
@@ -2373,6 +2379,7 @@ public class ControladorCotizacionComercial {
 				formaPagoAux.setNum_alternativa_formaPago(tpFromaPago);
 				formaPagoAux.setPct_cuota_Inicial_frmPago(frmPagoCuotaIni);
 				formaPagoAux.setNum_pago_formaPago(frmPagoNumPago);
+				formaPagoAux.setObservaciones(frmObservaciones);
 
 				res = srvFormaPago.insertaFormaPago(formaPagoAux);
 				if (res == 0) {
@@ -2754,6 +2761,7 @@ public class ControladorCotizacionComercial {
 		frmPagoTotal = 0.00;
 		frmPagoCuotaIni = 0.00;
 		frmPagoNumPago = 0;
+		frmObservaciones = "";
 
 		srvStorePRocedure.actualizaMarcaModelo();
 	}
@@ -3024,6 +3032,11 @@ public class ControladorCotizacionComercial {
 			frmPagoNumPago = formaPagoAux.getNum_pago_formaPago();
 		} catch (Exception e) {
 			frmPagoNumPago = 0;
+		}
+		try {
+			frmObservaciones = formaPagoAux.getObservaciones();
+		} catch (Exception e) {
+			frmObservaciones = "";
 		}
 		System.err.println("HASta Aqui Bien");
 
@@ -3540,6 +3553,10 @@ public class ControladorCotizacionComercial {
 
 		srvCorrespondencia.insertarCorrespondencia(carta);
 		numeroCarta = srvCorrespondencia.numCartaMax(String.valueOf(usr.getUsrid()));
+		String codCorresInteger = srvCorrespondencia.codCorresMax(String.valueOf(usr.getUsrid()));
+		srvProcedures.genera_cuadro_Comparativo(codCorresInteger,String.valueOf(datosCotizacion.getCd_compania()));
+		
+		
 		FacesContext contextMsj = FacesContext.getCurrentInstance();
 		contextMsj.addMessage(null, new FacesMessage("Registro Exitoso", "Se Generó el Documento Número " + numeroCarta
 				+ ". Ingrese al Módulo de Correspondecia para Imprimirlo"));
@@ -4414,6 +4431,14 @@ public class ControladorCotizacionComercial {
 
 	public void setSelectedContactoCarta(Contacto selectedContactoCarta) {
 		this.selectedContactoCarta = selectedContactoCarta;
+	}
+
+	public String getFrmObservaciones() {
+		return frmObservaciones;
+	}
+
+	public void setFrmObservaciones(String frmObservaciones) {
+		this.frmObservaciones = frmObservaciones;
 	}
 
 }

@@ -708,5 +708,27 @@ public class servicioProcedures {
 		}
 
 	}
+	
+	public int genera_cuadro_Comparativo(String codCorrespondencia,String codComp) {
+		Connection conn;
+		// ejecuta el SP
+		try {
+			System.out.println(
+					"ORACLE PROCEDURE-> call genera_cuadro_comparativo_sp("+codCorrespondencia+","+codComp+")");
+			conn = ConectarBase.getOracleConnection();
+			String proc3StoredProcedure = "{ call genera_cuadro_comparativo_sp(?,?) }";
+			CallableStatement cs = conn.prepareCall(proc3StoredProcedure);
+			cs.setString(1, codCorrespondencia);
+			cs.setString(2, codComp);
+			cs.execute();
+			cs.close();
+			conn.close();
+			return 0;
+		} catch (Exception e) {
+			System.out.println("error " + e.getMessage());
+			return 1;
+		}
+
+	}
 
 }
