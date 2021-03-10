@@ -4338,8 +4338,12 @@ public class ControladorEmision {
 		int res = 0, existePol = 0;
 		String poliza, ane, fac, codCot = null, codCompania = null;
 		for (CotizacionesPendientes pol : lstEmitirPoliza) {
+			
 			codCot = Integer.toString(pol.getCd_cotizacion());
 			codCompania = Integer.toString(pol.getCd_compania());
+			// actualiza tipo de cliente
+			System.out.println("tipoCliente:"+tipoCliente);
+			srvCotizacion.actualizaTipoCliente(codCompania, codCot, tipoCliente);
 			poliza = pol.getPoliza();
 			ane = pol.getAnexo();
 			fac = pol.getFactura();

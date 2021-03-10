@@ -1,5 +1,6 @@
 package confia.servicios.transaccionales;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -69,6 +70,31 @@ public class ServicioCotizacion {
 
 	public void eliminaCotizacion(Cotizacion obj) {
 		em.remove(em.merge(obj));
+	}
+	
+	public int actualizaTipoCliente(String cdCompania, String cdCotizacion,String tipoCliente) {
+		Connection conn;
+		String sql;
+		int retorno = 0;
+		// ejecuta el update
+		try {
+			System.out.println("Ingreso datos ORACLE -> update pago_tbl");
+			conn = ConectarBase.getOracleConnection();
+			sql = "update cotizacion_tbl set tipo_cliente = '" + tipoCliente
+					+ "' where cd_compania = " + cdCompania
+					+ " and cd_cotizacion  = " + cdCotizacion;
+			System.out.println("QUERY update ->:" + sql);
+			CallableStatement cs = conn.prepareCall(sql);
+			cs.execute();
+			cs.close();
+			conn.close();
+			retorno = 1;
+		} catch (Exception e) {
+			System.out.println("error al actualizar : " + e.getMessage());
+			retorno = 0;
+		}
+
+		return retorno;
 	}
 
 }

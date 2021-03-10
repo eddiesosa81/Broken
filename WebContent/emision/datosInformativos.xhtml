@@ -55,12 +55,6 @@
 		<p:selectBooleanCheckbox
 			value="#{ControladorEmision.mismoSolicitante}"
 			disabled="#{ControladorEmision.flgActivaCotiza}" />
-		<h:outputText value="Tipo Cliente " />
-		<p:selectOneMenu id="codTpClie" value="#{ControladorEmision.tipoCliente}" style="width:125px">
-            <f:selectItem itemLabel="INDIVIDUAL" itemValue="INDIVIDUAL" />
-            <f:selectItem itemLabel="CORPORATIVO" itemValue="CORPORATIVO" />
-            <f:selectItem itemLabel="CANAL" itemValue="CANAL" />
-        </p:selectOneMenu>
 	</h:panelGrid>
 	<h:panelGrid columns="4" >
 		<h:outputText value="Obs.Gestión Comercial" />
@@ -76,7 +70,7 @@
 			disabled="#{ControladorEmision.flgActivaCotiza}">
 			<p:ajax event="change"
 				listener="#{ControladorEmision.listarRamosAseguradora}"
-				update="frm_emision:tab_emision:listaRamos,frm_emision:tab_emision:codTpClie" />
+				update="frm_emision:tab_emision:listaRamos" />
 			<f:selectItem itemValue="0" itemLabel="-- Seleccionar --" />
 			<f:selectItems var="aseguradoras"
 				value="#{ControladorEmision.listadoAseguradoras}"
@@ -127,7 +121,7 @@
 			pattern="dd/MM/yyyy" mask="true"
 			disabled="#{ControladorEmision.flgActivaCotiza}" mode="inline"
 			locale="de" navigator="true">
-			<p:ajax event="dateSelect" process="@this,frm_emision:tab_emision:codTpClie"
+			<p:ajax event="dateSelect" process="@this"
 				listener="#{ControladorEmision.asignaVigencia}" />
 		</p:calendar>
 		<p:row></p:row>
@@ -640,6 +634,14 @@
 	<p:dialog header="Aprobación de Póliza" draggable="true"
 		widgetVar="wemitePoliza" showEffect="fade" hideEffect="fade"
 		closable="false">
+		
+		<h:outputText value="Tipo Cliente " />
+		<p:selectOneMenu id="codTpClie" value="#{ControladorEmision.tipoCliente}" style="width:125px">
+            <f:selectItem itemLabel="INDIVIDUAL" itemValue="INDIVIDUAL" />
+            <f:selectItem itemLabel="CORPORATIVO" itemValue="CORPORATIVO" />
+            <f:selectItem itemLabel="CANAL" itemValue="CANAL" />
+        </p:selectOneMenu>
+        
 		<p:dataTable id="dtEmitePol" var="emite" scrollable="true"
 			scrollHeight="150" value="#{ControladorEmision.lstEmitirPoliza}"
 			editable="true"
@@ -733,7 +735,7 @@
 		</p:dataTable>
 		<p:commandButton value="Aprobar" update="@this"
 			actionListener="#{ControladorEmision.emitir}" icon="ui-icon-check"
-			process="@this,frm_emision:tab_emision:dtEmitePol"
+			process="@this,frm_emision:tab_emision:dtEmitePol,frm_emision:tab_emision:codTpClie"
 			action="/index.xhtml?faces-redirect=true" />
 	</p:dialog>
 	<!-- fin emision -->

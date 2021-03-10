@@ -3526,6 +3526,23 @@ public class ControladorCotizacionComercial {
 		nmUsr = usr.getUsrnombres();
 		nmUsr = nmUsr.concat(" ");
 		nmUsr = nmUsr.concat(usr.getUsrapellidos());
+		System.out.println("datosCotizacion.getCd_cotizacion():"+datosCotizacion.getCd_cotizacion());
+		System.out.println("datosCotizacion.getCd_compania():"+datosCotizacion.getCd_compania());
+		System.out.println("datosCotizacion.getCd_compania():"+datosCotizacion.getCd_compania());
+		System.out.println("datosCotizacion.getCd_aseguradora():"+datosCotizacion.getCd_aseguradora());
+		System.out.println("datosCotizacion.getCd_cliente():"+datosCotizacion.getCd_cliente());
+		System.out.println("objCarta.getCd_rubro():"+objCarta.getCd_rubro());
+		System.out.println("objCarta.getDesc_general():"+objCarta.getDesc_general());
+		System.out.println("objCarta.getNm_reporte():"+objCarta.getNm_reporte());
+		System.out.println("objCarta.getDesc_rubro():"+objCarta.getDesc_rubro());
+		System.out.println("objCarta.getReferenciaCarta():"+objCarta.getReferenciaCarta());
+		System.out.println(":notasAdicionalesCarta"+notasAdicionalesCarta);
+		System.out.println("nmUsr:"+nmUsr);
+		System.out.println("usr.getUsrid():"+usr.getUsrid());
+		System.out.println("usr.getCargo():"+usr.getCargo());
+		System.out.println("selectedContactoCarta:"+selectedContactoCarta);
+		
+		
 		Correspondencia carta = new Correspondencia();
 		carta.setCdCotizacion(datosCotizacion.getCd_cotizacion());
 		carta.setCd_compania(datosCotizacion.getCd_compania());
