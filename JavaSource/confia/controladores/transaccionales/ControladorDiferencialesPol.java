@@ -13,10 +13,13 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import org.primefaces.PrimeFaces;
+
 import confia.entidades.basicos.Aseguradoras;
 import confia.entidades.basicos.Subagentes;
 import confia.entidades.transaccionales.LiquidaDiferencial;
 import confia.entidades.vistas.ComisionDiferencialPolView;
+import confia.entidades.vistas.PrefacturarView;
 import confia.procedures.ProcedimientosAlmacenadosDB;
 import confia.reportes.AbstractReportBean;
 import confia.servicios.basicos.ServicioAseguradoras;
@@ -40,6 +43,8 @@ public class ControladorDiferencialesPol extends AbstractReportBean {
 	
 	private List<ComisionDiferencialPolView> lstComisionAsegPolView;
 	private List<ComisionDiferencialPolView> selectedLstComisionPolView;
+	private List<ComisionDiferencialPolView> lstSelectedCom;
+	
 	private ComisionDiferencialPolView selectedComisionPolView;
 	private List<Aseguradoras> lstAseguradoras;
 	private Aseguradoras selectedAseguradoras;
@@ -55,6 +60,7 @@ public class ControladorDiferencialesPol extends AbstractReportBean {
 	private String codSubagnete;
 	private Date fechaDesde;
 	private Date fechaHasta;
+	private String numFactura;
 	
 	public ControladorDiferencialesPol() {
 		lstComisionAsegPolView = new ArrayList<ComisionDiferencialPolView>();
@@ -80,7 +86,7 @@ public class ControladorDiferencialesPol extends AbstractReportBean {
 	}
 	@Override
 	protected Map<String, Object> getReportParameters() {
-		System.out.println("Numero Liquidación:"+num_liquidacion);
+		System.out.println("Numero Liquidaciï¿½n:"+num_liquidacion);
 		Map<String, Object> parametros = new HashMap<String, Object>();
 		parametros.put("numLiq", num_liquidacion);
 		return parametros;
@@ -126,10 +132,13 @@ public class ControladorDiferencialesPol extends AbstractReportBean {
 		FacesContext fContextObj = FacesContext.getCurrentInstance();
 		fContextObj.addMessage(null,
 				new FacesMessage("Advertencia", "Total diferencial seleccionado: "+String.valueOf(valSel)));
+		fContextObj.addMessage(null,
+				new FacesMessage("Advertencia", "Total pÃ³lizas seleccionado: "+String.valueOf(selectedLstComisionPolView.size())));
+		
 	}
 		
 	public void guardarComiAsegPol() {
-		System.out.println("Tamaño:"+selectedLstComisionPolView.size());
+		System.out.println("Tamaï¿½o:"+selectedLstComisionPolView.size());
 	
 		try {
 			if (selectedLstComisionPolView.size() == 0) {
@@ -145,16 +154,41 @@ public class ControladorDiferencialesPol extends AbstractReportBean {
 						new FacesMessage("Advertencia", "Seleccione registros para Generar el pago"));
 			return;
 		}	
+		System.out.println(selectedLstComisionPolView.size());
+		lstSelectedCom = new ArrayList<ComisionDiferencialPolView>();
+		lstSelectedCom = selectedLstComisionPolView;
+		PrimeFaces.current().executeScript("PF('numFactConfia').show()");
+		
+		
+	}
+	public void generaPago() {
+		try {
+			if(numFactura.isEmpty() || numFactura == null || numFactura.equals("")) {
+				FacesContext fContextObj = FacesContext.getCurrentInstance();
+				fContextObj.addMessage(null,
+						new FacesMessage("Advertencia", "Ingrese el NÃºmero de Factura"));
+				return;
+			}
+			
+		} catch (Exception e) {
+			FacesContext fContextObj = FacesContext.getCurrentInstance();
+			fContextObj.addMessage(null,
+					new FacesMessage("Advertencia", "Ingrese el NÃºmero de Factura"));
+			return;
+		}
+			System.out.println("Numero Factura:"+numFactura);
+			System.out.println(selectedLstComisionPolView.size());
 		Integer numLiq;
 		numLiq = srvLiquidaDiferencial.numLiqDif();
 		num_liquidacion = String.valueOf(numLiq);
 		System.out.println("NUMERO LIQ:"+num_liquidacion);
-		System.out.println("TMAÑp:"+selectedLstComisionPolView.size());
-		for (ComisionDiferencialPolView comDifPolLst : selectedLstComisionPolView) {
+		System.out.println("TMAï¿½p:"+lstSelectedCom.size());
+		for (ComisionDiferencialPolView comDifPolLst : lstSelectedCom) {
 			LiquidaDiferencial comDifPolAux = new LiquidaDiferencial();
 			comDifPolAux.setCd_comision_poliza(Integer.valueOf(comDifPolLst.getCd_comision_poliza()));
 			comDifPolAux.setCd_compania(Integer.valueOf(comDifPolLst.getCd_compania()));
 			comDifPolAux.setNum_liquidacion(numLiq);
+			comDifPolAux.setFactura(numFactura);
 			
 			srvLiquidaDiferencial.insertaComiDiferencial(comDifPolAux);
 	
@@ -163,6 +197,8 @@ public class ControladorDiferencialesPol extends AbstractReportBean {
 		FacesContext fContextObj = FacesContext.getCurrentInstance();
 		fContextObj.addMessage(null,
 				new FacesMessage("Advertencia", "Proceso exitoso No."+numLiq));
+		PrimeFaces.current().executeScript("PF('numFactConfia').hide()");
+		
 	}
 		
 	public void salir() {
@@ -300,6 +336,14 @@ public class ControladorDiferencialesPol extends AbstractReportBean {
 
 	public void setFechaHasta(Date fechaHasta) {
 		this.fechaHasta = fechaHasta;
+	}
+
+	public String getNumFactura() {
+		return numFactura;
+	}
+
+	public void setNumFactura(String numFactura) {
+		this.numFactura = numFactura;
 	}
 	
 }

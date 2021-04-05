@@ -337,14 +337,19 @@ public class ControladorCobranzas {
 		} catch (Exception ex) {
 			clienteCd = "%";
 		}
+		if (tipo.equals("MENSUALIZADO")) {
+			FacesContext fContextObj = FacesContext.getCurrentInstance();
+			fContextObj.addMessage(null, new FacesMessage("Advertencia",
+					"Para dar el pago diríjase al módulo Cobranzas Mensualizado"));
+		}
 		if (flgFactPerio == false) {
 			listaCuotasXCobrar = srvCuotas.listarCuotasXCobrar(clienteCd, poliza, factura, ramoCd, grpContratanteCd,
 					aseguradoraCd, fechaDesde, fechaHasta, condicion, tipo);
 		} else {
 			listaCuotasXCobrar = srvCuotas.listarCuotasXCobrarPeriodica(clienteCd, poliza, factura, ramoCd,
 					grpContratanteCd, aseguradoraCd, fechaDesde, fechaHasta, condicion, tipo);
-
 		}
+
 	}
 
 	public void sumaTotalCobranza() {

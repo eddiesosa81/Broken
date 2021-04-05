@@ -61,6 +61,26 @@ public class ControladorConsolidaFactura  {
 		return;
 
 	}
+	
+	public void eliminaIva() {
+		Double valSel = 0.0;
+
+		for (Factura factura : listFactura) {
+			valSel = factura.getVal_factura();
+			factura.setIva(0.00);
+			factura.setTot_factura(valSel);
+			srvFactura.actualizaFactura(factura);
+		}
+		
+		listFactura = new ArrayList<Factura>();
+		FacesContext fContextObj = FacesContext.getCurrentInstance();
+		fContextObj.addMessage(null,
+				new FacesMessage("Advertencia", "Proceso Exitoso"));
+		return;
+
+	}
+	
+	
 	public void consultaFactura() {
 		
 		if(tipo.equals("Pendiente")) {

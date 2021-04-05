@@ -22,6 +22,21 @@
 
 			<ui:include src="/cobranzas/comisionDiferenciales.xhtml" />
 		</h:form>
+		<p:dialog header="No. Factura Confia" widgetVar="numFactConfia"
+			appendTo="@(body)" modal="true" showEffect="fade" hideEffect="fade"
+			resizable="false">
+			<h:form id="frmNumFact">
+				<p:panelGrid columns="1">
+					<p:inputMask value="#{controladorDiferencialesPol.numFactura}"
+						mask="999-999-999999999" style="width:100%" id="numFactConpt" />
+					<p:commandButton value="Facturar" id="btnNumfact"
+						update="@this"
+						process="@this,frmNumFact:numFactConpt,frmDifPol:dtDifAsegComiPol"
+						styleClass="ui-priority-primary" icon="ui-icon-clipboard"
+						action="#{controladorDiferencialesPol.generaPago}" />
+				</p:panelGrid>
+			</h:form>
+		</p:dialog>
 	</ui:define>
 	<ui:define name="tituloFormulario">Diferenciales</ui:define>
 </ui:composition>

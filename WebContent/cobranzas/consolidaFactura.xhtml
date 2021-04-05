@@ -29,7 +29,7 @@
 				<f:selectItem itemLabel="Pendiente" itemValue="Pendiente" />
 				<f:selectItem itemLabel="Consolidado" itemValue="Consolidado" />
 			</p:selectOneRadio>
-			<h:panelGrid columns="4">
+			<h:panelGrid columns="5">
 				<p:commandButton id="btnBuscaCobranza" icon="fa fa-fw fa-search"
 					value="Buscar Facturas" 
 					update="frmConsolidaFact:dtFacturas"
@@ -47,6 +47,13 @@
 					title="Total Registros Seleccionados"
 					process="@this,frmConsolidaFact:dtFacturas"
 					action="#{ControladorConsolidaFactura.sumaRegistros}">
+				</p:commandButton>
+				<p:commandButton value="Elimina IVA" icon="ui-icon-calculator"
+				update="frmConsolidaFact:dtFacturas"
+					styleClass="ui-priority-primary"
+					title="Reversa Valor de IVA"
+					process="@this,frmConsolidaFact:dtFacturas"
+					action="#{ControladorConsolidaFactura.eliminaIva}">
 				</p:commandButton>
 				<p:commandButton value="Salir" id="btnSalir" icon="ui-icon-cancel"
 					styleClass="ui-priority-primary"

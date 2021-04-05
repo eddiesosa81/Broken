@@ -62,7 +62,7 @@ public class ServicioPagoDetallePago {
 		
 		String sql = "select * from pago_detalle_pago_view where cd_aseguradora = "+cdAseg
 				+"and factura_aseg like '%"+factAseg+"%' "
-				+"and FC_INI_VIGENCIA_MENSUAL_JUL >= "+llfcDesde+" "
+				+"and FC_FIN_VIGENCIA_MENSUAL_JUL >= "+llfcDesde+" "
 				+"and FC_FIN_VIGENCIA_MENSUAL_JUL <= "+llfcHasta+" "
 				+"and fc_ini_vigencia_mensual is not null and fc_fin_vigencia_mensual is not null "
 				+"order by  fc_ini_vigencia_mensual,nombre_corto_aseguradora,cliente";
@@ -100,7 +100,7 @@ public class ServicioPagoDetallePago {
 				
 		String sql = "select * from pago_detalle_pago_view where cd_aseguradora = "+cdAseg
 				+" and factura_aseg like '%"+factAseg+"%' and poliza like '%"+pol+"%' "
-				+"and FC_INI_VIGENCIA_MENSUAL_JUL >= "+llfcDesde+" "
+				+"and FC_FIN_VIGENCIA_MENSUAL_JUL >= "+llfcDesde+" "
 				+"and FC_FIN_VIGENCIA_MENSUAL_JUL <= "+llfcHasta+" "
 				+"and fc_ini_vigencia_mensual is not null and fc_fin_vigencia_mensual is not null "
 				+"order by  fc_ini_vigencia_mensual,nombre_corto_aseguradora,cliente";

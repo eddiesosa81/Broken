@@ -551,6 +551,32 @@ public class servicioProcedures {
 		}
 		return Integer.parseInt(resultado);
 	}
+	
+	
+	
+	public int compruebaPagoCanal(String numPoliza, String numFactura) {
+		Connection conn;
+		String sql;
+		Integer resultado = 0;
+		try {
+			conn = ConectarBase.getOracleConnection();
+			sql = "select pagoFacturaCanal ('"+numPoliza+"','"+numFactura+"') as pago from dual ";
+			PreparedStatement a = conn.prepareStatement(sql);
+			ResultSet res = a.executeQuery();
+			if (res.next()) {
+				resultado = res.getInt("pago");
+			}
+			res.close();
+			a.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			resultado = 0;
+		}
+		return resultado;
+	}
+	
+	
 	public int actualizaVigenciasCot(String codCot,String fcDesde,String fcHasta,String tipo,String noReno,String codEjecutivo) {
 		Connection conn;
 		// ejecuta el SP

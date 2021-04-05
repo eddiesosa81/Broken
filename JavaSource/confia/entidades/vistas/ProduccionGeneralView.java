@@ -113,10 +113,17 @@ public class ProduccionGeneralView {
 	public String saldo_comision_canal;
 	@Column(name="fecha_pago_comision_canal")
 	public String fecha_pago_comision_canal;
+	@Column(name="saldo_comision_broker")
+	public String saldo_comision_broker;
 	
 	
 	
-	
+	public String getSaldo_comision_broker() {
+		return saldo_comision_broker;
+	}
+	public void setSaldo_comision_broker(String saldo_comision_broker) {
+		this.saldo_comision_broker = saldo_comision_broker;
+	}
 	public String getANIO_VIG_DESDE() {
 		return ANIO_VIG_DESDE;
 	}

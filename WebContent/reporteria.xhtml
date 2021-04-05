@@ -1424,6 +1424,30 @@
 						</f:facet>
 						<h:outputText value="#{report.dias_tardanza_pago}" />
 					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="% Comisión Broke" />
+						</f:facet>
+						<h:outputText value="#{report.pct_comision_brk}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Valor Comisión Broker" />
+						</f:facet>
+						<h:outputText value="#{report.valor_com_brk}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Saldo Comisión Broker" />
+						</f:facet>
+						<h:outputText value="#{report.saldo_com_brk}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Tipo Cliente" />
+						</f:facet>
+						<h:outputText value="#{report.tipo_cliente}" />
+					</p:column>
 				</p:dataTable>
 			</p:panel>
 			<p:panel header="Exportar Datos" id="panel7"

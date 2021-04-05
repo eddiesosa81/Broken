@@ -78,9 +78,42 @@ public class ReporteCuotasIniImpaga {
 	private String fecha_vencimiento_jul;
 	@Column(name="DIAS_TARDANZA_PAGO")
 	private String dias_tardanza_pago;
+	@Column(name="pct_comision_brk")
+	private String pct_comision_brk;
+	@Column(name="valor_com_brk")
+	private String valor_com_brk;
+	@Column(name="saldo_com_brk")
+	private String saldo_com_brk;
+	@Column(name="tipo_cliente")
+	private String tipo_cliente;
 	
 	
 	
+	
+	public String getPct_comision_brk() {
+		return pct_comision_brk;
+	}
+	public void setPct_comision_brk(String pct_comision_brk) {
+		this.pct_comision_brk = pct_comision_brk;
+	}
+	public String getValor_com_brk() {
+		return valor_com_brk;
+	}
+	public void setValor_com_brk(String valor_com_brk) {
+		this.valor_com_brk = valor_com_brk;
+	}
+	public String getSaldo_com_brk() {
+		return saldo_com_brk;
+	}
+	public void setSaldo_com_brk(String saldo_com_brk) {
+		this.saldo_com_brk = saldo_com_brk;
+	}
+	public String getTipo_cliente() {
+		return tipo_cliente;
+	}
+	public void setTipo_cliente(String tipo_cliente) {
+		this.tipo_cliente = tipo_cliente;
+	}
 	public String getDias_tardanza_pago() {
 		return dias_tardanza_pago;
 	}

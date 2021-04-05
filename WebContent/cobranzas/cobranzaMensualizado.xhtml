@@ -77,7 +77,7 @@
 			</h:panelGrid>
 			<h:panelGrid columns="4" cellpadding="5">
 				<p:commandButton value="Buscar" id="btnBuscaCobranza"
-					icon="ui-icon-search" update="@this,frmCobMen:dataCuotasCobrar"
+					icon="ui-icon-search" update="frmCobMen:dataCuotasCobrar"
 					styleClass="ui-priority-primary"
 					action="#{ControladorCobranzaMensualizado.buscadorCuotas}"
 					process="@this,frmCobMen:txtContratanteCob,frmCobMen:txtNumPoliza,frmCobMen:gpContCobranzas,frmCobMen:maskDesde,
@@ -103,64 +103,55 @@
 					update="@this" />
 			</h:panelGrid>
 
-			<p:dataTable id="dataCuotasCobrar"
-				value="#{ControladorCobranzaMensualizado.listaCuotasXCobrar}"
-				selection="#{ControladorCobranzaMensualizado.selectedCuotasXCobrar}"
-				rowKey="#{cc.id}" var="cc" 
-				scrollable="true" scrollHeight="150"
-				style="font-family:Verdana; font-size: 10px;">
-				<p:column selectionMode="multiple"
-					style="width:16px;text-align:center" />
-
-				<f:facet name="header">
-				        Seleccione los registros a Pagar
-				</f:facet>
+				
+			<p:dataTable id="dataCuotasCobrar" var="cuotaSel" value="#{ControladorCobranzaMensualizado.listaCuotasXCobrar}"
+                     selection="#{ControladorCobranzaMensualizado.selectedCuotasXCobrar}" rowKey="#{cuotaSel.id}"
+                     style="margin-bottom:0" paginator="true" rows="20" selectionPageOnly="false">
+            <p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+				
 				<p:column headerText="Póliza" style="width:50px;text-align:center">
-					<h:outputText value="#{cc.poliza}" />
+					<h:outputText value="#{cuotaSel.poliza}" />
 				</p:column>
-				<p:column headerText="Factura Mensual"
-					style="width:110px;text-align:center">
-					<h:outputText value="#{cc.dfp_factura_aseguradora}" />
+				<p:column headerText="Factura Mensual">
+					<h:outputText value="#{cuotaSel.dfp_factura_aseguradora}" />
 				</p:column>
-				<p:column headerText="Cliente" style="width:100px;text-align:center">
-					<h:outputText value="#{cc.razon_social_cliente}" />
+				<p:column headerText="Cliente">
+					<h:outputText value="#{cuotaSel.razon_social_cliente}" />
 				</p:column>
-				<p:column headerText="Aseguradora"
-					style="width:80px;text-align:center">
-					<h:outputText value="#{cc.razon_social_aseguradora}" />
+				<p:column headerText="Aseguradora">
+					<h:outputText value="#{cuotaSel.razon_social_aseguradora}" />
 				</p:column>
 
-				<p:column headerText="No. Cuota"
-					style="width:80px;text-align:center">
-					<h:outputText value="#{cc.ncuotas}" />
+				<p:column headerText="No. Cuota">
+					<h:outputText value="#{cuotaSel.ncuotas}" />
 				</p:column>
 
-				<p:column headerText="Vencimiento Pago"
-					style="width:80px;text-align:center">
-					<h:outputText value="#{cc.fecha_vencimiento_date}">
+				<p:column headerText="Vencimiento Pago">
+					<h:outputText value="#{cuotaSel.fecha_vencimiento_date}">
 						<f:convertDateTime pattern="dd/MM/yyyy" />
 					</h:outputText>
 				</p:column>
-				<p:column headerText="Valor" style="width:50px;text-align:center">
-					<h:outputText value="#{cc.valor}" />
+				<p:column headerText="Valor">
+					<h:outputText value="#{cuotaSel.valor}" />
 				</p:column>
 
-				<p:column headerText="Saldo" style="width:50px;text-align:center">
-					<h:outputText value="#{cc.saldo}" />
+				<p:column headerText="Saldo">
+					<h:outputText value="#{cuotaSel.saldo}" />
 				</p:column>
-				<p:column headerText="Vigencia Desde"
-					style="width:80px;text-align:center">
-					<h:outputText value="#{cc.fc_inicio_vigencia}">
+				<p:column headerText="Vigencia Desde">
+					<h:outputText value="#{cuotaSel.fc_inicio_vigencia}">
 						<f:convertDateTime pattern="dd/MM/yyyy" />
 					</h:outputText>
 				</p:column>
-				<p:column headerText="Vigencia Hasta"
-					style="width:80px;text-align:center">
-					<h:outputText value="#{cc.fc_fin_vigencia}">
+				<p:column headerText="Vigencia Hasta">
+					<h:outputText value="#{cuotaSel.fc_fin_vigencia}">
 						<f:convertDateTime pattern="dd/MM/yyyy" />
 					</h:outputText>
 				</p:column>
 			</p:dataTable>
+
+
+
 			<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
 				<p:commandButton value="Si" type="button"
 					styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />

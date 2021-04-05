@@ -25,6 +25,17 @@ public class LiquidaDiferencial {
 	@Column(name="num_liquidacion")
 	private Integer num_liquidacion;
 	
+	@Column(name="factura")
+	private String  factura;
+	
+	
+	
+	public String getFactura() {
+		return factura;
+	}
+	public void setFactura(String factura) {
+		this.factura = factura;
+	}
 	public Integer getCd_liq_diferencial() {
 		return cd_liq_diferencial;
 	}

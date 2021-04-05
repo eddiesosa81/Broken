@@ -86,8 +86,8 @@ public class ControladorCobranzaMensualizado {
 		listaClientes = srvClientes.listaClientes("");
 
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-		String dateInString = "01-01-2017";
-		String dateFinString = "01-01-2021";
+		String dateInString = "01-01-2021";
+		String dateFinString = "31-01-2021";
 
 		try {
 
@@ -160,6 +160,9 @@ public class ControladorCobranzaMensualizado {
 
 		listaCuotasXCobrar = srvCuotas.listarCuotasXCobrarMensualizada(clienteCd, poliza, factura, ramoCd,
 				grpContratanteCd, aseguradoraCd, fechaDesde, fechaHasta, condicion, "1");
+		
+		System.out.println("SalioConsulta");
+		System.err.println(listaCuotasXCobrar.size());
 	}
 	public void valotTotalPago() {
 		List<CuotasXCobrar> lstSel = new ArrayList<CuotasXCobrar>();

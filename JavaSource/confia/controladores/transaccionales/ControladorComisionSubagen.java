@@ -26,6 +26,7 @@ import confia.entidades.basicos.Subagentes;
 import confia.entidades.transaccionales.DetallePagoCanal;
 import confia.entidades.vistas.ComiSubagenPolView;
 import confia.entidades.vistas.liquidacionCanalPolView;
+import confia.procedures.servicioProcedures;
 import confia.reportes.AbstractReportBean;
 import confia.servicios.basicos.ServicioAseguradoras;
 import confia.servicios.basicos.ServicioComisionSubagenPol;
@@ -52,6 +53,7 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 	private ServicioDetallePagoCanal srvDetallePagoCanal;
 	@EJB
 	private ServicioLiquidacionCanalPolView srvLiquidacionesCanal;
+	private servicioProcedures srvProcedures;
 
 	private List<ComiSubagenPolView> listComisionSubagenPol;
 	private List<ComiSubagenPolView> selectedListComiaionSubagenPol;
@@ -86,6 +88,7 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 		btnPrint = true;
 		listadoAseguradoras = new ArrayList<Aseguradoras>();
 		ls_num_liq = "";
+		srvProcedures = new servicioProcedures();
 
 	}
 
@@ -146,6 +149,8 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 	}
 
 	public void cargarComiSubagenPol() {
+		Boolean flgMensajeBoolean= false;
+		Integer respuestInteger;
 		try {
 			if (numFacturaAseg.isEmpty() || numFacturaAseg == null) {
 				numFacturaAseg = "%";
@@ -181,6 +186,25 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 		if (numFacturaAseg.equals("%") && numPoliza.equals("%")) {
 			listComisionSubagenPol = svrComisionSubagenPolView.consultaComiSubagenPolView(codSubagnete, numPoliza,
 					numFacturaAseg, codigoAseguradora);
+		}
+		
+		// verifica si existe datos
+		if(listComisionSubagenPol.size() >0) {
+			flgMensajeBoolean =  true;
+		}
+		
+		// verifica si la factura ya se encuentra pagada
+		if(!flgMensajeBoolean) {
+			respuestInteger = srvProcedures.compruebaPagoCanal(numPoliza, numFacturaAseg);
+			if(respuestInteger.equals(0)) {
+				FacesContext fContextObj = FacesContext.getCurrentInstance();
+				fContextObj.addMessage(null,
+						new FacesMessage("No Existe Comisión", "Comuníquese con el Administrador del Sistema" ));
+			}else if (respuestInteger.equals(1)) {
+				FacesContext fContextObj = FacesContext.getCurrentInstance();
+				fContextObj.addMessage(null,
+						new FacesMessage("Advertencia", "Comisión ya facturada." ));
+			}
 		}
 	}
 
