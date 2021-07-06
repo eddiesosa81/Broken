@@ -42,6 +42,25 @@ public class Gestion {
 	private String nm_usuario;
 	@Column(name="fecha_pago")
 	private Date fecha_pago;
+	@Column(name="medio")
+	private String medio;
+	@Column(name="cd_siniestro")
+	private Integer cd_siniestro;
+	
+	
+	
+	public Integer getCd_siniestro() {
+		return cd_siniestro;
+	}
+	public void setCd_siniestro(Integer cd_siniestro) {
+		this.cd_siniestro = cd_siniestro;
+	}
+	public String getMedio() {
+		return medio;
+	}
+	public void setMedio(String medio) {
+		this.medio = medio;
+	}
 	public Integer getCd_gestion() {
 		return cd_gestion;
 	}

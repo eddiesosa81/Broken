@@ -3,6 +3,7 @@ package confia.controladores.transaccionales;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -42,6 +43,7 @@ import confia.entidades.transaccionales.Correspondencia;
 import confia.entidades.transaccionales.DetalleSiniestros;
 import confia.entidades.transaccionales.DiagnosticoReclamo;
 import confia.entidades.transaccionales.DocumentoSiniestro;
+import confia.entidades.transaccionales.Gestion;
 import confia.entidades.transaccionales.PagoSiniestro;
 import confia.entidades.transaccionales.ProformaSiniestro;
 import confia.entidades.transaccionales.Reservas;
@@ -55,6 +57,7 @@ import confia.entidades.vistas.ConsultaUbicacionPolView;
 import confia.procedures.ProcedimientosAlmacenadosDB;
 import confia.procedures.servicioProcedures;
 import confia.reportes.EmailSenderService;
+import confia.reportes.MeetingSenderService;
 import confia.servicios.basicos.ServicioAseguradoras;
 import confia.servicios.basicos.ServicioCanton;
 import confia.servicios.basicos.ServicioCiudad;
@@ -78,6 +81,7 @@ import confia.servicios.transaccionales.ServicioCorrespondencia;
 import confia.servicios.transaccionales.ServicioDetalleSiniestro;
 import confia.servicios.transaccionales.ServicioDiagnosticoReclamo;
 import confia.servicios.transaccionales.ServicioDocumentoSiniestro;
+import confia.servicios.transaccionales.ServicioGestion;
 import confia.servicios.transaccionales.ServicioPagoSiniestro;
 import confia.servicios.transaccionales.ServicioProformaSiniestro;
 import confia.servicios.transaccionales.ServicioSiniestros;
@@ -162,6 +166,8 @@ public class ControladorSiniestros {
 	private ServicioEjecutivos srvEjecutivos;
 	@EJB
 	private ServicioRamo srvRamo;
+	@EJB
+	private ServicioGestion srvGestion;
 
 	private String numSinies;
 	private String polizaSinies;
@@ -277,6 +283,22 @@ public class ControladorSiniestros {
 	private String lscdRamo;
 	
 	private boolean caduca; 
+	
+	// gestion de seguimiento
+	
+	private Gestion gestion;
+	private List<Gestion> lstGestion;
+	private Date fcSeg;
+	private String[] selectedUsuarios;
+	private List<Usuarios> lstUsuarios;
+	private String usuarioId, nmUsr;
+	private Usuarios usr;
+	private String gestionContacto;
+	private String gestionMedio;
+	private String gestionInstruccion;
+	private List<Gestion> lstGestionGen;
+	
+	
 
 	public ControladorSiniestros() {
 		fcEstadoSiniestro = new Date();
@@ -315,6 +337,11 @@ public class ControladorSiniestros {
 		email = new EmailSenderService();
 		listAseguradoras = new ArrayList<Aseguradoras>();
 		lstRamo = new ArrayList<Ramo>();
+		lstGestion = new ArrayList<Gestion>();
+		gestion = new Gestion();
+		lstUsuarios = new ArrayList<Usuarios>();
+		lstGestionGen = new ArrayList<Gestion>();
+		
 
 	}
 
@@ -334,6 +361,16 @@ public class ControladorSiniestros {
 		cdParroquia = "0";
 		listAseguradoras = srvAseguradoras.BuscaAseguradoras();
 		lstRamo = srvRamo.listaRamos();
+		lstUsuarios = srvUsuario.listaUsuariosActivos();
+		
+		usuarioId = FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("USUARIO").toString();
+		System.out.println("USuario Logeado:" + usuarioId);
+		usr = new Usuarios();
+		usr = srvUsuario.recuperaUsuario(usuarioId);
+		nmUsr = usr.getUsrnombres();
+		nmUsr = nmUsr.concat(" ");
+		nmUsr = nmUsr.concat(usr.getUsrapellidos());
+		lstGestionGen = srvGestion.recuperaGestionSiniesGen();
 	}
 
 	public void buscaPoliza() {
@@ -515,7 +552,9 @@ public class ControladorSiniestros {
 		siniestro.setIdentificacion_cliente(selectedConsultaPoliza.getIdentificacion_cliente());
 		siniestro.setCd_subagente(Integer.valueOf(selectedConsultaPoliza.getCdSubagente()));
 		siniestro.setNm_subagente(selectedConsultaPoliza.getNmSubagente());
+		
 		res = srvSiniestros.insertarSiniestros(siniestro);
+		System.err.println("Inserta nuevo Sinistro:"+res);
 		if (res == 1) {
 			res = srvSiniestros.codigoMaxSiniestro();
 			siniestro = new Siniestros();
@@ -526,7 +565,7 @@ public class ControladorSiniestros {
 			// verirfico si el ramo es
 			// Ubicación o RamoCotizacion
 			Integer tpRam = srvRamo.tipoRamo(siniestro.getCdRamo());
-
+			System.err.println("tpRam Sinistro:"+tpRam);
 			if (tpRam.equals(1)) {
 				try {
 					plan = srvPlan.consultaPlanUbicacion(Integer.valueOf(selectedObjetosPoliza.getCd_obj_cotizacion()));
@@ -625,7 +664,7 @@ public class ControladorSiniestros {
 					+ "<o:p></o:p></span></p>"
 					+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
 					+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Por medio del presente se informa que el cliente "
-					+ siniestro.getNm_cliente() + " tuvo un siniestro con fecha " + siniestro.getFcCreacion()
+					+ siniestro.getNm_cliente() + " tuvo un siniestro con fecha " + siniestro.getFcSiniestro()
 					+ ", asignado el caso número " + siniestro.getCdSiniestro()
 					+ ", además se informa que se realiza el debido "
 					+ "seguimiento con el cliente para la continuidad de su proceso." + " <o:p></o:p></span></p>"
@@ -1392,7 +1431,7 @@ public class ControladorSiniestros {
 		}
 		lstReservas = new ArrayList<Reservas>();
 		lstReservas = srvReservas.recuperaReservasSinies(siniestro.getCdSiniestro(), siniestro.getCdCompania());
-		// a�ade la COMISON DE LA RASA SI ESTA EXISTE
+		// aóade la COMISON DE LA RASA SI ESTA EXISTE
 		if (reservas.getVal_rasa() > 0) {
 			ComisionesPoliza comPol = new ComisionesPoliza();
 			String aux = "RASA - No. Siniestro: ";
@@ -1427,7 +1466,7 @@ public class ControladorSiniestros {
 		siniestro.setCalifica_atencion(calificaSin);
 		srvSiniestros.actualizaSiniestros(siniestro);
 		// en caso de que sea poliza mensualizada
-		// verifica el pago pendiente del a�o en vigencia
+		// verifica el pago pendiente del aóo en vigencia
 		Integer resPolMen = 0;
 		Siniestros sinAux = new Siniestros();
 		sinAux = srvSiniestros.recuperaCodSiniestros(pagoSiniesttro.getCd_siniestro());
@@ -1475,7 +1514,7 @@ public class ControladorSiniestros {
 		}
 		lstReservas = new ArrayList<Reservas>();
 		lstReservas = srvReservas.recuperaReservasSinies(siniestro.getCdSiniestro(), siniestro.getCdCompania());
-		// a�ade la COMISON DE LA RASA SI ESTA EXISTE
+		// aóade la COMISON DE LA RASA SI ESTA EXISTE
 		if (reservas.getVal_rasa() > 0) {
 			ComisionesPoliza comPol = new ComisionesPoliza();
 			String aux = "RASA - No. Siniestro: ";
@@ -1511,7 +1550,7 @@ public class ControladorSiniestros {
 		srvSiniestros.actualizaSiniestros(siniestro);
 
 		// en caso de que sea poliza mensualizada
-		// verifica el pago pendiente del a�o en vigencia
+		// verifica el pago pendiente del aóo en vigencia
 		Integer resPolMen = 0;
 		Siniestros sinAux = new Siniestros();
 		sinAux = srvSiniestros.recuperaCodSiniestros(siniestro.getCdSiniestro());
@@ -1684,6 +1723,8 @@ public class ControladorSiniestros {
 		}
 
 		siniestro = srvSiniestros.recuperaCodSiniestros(selectedSiniestro.getCdSiniestro());
+		lstGestion = new ArrayList<Gestion>();
+		lstGestion = srvGestion.recuperaGestionSiniestro(siniestro.getCdSiniestro());
 		grupoContratante = new GrupoContratante();
 		grupoContratante = srvGrupoContratante.buscaGruposContratanteCrC(siniestro.getCdRamoCotizacion());
 
@@ -1876,6 +1917,276 @@ public class ControladorSiniestros {
 		lstParroquias = new ArrayList<Parroquia>();
 		lstParroquias = srvParroquia.listaParroquia(cdCanton);
 	}
+	
+	public void guardaGestion() {
+		System.out.println("INGRESO A GESTION");
+		Boolean flg = false;
+		
+
+		try {
+			if (gestion.getInstruccion().isEmpty() || gestion.getInstruccion() == null) {
+				gestion.setInstruccion("Sin Gestión de Siniestro");
+			}
+		} catch (Exception e) {
+			gestion.setInstruccion("Sin Gestión de Siniestro");
+		}
+		try {
+			System.out.println("ID:USUARIO:" + usuarioId);
+			gestion.setUsrid(usuarioId);
+			gestion.setNm_usuario(nmUsr);
+		} catch (Exception e) {
+			System.out.println("ERROR EN EL INGRESO DEL USUARIO");
+			gestion.setUsrid("S/N");
+			gestion.setNm_usuario("S/N");
+		}
+		gestion = new Gestion();
+		gestion.setContacto(gestionContacto);
+		gestion.setMedio(gestionMedio);
+		gestion.setInstruccion(gestionInstruccion);
+		gestion.setCd_siniestro(siniestro.getCdSiniestro());
+		gestion.setCd_ramo_cotizacion(Integer.valueOf(siniestro.getCdRamoCotizacion()));
+		gestion.setTipo("SINIESTRO");
+		gestion.setResultado("POSITIVO");
+		gestion.setFecha_seguimiento(fcSeg);
+		gestion.setNm_usuario(nmUsr);
+		gestion.setUsrid(usuarioId);
+
+		srvGestion.insertarGestion(gestion);
+		System.out.println("INSERTO GESTION");
+
+		
+		System.out.println("--Ingresa Meeting Request");
+		String user = "", ubc = "";
+		Boolean fec = true;
+		int cont = 0;
+		Date fcMeeting = new Date();
+		Date fcFin = new Date();
+		
+		for (String usrSel : selectedUsuarios) {
+			if (cont == 0) {
+				user = usrSel;
+				System.out.println("Destinatarios correo:" + user);
+			} else {
+				user = user.concat(",");
+				user = user.concat(usrSel);
+				System.out.println("Destinatarios correo:" + user);
+			}
+			cont = cont + 1;
+		}
+
+		// envio de mail
+		if (flg == false) {
+			ubc = "Gestión Sistema - Siniestro No. ";
+			ubc = ubc.concat(String.valueOf(siniestro.getCdSiniestro()));
+
+			email.setReceptor(user);
+			email.setSubject(ubc);
+			email.setTexto("<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
+					+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Estimad@<o:p></o:p></span></p>"
+					+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
+					+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Se ha generado una nueva gestión de Siniestros en el sistema"
+					+ " con las siguientes referencias:" + " <o:p></o:p></span></p>"
+
+					+ "<table class=MsoNormalTable border=0 cellpadding=0 width=600 style='width:450.0pt; mso-cellspacing:1.5pt;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt'>"
+					+ "<tr style='mso-yfti-irow:0;mso-yfti-firstrow:yes'>"
+					+ "<td colspan=2 style='background:#CFDFFF;padding:.75pt .75pt .75pt .75pt' >"
+					+ "<p class=MsoNormal><b><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
+					+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:Calibri;"
+					+ "mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
+					+ "mso-bidi-theme-font:minor-latin'>Descripción</span></b><span "
+					+ "style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:minor-latin;"
+					+ "mso-fareast-font-family:Times New Roman;mso-hansi-font-family:Calibri;"
+					+ "mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;mso-bidi-theme-font:"
+					+ "minor-latin'><o:p></o:p></span></p>" + "</td>" + "</tr>"
+
+					+ "<tr style='mso-yfti-irow:1'>"
+					+ "<td width=250 style='width:187.5pt;padding:.75pt .75pt .75pt .75pt'>"
+					+ "<p class=MsoNormal><b><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
+					+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:"
+					+ "Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
+					+ "mso-bidi-theme-font:minor-latin'>Siniestro No.:</span></b><span style='mso-ascii-font-family:"
+					+ "Calibri;mso-ascii-theme-font:minor-latin;mso-fareast-font-family:Times New Roman;"
+					+ "mso-hansi-font-family:Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:"
+					+ "Calibri;mso-bidi-theme-font:minor-latin'><o:p></o:p></span></p>" + "</td>"
+					+ "<td style='padding:.75pt .75pt .75pt .75pt'>"
+					+ "<p class=MsoNormal><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
+					+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:"
+					+ "Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
+					+ "mso-bidi-theme-font:minor-latin'>" + String.valueOf(siniestro.getCdSiniestro())
+					+ "<o:p></o:p></span></p>" + "</td>" + "</tr>"
+
+					
+
+					+ "<tr style='mso-yfti-irow:6'>"
+					+ "<td width=250 style='width:187.5pt;padding:.75pt .75pt .75pt .75pt'>"
+					+ "<p class=MsoNormal><b><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
+					+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:"
+					+ "Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
+					+ "mso-bidi-theme-font:minor-latin'>Contacto:</span></b><span style='mso-ascii-font-family:"
+					+ "Calibri;mso-ascii-theme-font:minor-latin;mso-fareast-font-family:Times New Roman;"
+					+ "mso-hansi-font-family:Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:"
+					+ "Calibri;mso-bidi-theme-font:minor-latin'><o:p></o:p></span></p>" + "</td>"
+					+ "<td style='padding:.75pt .75pt .75pt .75pt'>"
+					+ "<p class=MsoNormal><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
+					+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:"
+					+ "Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
+					+ "mso-bidi-theme-font:minor-latin'>" + gestion.getContacto()+ "<o:p></o:p></span></p>" + "</td>"
+					+ "</tr>"
+
+					+ "<tr style='mso-yfti-irow:6'>"
+					+ "<td width=250 style='width:187.5pt;padding:.75pt .75pt .75pt .75pt'>"
+					+ "<p class=MsoNormal><b><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
+					+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:"
+					+ "Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
+					+ "mso-bidi-theme-font:minor-latin'>Instrucción:</span></b><span style='mso-ascii-font-family:"
+					+ "Calibri;mso-ascii-theme-font:minor-latin;mso-fareast-font-family:Times New Roman;"
+					+ "mso-hansi-font-family:Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:"
+					+ "Calibri;mso-bidi-theme-font:minor-latin'><o:p></o:p></span></p>" + "</td>"
+					+ "<td style='padding:.75pt .75pt .75pt .75pt'>"
+					+ "<p class=MsoNormal><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
+					+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:"
+					+ "Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
+					+ "mso-bidi-theme-font:minor-latin'>" + gestion.getInstruccion() + "<o:p></o:p></span></p>" + "</td>" + "</tr>"
+
+					+ "<tr style='mso-yfti-irow:7'>"
+					+ "<td width=250 style='width:187.5pt;padding:.75pt .75pt .75pt .75pt'>"
+					+ "<p class=MsoNormal><b><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
+					+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:"
+					+ "Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
+					+ "mso-bidi-theme-font:minor-latin'>Fecha Seguimiento:</span></b><span style='mso-ascii-font-family:"
+					+ "Calibri;mso-ascii-theme-font:minor-latin;mso-fareast-font-family:Times New Roman;"
+					+ "mso-hansi-font-family:Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:"
+					+ "Calibri;mso-bidi-theme-font:minor-latin'><o:p></o:p></span></p>" + "</td>"
+					+ "<td style='padding:.75pt .75pt .75pt .75pt'>"
+					+ "<p class=MsoNormal><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
+					+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:"
+					+ "Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
+					+ "mso-bidi-theme-font:minor-latin'>" + gestion.getFecha_seguimiento() + "<o:p></o:p></span></p>"
+					+ "</td>" + "</tr>"
+
+					+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
+					+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'> " + " <o:p></o:p></span></p>"
+					+ "<p><strong>Nota: </strong>"
+					+ "Este mensaje ha sido generado automóticamente, por favor no lo responda." + "</p> ");
+			email.sendEmail();
+
+		} else {
+			System.out.println("---- ENVIO MEETING REQUEST ORGANIZADOR----");
+			// eMeeting.setSubject("Planificación de Reuniones");
+			/*try {
+				if (asunto.isEmpty() || asunto == null) {
+					asunto = "Gestión Sistema";
+				}
+			} catch (Exception e) {
+				asunto = "Gestión Sistema";
+			}
+			eMeeting.setSubject(asunto);
+			System.out.println("********* tema_subject*********" + asunto);
+
+			for (String usrSel : selectedUsuarios) {
+				if (cont == 0) {
+					user = usrSel;
+					System.out.println("Destinatarios correo:" + user);
+				} else {
+					user = user.concat(",");
+					user = user.concat(usrSel);
+					System.out.println("Destinatarios correo:" + user);
+				}
+				cont = cont + 1;
+			}
+			eMeeting.setReceptor(user);
+			ubc = "Gestión Sistema - Póliza: ";
+			ubc = ubc.concat(selectedConsultaPoliza.getPoliza());
+			ubc = ubc.concat(" Factura:");
+			ubc = ubc.concat(selectedConsultaPoliza.getFactura_aseguradora());
+			System.out.println("Ubicacion:" + ubc);
+			eMeeting.setUbicacion(ubc);
+
+			try {
+				if (gestion.getFecha_pago() == null) {
+					fec = false;
+				}
+			} catch (Exception e) {
+				fec = false;
+			}
+
+			if (fec) {
+				eMeeting.setCuerpo("<p> Este mensaje ha sido generado automóticamente, por favor no lo responda. </p>"
+						+ "<p>Estimad@,</p>" + "Se ha planificado un nuevo evento " + " con la siguiente referencia:"
+						+ " " + "<p><strong>Asunto: </strong>" + asunto + "</p> " + "<p><strong>Descripción: </strong>"
+						+ " " + gestion.getInstruccion() + "</p> " + "<p><strong>Fecha Pago: </strong>"
+						+ gestion.getFecha_pago() + "</p> " + "<p><strong>Cliente: </strong>"
+						+ selectedConsultaPoliza.getCliente() + "</p> " + "<p><strong>Póliza: </strong>"
+						+ selectedConsultaPoliza.getPoliza() + "</p> " + "<p><strong>Factura: </strong>"
+						+ selectedConsultaPoliza.getFactura_aseguradora() + "</p> " + "<p><strong>Ramo: </strong>"
+						+ selectedConsultaPoliza.getDesc_ramo() + "</p> " + "<p><strong>Aseguradora: </strong>"
+						+ selectedConsultaPoliza.getNombre_corto_aseguradora() + "</p> ");
+
+				eMeeting.setTitulo(asunto);
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(gestion.getFecha_pago());
+				calendar.add(Calendar.HOUR, 5);
+				fcMeeting = calendar.getTime();
+
+				Calendar calendarFin = Calendar.getInstance();
+				calendarFin.setTime(gestion.getFecha_pago());
+				calendarFin.add(Calendar.HOUR, 5);
+				fcFin = calendarFin.getTime();
+				System.out.println("FECHA AUMENTA HORA:" + fcMeeting);
+				System.out.println("FECHA FIN HORA:" + fcFin);
+			} else {
+				eMeeting.setCuerpo("<p> Este mensaje ha sido generado automóticamente, por favor no lo responda. </p>"
+						+ "<p>Estimad@,</p>" + "Se ha planificado un nuevo evento " + " con la siguiente referencia:"
+						+ " " + "<p><strong>Asunto: </strong>" + asunto + "</p> " + "<p><strong>Descripción: </strong>"
+						+ " " + gestion.getInstruccion() + "</p> " + "<p><strong>Fecha Seguimiento: </strong>"
+						+ gestion.getFecha_seguimiento() + "</p> " + "<p><strong>Cliente: </strong>"
+						+ selectedConsultaPoliza.getCliente() + "</p> " + "<p><strong>Póliza: </strong>"
+						+ selectedConsultaPoliza.getPoliza() + "</p> " + "<p><strong>Factura: </strong>"
+						+ selectedConsultaPoliza.getFactura_aseguradora() + "</p> " + "<p><strong>Ramo: </strong>"
+						+ selectedConsultaPoliza.getDesc_ramo() + "</p> " + "<p><strong>Aseguradora: </strong>"
+						+ selectedConsultaPoliza.getNombre_corto_aseguradora() + "</p> ");
+
+				eMeeting.setTitulo(asunto);
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(gestion.getFecha_seguimiento());
+				calendar.add(Calendar.HOUR, 5);
+				fcMeeting = calendar.getTime();
+
+				Calendar calendarFin = Calendar.getInstance();
+				calendarFin.setTime(gestion.getFecha_seguimiento());
+				calendarFin.add(Calendar.HOUR, 5);
+				fcFin = calendarFin.getTime();
+				System.out.println("FECHA AUMENTA HORA:" + fcMeeting);
+				System.out.println("FECHA FIN HORA:" + fcFin);
+			}
+
+			eMeeting.setStart(fcMeeting);
+			eMeeting.setEnd(fcFin);
+
+			eMeeting.sendMeeting();
+			eMeeting = new MeetingSenderService();
+		*/
+		}
+		gestion = new Gestion();
+		FacesContext context = FacesContext.getCurrentInstance();
+		context.addMessage(null, new FacesMessage("Advertencia", "Proceso Exitoso"));
+		gestionContacto = "CLIENTE";
+		gestionMedio  = "LLAMADA";
+		gestionInstruccion = null;
+		fcSeg  = null;
+		lstGestion = new ArrayList<Gestion>();
+		lstGestion = srvGestion.recuperaGestionSiniestro(siniestro.getCdSiniestro());
+
+	}
+	
+	public void onRowEditGestion(RowEditEvent<Gestion> event) {
+		Gestion auxGestion = new Gestion();
+		auxGestion = event.getObject();
+		srvGestion.actualizaGestion(auxGestion);
+		
+        FacesMessage msg = new FacesMessage("Registro Exitoso");
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }
 
 	public Contacto getSelectedContactoCarta() {
 		return selectedContactoCarta;
@@ -2643,6 +2954,78 @@ public class ControladorSiniestros {
 
 	public void setFilteredlstCoberturasPlan(List<CoberturasEmitidas> filteredlstCoberturasPlan) {
 		this.filteredlstCoberturasPlan = filteredlstCoberturasPlan;
+	}
+
+	public Gestion getGestion() {
+		return gestion;
+	}
+
+	public void setGestion(Gestion gestion) {
+		this.gestion = gestion;
+	}
+
+	public List<Gestion> getLstGestion() {
+		return lstGestion;
+	}
+
+	public void setLstGestion(List<Gestion> lstGestion) {
+		this.lstGestion = lstGestion;
+	}
+
+	public Date getFcSeg() {
+		return fcSeg;
+	}
+
+	public void setFcSeg(Date fcSeg) {
+		this.fcSeg = fcSeg;
+	}
+
+	public String[] getSelectedUsuarios() {
+		return selectedUsuarios;
+	}
+
+	public void setSelectedUsuarios(String[] selectedUsuarios) {
+		this.selectedUsuarios = selectedUsuarios;
+	}
+
+	public List<Usuarios> getLstUsuarios() {
+		return lstUsuarios;
+	}
+
+	public void setLstUsuarios(List<Usuarios> lstUsuarios) {
+		this.lstUsuarios = lstUsuarios;
+	}
+
+	public String getGestionContacto() {
+		return gestionContacto;
+	}
+
+	public void setGestionContacto(String gestionContacto) {
+		this.gestionContacto = gestionContacto;
+	}
+
+	public String getGestionMedio() {
+		return gestionMedio;
+	}
+
+	public void setGestionMedio(String gestionMedio) {
+		this.gestionMedio = gestionMedio;
+	}
+
+	public String getGestionInstruccion() {
+		return gestionInstruccion;
+	}
+
+	public void setGestionInstruccion(String gestionInstruccion) {
+		this.gestionInstruccion = gestionInstruccion;
+	}
+
+	public List<Gestion> getLstGestionGen() {
+		return lstGestionGen;
+	}
+
+	public void setLstGestionGen(List<Gestion> lstGestionGen) {
+		this.lstGestionGen = lstGestionGen;
 	}
 	
 

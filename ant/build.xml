@@ -27,7 +27,7 @@
 		<pathelement path="${webinf.dir}/lib/jsf-tlds.jar" />
 		<pathelement path="${webinf.dir}/lib/jstl.jar" />
 		<pathelement path="${webinf.dir}/lib/standard.jar" />
-		<pathelement path="${webinf.dir}/lib/primefaces-8.0.1.jar" />
+		<pathelement path="${webinf.dir}/lib/primefaces-10.0.4.jar" />
 		<!-- Classpath EJB -->
 		<pathelement path="${jboss.home}/modules/javax/ejb/api/main/jboss-ejb-api_3.1_spec-1.0.1.Final.jar" />
 		<pathelement path="${jboss.home}/modules/javax/persistence/api/main/hibernate-jpa-2.0-api-1.0.1.Final.jar" />

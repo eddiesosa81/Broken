@@ -24,14 +24,16 @@ public class ServicioPreFacturaDetalleView {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<PreFacturaDetalleView> lstPreFacturaDetalleViewLiq(String codClie, String codAseg, String lscdRamo,
-			String fcDesde, String fcHasta) {
+	public List<PreFacturaDetalleView> lstPreFacturaDetalleViewLiq(String codClie, String codAseg, 
+			String lscdRamo,
+			String fcDesde, String fcHasta, String codGrpContr) {
 		String sql = "select * from prefacturadetalle_view" 
 				+ " where to_char(cd_cliente) like '" + codClie + "'"
 				+ " and to_char(cd_aseguradora) like '" + codAseg + "'" 
 				+ " and to_char(cd_ramo) like '" + lscdRamo+ "'" 
 				+ " and fechajuliana_func(fc_pre_factura) >= fechajuliana_func('" + fcDesde + "')"
-				+ " and fechajuliana_func(fc_pre_factura) <= fechajuliana_func('" + fcHasta + "')";
+				+ " and fechajuliana_func(fc_pre_factura) <= fechajuliana_func('" + fcHasta + "')"
+				+ " and cd_grupo_contratante like '"+codGrpContr+"'";
 		System.out.println("SQL --->" + sql);
 		Query query = em.createNativeQuery(sql, PreFacturaDetalleView.class);
 

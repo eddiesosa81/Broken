@@ -41,7 +41,7 @@
 					styleClass="ui-priority-primary" />
 			</h:panelGrid>
 			<p:dataTable id="dtSinies" var="sinies" scrollable="true"
-				scrollHeight="80" value="#{ControladorSiniestros.lstSiniestro}"
+				scrollHeight="280" value="#{ControladorSiniestros.lstSiniestro}"
 				selectionMode="single"
 				selection="#{ControladorSiniestros.selectedSiniestro}"
 				rowKey="#{sinies.cdSiniestro}"
@@ -133,7 +133,8 @@
 							frm_siniestros:tabSiniestroEdt:caldFcAutEdt
 							frm_siniestros:tabSiniestroEdt:siniesProvinciaEdt 
 							frm_siniestros:tabSiniestroEdt:siniesCantonEdt 
-							frm_siniestros:tabSiniestroEdt:siniesParroquiaEdt "
+							frm_siniestros:tabSiniestroEdt:siniesParroquiaEdt 
+							frm_siniestros:tabSiniestroEdt:tblgesT"
 						action="#{ControladorSiniestros.editaSiniestroExistente}"
 						value="Editar" icon="ui-icon-pencil"
 						process="@this,frm_siniestros:tbViewSinies:dtSinies">
@@ -241,6 +242,42 @@
 				</f:facet>
 			</p:dataTable>
 		</p:tab>
+		<p:tab title="Gestión Siniestros">
+			<p:dataTable var="ges" id="tblgesTPrin"
+				value="#{ControladorSiniestros.lstGestionGen}" rows="10"
+				paginator="true"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="10,15,20,30"
+				style="font-family:Verdana; font-size: 10px;">
+
+				<p:column headerText="No.Siniestro">
+					<h:outputText value="#{ges.cd_siniestro}" />
+				</p:column>
+				<p:column headerText="Fecha Contacto">
+					<h:outputText value="#{ges.fecha_contacto}">
+						<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+					</h:outputText>
+				</p:column>
+
+				<p:column headerText="Gestiona">
+					<h:outputText value="#{ges.contacto}" />
+				</p:column>
+
+				<p:column headerText="Tipo">
+					<h:outputText value="#{ges.medio}" />
+				</p:column>
+
+				<p:column headerText="Descripción">
+					<h:outputText value="#{ges.instruccion}" />
+				</p:column>
+
+				<p:column headerText="Fecha Seguimiento">
+					<h:outputText value="#{ges.fecha_seguimiento}">
+						<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+					</h:outputText>
+				</p:column>
+			</p:dataTable>
+		</p:tab>
 	</p:tabView>
 	<!-- COntraseña de Edición-->
 	<p:dialog header="" draggable="true"
@@ -302,15 +339,15 @@
 
 	<!-- Inicia Dialogo Liquidacion de Objeto-->
 	<p:dialog header="Registro Documento del Siniestro"
-		widgetVar="DocAdcSinies" 
-		showEffect="fade" hideEffect="fade" resizable="false">
-			<p:inputTextarea rows="3" style="width: 100%"
-				value="#{ControladorSiniestros.docAdcSiniestro}" id="txtDocAdcSin"></p:inputTextarea>
-			<p:separator />
-			<p:commandButton value="Añadir" id="btnDocAdc"
-				update="@this,frm_siniestros:tabSiniestro:dtDocuSinies,frm_siniestros:tabSiniestroEdt:dtDocuSinies"
-				styleClass="ui-priority-primary" icon="ui-icon-document-b"
-				process="@this,frm_siniestros:txtDocAdcSin"
-				action="#{ControladorSiniestros.guardaDocAdc}" />
+		widgetVar="DocAdcSinies" showEffect="fade" hideEffect="fade"
+		resizable="false">
+		<p:inputTextarea rows="3" style="width: 100%"
+			value="#{ControladorSiniestros.docAdcSiniestro}" id="txtDocAdcSin"></p:inputTextarea>
+		<p:separator />
+		<p:commandButton value="Añadir" id="btnDocAdc"
+			update="@this,frm_siniestros:tabSiniestro:dtDocuSinies,frm_siniestros:tabSiniestroEdt:dtDocuSinies"
+			styleClass="ui-priority-primary" icon="ui-icon-document-b"
+			process="@this,frm_siniestros:txtDocAdcSin"
+			action="#{ControladorSiniestros.guardaDocAdc}" />
 	</p:dialog>
 </ui:composition>

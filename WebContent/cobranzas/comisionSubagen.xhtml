@@ -138,7 +138,7 @@
 		<p:column headerText="Total asegurado" style="width:80px">
 			<h:outputText value="#{polSuba.total_asegurado}" />
 		</p:column>
-		<p:column headerText="Total prima" style="width:80px">
+		<p:column headerText="Prima Neta" style="width:80px">
 			<h:outputText value="#{polSuba.total_prima}" />
 		</p:column>
 		<p:column headerText="% Comisión Brk" style="width:80px">
@@ -159,7 +159,7 @@
 					<h:outputText value="#{polSuba.pct_com_suba}" />
 				</f:facet>
 				<f:facet name="input">
-					<p:inputText value="#{polSuba.pct_com_suba}" style="width:100%" />
+					<p:inputNumber value="#{polSuba.pct_com_suba}" style="width:100%" />
 				</f:facet>
 			</p:cellEditor>
 		</p:column>
@@ -169,7 +169,7 @@
 					<h:outputText value="#{polSuba.val_com_suba}" />
 				</f:facet>
 				<f:facet name="input">
-					<p:inputText value="#{polSuba.val_com_suba}" style="width:100%" />
+					<p:inputNumber value="#{polSuba.val_com_suba}" style="width:100%" />
 				</f:facet>
 			</p:cellEditor>
 		</p:column>

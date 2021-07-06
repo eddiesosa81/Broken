@@ -34,6 +34,7 @@ import confia.entidades.vistas.ReporteCanalesView;
 import confia.entidades.vistas.ReporteComisionPendteView;
 import confia.entidades.vistas.ReporteComisionesLiquidadasView;
 import confia.entidades.vistas.ReporteCuotasIniImpaga;
+import confia.entidades.vistas.ReporteGestionSiniestrosView;
 import confia.entidades.vistas.ReporteRepositorio;
 import confia.entidades.vistas.ReporteRepositorioSiniestro;
 import confia.entidades.vistas.ReporteSiniestralidadView;
@@ -59,6 +60,7 @@ import confia.servicios.vistas.ServicioReporteCanalesView;
 import confia.servicios.vistas.ServicioReporteComisionPendteView;
 import confia.servicios.vistas.ServicioReporteComisionesLiquidadasView;
 import confia.servicios.vistas.ServicioReporteCuotasIniImpaga;
+import confia.servicios.vistas.ServicioReporteGestionSiniestrosView;
 import confia.servicios.vistas.ServicioReporteSiniestralidadView;
 import confia.servicios.vistas.ServicioReporteSiniestroView;
 import confia.servicios.vistas.ServicioReporteVencimientoMenView;
@@ -116,6 +118,8 @@ public class ControladorReporteria {
 	private ServicioPreFacturaDetalleView srvPreFacturaDetalleView;
 	@EJB
 	private ServicioProspecciones srvProspecciones;
+	@EJB
+	private ServicioReporteGestionSiniestrosView srvGestionSiniestros;
 
 	public String lscdAseguradora;
 	private List<Aseguradoras> listAseguradoras;
@@ -173,6 +177,8 @@ public class ControladorReporteria {
 	public Boolean flgProspeccionBoolean;
 	public List<ProspeccionesView> lstProspeccionesViews;
 	
+	public Boolean flgRepGestSiniestro; 
+	public List<ReporteGestionSiniestrosView> lstReporteGestionSiniestrosView;
 
 	public ControladorReporteria() {
 		listAseguradoras = new ArrayList<Aseguradoras>();
@@ -216,6 +222,8 @@ public class ControladorReporteria {
 		lstprefacturadetalleView = new ArrayList<PreFacturaDetalleView>();
 		flgProspeccionBoolean = false;
 		lstProspeccionesViews = new ArrayList<ProspeccionesView>();
+		flgRepGestSiniestro = false;
+		lstReporteGestionSiniestrosView = new ArrayList<ReporteGestionSiniestrosView>();
 	}
 
 	@PostConstruct
@@ -275,6 +283,7 @@ public class ControladorReporteria {
 				flgRepVencimientoMens = false;
 				flgPreFacturaDetalleBoolean = false;
 				flgProspeccionBoolean = false;
+				flgRepGestSiniestro = false;
 
 				List<ProduccionEmitidaView> lstRepProdEmi = new ArrayList<ProduccionEmitidaView>();
 				lstRepProdEmi = srvProduccionEmitida.recuperaPRoduccionEmitida(lscdCliente, lscdGrupoContratante,
@@ -338,6 +347,7 @@ public class ControladorReporteria {
 				flgRepVencimientoMens = false;
 				flgPreFacturaDetalleBoolean = false;
 				flgProspeccionBoolean = false;
+				flgRepGestSiniestro = false;
 
 				lstProdEmiMEnsualizado = new ArrayList<ProduccionEmitidaMensualizadoView>();
 				lstProdEmiMEnsualizado = srvProdEmitidaMensual.recuperaPRoduccionEmitidaMensualizada(lscdCliente,
@@ -365,6 +375,7 @@ public class ControladorReporteria {
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
 			flgProspeccionBoolean = false;
+			flgRepGestSiniestro = false;
 
 			List<ProduccionPagadaView> lstRepProdPag = new ArrayList<ProduccionPagadaView>();
 			lstRepProdPag = srvProdPagada.recuperaProduccionPagadaView(lscdCliente, lscdGrupoContratante,
@@ -425,6 +436,7 @@ public class ControladorReporteria {
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
 			flgProspeccionBoolean = false;
+			flgRepGestSiniestro = false;
 
 			List<ProduccionPendientePagoView> lstRepProdPenPago = new ArrayList<ProduccionPendientePagoView>();
 			lstRepProdPenPago = srvProdPrenPago.recuperaProduccionPendientePago(lscdCliente, lscdGrupoContratante,
@@ -486,6 +498,7 @@ public class ControladorReporteria {
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
 			flgProspeccionBoolean = false;
+			flgRepGestSiniestro = false;
 
 			List<ReporteRepositorioSiniestro> lstRepGenSinies = new ArrayList<ReporteRepositorioSiniestro>();
 			lstRepGenSinies = srvRepGeneralSiniestro.recuperaReporteRepositorioSiniestro(lscdCliente,
@@ -516,6 +529,7 @@ public class ControladorReporteria {
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
 			flgProspeccionBoolean = false;
+			flgRepGestSiniestro = false;
 
 			List<ReporteSiniestralidadView> lstRepSiniesAux = new ArrayList<ReporteSiniestralidadView>();
 			lstRepSiniesAux = srvRepSiniestralidad.recuperaReporteSiniestralidad(lscdCliente, lscdGrupoContratante,
@@ -545,6 +559,7 @@ public class ControladorReporteria {
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
 			flgProspeccionBoolean = false;
+			flgRepGestSiniestro = false;
 
 			List<ProduccionGeneralView> lstRepGenAux = new ArrayList<ProduccionGeneralView>();
 			lstRepGenAux = srvProduccionGeneral.recuperaProduccionGeneralView(lscdCliente, lscdGrupoContratante,
@@ -574,6 +589,7 @@ public class ControladorReporteria {
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
 			flgProspeccionBoolean = false;
+			flgRepGestSiniestro = false;
 
 			lstCuotaIniImpaga = new ArrayList<ReporteCuotasIniImpaga>();
 			lstCuotaIniImpaga = srvCuotaIniImpaga.recuperaReporteCuotasIniImp(lscdCliente, lscdGrupoContratante,
@@ -600,6 +616,7 @@ public class ControladorReporteria {
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
 			flgProspeccionBoolean = false;
+			flgRepGestSiniestro = false;
 
 			lstReporteComisionPendteView = new ArrayList<ReporteComisionPendteView>();
 			lstReporteComisionPendteView = srvReporteComisionPendteView.recuperaReporteComisionesPendientes(lscdCliente,
@@ -627,13 +644,14 @@ public class ControladorReporteria {
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
 			flgProspeccionBoolean = false;
+			flgRepGestSiniestro = false;
 
 			lstReporteComisionesLiquidadasView = new ArrayList<ReporteComisionesLiquidadasView>();
 			lstReporteComisionesLiquidadasView = srvReporteComisionesLiquidadasView
 					.recuperaReporteComisionesLiquidadasViewRep(lscdCliente, lscdGrupoContratante, lscdAseguradora,
 							lscdRamo, lscdSubagente, lscdEjecutivo, asFechaDesde, asFechaHasta, tipo);
 
-			FacesMessage msg = new FacesMessage("Advertencia", "Fecha de corte - Emisión de la Póliza - ");
+			FacesMessage msg = new FacesMessage("Advertencia", "Fecha de corte - Factura Confia - ");
 			FacesContext.getCurrentInstance().addMessage(null, msg);
 		}
 
@@ -654,6 +672,7 @@ public class ControladorReporteria {
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
 			flgProspeccionBoolean = false;
+			flgRepGestSiniestro = false;
 
 			lstReporteCanalesView = new ArrayList<ReporteCanalesView>();
 			lstReporteCanalesView = srvReporteCanalesView.recuperaReporteCanalesView(lscdCliente, lscdGrupoContratante,
@@ -680,6 +699,7 @@ public class ControladorReporteria {
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
 			flgProspeccionBoolean = false;
+			flgRepGestSiniestro = false;
 
 			lstProdPendEmi = new ArrayList<ProduccionEmisionesPendientesView>();
 			lstProdPendEmi = srvProdePendEmiView.recuperaEmisionesPendientesView(lscdCliente, lscdGrupoContratante,
@@ -706,6 +726,7 @@ public class ControladorReporteria {
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
 			flgProspeccionBoolean = false;
+			flgRepGestSiniestro = false;
 
 			lstCanalesPend = new ArrayList<ReporteCanalesPendienteView>();
 			lstCanalesPend = srvCanalPendView.recuperaReporteCanalesPenView(lscdCliente, lscdGrupoContratante,
@@ -733,6 +754,7 @@ public class ControladorReporteria {
 				flgRepVencimientoMens = false;
 				flgPreFacturaDetalleBoolean = false;
 				flgProspeccionBoolean = false;
+				flgRepGestSiniestro = false;
 
 				lstRepVencimiento = new ArrayList<ReporteVencimientoView>();
 				lstRepVencimiento = srvVencimientoView.recuperaVencimiento(lscdCliente, lscdGrupoContratante,
@@ -757,6 +779,7 @@ public class ControladorReporteria {
 				flgRepVencimientoMens = true;
 				flgPreFacturaDetalleBoolean = false;
 				flgProspeccionBoolean = false;
+				flgRepGestSiniestro = false;
 
 				lstRepVencimientoMen = new ArrayList<ReporteVencimientoMenView>();
 				lstRepVencimientoMen = srvVencimientoViewMen.recuperaVencimientoMensual(lscdCliente, lscdGrupoContratante,
@@ -785,9 +808,11 @@ public class ControladorReporteria {
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = true;
 			flgProspeccionBoolean = false;
+			flgRepGestSiniestro = false;
 
 			lstprefacturadetalleView = new ArrayList<PreFacturaDetalleView>();
-			lstprefacturadetalleView = srvPreFacturaDetalleView.lstPreFacturaDetalleViewLiq(lscdCliente, lscdAseguradora, lscdRamo, asFechaDesde, asFechaHasta);
+			lstprefacturadetalleView = srvPreFacturaDetalleView.lstPreFacturaDetalleViewLiq(lscdCliente, 
+					lscdAseguradora, lscdRamo, asFechaDesde, asFechaHasta,lscdGrupoContratante);
 			
 
 			FacesMessage msg = new FacesMessage("Advertencia", "Fecha de corte - Preliquidación - ");
@@ -811,6 +836,7 @@ public class ControladorReporteria {
 			flgRepVencimientoMens = false;
 			flgPreFacturaDetalleBoolean = false;
 			flgProspeccionBoolean = true;
+			flgRepGestSiniestro = false;
 
 			lstProspeccionesViews = new ArrayList<ProspeccionesView>();
 			lstProspeccionesViews = srvProspecciones.recuperaProspeccionView(lscdCliente, lscdGrupoContratante,
@@ -818,6 +844,35 @@ public class ControladorReporteria {
 			
 
 			FacesMessage msg = new FacesMessage("Advertencia", "Fecha de Creación - Prospección - ");
+			FacesContext.getCurrentInstance().addMessage(null, msg);
+		}
+		
+		if (lscdRubro.equals("REPORTEGESTIONSINIESTROS")) {
+			flgRepProd = false;
+			flgRepProdPag = false;
+			flgRepSiniestro = false;
+			flgRepSiniestralidad = false;
+			flgRepProdGeneral = false;
+			flgRepProdMens = false;
+			flgRepCuotaIniImpaga = false;
+			flgComisionesPendienteConfia = false;
+			flgComisionesLiquidadas = false;
+			flgReporteCanales = false;
+			flgRepProdPendEmi = false;
+			flgReporteCanalesPend = false;
+			flgRepVencimiento = false;
+			flgRepVencimientoMens = false;
+			flgPreFacturaDetalleBoolean = false;
+			flgProspeccionBoolean = false;
+			flgRepGestSiniestro = true;
+
+			lstReporteGestionSiniestrosView = new ArrayList<ReporteGestionSiniestrosView>();
+			
+			lstReporteGestionSiniestrosView = srvGestionSiniestros.recuperaReporteGestionSinies(lscdCliente, lscdGrupoContratante,
+					lscdAseguradora, lscdRamo, lscdSubagente, lscdEjecutivo, asFechaDesde, asFechaHasta, tipo);
+			
+
+			FacesMessage msg = new FacesMessage("Advertencia", "Fecha de Contacto ");
 			FacesContext.getCurrentInstance().addMessage(null, msg);
 		}
 
@@ -1215,6 +1270,22 @@ public class ControladorReporteria {
 
 	public void setLstProspeccionesViews(List<ProspeccionesView> lstProspeccionesViews) {
 		this.lstProspeccionesViews = lstProspeccionesViews;
+	}
+
+	public List<ReporteGestionSiniestrosView> getLstReporteGestionSiniestrosView() {
+		return lstReporteGestionSiniestrosView;
+	}
+
+	public void setLstReporteGestionSiniestrosView(List<ReporteGestionSiniestrosView> lstReporteGestionSiniestrosView) {
+		this.lstReporteGestionSiniestrosView = lstReporteGestionSiniestrosView;
+	}
+
+	public Boolean getFlgRepGestSiniestro() {
+		return flgRepGestSiniestro;
+	}
+
+	public void setFlgRepGestSiniestro(Boolean flgRepGestSiniestro) {
+		this.flgRepGestSiniestro = flgRepGestSiniestro;
 	}
 
 }

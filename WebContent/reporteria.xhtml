@@ -121,7 +121,14 @@
 					frm_correspondencia:tblRepo12 frm_correspondencia:panel12 
 					frm_correspondencia:tblRepo13 frm_correspondencia:panel13
 					frm_correspondencia:tblRepo14 frm_correspondencia:panel14 
-					frm_correspondencia:tblRepo14 frm_correspondencia:panel15 " />
+					frm_correspondencia:tblRepo15 frm_correspondencia:panel15 
+					frm_correspondencia:tblRepo16 frm_correspondencia:panel16" 
+					process ="@this frm_correspondencia:repotp frm_correspondencia:repCliente 
+					frm_correspondencia:repGrpCont frm_correspondencia:repAseg 
+					frm_correspondencia:tipo frm_correspondencia:repEjec 
+					frm_correspondencia:repEjec frm_correspondencia:repCanal 
+					frm_correspondencia:repRamo frm_correspondencia:fcHasta 
+					frm_correspondencia:fcDesde"/>
 				<p:commandButton value="Salir" id="btnSalir" icon="ui-icon-cancel"
 					styleClass="ui-priority-primary"
 					action="#{ControladorReporteria.salir}" update="@this" />
@@ -3029,6 +3036,12 @@
 						</f:facet>
 						<h:outputText value="#{report.facturado}" />
 					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Grupo Contratante" />
+						</f:facet>
+						<h:outputText value="#{report.grupo_contratante}" />
+					</p:column>
 				</p:dataTable>
 			</p:panel>
 			<p:panel header="Exportar Datos" id="panel15"
@@ -3122,6 +3135,196 @@
 						<h:outputText value="#{report.num_cotizacion}" />
 					</p:column>
 						
+				</p:dataTable>
+			</p:panel>
+			<p:panel header="Exportar Datos" id="panel16"
+				visible="#{ControladorReporteria.flgRepGestSiniestro}" toggleable="true">
+				<h:commandLink>
+					<p:graphicImage value="/images/excel.png" width="24" />
+					<p:dataExporter type="xls" target="tblRepo16" fileName="reporte" />
+				</h:commandLink>
+
+				<h:commandLink>
+					<p:graphicImage value="/images/csv.png" width="24" />
+					<p:dataExporter type="csv" target="tblRepo16" fileName="reporte" />
+				</h:commandLink>
+				<p:dataTable id="tblRepo16" var="report"
+					value="#{ControladorReporteria.lstReporteGestionSiniestrosView}"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+					paginator="true" rows="5"
+					style="font-family:Verdana; font-size: 12px;" scrollable="true"
+					scrollWidth="1200">
+
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Cliente" />
+						</f:facet>
+						<h:outputText value="#{report.CLIENTE}" />
+					</p:column>
+
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="No.Siniestro" />
+						</f:facet>
+						<h:outputText value="#{report.NUMERO_SINIESTRO}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Ejecutivo Comercial" />
+						</f:facet>
+						<h:outputText value="#{report.EJECUTIVO_COMERCIAL}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Ramo" />
+						</f:facet>
+						<h:outputText value="#{report.RAMO}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Aseguradora" />
+						</f:facet>
+						<h:outputText value="#{report.ASEGURADORA}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Póliza" />
+						</f:facet>
+						<h:outputText value="#{report.POLIZA}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Placa" />
+						</f:facet>
+						<h:outputText value="#{report.PLACA}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Prima Neta" />
+						</f:facet>
+						<h:outputText value="#{report.PRIMA_NETA}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Valor Perdida" />
+						</f:facet>
+						<h:outputText value="#{report.VALOR_PERDIDA}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Tipo Cliente" />
+						</f:facet>
+						<h:outputText value="#{report.TIPO_CLIENTE_POLIZA}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Año" />
+						</f:facet>
+						<h:outputText value="#{report.ANIO_VH}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Cédula" />
+						</f:facet>
+						<h:outputText value="#{report.CEDULA}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Grupo Contratante" />
+						</f:facet>
+						<h:outputText value="#{report.GRUPOCONTRATANTE}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Inicio Vigencia" />
+						</f:facet>
+						<h:outputText value="#{report.INICIO_VIGENCIA}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Fin Vigencia" />
+						</f:facet>
+						<h:outputText value="#{report.FIN_VIGENCIA}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Estado" />
+						</f:facet>
+						<h:outputText value="#{report.ESTADO}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Fecha Reporte Siniestro" />
+						</f:facet>
+						<h:outputText value="#{report.FECHA_REPORTE_SINIESTRO}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Canal" />
+						</f:facet>
+						<h:outputText value="#{report.CANAL}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Objeto Asegurado" />
+						</f:facet>
+						<h:outputText value="#{report.DSC_OBJETO}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Subobjeto" />
+						</f:facet>
+						<h:outputText value="#{report.DESCRIPCION_SUBOBJETO}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Fecha Ocurrencia" />
+						</f:facet>
+						<h:outputText value="#{report.FECHA_OCURRENCIA}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Gestión" />
+						</f:facet>
+						<h:outputText value="#{report.DESCRIPCION_GESTION}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Fecha de Contacto" />
+						</f:facet>
+						<h:outputText value="#{report.FECHA_CONTACTO}" />
+					</p:column>
+					
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Tipo Gestión" />
+						</f:facet>
+						<h:outputText value="#{report.TIPO_GESTION}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Medio" />
+						</f:facet>
+						<h:outputText value="#{report.MEDIO}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Fecha Seguimiento" />
+						</f:facet>
+						<h:outputText value="#{report.FECHA_SEGUIMIENTO}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Grupo Contratante" />
+						</f:facet>
+						<h:outputText value="#{report.nm_grupo_contratante}" />
+					</p:column>
+					<p:column style="width:80px">
+						<f:facet name="header">
+							<h:outputText value="Ejecutivo Siniestro" />
+						</f:facet>
+						<h:outputText value="#{report.EJECUTIVO_SINIESTROS}" />
+					</p:column>
 				</p:dataTable>
 			</p:panel>
 		</h:form>

@@ -12,6 +12,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 
 import confia.entidades.basicos.Clientes;
@@ -28,6 +29,7 @@ import confia.servicios.basicos.ServicioClientes;
 import confia.servicios.basicos.ServicioRubros;
 import confia.servicios.basicos.ServicioUsuarios;
 import confia.servicios.transaccionales.ServicioCotizacion;
+import confia.servicios.transaccionales.ServicioDetalleFormaPago;
 import confia.servicios.transaccionales.ServicioFormaPago;
 import confia.servicios.transaccionales.ServicioObjetoCotizacion;
 import confia.servicios.transaccionales.ServicioRamoCotizacion;
@@ -58,6 +60,8 @@ public class ControladorAnexoProvisional {
 	private ServicioCotizacion srvCotizacion;
 	@EJB
 	private ServicioRamoCotizacion srvRamoCotizacion;
+	@EJB
+	private ServicioDetalleFormaPago srvDetalleFrmPago;
 
 	private String tipoAnexoSelec;
 	private String numPoliza;
@@ -92,10 +96,13 @@ public class ControladorAnexoProvisional {
 	private boolean btnIncAsis;
 	private String polizaAnexoNoCot;
 	private String facturaNo;
+	private List<FormaPago> lstFrmPago;
+	private List<DetalleFormaPago> lstDetFrmPago;
 
 	public ControladorAnexoProvisional() {
 		datosCliente = new Clientes();
 		listaClientes = new ArrayList<Clientes>();
+		tpFromaPago = "CONTADO";
 	}
 
 	public void buscarClientes() {
@@ -126,11 +133,12 @@ public class ControladorAnexoProvisional {
 	}
 
 	public void consultaProv() {
-
-		if (numPoliza.isEmpty() || numPoliza == null) {
-			FacesMessage msg = new FacesMessage("Advertencia", "Ingrese el número de póliza");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
-			return;
+		try {
+			if (numPoliza.isEmpty() || numPoliza == null) {
+				numPoliza = "%";
+			}
+		} catch (Exception e) {
+			numPoliza = "%";
 		}
 		try {
 			if (datosCliente.getCd_cliente() == null) {
@@ -281,7 +289,7 @@ public class ControladorAnexoProvisional {
 		System.out.println("GUARDAR CARTA USuario:" + usuarioId);
 		Usuarios usr = new Usuarios();
 		usr = srvUsuario.recuperaUsuario(usuarioId);
-		// crear una nueva cotización
+		// crear una nueva cotizaciï¿½n
 		Cotizacion nuevaCot = new Cotizacion();
 		Integer codCot;
 		nuevaCot.setCd_compania(Integer.parseInt(codigoCompania));
@@ -309,6 +317,7 @@ public class ControladorAnexoProvisional {
 		formaPagoAux.setOtro_valor_forma_Pago(frmPagoOtroValor);
 		formaPagoAux.setIva_Forma_Pago(frmPagoIva);
 		formaPagoAux.setTotal_Pago_FormaPago(frmPagoTotal);
+		System.err.println("FORMA PAGO:"+tpFromaPago);
 		formaPagoAux.setNum_alternativa_formaPago(tpFromaPago);
 		formaPagoAux.setPct_cuota_Inicial_frmPago(frmPagoCuotaIni);
 		formaPagoAux.setNum_pago_formaPago(frmPagoNumPago);
@@ -325,10 +334,23 @@ public class ControladorAnexoProvisional {
 			context.addMessage(null, new FacesMessage("Advertencia", "Error al Grabar la forma de Pago."));
 			return;
 		}
-		// ramos de la cotización Provisional
+		
+		lstFrmPago = new ArrayList<FormaPago>();
+		lstDetFrmPago = new ArrayList<DetalleFormaPago>();
+		FormaPago frmFormaPagoAux = new FormaPago();
+		frmFormaPagoAux = srvFormaPago.recuperaFormaPagoxCdCot(Integer.valueOf(codCot), Integer.valueOf(codigoCompania));
+		System.out.println("FORMA_PAGO:"+frmFormaPagoAux.getCd_forma_Pago());
+		lstFrmPago.add(frmFormaPagoAux);
+		System.err.println("Tamano:"+lstFrmPago.size());
+		
+		lstDetFrmPago = srvDetalleFrmPago.recuperaDetalleCodFormaPago(frmFormaPagoAux.getCd_forma_Pago(),
+				frmFormaPagoAux.getCd_compania());
+		
+		
+		// ramos de la cotizaciï¿½n Provisional
 		for (EndososProvisionalesView anex : selectedlstCotProvisiol) {
-			System.out.println("Inserta Ramo Cotización");
-			// actualizo el número de factura en la póliza original
+			System.out.println("Inserta Ramo Cotizaciï¿½n");
+			// actualizo el nï¿½mero de factura en la pï¿½liza original
 			RamoCotizacion ramOri = new RamoCotizacion();
 			ramOri = srvRamoCotizacion.recuperaRamoCotizacionPorCodigo(anex.getCd_ramo_cotizacion(),
 					anex.getCd_compania());
@@ -337,13 +359,15 @@ public class ControladorAnexoProvisional {
 			srvRamoCotizacion.actualizaRamoCotizacion(ramOri);
 		}
 
-		// elimino la cotización provisional
+		// elimino la cotizaciï¿½n provisional
 		for (EndososProvisionalesView anex : selectedlstCotProvisiol) {
 			Cotizacion coti = new Cotizacion();
 			coti = srvCotizacion.recuperaCotizacionPorCodigo(anex.getCd_cotizacion(), anex.getCd_compania());
 			srvCotizacion.eliminaCotizacion(coti);
 		}
-
+	}
+	
+	public void cerrarFrmPag() {
 		tpFromaPago = null;
 		frmPagoPrimaTot = 0.0;
 
@@ -358,7 +382,30 @@ public class ControladorAnexoProvisional {
 		lstObjetoConsulta = new ArrayList<ObjetoCotizacion>();
 
 		PrimeFaces.current().executeScript("PF('nuevaFormaPago').hide();");
-
+	}
+	
+	public void onRowDeleteFrmPag(FormaPago frm) {
+		srvFormaPago.eliminaFormaPago(frm);
+		lstFrmPago = new ArrayList<FormaPago>();
+		lstDetFrmPago = new ArrayList<DetalleFormaPago>();
+	}
+	
+	public void onRowEditDetFin(RowEditEvent event) {
+		DetalleFormaPago detFrmAux = new DetalleFormaPago();
+		int cdDetFrmP, cdCompania;
+		Double val = 0.00;
+		Date fcVen;
+		String numDoc;
+		cdDetFrmP = ((DetalleFormaPago) event.getObject()).getCD_DET_FORMA_PAGO();
+		cdCompania = ((DetalleFormaPago) event.getObject()).getCD_COMPANIA();
+		fcVen = ((DetalleFormaPago) event.getObject()).getFECHA_VENCIMIENTO_DATE();
+		numDoc = ((DetalleFormaPago) event.getObject()).getFACTURA_ASEGURADORA();
+		val = ((DetalleFormaPago) event.getObject()).getVALOR();
+		detFrmAux = srvDetalleFrmPago.recuperaDetallexCdFrmPago(cdDetFrmP, cdCompania);
+		detFrmAux.setFECHA_VENCIMIENTO_DATE(fcVen);
+		detFrmAux.setFACTURA_ASEGURADORA(numDoc);
+		detFrmAux.setVALOR(val);
+		srvDetalleFrmPago.actualizaDetFormaPago(detFrmAux);
 	}
 
 	public String getTipoAnexoSelec() {
@@ -567,6 +614,22 @@ public class ControladorAnexoProvisional {
 
 	public void setFacturaNo(String facturaNo) {
 		this.facturaNo = facturaNo;
+	}
+
+	public List<FormaPago> getLstFrmPago() {
+		return lstFrmPago;
+	}
+
+	public void setLstFrmPago(List<FormaPago> lstFrmPago) {
+		this.lstFrmPago = lstFrmPago;
+	}
+
+	public List<DetalleFormaPago> getLstDetFrmPago() {
+		return lstDetFrmPago;
+	}
+
+	public void setLstDetFrmPago(List<DetalleFormaPago> lstDetFrmPago) {
+		this.lstDetFrmPago = lstDetFrmPago;
 	}
 
 }

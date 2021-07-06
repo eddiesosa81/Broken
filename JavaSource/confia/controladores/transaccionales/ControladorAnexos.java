@@ -36,6 +36,7 @@ import confia.entidades.basicos.SubeArchivoObj;
 import confia.entidades.basicos.TipoModuloCarta;
 import confia.entidades.basicos.Usuarios;
 import confia.entidades.transaccionales.Archivos;
+import confia.entidades.transaccionales.CaracteristicasObjeto;
 import confia.entidades.transaccionales.CaracteristicasVehiculos;
 import confia.entidades.transaccionales.Correspondencia;
 import confia.entidades.transaccionales.Cotizacion;
@@ -202,7 +203,7 @@ public class ControladorAnexos {
 	private List<FormaPago> lstFrmPago;
 	private List<DetalleFormaPago> lstDetFrmPago;
 
-	// variables Ubicaci�n
+	// variables Ubicación
 	private Ubicacion datosUbicacion;
 
 	// variables objeto
@@ -229,6 +230,7 @@ public class ControladorAnexos {
 	private List<ConsultaSubObjetoPolView> filteredLstSubobjetoPol;
 
 	// variables caracteristicas
+	private List<CaracteristicasVehiculos> caracteristicasObjetoCons;
 	private CaracteristicasVehiculos datosCaracteristicasVehiculos;
 	private List<Modelo> listadoModelos;
 	private List<Marca> listadoMarcas;
@@ -421,18 +423,42 @@ public class ControladorAnexos {
 	public void consultaArchivosGuardados() {
 		System.out.println("numCotizacion:" + numCotizacion);
 		System.out.println("datosCotizacion:" + nuevaCot.getCd_cliente());
+		
 		try {
 			if (numCotizacion.isEmpty() || numCotizacion == null) {
-				FacesContext context = FacesContext.getCurrentInstance();
-				context.addMessage(null, new FacesMessage("Advertencia",
-						"Cotizaci�n no identificado, comun�quese con el Administrador del Sistemas"));
-				return;
+				try {
+					if(nuevaCot.getNum_cotizacion().isEmpty() || nuevaCot.getNum_cotizacion() == null) {
+						FacesContext context = FacesContext.getCurrentInstance();
+						context.addMessage(null, new FacesMessage("Advertencia",
+								"Cotización no identificado, comuníquese con el Administrador del Sistemas"));
+						return;
+					}else {
+						numCotizacion = nuevaCot.getNum_cotizacion();
+					}
+				} catch (Exception e) {
+					FacesContext context = FacesContext.getCurrentInstance();
+					context.addMessage(null, new FacesMessage("Advertencia",
+							"Cotización no identificado, comuníquese con el Administrador del Sistemas"));
+					return;
+				}
+				
 			}
 		} catch (Exception e) {
-			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia",
-					"Cotizaci�n no identificada, comun�quese con el Administrador del Sistemas"));
-			return;
+			try {
+				if(nuevaCot.getNum_cotizacion().isEmpty() || nuevaCot.getNum_cotizacion() == null) {
+					FacesContext context = FacesContext.getCurrentInstance();
+					context.addMessage(null, new FacesMessage("Advertencia",
+							"Cotización no identificado, comuníquese con el Administrador del Sistemas"));
+					return;
+				}else {
+					numCotizacion = nuevaCot.getNum_cotizacion();
+				}
+			} catch (Exception ex) {
+				FacesContext context = FacesContext.getCurrentInstance();
+				context.addMessage(null, new FacesMessage("Advertencia",
+						"Cotización no identificado, comuníquese con el Administrador del Sistemas"));
+				return;
+			}
 		}
 		lstArchivos = new ArrayList<Archivos>();
 		System.out.println("tipoArchivo:" + tipoArchivo);
@@ -485,6 +511,8 @@ public class ControladorAnexos {
 			return;
 		}
 		System.out.println("numCotizacion:" + nuevaCot.getNum_cotizacion());
+		String numCotAuxString = nuevaCot.getNum_cotizacion();
+		
 		System.out.println("Cliente:" + nuevaCot.getCd_cliente());
 
 		try {
@@ -497,16 +525,16 @@ public class ControladorAnexos {
 		System.out.println("POLIZA:" + polizaGestDocu);
 		System.out.println("tipoArchivo:" + tipoArchivo);
 		if (tipoArchivo.equals("POLIZA")) {
-			// verifico que se haya ingresado la p�liza
+			// verifico que se haya ingresado la Póliza
 			try {
 				if (polizaGestDocu.isEmpty() || polizaGestDocu == null || polizaGestDocu.equals("")) {
 					FacesContext context = FacesContext.getCurrentInstance();
-					context.addMessage(null, new FacesMessage("Advertencia", "Ingrese el n�mero de Factura o Anexo"));
+					context.addMessage(null, new FacesMessage("Advertencia", "Ingrese el número de Factura o Anexo"));
 					return;
 				}
 			} catch (Exception e) {
 				FacesContext context = FacesContext.getCurrentInstance();
-				context.addMessage(null, new FacesMessage("Advertencia", "Ingrese el n�mero de Factura o Anexo"));
+				context.addMessage(null, new FacesMessage("Advertencia", "Ingrese el número de Factura o Anexo"));
 				return;
 			}
 		}
@@ -521,13 +549,13 @@ public class ControladorAnexos {
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
-		System.out.println("Paso validaci�n......");
+		System.out.println("Paso validación......");
 		Clientes clieAux = new Clientes();
 		clieAux = srvClientes.listaClientesXId(nuevaCot.getCd_cliente());
 		System.out.println("EXISTE CLIENTE:" + clieAux.getCd_cliente());
 
 		UploadedFile miArchivo = event.getFile();
-		long tamanio = miArchivo.getSize();// tama�o del archivo
+		long tamanio = miArchivo.getSize();// tamaóo del archivo
 		byte[] contenido = miArchivo.getContent();// contenido del archivo
 		String tipoDeArchivo = miArchivo.getContentType();// que tipo de archivo
 		String nombre = miArchivo.getFileName();
@@ -539,12 +567,14 @@ public class ControladorAnexos {
 
 		System.out.println("--nombre--" + nombre);
 		System.out.println("--extension--" + extension);
-		System.out.println("-**********-------Tama�o: " + tamanio);
+		System.out.println("-**********-------Tamaóo: " + tamanio);
 		System.out.println("-**********-------Contenido: " + contenido);
 		System.out.println("-********-------Tipo de Archivo: " + tipoDeArchivo);
 
 		String nmArchivo = getRandomImageNameFile(extension, clieAux);
 		System.out.println("nmArchivo:" + nmArchivo);
+		nuevaCot.setNum_cotizacion(numCotAuxString);
+		System.err.println("numero Cotiza:"+nuevaCot.getNum_cotizacion());
 		guardarArchivo(nmArchivo, contenido);
 		FacesMessage message = new FacesMessage("Advertencia",
 				" Carga del Archivo Exitoso. Realice nuevamente la consulta para visualizarlo.");
@@ -603,6 +633,7 @@ public class ControladorAnexos {
 			arc.setPoliza(numPolizaAnexo);
 		}
 		srvArchivos.insertaArchivos(arc);
+		System.err.println("numero Cotiza:"+nuevaCot.getNum_cotizacion());
 		consultaArchivosGuardados();
 
 	}
@@ -727,7 +758,7 @@ public class ControladorAnexos {
 		Map<String, String> requestParameterMap = FacesContext.getCurrentInstance().getExternalContext()
 				.getRequestParameterMap();
 		cdRamoCotizacionAne = Integer.parseInt(requestParameterMap.get("cdRamoCotizacionAne"));
-		// recupera la cotizaci�n del anexo
+		// recupera la Cotización del anexo
 
 		// RequestContext context = RequestContext.getCurrentInstance();
 		// context.execute("PF('wDlgEmitePendAnexo').show();");
@@ -788,7 +819,26 @@ public class ControladorAnexos {
 		codObj = ((ConsultaObjetoAneView) event.getObject()).getCd_obj_cotizacion();
 		lstSubObjeAnePend = new ArrayList<ConsultaSubObjetoAneView>();
 		lstSubObjeAnePend = srvConsultaSubObjAnePend.consultaSubObjetoxCdObj(codObj);
+		Integer cdObjCot,cdCompania;
+		cdObjCot = Integer.valueOf(codObj);
+		cdCompania = Integer.valueOf(((ConsultaObjetoAneView) event.getObject()).getCd_compania());
+		System.err.println("cdobjcot;"+cdObjCot);
+		System.err.println("cdCompania;"+cdCompania);
+		caracteristicasObjetoCons = new ArrayList<CaracteristicasVehiculos>();
+		CaracteristicasVehiculos caracAux = new CaracteristicasVehiculos();
+		caracAux = srvCaracteristicasVehiculos.recuperaCaractVH(cdObjCot,cdCompania );
+		caracteristicasObjetoCons.add(caracAux);
+		
 	}
+	
+	public void onRowEditCaract(RowEditEvent<CaracteristicasVehiculos> event) {
+		CaracteristicasVehiculos caracAux = new CaracteristicasVehiculos();
+		caracAux = event.getObject();
+		srvCaracteristicasVehiculos.actualizaCaracteristicaVehiculos(caracAux);
+		FacesMessage msg = new FacesMessage("Advertencia","Actualización Exitosa");
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+        
+    }
 
 	public void eliminaAnexo() {
 		Cotizacion cot = new Cotizacion();
@@ -923,7 +973,7 @@ public class ControladorAnexos {
 
 	public void guardaEmision() {
 		System.out.println("INGRESO EMITIR");
-		// guardo la emisi�n del anexo
+		// guardo la emisión del anexo
 		int count = 0;
 		int res = 0;
 		// verifica si tiene ingresada la forma de pagon
@@ -951,7 +1001,7 @@ public class ControladorAnexos {
 			if (existePol > 0) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null,
-						new FacesMessage("Advertencia", "N�mero de P�liza y Factura Registrado en el Sistema"));
+						new FacesMessage("Advertencia", "número de Póliza y Factura Registrado en el Sistema"));
 
 				return;
 
@@ -1093,7 +1143,7 @@ public class ControladorAnexos {
 			} else {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Advertencia",
-						"Error al Emitir el Anexo Comun�quese con el Administrador del Sistema."));
+						"Error al Emitir el Anexo comuníquese con el Administrador del Sistema."));
 				return;
 			}
 
@@ -1193,7 +1243,7 @@ public class ControladorAnexos {
 			} else {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Advertencia",
-						"Error al Emitir el Anexo Comun�quese con el Administrador del Sistema."));
+						"Error al Emitir el Anexo comuníquese con el Administrador del Sistema."));
 				return;
 			}
 		}
@@ -1205,7 +1255,7 @@ public class ControladorAnexos {
 		int res = 0;
 		if (tipoAnexoSelec.equals("DEDUCIBLE")) {
 			System.out.println("NUEVACOT:" + nuevaCot);
-			// RECUPERO LAS UBICACIONES DE LA P�LIZA
+			// RECUPERO LAS UBICACIONES DE LA Póliza
 			System.out.println("RAMO COTIZACION:" + PolizaSeleccionadaParaAnexo.getCd_ramo_cotizacion());
 			System.out.println("RAMO:" + PolizaSeleccionadaParaAnexo.getDesc_ramo());
 			System.out.println("RAMO COTIZACION:" + PolizaSeleccionadaParaAnexo.getPoliza());
@@ -1237,30 +1287,30 @@ public class ControladorAnexos {
 		}
 		if (tipoAnexoSelec.equals("ANULACION") || tipoAnexoSelec.equals("CANCELACION")) {
 			if (afectaPoliza.equals("POLIZA")) {
-				// verifica si se trata de una anulaci�n o cancelaci�n
+				// verifica si se trata de una anulación o cancelación
 				res = srvConsultaPolizaView.polizaPagada(PolizaSeleccionadaParaAnexo.getCd_compania(),
 						PolizaSeleccionadaParaAnexo.getCd_cotizacion());
 				if (tipoAnexoSelec.equals("ANULACION") && res == 1) {
 					FacesContext context = FacesContext.getCurrentInstance();
 					context.addMessage(null, new FacesMessage("Advertencia",
-							"Existe Pago Realizado a la P�liza. No Puede Generar el Anexo de Anulaci�n"));
+							"Existe Pago Realizado a la Póliza. No Puede Generar el Anexo de Anulación"));
 					return;
 				}
 				if (tipoAnexoSelec.equals("CANCELACION") && res == 0) {
 					FacesContext context = FacesContext.getCurrentInstance();
 					context.addMessage(null, new FacesMessage("Advertencia",
-							"No Existe Pago Realizado a la P�liza. No Puede Generar el Anexo de Cancelaci�n"));
+							"No Existe Pago Realizado a la Póliza. No Puede Generar el Anexo de Cancelación"));
 					return;
 				}
 			} else {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Advertencia",
-						"Anexo no soportado. Comun�quese con el Administrador del Sistema"));
+						"Anexo no soportado. comuníquese con el Administrador del Sistema"));
 				return;
 			}
 		} else if (afectaPoliza.equals("NO")) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Seleccione el campo Afectaci�n"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Seleccione el campo Afectación"));
 			return;
 		}
 
@@ -1272,7 +1322,7 @@ public class ControladorAnexos {
 		}
 
 		////////////////////////////////////////////////
-		// a�ado la cotizaci�n para el anexo
+		// aóado la Cotización para el anexo
 		// COTIZACION
 		////////////////////////////////////////////////
 		String lsCompania;
@@ -1281,7 +1331,7 @@ public class ControladorAnexos {
 		Boolean flgAnexo = false;
 		lsCompania = FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("COMPANIA").toString();
 		liCompania = Integer.parseInt(lsCompania);
-		// ingresa nueva cotizaci�n
+		// ingresa nueva Cotización
 		nuevaCot.setCd_compania(liCompania);
 		nuevaCot.setAfecta_anexo(afectaPoliza);
 		if (tipoAnexoSelec.equals("INCLUSION") && !afectaPoliza.equals("POLIZA")) {
@@ -1312,7 +1362,7 @@ public class ControladorAnexos {
 		if (flgAnexo == false) {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Advertencia",
-					"Tipo de Anexo no Soportado. Comun�quese con el Administrador del Sistema"));
+					"Tipo de Anexo no Soportado. comuníquese con el Administrador del Sistema"));
 			return;
 		}
 
@@ -1385,7 +1435,7 @@ public class ControladorAnexos {
 
 		// RequestContext context = RequestContext.getCurrentInstance();
 		if (tipoAnexoSelec.equals("INCLUSION") && afectaPoliza.equals("UBICACION")) {
-			// RECUPERO LAS UBICACIONES DE LA P�LIZA
+			// RECUPERO LAS UBICACIONES DE LA Póliza
 			System.out.println("RAMO COTIZACION:" + PolizaSeleccionadaParaAnexo.getCd_ramo_cotizacion());
 			lstUbicacion = new ArrayList<ConsultaUbicacionPolView>();
 			lstUbicacion = srvConsultaUbicacionView
@@ -1396,14 +1446,14 @@ public class ControladorAnexos {
 				btnIncAsis = false;
 			}
 
-			// habilito el controlador de texto y deshabilito la selecci�n de
-			// ubicaci�n
+			// habilito el controlador de texto y deshabilito la selección de
+			// ubicación
 			flgHabilitaUbicacion = false;
 			flgHabilitaUbicacionDataTable = true;
 		}
 		if (tipoAnexoSelec.equals("INCLUSION") && afectaPoliza.equals("OBJETO")) {
 
-			// RECUPERO LAS UBICACIONES DE LA P�LIZA
+			// RECUPERO LAS UBICACIONES DE LA Póliza
 			System.out.println("RAMO COTIZACION:" + PolizaSeleccionadaParaAnexo.getCd_ramo_cotizacion());
 			lstUbicacion = new ArrayList<ConsultaUbicacionPolView>();
 			lstUbicacion = srvConsultaUbicacionView
@@ -1418,7 +1468,7 @@ public class ControladorAnexos {
 		}
 		if (tipoAnexoSelec.equals("INCLUSION") && afectaPoliza.equals("EXTRA")) {
 			System.out.println("INGRESO A INCLUSION EXTRA");
-			// RECUPERO LAS UBICACIONES DE LA P�LIZA
+			// RECUPERO LAS UBICACIONES DE LA Póliza
 			lstUbicacion = new ArrayList<ConsultaUbicacionPolView>();
 			lstObjetosIncluidos = new ArrayList<ObjetoCotizacion>();
 			lstSubObjetoCot = new ArrayList<SubObjetoCotizacion>();
@@ -1427,7 +1477,7 @@ public class ControladorAnexos {
 			PrimeFaces.current().executeScript("PF('wDlgInclusionSubObj').show();");
 		}
 		if (tipoAnexoSelec.equals("EXCLUSION") && afectaPoliza.equals("UBICACION")) {
-			// RECUPERO LAS UBICACIONES DE LA P�LIZA
+			// RECUPERO LAS UBICACIONES DE LA Póliza
 			System.out.println("RAMO COTIZACION POLIZA:" + PolizaSeleccionadaParaAnexo.getCd_ramo_cotizacion());
 			lstUbicacion = new ArrayList<ConsultaUbicacionPolView>();
 			lstUbicacion = srvConsultaUbicacionView
@@ -1441,7 +1491,7 @@ public class ControladorAnexos {
 			PrimeFaces.current().executeScript("PF('wDlgExclusionUbc').show();");
 		}
 		if (tipoAnexoSelec.equals("EXCLUSION") && afectaPoliza.equals("OBJETO")) {
-			// RECUPERO LAS UBICACIONES DE LA P�LIZA
+			// RECUPERO LAS UBICACIONES DE LA Póliza
 			System.out.println("RAMO COTIZACION:" + PolizaSeleccionadaParaAnexo.getCd_ramo_cotizacion());
 			lstUbicacion = new ArrayList<ConsultaUbicacionPolView>();
 			lstUbicacion = srvConsultaUbicacionView
@@ -1455,7 +1505,7 @@ public class ControladorAnexos {
 		}
 
 		if (tipoAnexoSelec.equals("EXCLUSION") && afectaPoliza.equals("EXTRA")) {
-			// RECUPERO LAS UBICACIONES DE LA P�LIZA
+			// RECUPERO LAS UBICACIONES DE LA Póliza
 			System.out.println("RAMO COTIZACION:" + PolizaSeleccionadaParaAnexo.getCd_ramo_cotizacion());
 			lstUbicacion = new ArrayList<ConsultaUbicacionPolView>();
 			lstUbicacion = srvConsultaUbicacionView
@@ -1470,7 +1520,7 @@ public class ControladorAnexos {
 		}
 
 		if (tipoAnexoSelec.equals("MODVALASEG") && afectaPoliza.equals("OBJETO")) {
-			// RECUPERO LAS UBICACIONES DE LA P�LIZA
+			// RECUPERO LAS UBICACIONES DE LA Póliza
 			System.out.println("RAMO COTIZACION:" + PolizaSeleccionadaParaAnexo.getCd_ramo_cotizacion());
 			lstUbicacion = new ArrayList<ConsultaUbicacionPolView>();
 			lstUbicacion = srvConsultaUbicacionView
@@ -1483,7 +1533,7 @@ public class ControladorAnexos {
 			PrimeFaces.current().executeScript("PF('wDlgModValAsegObj').show();");
 		}
 		if (tipoAnexoSelec.equals("MODVALASEG") && afectaPoliza.equals("EXTRA")) {
-			// RECUPERO LAS UBICACIONES DE LA P�LIZA
+			// RECUPERO LAS UBICACIONES DE LA Póliza
 			System.out.println("RAMO COTIZACION:" + PolizaSeleccionadaParaAnexo.getCd_ramo_cotizacion());
 			lstUbicacion = new ArrayList<ConsultaUbicacionPolView>();
 			lstUbicacion = srvConsultaUbicacionView
@@ -1507,7 +1557,7 @@ public class ControladorAnexos {
 		}
 		if (tipoAnexoSelec.equals("ACLARATORIO")) {
 			System.out.println("NUEVACOT:" + nuevaCot);
-			// RECUPERO LAS UBICACIONES DE LA P�LIZA
+			// RECUPERO LAS UBICACIONES DE LA Póliza
 			System.out.println("RAMO COTIZACION:" + PolizaSeleccionadaParaAnexo.getCd_ramo_cotizacion());
 			System.out.println("RAMO:" + PolizaSeleccionadaParaAnexo.getDesc_ramo());
 			System.out.println("RAMO COTIZACION:" + PolizaSeleccionadaParaAnexo.getPoliza());
@@ -1816,7 +1866,7 @@ public class ControladorAnexos {
 			} catch (Exception e) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Error",
-						"Error al recuperar el objeto. Comun�quese con el Administrador del sistema"));
+						"Error al recuperar el objeto. comuníquese con el Administrador del sistema"));
 				return;
 			}
 		}
@@ -1829,7 +1879,7 @@ public class ControladorAnexos {
 			} catch (Exception e) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Error",
-						"Error al recuperar el objeto. Comun�quese con el Administrador del sistema"));
+						"Error al recuperar el objeto. comuníquese con el Administrador del sistema"));
 				return;
 			}
 			valAsegExcAne = datosUbicacion.getValor_asegurado_ubicacion() * -1;
@@ -1857,7 +1907,7 @@ public class ControladorAnexos {
 			} catch (Exception e) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Error",
-						"Error al recuperar el objeto. Comun�quese con el Administrador del sistema"));
+						"Error al recuperar el objeto. comuníquese con el Administrador del sistema"));
 				return;
 			}
 
@@ -1894,7 +1944,7 @@ public class ControladorAnexos {
 		if (descUbicacion == null) {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null,
-					new FacesMessage("Advertencia", "Digite la nueva Ubicaci�n y de click en el bot�n '+'"));
+					new FacesMessage("Advertencia", "Digite la nueva Ubicación y de click en el botón '+'"));
 			return;
 		}
 		descUbicacion = descUbicacion.trim().toUpperCase();
@@ -1914,7 +1964,7 @@ public class ControladorAnexos {
 		} else {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Advertencia",
-					"Error al ingresar la Ubicaci�n Comuniquese con el Administrador del Sistema"));
+					"Error al ingresar la Ubicación Comuniquese con el Administrador del Sistema"));
 			return;
 		}
 	}
@@ -1951,7 +2001,7 @@ public class ControladorAnexos {
 		if (tipoAnexoSelec.equals("INCLUSION") && afectaPoliza.equals("UBICACION")) {
 			if (datosUbicacion == null) {
 				FacesContext context = FacesContext.getCurrentInstance();
-				context.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Ubicaci�n"));
+				context.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Ubicación"));
 				return;
 			} else {
 				lstSubObjetoCot = new ArrayList<SubObjetoCotizacion>();
@@ -1965,7 +2015,7 @@ public class ControladorAnexos {
 		}
 
 		if (tipoAnexoSelec.equals("INCLUSION") && afectaPoliza.equals("OBJETO")) {
-			System.out.println("LISTADO tama�o:" + lstObjetosIncluidos.size());
+			System.out.println("LISTADO tamaóo:" + lstObjetosIncluidos.size());
 			if (lstObjetosIncluidos.size() == 0) {
 				datosUbicacion = new Ubicacion();
 				datosUbicacion.setCd_compania(datosRamoCotizacion.getCd_compania());
@@ -1973,13 +2023,13 @@ public class ControladorAnexos {
 				try {
 					if (selectedUbicacionEmision == null) {
 						FacesContext fContextObj = FacesContext.getCurrentInstance();
-						fContextObj.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Ubicaci�n"));
+						fContextObj.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Ubicación"));
 						return;
 					}
 					datosUbicacion.setDsc_ubicacion(selectedUbicacionEmision.getDsc_ubicacion());
 				} catch (Exception e) {
 					FacesContext fContextObj = FacesContext.getCurrentInstance();
-					fContextObj.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Ubicaci�n"));
+					fContextObj.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Ubicación"));
 					return;
 				}
 				res = srvUbicacion.insertarUbicacion(datosUbicacion);
@@ -1997,7 +2047,7 @@ public class ControladorAnexos {
 				} else {
 					FacesContext context = FacesContext.getCurrentInstance();
 					context.addMessage(null, new FacesMessage("Advertencia",
-							"Error al ingresar la Ubicaci�n Comuniquese con el Administrador del Sistema"));
+							"Error al ingresar la Ubicación Comuniquese con el Administrador del Sistema"));
 					return;
 				}
 			} else {
@@ -2008,7 +2058,7 @@ public class ControladorAnexos {
 				// RequestContext.getCurrentInstance();
 				// rContextObj.execute("PF('nuevoObjeto').show();");
 				PrimeFaces.current().executeScript("PF('nuevoObjeto').show();");
-				// ingresa nuevo objeto en la ubicaci�n inicial
+				// ingresa nuevo objeto en la ubicación inicial
 			}
 		}
 	}
@@ -2016,7 +2066,7 @@ public class ControladorAnexos {
 	public void cargaArchivo() {
 		// guarda la ubicacion
 		int res;
-		System.out.println("Tama�o Archivo Excel:" + lstObjetosIncluidos.size());
+		System.out.println("Tamaóo Archivo Excel:" + lstObjetosIncluidos.size());
 		if (lstObjetosIncluidos.size() == 0) {
 			datosUbicacion = new Ubicacion();
 			datosUbicacion.setCd_compania(datosRamoCotizacion.getCd_compania());
@@ -2024,13 +2074,13 @@ public class ControladorAnexos {
 			try {
 				if (selectedUbicacion == null) {
 					FacesContext fContextObj = FacesContext.getCurrentInstance();
-					fContextObj.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Ubicaci�n"));
+					fContextObj.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Ubicación"));
 					return;
 				}
 				datosUbicacion.setDsc_ubicacion(selectedUbicacion.getDsc_ubicacion());
 			} catch (Exception e) {
 				FacesContext fContextObj = FacesContext.getCurrentInstance();
-				fContextObj.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Ubicaci�n"));
+				fContextObj.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Ubicación"));
 				return;
 			}
 			res = srvUbicacion.insertarUbicacion(datosUbicacion);
@@ -2050,7 +2100,7 @@ public class ControladorAnexos {
 			} else {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Advertencia",
-						"Error al ingresar la Ubicaci�n Comuniquese con el Administrador del Sistema"));
+						"Error al ingresar la Ubicación Comuniquese con el Administrador del Sistema"));
 				return;
 			}
 		} else {
@@ -2070,7 +2120,7 @@ public class ControladorAnexos {
 		formatoDos = new SimpleDateFormat(patronDos);
 
 		UploadedFile miArchivo = evt.getFile();
-		long tamanio = miArchivo.getSize();// tama�o del archivo
+		long tamanio = miArchivo.getSize();// tamaóo del archivo
 		byte[] contenido = miArchivo.getContent();// contenido del archivo
 		String tipoDeArchivo = miArchivo.getContentType();// que tipo de
 															// archivo
@@ -2081,7 +2131,7 @@ public class ControladorAnexos {
 
 		nombre = nombre.replaceAll("[^\\p{Alpha}\\p{Digit}]+", "_") + extension;
 
-		System.out.println("-*****------- Tama�o: " + tamanio);
+		System.out.println("-*****------- Tamaóo: " + tamanio);
 		System.out.println("-*****------- Contenido: " + contenido);
 		System.out.println("-*****------- Tipo de Archivo: " + tipoDeArchivo);
 		System.out.println("********** Nombre: " + nombre);
@@ -2489,7 +2539,7 @@ public class ControladorAnexos {
 				}
 			}
 
-			System.out.println("TAMA�O ARRAY:" + lstSubeArchivoObj.size());
+			System.out.println("TAMAóO ARRAY:" + lstSubeArchivoObj.size());
 		} catch (BiffException e) {
 			e.printStackTrace();
 		}
@@ -2643,7 +2693,7 @@ public class ControladorAnexos {
 				if (res == 0) {
 					FacesContext context = FacesContext.getCurrentInstance();
 					context.addMessage(null, new FacesMessage("Advertencia",
-							"Error al importar el Archivo Comun�quese con el Administrador del Sistema"));
+							"Error al importar el Archivo comuníquese con el Administrador del Sistema"));
 					return;
 				}
 				try {
@@ -2734,7 +2784,7 @@ public class ControladorAnexos {
 						if (strgAux == null) {
 							strgAux = "S/N";
 						}
-						datosCaracteristicasVehiculos.setAnio_de_fabricacion(Integer.valueOf(strgAux));
+						datosCaracteristicasVehiculos.setAnio_de_fabricacion(strgAux);
 					} catch (Exception e) {
 						strgAux = "S/N";
 					}
@@ -2763,7 +2813,7 @@ public class ControladorAnexos {
 					if (res == 0) {
 						FacesContext context = FacesContext.getCurrentInstance();
 						context.addMessage(null, new FacesMessage("Advertencia",
-								"Error al importar el Archivo Comun�quese con el Administrador del Sistema"));
+								"Error al importar el Archivo comuníquese con el Administrador del Sistema"));
 						return;
 					}
 				}
@@ -2876,7 +2926,7 @@ public class ControladorAnexos {
 					if (res == 0) {
 						FacesContext context = FacesContext.getCurrentInstance();
 						context.addMessage(null, new FacesMessage("Advertencia",
-								"Error al importar el Archivo Comun�quese con el Administrador del Sistema"));
+								"Error al importar el Archivo comuníquese con el Administrador del Sistema"));
 						return;
 					}
 
@@ -2903,7 +2953,7 @@ public class ControladorAnexos {
 		if (res == 0) {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Advertencia",
-					"Error al ingresar el Objeto Comun�quese con el Administrador del Sistema"));
+					"Error al ingresar el Objeto comuníquese con el Administrador del Sistema"));
 			return;
 		}
 		res = srvObjetoCotizacion.codigoMaxObjetoCot(datosObjetoCotizacion.getCd_ubicacion());
@@ -2926,7 +2976,7 @@ public class ControladorAnexos {
 			if (res == 0) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Advertencia",
-						"Error al ingresar el Objeto Comun�quese con el Administrador del Sistema"));
+						"Error al ingresar el Objeto comuníquese con el Administrador del Sistema"));
 				return;
 			}
 		}
@@ -2964,7 +3014,7 @@ public class ControladorAnexos {
 				if (res == 0) {
 					FacesContext context = FacesContext.getCurrentInstance();
 					context.addMessage(null, new FacesMessage("Advertencia",
-							"Error al ingresar las caracteristicas del Objeto Comun�quese con el Administrador del Sistema"));
+							"Error al ingresar las caracteristicas del Objeto comuníquese con el Administrador del Sistema"));
 					return;
 				}
 			} catch (Exception e) {
@@ -2980,7 +3030,7 @@ public class ControladorAnexos {
 		datosObjetoCotizacion = new ObjetoCotizacion();
 		datosCaracteristicasVehiculos = new CaracteristicasVehiculos();
 		lstSubObjetoCot = new ArrayList<SubObjetoCotizacion>();
-		System.out.println("TAMA�O:" + lstObjetosIncluidos.size());
+		System.out.println("TAMAóO:" + lstObjetosIncluidos.size());
 		// flgHabilitaUbicacion = false;
 		FacesContext contextMsj = FacesContext.getCurrentInstance();
 		contextMsj.addMessage(null, new FacesMessage("Advertencia", "Registro Exitoso"));
@@ -2993,7 +3043,7 @@ public class ControladorAnexos {
 		int res = 0;
 		if (selectedUbicacion == null) {
 			FacesContext contextMsj = FacesContext.getCurrentInstance();
-			contextMsj.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Ubicaci�n"));
+			contextMsj.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Ubicación"));
 			return;
 		}
 
@@ -3026,7 +3076,7 @@ public class ControladorAnexos {
 		if (res == 0) {
 			FacesContext contextMsj = FacesContext.getCurrentInstance();
 			contextMsj.addMessage(null, new FacesMessage("Advertencia",
-					"Erro al Insertar la Ubicaci�n. Comun�quese con el Administrador del sistema"));
+					"Erro al Insertar la Ubicación. comuníquese con el Administrador del sistema"));
 			return;
 		}
 		datosUbicacion = new Ubicacion();
@@ -3051,7 +3101,7 @@ public class ControladorAnexos {
 		if (res == 0) {
 			FacesContext contextMsj = FacesContext.getCurrentInstance();
 			contextMsj.addMessage(null, new FacesMessage("Advertencia",
-					"Erro al Insertar el Objeto Asegurado. Comun�quese con el Administrador del Sistema"));
+					"Erro al Insertar el Objeto Asegurado. comuníquese con el Administrador del Sistema"));
 			return;
 		}
 		datosObjetoCotizacion = new ObjetoCotizacion();
@@ -3077,7 +3127,7 @@ public class ControladorAnexos {
 			if (res == 0) {
 				FacesContext contextMsj = FacesContext.getCurrentInstance();
 				contextMsj.addMessage(null, new FacesMessage("Advertencia",
-						"Erro al Insertar el Sub - Objeto Asegurado. Comun�quese con el Administrador del Sistema"));
+						"Erro al Insertar el Sub - Objeto Asegurado. comuníquese con el Administrador del Sistema"));
 				return;
 			}
 		}
@@ -3090,7 +3140,7 @@ public class ControladorAnexos {
 		int res = 0;
 		if (selectedUbicacion == null) {
 			FacesContext contextMsj = FacesContext.getCurrentInstance();
-			contextMsj.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Ubicaci�n"));
+			contextMsj.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Ubicación"));
 			return;
 		}
 		System.out.println("UBICACION SELECCIONADA:" + selectedUbicacion.getCd_ubicacion());
@@ -3118,7 +3168,7 @@ public class ControladorAnexos {
 		if (res == 0) {
 			FacesContext contextMsj = FacesContext.getCurrentInstance();
 			contextMsj.addMessage(null, new FacesMessage("Advertencia",
-					"Erro al Insertar la Ubicaci�n. Comun�quese con el Administrador del sistema"));
+					"Erro al Insertar la Ubicación. comuníquese con el Administrador del sistema"));
 			return;
 		}
 		// RequestContext context = RequestContext.getCurrentInstance();
@@ -3141,7 +3191,7 @@ public class ControladorAnexos {
 		int res = 0;
 		if (selectedUbicacion == null) {
 			FacesContext contextMsj = FacesContext.getCurrentInstance();
-			contextMsj.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Ubicaci�n"));
+			contextMsj.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Ubicación"));
 			return;
 		}
 		if (selectedLstObjetosPoliza.size() == 0) {
@@ -3170,7 +3220,7 @@ public class ControladorAnexos {
 		if (res == 0) {
 			FacesContext contextMsj = FacesContext.getCurrentInstance();
 			contextMsj.addMessage(null, new FacesMessage("Advertencia",
-					"Erro al Insertar la Ubicaci�n. Comun�quese con el Administrador del sistema"));
+					"Erro al Insertar la Ubicación. comuníquese con el Administrador del sistema"));
 			return;
 		}
 
@@ -3224,7 +3274,7 @@ public class ControladorAnexos {
 		int res = 0;
 		if (selectedUbicacion == null) {
 			FacesContext contextMsj = FacesContext.getCurrentInstance();
-			contextMsj.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Ubicaci�n"));
+			contextMsj.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Ubicación"));
 			return;
 		}
 
@@ -3253,7 +3303,7 @@ public class ControladorAnexos {
 		if (res == 0) {
 			FacesContext contextMsj = FacesContext.getCurrentInstance();
 			contextMsj.addMessage(null, new FacesMessage("Advertencia",
-					"Erro al Insertar la Ubicaci�n. Comun�quese con el Administrador del sistema"));
+					"Erro al Insertar la Ubicación. comuníquese con el Administrador del sistema"));
 			return;
 		}
 		datosUbicacion = new Ubicacion();
@@ -3286,7 +3336,7 @@ public class ControladorAnexos {
 		int res = 0;
 		if (selectedUbicacion == null) {
 			FacesContext contextMsj = FacesContext.getCurrentInstance();
-			contextMsj.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Ubicaci�n"));
+			contextMsj.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Ubicación"));
 			return;
 		}
 
@@ -3318,7 +3368,7 @@ public class ControladorAnexos {
 		if (res == 0) {
 			FacesContext contextMsj = FacesContext.getCurrentInstance();
 			contextMsj.addMessage(null, new FacesMessage("Advertencia",
-					"Erro al Insertar la Ubicaci�n. Comun�quese con el Administrador del sistema"));
+					"Erro al Insertar la Ubicación. comuníquese con el Administrador del sistema"));
 			return;
 		}
 		datosUbicacion = new Ubicacion();
@@ -3343,7 +3393,7 @@ public class ControladorAnexos {
 		if (res == 0) {
 			FacesContext contextMsj = FacesContext.getCurrentInstance();
 			contextMsj.addMessage(null, new FacesMessage("Advertencia",
-					"Erro al Insertar el Objeto Asegurado. Comun�quese con el Administrador del Sistema"));
+					"Erro al Insertar el Objeto Asegurado. comuníquese con el Administrador del Sistema"));
 			return;
 		}
 		datosObjetoCotizacion = new ObjetoCotizacion();
@@ -3368,7 +3418,7 @@ public class ControladorAnexos {
 		if (res == 0) {
 			FacesContext contextMsj = FacesContext.getCurrentInstance();
 			contextMsj.addMessage(null, new FacesMessage("Advertencia",
-					"Erro al Insertar el Sub - Objeto Asegurado. Comun�quese con el Administrador del Sistema"));
+					"Erro al Insertar el Sub - Objeto Asegurado. comuníquese con el Administrador del Sistema"));
 			return;
 		}
 
@@ -3433,7 +3483,7 @@ public class ControladorAnexos {
 		Double primaTotaObj = 0.0, totalAseguradoObj = 0.0;
 		int res = 0, objaux;
 
-		// inserto la ubicaci�n
+		// inserto la ubicación
 		datosUbicacion.setCd_compania(datosRamoCotizacion.getCd_compania());
 		datosUbicacion.setCd_ramo_cotizacion(datosRamoCotizacion.getCd_ramo_cotizacion());
 		res = srvUbicacion.insertaUbicacionAnexo(datosRamoCotizacion.getCd_ramo_cotizacion(),
@@ -3441,7 +3491,7 @@ public class ControladorAnexos {
 		if (res == 0) {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Advertencia",
-					"Error al ingresar la Ubicaci�n Comuniquese con el Administrador del Sistema"));
+					"Error al ingresar la Ubicación Comuniquese con el Administrador del Sistema"));
 			return;
 		} else {
 			Ubicacion ubcAux = new Ubicacion();
@@ -3482,7 +3532,7 @@ public class ControladorAnexos {
 		if (res == 0) {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null, new FacesMessage("Advertencia",
-					"Error al ingresar el Objeto Comun�quese con el Administrador del Sistema"));
+					"Error al ingresar el Objeto comuníquese con el Administrador del Sistema"));
 			return;
 		}
 		// GUARDA DATOS DE LOS EXTRAS
@@ -3499,7 +3549,7 @@ public class ControladorAnexos {
 			if (res == 0) {
 				FacesContext context = FacesContext.getCurrentInstance();
 				context.addMessage(null, new FacesMessage("Advertencia",
-						"Error al ingresar el Objeto Comun�quese con el Administrador del Sistema"));
+						"Error al ingresar el Objeto comuníquese con el Administrador del Sistema"));
 				return;
 			}
 		}
@@ -3508,7 +3558,7 @@ public class ControladorAnexos {
 		datosObjetoCotizacion.setValor_asegurador_objeto(0.0);
 		datosObjetoCotizacion.setTotal_asegurado_objeto(totalAseguradoObj);
 		srvObjetoCotizacion.actualizaObjetoCotizacion(datosObjetoCotizacion);
-		// actualizo la prima de la ubicaci�n
+		// actualizo la prima de la ubicación
 		datosUbicacion.setValor_prima_ubicacion(primaTotaObj);
 		datosUbicacion.setValor_asegurado_ubicacion(totalAseguradoObj);
 		srvUbicacion.actualizaUbicacion(datosUbicacion);
@@ -3563,7 +3613,7 @@ public class ControladorAnexos {
 						valAsegPen = valAsegPen + Double.valueOf(objPenAux.getTotal_asegurado_objeto());
 						primaObjTot = primaObjTot + Double.valueOf(objPenAux.getPrima_objeto());
 					}
-					// actualizo la ubicaci�n
+					// actualizo la ubicación
 					Ubicacion ubPenAux = new Ubicacion();
 					ubPenAux = srvUbicacion.recuperaUbicacionPorCodigo(Integer.valueOf(ubcPend.getCd_ubicacion()),
 							Integer.valueOf(ubcPend.getCd_compania()));
@@ -3661,13 +3711,13 @@ public class ControladorAnexos {
 				if (res == 0) {
 					//////////////////////////////////////////
 					//
-					// ACTUALIZA LOS C�LCULO PARA EL ANEXO //
+					// ACTUALIZA LOS CóLCULO PARA EL ANEXO //
 					//
 					/////////////////////////////////////////
 					// GUARDA DATOS DE LOS EXTRAS EN CASO DE EXISTIR
 					////////////////////////////////////////
 					if (tipoAnexoSelec.equals("INCLUSION") && afectaPoliza.equals("EXTRA")) {
-						// actualizo el Ramo Cotizaci�n
+						// actualizo el Ramo Cotización
 						primaObjTot = datosUbicacion.getValor_prima_ubicacion();
 						totalValorAsegObj = datosUbicacion.getValor_asegurado_ubicacion();
 						RamoCotizacion ramCot = new RamoCotizacion();
@@ -3678,7 +3728,7 @@ public class ControladorAnexos {
 						srvRamoCotizacion.actualizaRamoCotizacion(ramCot);
 					}
 					if (tipoAnexoSelec.equals("EXCLUSION") && afectaPoliza.equals("UBICACION")) {
-						// actualizo el Ramo Cotizaci�n
+						// actualizo el Ramo Cotización
 						primaObjTot = datosUbicacion.getValor_prima_ubicacion();
 						totalValorAsegObj = datosUbicacion.getValor_asegurado_ubicacion();
 						RamoCotizacion ramCot = new RamoCotizacion();
@@ -3689,7 +3739,7 @@ public class ControladorAnexos {
 						srvRamoCotizacion.actualizaRamoCotizacion(ramCot);
 					}
 					if (tipoAnexoSelec.equals("EXCLUSION") && afectaPoliza.equals("OBJETO")) {
-						// actualizo el Ramo Cotizaci�n
+						// actualizo el Ramo Cotización
 						primaObjTot = datosUbicacion.getValor_prima_ubicacion();
 						totalValorAsegObj = datosUbicacion.getValor_asegurado_ubicacion();
 						RamoCotizacion ramCot = new RamoCotizacion();
@@ -3700,7 +3750,7 @@ public class ControladorAnexos {
 						srvRamoCotizacion.actualizaRamoCotizacion(ramCot);
 					}
 					if (tipoAnexoSelec.equals("EXCLUSION") && afectaPoliza.equals("EXTRA")) {
-						// actualizo el Ramo Cotizaci�n
+						// actualizo el Ramo Cotización
 						primaObjTot = datosUbicacion.getValor_prima_ubicacion();
 						totalValorAsegObj = datosUbicacion.getValor_asegurado_ubicacion();
 						RamoCotizacion ramCot = new RamoCotizacion();
@@ -3711,7 +3761,7 @@ public class ControladorAnexos {
 						srvRamoCotizacion.actualizaRamoCotizacion(ramCot);
 					}
 					if (tipoAnexoSelec.equals("MODVALASEG") && afectaPoliza.equals("OBJETO")) {
-						// actualizo el Ramo Cotizaci�n
+						// actualizo el Ramo Cotización
 						primaObjTot = datosUbicacion.getValor_prima_ubicacion();
 						totalValorAsegObj = datosUbicacion.getValor_asegurado_ubicacion();
 						RamoCotizacion ramCot = new RamoCotizacion();
@@ -3722,7 +3772,7 @@ public class ControladorAnexos {
 						srvRamoCotizacion.actualizaRamoCotizacion(ramCot);
 					}
 					if (tipoAnexoSelec.equals("MODVALASEG") && afectaPoliza.equals("EXTRA")) {
-						// actualizo el Ramo Cotizaci�n
+						// actualizo el Ramo Cotización
 						primaObjTot = datosUbicacion.getValor_prima_ubicacion();
 						totalValorAsegObj = datosUbicacion.getValor_asegurado_ubicacion();
 						RamoCotizacion ramCot = new RamoCotizacion();
@@ -3749,7 +3799,7 @@ public class ControladorAnexos {
 						datosUbicacion.setValor_prima_ubicacion(primaObjTot);
 						datosUbicacion.setValor_asegurado_ubicacion(totalValorAsegObj);
 						srvUbicacion.actualizaUbicacion(datosUbicacion);
-						// actualizo el Ramo Cotizaci�n
+						// actualizo el Ramo Cotización
 						RamoCotizacion ramCot = new RamoCotizacion();
 						ramCot = srvRamoCotizacion.recuperaRamoCotizacionPorCodigo(
 								datosUbicacion.getCd_ramo_cotizacion(), datosUbicacion.getCd_compania());
@@ -4050,7 +4100,7 @@ public class ControladorAnexos {
 						new FacesMessage("Advertencia", "Resumen no disponible para este tipo de Anexo"));
 				return;
 			} else {
-				System.out.println("P�liza Seleccionada:" + PolizaSeleccionadaParaAnexo.getCd_cotizacion());
+				System.out.println("Póliza Seleccionada:" + PolizaSeleccionadaParaAnexo.getCd_cotizacion());
 				carta.setCd_cot_ane(Integer.valueOf(PolizaSeleccionadaParaAnexo.getCd_cotizacion()));
 			}
 		}
@@ -4090,8 +4140,8 @@ public class ControladorAnexos {
 		srvCorrespondencia.insertarCorrespondencia(carta);
 		numeroCarta = srvCorrespondencia.numCartaMax(String.valueOf(usr.getUsrid()));
 		FacesContext contextMsj = FacesContext.getCurrentInstance();
-		contextMsj.addMessage(null, new FacesMessage("Registro Exitoso", "Se Gener� el Documento N�mero " + numeroCarta
-				+ ". Ingrese al M�dulo de Correspondecia para Imprimirlo"));
+		contextMsj.addMessage(null, new FacesMessage("Registro Exitoso", "Se Generó el Documento número " + numeroCarta
+				+ ". Ingrese al Módulo de Correspondecia para Imprimirlo"));
 	}
 
 	public String getCdRamCotPolizaAnexo() {
@@ -4877,6 +4927,16 @@ public class ControladorAnexos {
 	public void setFrmObservaciones(String frmObservaciones) {
 		this.frmObservaciones = frmObservaciones;
 	}
+
+	public List<CaracteristicasVehiculos> getCaracteristicasObjetoCons() {
+		return caracteristicasObjetoCons;
+	}
+
+	public void setCaracteristicasObjetoCons(List<CaracteristicasVehiculos> caracteristicasObjetoCons) {
+		this.caracteristicasObjetoCons = caracteristicasObjetoCons;
+	}
+
+
 	
 	
 

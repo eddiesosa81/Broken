@@ -541,7 +541,7 @@
 			<p:column headerText="MOTOR">
 				<p:cellEditor>
 					<f:facet name="output">
-						<h:outputText value="#{carac.no_de_motor}" style="width:120px"/>
+						<h:outputText value="#{carac.no_de_motor}" style="width:120px" />
 					</f:facet>
 					<f:facet name="input">
 						<p:inputText value="#{carac.no_de_motor}" style="width:100%" />
@@ -551,7 +551,7 @@
 			<p:column headerText="CHASIS">
 				<p:cellEditor>
 					<f:facet name="output">
-						<h:outputText value="#{carac.no_de_chasis}" style="width:120px"/>
+						<h:outputText value="#{carac.no_de_chasis}" style="width:120px" />
 					</f:facet>
 					<f:facet name="input">
 						<p:inputText value="#{carac.no_de_chasis}" style="width:100%" />
@@ -1167,8 +1167,9 @@
 					<p:inputText id="vhChasis"
 						value="#{ControladorEmision.datosCaracteristicasVehiculos.no_de_chasis}" />
 					<h:outputText value="Año " />
-					<p:inputNumber id="vhAnio"
-						value="#{ControladorEmision.datosCaracteristicasVehiculos.anio_de_fabricacion}" />
+					<p:inputMask id="vhAnio"
+						value="#{ControladorEmision.datosCaracteristicasVehiculos.anio_de_fabricacion}"
+						mask="9999" />
 					<h:outputText value="Dispositivo " />
 					<p:selectOneMenu id="vhDispositivo"
 						value="#{ControladorEmision.datosCaracteristicasVehiculos.cd_dispositivo}"
@@ -1199,7 +1200,7 @@
 			<p:tab title="Extra">
 				<h:panelGrid columns="6" cellpadding="5">
 					<h:outputText value="Item Aseg." />
-					<p:inputNumber id="exCantidad"
+					<p:inputText id="exCantidad"
 						value="#{ControladorEmision.exCantidad}" style="width:50px;" />
 					<h:outputText value="Detalle" />
 					<p:inputText id="exDetalle" value="#{ControladorEmision.exDetalle}"
@@ -1217,6 +1218,8 @@
 							process="@this, frm_emision:tab_emision:tbViewObjAseg:exCantidad, frm_emision:tab_emision:tbViewObjAseg:exDetalle, frm_emision:tab_emision:tbViewObjAseg:exValorSubobjeto, 
 							frm_emision:tab_emision:tbViewObjAseg:exTasaSubObj, frm_emision:tab_emision:tbViewObjAseg:exFactorSubObj, frm_emision:tab_emision:tbViewObjAseg:exPrimaSubObj" />
 					</p:inputNumber>
+					
+					
 					<h:outputText value="Factor" />
 					<p:selectOneRadio id="exFactorSubObj"
 						value="#{ControladorEmision.exFactos}" style="width:50px;">
@@ -1859,12 +1862,12 @@
 	<p:dialog header="Carga de Archivos" draggable="true" showEffect="fade"
 		hideEffect="fade" widgetVar="wDlgCargaArchivoPrin" closable="true"
 		appendTo="@(body)" modal="true">
-			<p:fileUpload listener="#{ControladorEmision.subirArchivos}"
-				label="Seleccionar" uploadLabel="Adjuntar" cancelLabel="Cancelar"
-				mode="advanced" dragDropSupport="true"
-				update="@this,frmUbcRamoCot:objectUbc" sizeLimit="9000000"
-				fileLimit="1" allowTypes="/(\.|\/)(xls)$/">
-			</p:fileUpload>
+		<p:fileUpload listener="#{ControladorEmision.subirArchivos}"
+			label="Seleccionar" uploadLabel="Adjuntar" cancelLabel="Cancelar"
+			mode="advanced" dragDropSupport="true"
+			update="@this,frmUbcRamoCot:objectUbc" sizeLimit="9000000"
+			fileLimit="1" allowTypes="/(\.|\/)(xls)$/">
+		</p:fileUpload>
 	</p:dialog>
 
 </ui:composition>

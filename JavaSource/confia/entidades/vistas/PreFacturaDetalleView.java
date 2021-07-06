@@ -46,6 +46,10 @@ public class PreFacturaDetalleView {
 	private String nombre_aseguradora;
 	@Column(name="fc_pre_factura")
 	private String fc_pre_factura;
+	@Column(name="grupo_contratante")
+	private String grupo_contratante;
+	@Column(name="cd_grupo_contratante")
+	private String cd_grupo_contratante;
 	
 	
 	public String getCd_aseguradora() {
@@ -155,6 +159,18 @@ public class PreFacturaDetalleView {
 	}
 	public void setFc_pre_factura(String fc_pre_factura) {
 		this.fc_pre_factura = fc_pre_factura;
+	}
+	public String getGrupo_contratante() {
+		return grupo_contratante;
+	}
+	public void setGrupo_contratante(String grupo_contratante) {
+		this.grupo_contratante = grupo_contratante;
+	}
+	public String getCd_grupo_contratante() {
+		return cd_grupo_contratante;
+	}
+	public void setCd_grupo_contratante(String cd_grupo_contratante) {
+		this.cd_grupo_contratante = cd_grupo_contratante;
 	}
 	
 

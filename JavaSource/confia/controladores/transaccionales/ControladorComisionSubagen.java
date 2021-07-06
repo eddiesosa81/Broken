@@ -208,18 +208,48 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 		}
 	}
 
-	public void onRowEdit(RowEditEvent event) {
+	public void onRowEdit(RowEditEvent<ComiSubagenPolView> event) {
 		ComiSubagenPolView comSuba = new ComiSubagenPolView();
 		comSuba = (ComiSubagenPolView) event.getObject();
-		ComisionSubagentePol comPol = new ComisionSubagentePol();
 		
+		Double valComSubaEven,pctComSubaEven;
+		try {
+			valComSubaEven = comSuba.getVal_com_suba();
+		} catch (Exception e) {
+			valComSubaEven = 0.0;
+		}
+		try {
+			pctComSubaEven = comSuba.getPct_com_suba();
+		} catch (Exception e) {
+			pctComSubaEven = 0.0;
+		}
+		System.out.println("valComSubaEven:"+valComSubaEven);
+		System.out.println("pctComSubaEven:"+pctComSubaEven);
+		
+		
+		ComisionSubagentePol comPol = new ComisionSubagentePol();
 		comPol = srvComPolSuba.consultaSubagentePol(Integer.valueOf(comSuba.getCd_comisuba_pol()));
-		System.out.println("comPol.getVal_com_suba():"+comPol.getVal_com_suba());
-		System.out.println("comPol.getSaldo_com_suba():"+comPol.getSaldo_com_suba());
-		if(comPol.getVal_com_suba().equals(comPol.getSaldo_com_suba())) {
-			comPol.setVal_com_suba(Double.valueOf(comSuba.getVal_com_suba()));
-			comPol.setPct_com_suba(Double.valueOf(comSuba.getPct_com_suba()));
-			comPol.setSaldo_com_suba(Double.valueOf(comSuba.getVal_com_suba()));
+
+		
+		
+		Double valComSubaAux,salComSubaAux;
+		try {
+			valComSubaAux = comPol.getVal_com_suba();
+		} catch (Exception e) {
+			valComSubaAux = 0.0;
+		}
+		try {
+			salComSubaAux = comPol.getSaldo_com_suba();
+		} catch (Exception e) {
+			salComSubaAux = 0.0;
+		}
+		System.out.println("comPol.getVal_com_suba():"+valComSubaAux);
+		System.out.println("comPol.getSaldo_com_suba():"+salComSubaAux);
+		
+		if(valComSubaAux.equals(salComSubaAux)) {
+			comPol.setVal_com_suba(valComSubaEven);
+			comPol.setPct_com_suba(pctComSubaEven);
+			comPol.setSaldo_com_suba(valComSubaEven);
 			srvComPolSuba.actualizaComisionSubagentePol(comPol);
 			listComisionSubagenPol = new ArrayList<ComiSubagenPolView>();
 			cargarComiSubagenPol();	
@@ -230,7 +260,7 @@ public class ControladorComisionSubagen extends AbstractReportBean {
 			
 			listComisionSubagenPol = new ArrayList<ComiSubagenPolView>();
 		}
-	}
+    }
 
 	public double redondear(double numero) {
 		return Math.rint(numero * 100) / 100;

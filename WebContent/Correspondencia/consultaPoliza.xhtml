@@ -165,6 +165,10 @@
 			<h:outputText value="#{pol.total_asegurado}">
 			</h:outputText>
 		</p:column>
+		<p:column headerText="Prima Neta:">
+			<h:outputText value="#{pol.total_prima}">
+			</h:outputText>
+		</p:column>
 		<p:column headerText="Tipo">
 			<h:outputText value="#{pol.desc_rubro}">
 			</h:outputText>
@@ -188,7 +192,7 @@
 			<p:commandButton
 				action="#{ControladorConsultaPoliza.onRowSelectPago}" value="Pagos"
 				icon="ui-icon-suitcase"
-				update="@this frm_consultas:tab_consulta:idConsPagoPol"
+				update="@this,frm_consultas:tab_consulta:idConsPagoPol,frm_consultas:tab_consulta:numAltFrmPagPtot,frm_consultas:tab_consulta:numAltFrmPagPag"
 				process="@this,frm_consultas:tab_consulta:listadoPolizaBusca">
 			</p:commandButton>
 		</f:facet>
@@ -498,28 +502,40 @@
 		widgetVar="dlgPagoPolCons" showEffect="fade" hideEffect="fade"
 		closable="true">
 		<p:panel>
+			<h:panelGrid columns="2">
+				<h3>Forma Pago:</h3>
+				<h:outputText
+					value="#{ControladorConsultaPoliza.frFormaPago.num_alternativa_formaPago}"
+					id="numAltFrmPagPag" />
+				<h3>Prima Total:</h3>
+				<h:outputText
+					value="#{ControladorConsultaPoliza.frFormaPago.total_Pago_FormaPago}"
+					id="numAltFrmPagPtot" />
+
+			</h:panelGrid>
+
 			<p:dataTable id="idConsPagoPol" var="pag"
 				value="#{ControladorConsultaPoliza.lstPagoPoliza}" scrollable="true"
 				scrollHeight="150"
-				style="width:500px; font-family:Verdana; font-size: 12px;">
-				<p:column headerText="Tipo">
+				style="width:1200px; font-family:Verdana; font-size: 12px;">
+				<p:column headerText="Tipo" style="width:80px">
 					<h:outputText value="#{pag.tipo}" />
 				</p:column>
-				<p:column headerText="Valor">
+				<p:column headerText="Valor" style="width:80px">
 					<h:outputText value="#{pag.valor}" />
 				</p:column>
-				<p:column headerText="Saldo">
+				<p:column headerText="Saldo" style="width:80px">
 					<h:outputText value="#{pag.saldo}" />
 				</p:column>
-				<p:column headerText="Estado">
+				<p:column headerText="Estado" style="width:80px">
 					<h:outputText value="#{pag.estado}" />
 				</p:column>
-				<p:column headerText="Fc. Vencimiento">
+				<p:column headerText="Fc. Vencimiento" style="width:80px">
 					<h:outputText value="#{pag.fecha_vencimiento_date}">
 						<f:convertDateTime pattern="dd/MM/yyyy" />
 					</h:outputText>
 				</p:column>
-				<p:column headerText="Observaciones">
+				<p:column headerText="Observaciones" style="width:120px">
 					<h:outputText value="#{pag.observaciones}">
 
 					</h:outputText>

@@ -34,6 +34,7 @@ import confia.entidades.basicos.Usuarios;
 import confia.entidades.transaccionales.Archivos;
 import confia.entidades.transaccionales.CaracteristicasVehiculos;
 import confia.entidades.transaccionales.Correspondencia;
+import confia.entidades.transaccionales.FormaPago;
 import confia.entidades.transaccionales.Gestion;
 import confia.entidades.transaccionales.NotasAclaratorias;
 import confia.entidades.transaccionales.RamoCotizacion;
@@ -68,6 +69,7 @@ import confia.servicios.basicos.ServiciosDeduciblesEmitidas;
 import confia.servicios.transaccionales.ServicioArchivos;
 import confia.servicios.transaccionales.ServicioCaracteristicasVehiculos;
 import confia.servicios.transaccionales.ServicioCorrespondencia;
+import confia.servicios.transaccionales.ServicioFormaPago;
 import confia.servicios.transaccionales.ServicioGestion;
 import confia.servicios.transaccionales.ServicioNotasAclaratorias;
 import confia.servicios.transaccionales.ServicioRamoCotizacion;
@@ -153,6 +155,8 @@ public class ControladorConsultaPoliza {
 	private ServicioRamo srvRamo;
 	@EJB
 	private ServicioRamoCotizacion srvRamoCotizacion;
+	@EJB
+	private ServicioFormaPago srvFormaPago;
 
 	private String numPoliza;
 	private String numFactura;
@@ -187,7 +191,8 @@ public class ControladorConsultaPoliza {
 	private String objAsegurado;
 	// PAGOS
 	private List<ConsultaPagoRealizadosView> lstPagoRealizado;
-	// gesti�n
+	private FormaPago frFormaPago;
+	// gestión
 	private Clientes cliente;
 	private Direccion direccion;
 	private Telefono telefono;
@@ -317,7 +322,7 @@ public class ControladorConsultaPoliza {
 			codCliente = selectedConsultaPoliza.getCd_cliente();
 		} catch (Exception e) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Seleccione la p�liza"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Seleccione la póliza"));
 			return;
 		}
 
@@ -336,12 +341,12 @@ public class ControladorConsultaPoliza {
 			if (selectedConsultaPoliza.getCd_cotizacion().isEmpty()
 					|| selectedConsultaPoliza.getCd_cotizacion() == null) {
 				FacesContext context = FacesContext.getCurrentInstance();
-				context.addMessage(null, new FacesMessage("Advertencia", "Seleccione la p�liza"));
+				context.addMessage(null, new FacesMessage("Advertencia", "Seleccione la póliza"));
 				return;
 			}
 		} catch (Exception e) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Seleccione la p�liza"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Seleccione la póliza"));
 			return;
 		}
 
@@ -356,11 +361,11 @@ public class ControladorConsultaPoliza {
 		res = srvProcedimientos.renuevaPoliza(selectedConsultaPoliza.getCd_cotizacion(),
 				selectedConsultaPoliza.getCd_compania());
 		FacesContext context = FacesContext.getCurrentInstance();
-		context.addMessage(null, new FacesMessage("Advertencia", "Renovaci�n N�mero:" + res));
+		context.addMessage(null, new FacesMessage("Advertencia", "Renovación Nómero:" + res));
 		// } else {
 		// FacesContext context = FacesContext.getCurrentInstance();
 		// context.addMessage(null,
-		// new FacesMessage("Advertencia", "Usted puede renovar 30 d�as antes
+		// new FacesMessage("Advertencia", "Usted puede renovar 30 dóas antes
 		// del fin de vigencia."));
 		// }
 	}
@@ -633,6 +638,11 @@ public class ControladorConsultaPoliza {
 			lstPagoPoliza = srvConsPagoPolView.consultaPagoPolXCdCot(codCotAux);
 			System.out.println("FROMAPAGO:" + lstPagoPoliza.size());
 		}
+		
+		frFormaPago = new FormaPago();
+		frFormaPago = srvFormaPago.recuperaFormaPagoxCod(Integer.valueOf(lstPagoPoliza.get(0).getCd_forma_pago()), Integer.valueOf(lstPagoPoliza.get(0).getCd_compania()));
+		System.err.println("FORMA PAGO:"+frFormaPago.getTotal_Pago_FormaPago());
+		
 		// RequestContext context = RequestContext.getCurrentInstance();
 		// context.execute("PF('dlgPagoPolCons').show()");
 		PrimeFaces.current().executeScript("PF('dlgPagoPolCons').show()");
@@ -680,7 +690,7 @@ public class ControladorConsultaPoliza {
 			String tamano = selectedConsultaPoliza.getPoliza();
 		} catch (Exception e) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("Advertencia", "Seleccione la P�liza antes de generar la carta"));
+			context.addMessage(null, new FacesMessage("Advertencia", "Seleccione la Póliza antes de generar la carta"));
 			nmCarta = "0";
 			return;
 		}
@@ -743,8 +753,8 @@ public class ControladorConsultaPoliza {
 		}
 
 		FacesContext contextMsj = FacesContext.getCurrentInstance();
-		contextMsj.addMessage(null, new FacesMessage("Registro Exitoso", "Se Gener� el Documento N�mero " + numeroCarta
-				+ ". Ingrese al M�dulo de Correspondecia para Imprimirlo"));
+		contextMsj.addMessage(null, new FacesMessage("Registro Exitoso", "Se Generó el Documento Nómero " + numeroCarta
+				+ ". Ingrese al Módulo de Correspondecia para Imprimirlo"));
 	}
 
 	public void buscarDetallePago() {
@@ -760,7 +770,7 @@ public class ControladorConsultaPoliza {
 		} catch (Exception ex) {
 			//
 		}
-		System.out.println("TAMA�O:" + lstPagoRealizado.size());
+		System.out.println("TAMAóO:" + lstPagoRealizado.size());
 
 		// RequestContext context = RequestContext.getCurrentInstance();
 		// context.execute("PF('pagoDialog').show()");
@@ -775,7 +785,7 @@ public class ControladorConsultaPoliza {
 		} catch (Exception e) {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage(null,
-					new FacesMessage("Advertencia", "Seleccione la P�liza antes de realizar la gesti�n del Cliente"));
+					new FacesMessage("Advertencia", "Seleccione la Póliza antes de realizar la gestión del Cliente"));
 			nmCarta = "0";
 			return;
 		}
@@ -789,7 +799,7 @@ public class ControladorConsultaPoliza {
 		try {
 			direccion = srvDireccion.BuscaDireccionCodCliente(selectedConsultaPoliza.getCd_cliente());
 		} catch (Exception e) {
-			System.out.println("No existe direcci�n ingresada");
+			System.out.println("No existe dirección ingresada");
 		}
 		try {
 			telefono = srvTelefono.BuscaTelefonoCodCliente(selectedConsultaPoliza.getCd_cliente());
@@ -876,10 +886,10 @@ public class ControladorConsultaPoliza {
 
 		try {
 			if (gestion.getInstruccion().isEmpty() || gestion.getInstruccion() == null) {
-				gestion.setInstruccion("Sin Instrucci�n");
+				gestion.setInstruccion("Sin Instrucción");
 			}
 		} catch (Exception e) {
-			gestion.setInstruccion("Sin Instrucci�n");
+			gestion.setInstruccion("Sin Instrucción");
 		}
 		try {
 			System.out.println("ID:USUARIO:" + usuarioId);
@@ -893,7 +903,7 @@ public class ControladorConsultaPoliza {
 
 		gestion.setCd_cotizacion(Integer.valueOf(selectedConsultaPoliza.getCd_cotizacion()));
 		gestion.setCd_ramo_cotizacion(Integer.valueOf(selectedConsultaPoliza.getCd_ramo_cotizacion()));
-		System.out.println("Pasa Validaci�n");
+		System.out.println("Pasa Validación");
 		srvGestion.insertarGestion(gestion);
 		System.out.println("INSERTO GESTION");
 
@@ -951,7 +961,7 @@ public class ControladorConsultaPoliza {
 				cont = cont + 1;
 			}
 
-			ubc = "Gesti�n Sistema - P�liza: ";
+			ubc = "Gestión Sistema - Póliza: ";
 			ubc = ubc.concat(selectedConsultaPoliza.getPoliza());
 			ubc = ubc.concat(" Factura:");
 			ubc = ubc.concat(selectedConsultaPoliza.getFactura_aseguradora());
@@ -961,7 +971,7 @@ public class ControladorConsultaPoliza {
 			email.setTexto("<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
 					+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Estimad@<o:p></o:p></span></p>"
 					+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
-					+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Se ha generado una nueva gesti�n en el sistema"
+					+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'>Se ha generado una nueva gestión en el sistema"
 					+ " con las siguientes referencias:" + " <o:p></o:p></span></p>"
 
 					+ "<table class=MsoNormalTable border=0 cellpadding=0 width=600 style='width:450.0pt; mso-cellspacing:1.5pt;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt'>"
@@ -970,7 +980,7 @@ public class ControladorConsultaPoliza {
 					+ "<p class=MsoNormal><b><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
 					+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:Calibri;"
 					+ "mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
-					+ "mso-bidi-theme-font:minor-latin'>Descripci�n</span></b><span "
+					+ "mso-bidi-theme-font:minor-latin'>Descripción</span></b><span "
 					+ "style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:minor-latin;"
 					+ "mso-fareast-font-family:Times New Roman;mso-hansi-font-family:Calibri;"
 					+ "mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;mso-bidi-theme-font:"
@@ -1029,7 +1039,7 @@ public class ControladorConsultaPoliza {
 					+ "<p class=MsoNormal><b><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
 					+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:"
 					+ "Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
-					+ "mso-bidi-theme-font:minor-latin'>P�liza:</span></b><span style='mso-ascii-font-family:"
+					+ "mso-bidi-theme-font:minor-latin'>Póliza:</span></b><span style='mso-ascii-font-family:"
 					+ "Calibri;mso-ascii-theme-font:minor-latin;mso-fareast-font-family:Times New Roman;"
 					+ "mso-hansi-font-family:Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:"
 					+ "Calibri;mso-bidi-theme-font:minor-latin'><o:p></o:p></span></p>" + "</td>"
@@ -1061,7 +1071,7 @@ public class ControladorConsultaPoliza {
 					+ "<p class=MsoNormal><b><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
 					+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:"
 					+ "Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
-					+ "mso-bidi-theme-font:minor-latin'>Tipo Instrucci�n:</span></b><span style='mso-ascii-font-family:"
+					+ "mso-bidi-theme-font:minor-latin'>Tipo Instrucción:</span></b><span style='mso-ascii-font-family:"
 					+ "Calibri;mso-ascii-theme-font:minor-latin;mso-fareast-font-family:Times New Roman;"
 					+ "mso-hansi-font-family:Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:"
 					+ "Calibri;mso-bidi-theme-font:minor-latin'><o:p></o:p></span></p>" + "</td>"
@@ -1092,7 +1102,7 @@ public class ControladorConsultaPoliza {
 					+ "<p class=MsoNormal><b><span style='mso-ascii-font-family:Calibri;mso-ascii-theme-font:"
 					+ "minor-latin;mso-fareast-font-family:Times New Roman;mso-hansi-font-family:"
 					+ "Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:Calibri;"
-					+ "mso-bidi-theme-font:minor-latin'>Instrucci�n:</span></b><span style='mso-ascii-font-family:"
+					+ "mso-bidi-theme-font:minor-latin'>Instrucción:</span></b><span style='mso-ascii-font-family:"
 					+ "Calibri;mso-ascii-theme-font:minor-latin;mso-fareast-font-family:Times New Roman;"
 					+ "mso-hansi-font-family:Calibri;mso-hansi-theme-font:minor-latin;mso-bidi-font-family:"
 					+ "Calibri;mso-bidi-theme-font:minor-latin'><o:p></o:p></span></p>" + "</td>"
@@ -1106,18 +1116,18 @@ public class ControladorConsultaPoliza {
 					+ "<p><span style='font-family:Times New Roman,sans-serif;mso-ascii-theme-font:minor-latin;"
 					+ "mso-hansi-theme-font:minor-latin;mso-bidi-theme-font:minor-latin'> " + " <o:p></o:p></span></p>"
 					+ "<p><strong>Nota: </strong>"
-					+ "Este mensaje ha sido generado autom�ticamente, por favor no lo responda." + "</p> ");
+					+ "Este mensaje ha sido generado automóticamente, por favor no lo responda." + "</p> ");
 			email.sendEmail();
 
 		} else {
 			System.out.println("---- ENVIO MEETING REQUEST ORGANIZADOR----");
-			// eMeeting.setSubject("Planificaci�n de Reuniones");
+			// eMeeting.setSubject("Planificación de Reuniones");
 			try {
 				if (asunto.isEmpty() || asunto == null) {
-					asunto = "Gesti�n Sistema";
+					asunto = "Gestión Sistema";
 				}
 			} catch (Exception e) {
-				asunto = "Gesti�n Sistema";
+				asunto = "Gestión Sistema";
 			}
 			eMeeting.setSubject(asunto);
 			System.out.println("********* tema_subject*********" + asunto);
@@ -1134,7 +1144,7 @@ public class ControladorConsultaPoliza {
 				cont = cont + 1;
 			}
 			eMeeting.setReceptor(user);
-			ubc = "Gesti�n Sistema - P�liza: ";
+			ubc = "Gestión Sistema - Póliza: ";
 			ubc = ubc.concat(selectedConsultaPoliza.getPoliza());
 			ubc = ubc.concat(" Factura:");
 			ubc = ubc.concat(selectedConsultaPoliza.getFactura_aseguradora());
@@ -1150,12 +1160,12 @@ public class ControladorConsultaPoliza {
 			}
 
 			if (fec) {
-				eMeeting.setCuerpo("<p> Este mensaje ha sido generado autom�ticamente, por favor no lo responda. </p>"
+				eMeeting.setCuerpo("<p> Este mensaje ha sido generado automóticamente, por favor no lo responda. </p>"
 						+ "<p>Estimad@,</p>" + "Se ha planificado un nuevo evento " + " con la siguiente referencia:"
-						+ " " + "<p><strong>Asunto: </strong>" + asunto + "</p> " + "<p><strong>Descripci�n: </strong>"
+						+ " " + "<p><strong>Asunto: </strong>" + asunto + "</p> " + "<p><strong>Descripción: </strong>"
 						+ " " + gestion.getInstruccion() + "</p> " + "<p><strong>Fecha Pago: </strong>"
 						+ gestion.getFecha_pago() + "</p> " + "<p><strong>Cliente: </strong>"
-						+ selectedConsultaPoliza.getCliente() + "</p> " + "<p><strong>P�liza: </strong>"
+						+ selectedConsultaPoliza.getCliente() + "</p> " + "<p><strong>Póliza: </strong>"
 						+ selectedConsultaPoliza.getPoliza() + "</p> " + "<p><strong>Factura: </strong>"
 						+ selectedConsultaPoliza.getFactura_aseguradora() + "</p> " + "<p><strong>Ramo: </strong>"
 						+ selectedConsultaPoliza.getDesc_ramo() + "</p> " + "<p><strong>Aseguradora: </strong>"
@@ -1174,12 +1184,12 @@ public class ControladorConsultaPoliza {
 				System.out.println("FECHA AUMENTA HORA:" + fcMeeting);
 				System.out.println("FECHA FIN HORA:" + fcFin);
 			} else {
-				eMeeting.setCuerpo("<p> Este mensaje ha sido generado autom�ticamente, por favor no lo responda. </p>"
+				eMeeting.setCuerpo("<p> Este mensaje ha sido generado automóticamente, por favor no lo responda. </p>"
 						+ "<p>Estimad@,</p>" + "Se ha planificado un nuevo evento " + " con la siguiente referencia:"
-						+ " " + "<p><strong>Asunto: </strong>" + asunto + "</p> " + "<p><strong>Descripci�n: </strong>"
+						+ " " + "<p><strong>Asunto: </strong>" + asunto + "</p> " + "<p><strong>Descripción: </strong>"
 						+ " " + gestion.getInstruccion() + "</p> " + "<p><strong>Fecha Seguimiento: </strong>"
 						+ gestion.getFecha_seguimiento() + "</p> " + "<p><strong>Cliente: </strong>"
-						+ selectedConsultaPoliza.getCliente() + "</p> " + "<p><strong>P�liza: </strong>"
+						+ selectedConsultaPoliza.getCliente() + "</p> " + "<p><strong>Póliza: </strong>"
 						+ selectedConsultaPoliza.getPoliza() + "</p> " + "<p><strong>Factura: </strong>"
 						+ selectedConsultaPoliza.getFactura_aseguradora() + "</p> " + "<p><strong>Ramo: </strong>"
 						+ selectedConsultaPoliza.getDesc_ramo() + "</p> " + "<p><strong>Aseguradora: </strong>"
@@ -1797,4 +1807,12 @@ public class ControladorConsultaPoliza {
 		this.lstFilteredCalusulaEmitida = lstFilteredCalusulaEmitida;
 	}
 
+	public FormaPago getFrFormaPago() {
+		return frFormaPago;
+	}
+
+	public void setFrFormaPago(FormaPago frFormaPago) {
+		this.frFormaPago = frFormaPago;
+	}
+	
 }

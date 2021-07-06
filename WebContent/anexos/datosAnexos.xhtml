@@ -118,11 +118,7 @@
 						value="Emitir" title="Emite Anexo"
 						process="@this,frm_anexos:tbViewInclUbc:dtFrmpFinal,frm_anexos:tbViewInclUbc:tipoAfectaPol,frm_anexos:dtUbc"
 						update="frm_anexos:tbViewInclUbc:dtFrmpFinal,frm_anexos:frmEmiteAnexo:inpTxtFact" />
-					<p:commandButton id="btnEmiteAnexoCancel"
-						styleClass="ui-priority-primary"
-						action="/index.xhtml?faces-redirect=true"
-						actionListener="#{ControladorAnexos.cancelaAnexo}"
-						icon="ui-icon-cancel" value="Salir" title="Canela Anexo" />
+					
 				</h:panelGrid>
 			</p:row>
 		</p:tab>
@@ -586,7 +582,7 @@
 			<h:panelGrid columns="1" cellpadding="5">
 				<h:panelGrid columns="6">
 					<h:outputText value="Item Aseg." />
-					<p:inputNumber id="exCantidad"
+					<p:inputText id="exCantidad"
 						value="#{ControladorAnexos.exCantidad}" style="width:50px;" />
 					<h:outputText value="Detalle" />
 					<p:inputText id="exDetalle" value="#{ControladorAnexos.exDetalle}" />
@@ -800,7 +796,7 @@
 		<h:panelGrid columns="1" cellpadding="5">
 			<h:panelGrid columns="6">
 				<h:outputText value="Item Aseg." />
-				<p:inputNumber id="exCantidadSub"
+				<p:inputText id="exCantidadSub"
 					value="#{ControladorAnexos.exCantidad}" style="width:50px;" />
 				<h:outputText value="Detalle" />
 				<p:inputText id="exDetalleSub"

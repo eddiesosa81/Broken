@@ -44,7 +44,7 @@ public class CaracteristicasVehiculos {
 	@Column(name="tipo_combustible")
 	private String tipo_combustible;
 	@Column(name="anio_de_fabricacion")
-	private Integer anio_de_fabricacion;
+	private String anio_de_fabricacion;
 	@Column(name="concesionario")
 	private String concesionario;
 	@Column(name="deudor")
@@ -164,10 +164,11 @@ public class CaracteristicasVehiculos {
 	public void setTipo_combustible(String tipo_combustible) {
 		this.tipo_combustible = tipo_combustible;
 	}
-	public Integer getAnio_de_fabricacion() {
+	
+	public String getAnio_de_fabricacion() {
 		return anio_de_fabricacion;
 	}
-	public void setAnio_de_fabricacion(Integer anio_de_fabricacion) {
+	public void setAnio_de_fabricacion(String anio_de_fabricacion) {
 		this.anio_de_fabricacion = anio_de_fabricacion;
 	}
 	public String getConcesionario() {

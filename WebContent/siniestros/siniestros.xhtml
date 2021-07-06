@@ -1068,6 +1068,110 @@
 								</p:dataTable>
 							</p:panel>
 						</p:tab>
+						<p:tab title="Gestión">
+
+							<h:panelGrid columns="2">
+								<p:row>
+									<h:panelGrid columns="4">
+										<h:outputText value="Gestiona:" />
+										<p:selectOneMenu id="tpGestIni"
+											value="#{ControladorSiniestros.gestionContacto}"
+											style="width:150px" autoWidth="false">
+											<f:selectItem itemLabel="CLIENTE" itemValue="CLIENTE" />
+											<f:selectItem itemLabel="ASEGURADORA" itemValue="ASEGURADORA" />
+											<f:selectItem itemLabel="TALLER" itemValue="TALLER" />
+											<f:selectItem itemLabel="OTROS" itemValue="OTROS" />
+										</p:selectOneMenu>
+										<h:outputText value="Tipo:" />
+										<p:selectOneMenu id="tpGestResIni"
+											value="#{ControladorSiniestros.gestionMedio}"
+											style="width:150px" autoWidth="false">
+											<f:selectItem itemLabel="LLAMADA" itemValue="LLAMADA" />
+											<f:selectItem itemLabel="MENSAJE" itemValue="MENSAJE" />
+											<f:selectItem itemLabel="VISITA" itemValue="VISITA" />
+											<f:selectItem itemLabel="CORREO" itemValue="CORREO" />
+										</p:selectOneMenu>
+										<h:outputText value="Fecha Siguiente Cita:" />
+										<p:calendar id="gestFcSegIni"
+											value="#{ControladorSiniestros.fcSeg}"
+											pattern="dd/MM/yyyy HH:mm" />
+										<h:outputText value="Destinatario Correo:" />
+										<p:selectCheckboxMenu id="scmUsrIni"
+											value="#{ControladorSiniestros.selectedUsuarios}"
+											label="Usuarios" multiple="true" filter="true"
+											filterMatchMode="startsWith" panelStyle="width:250px"
+											autoWidth="false" style="width:150px">
+											<f:selectItems var="usr"
+												value="#{ControladorSiniestros.lstUsuarios}"
+												itemLabel="#{usr.usrapellidos} #{usr.usrnombres}"
+												itemValue="#{usr.correo}" />
+										</p:selectCheckboxMenu>
+										<h:outputText value="Descripción:" />
+										<p:inputTextarea id="intxtDescGesIni" rows="5" cols="30"
+											value="#{ControladorSiniestros.gestionInstruccion}" />
+									</h:panelGrid>
+									<p:commandButton value="Gestionar" id="btnGestSaveIni"
+										icon="ui-icon-suitcase" styleClass="ui-priority-primary"
+										action="#{ControladorSiniestros.guardaGestion}"
+										process="@this,frm_siniestros:tabSiniestro:tpGestIni,frm_siniestros:tabSiniestro:tpGestResIni,frm_siniestros:tabSiniestro:gestFcSegIni,
+										frm_siniestros:tabSiniestro:scmUsrIni,frm_siniestros:tabSiniestro:intxtDescGesIni"
+										update="frm_siniestros:tabSiniestro:tblgesTIni,frm_siniestros:tabSiniestro:tpGestIni,frm_siniestros:tabSiniestro:tpGestResIni,frm_siniestros:tabSiniestro:gestFcSegIni,
+										frm_siniestros:tabSiniestro:scmUsrIni,frm_siniestros:tabSiniestro:intxtDescGesIni" />
+								</p:row>
+								<p:row>
+									<p:panel header="Gestiones Realizadas">
+										<p:dataTable var="gestbl" id="tblgesTIni"
+											value="#{ControladorSiniestros.lstGestion}" rows="4"
+											paginator="true"
+											paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+											rowsPerPageTemplate="3,5,10,15"
+											style="font-family:Verdana; font-size: 10px;" editable="true">
+
+											<p:ajax event="rowEdit"
+												listener="#{ControladorSiniestros.onRowEditGestion}"
+												update="@this" />
+
+											<p:column headerText="Fecha Contacto">
+												<h:outputText value="#{gestbl.fecha_contacto}">
+													<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+												</h:outputText>
+											</p:column>
+
+											<p:column headerText="Gestiona">
+												<h:outputText value="#{gestbl.contacto}" />
+											</p:column>
+
+											<p:column headerText="Tipo">
+												<h:outputText value="#{gestbl.medio}" />
+											</p:column>
+
+											<p:column headerText="Descripción">
+												<p:cellEditor>
+													<f:facet name="output">
+														<h:outputText value="#{gestbl.instruccion}" />
+													</f:facet>
+													<f:facet name="input">
+														<p:inputText id="modelInput" value="#{gestbl.instruccion}"
+															style="width:100%" />
+													</f:facet>
+												</p:cellEditor>
+											</p:column>
+
+											<p:column headerText="Fecha Seguimiento">
+												<h:outputText value="#{gestbl.fecha_seguimiento}">
+													<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+												</h:outputText>
+											</p:column>
+
+											<p:column style="width:32px">
+												<p:rowEditor />
+											</p:column>
+										</p:dataTable>
+									</p:panel>
+								</p:row>
+							</h:panelGrid>
+
+						</p:tab>
 					</p:tabView>
 				</p:outputPanel>
 			</p:dialog>
@@ -2012,6 +2116,109 @@
 									</p:column>
 								</p:dataTable>
 							</p:panel>
+						</p:tab>
+						<p:tab title="Gestión">
+							<h:panelGrid columns="2">
+								<p:row>
+									<h:panelGrid columns="4">
+										<h:outputText value="Gestiona:" />
+										<p:selectOneMenu id="tpGest"
+											value="#{ControladorSiniestros.gestionContacto}"
+											style="width:150px" autoWidth="false">
+											<f:selectItem itemLabel="CLIENTE" itemValue="CLIENTE" />
+											<f:selectItem itemLabel="ASEGURADORA" itemValue="ASEGURADORA" />
+											<f:selectItem itemLabel="TALLER" itemValue="TALLER" />
+											<f:selectItem itemLabel="OTROS" itemValue="OTROS" />
+										</p:selectOneMenu>
+										<h:outputText value="Tipo:" />
+										<p:selectOneMenu id="tpGestRes"
+											value="#{ControladorSiniestros.gestionMedio}"
+											style="width:150px" autoWidth="false">
+											<f:selectItem itemLabel="LLAMADA" itemValue="LLAMADA" />
+											<f:selectItem itemLabel="MENSAJE" itemValue="MENSAJE" />
+											<f:selectItem itemLabel="VISITA" itemValue="VISITA" />
+											<f:selectItem itemLabel="CORREO" itemValue="CORREO" />
+										</p:selectOneMenu>
+										<h:outputText value="Fecha Siguiente Cita:" />
+										<p:calendar id="gestFcSeg"
+											value="#{ControladorSiniestros.fcSeg}"
+											pattern="dd/MM/yyyy HH:mm" />
+										<h:outputText value="Destinatario Correo:" />
+										<p:selectCheckboxMenu id="scmUsr"
+											value="#{ControladorSiniestros.selectedUsuarios}"
+											label="Usuarios" multiple="true" filter="true"
+											filterMatchMode="startsWith" panelStyle="width:250px"
+											autoWidth="false" style="width:150px">
+											<f:selectItems var="usr"
+												value="#{ControladorSiniestros.lstUsuarios}"
+												itemLabel="#{usr.usrapellidos} #{usr.usrnombres}"
+												itemValue="#{usr.correo}" />
+										</p:selectCheckboxMenu>
+										<h:outputText value="Descripción:" />
+										<p:inputTextarea id="intxtDescGes" rows="5" cols="30"
+											value="#{ControladorSiniestros.gestionInstruccion}" />
+									</h:panelGrid>
+									<p:commandButton value="Gestionar" id="btnGestSave"
+										icon="ui-icon-suitcase" styleClass="ui-priority-primary"
+										action="#{ControladorSiniestros.guardaGestion}"
+										process="@this,frm_siniestros:tabSiniestroEdt:tpGest,frm_siniestros:tabSiniestroEdt:tpGestRes,frm_siniestros:tabSiniestroEdt:gestFcSeg,
+										frm_siniestros:tabSiniestroEdt:scmUsr,frm_siniestros:tabSiniestroEdt:intxtDescGes"
+										update="frm_siniestros:tabSiniestroEdt:tblgesT,frm_siniestros:tabSiniestroEdt:tpGest,frm_siniestros:tabSiniestroEdt:tpGestRes,frm_siniestros:tabSiniestroEdt:gestFcSeg,
+										frm_siniestros:tabSiniestroEdt:scmUsr,frm_siniestros:tabSiniestroEdt:intxtDescGes,frm_siniestros:tabSiniestroEdt:tblgesT" />
+								</p:row>
+								<p:row>
+									<p:panel header="Gestiones Realizadas">
+										<p:dataTable var="gestbl" id="tblgesT"
+											value="#{ControladorSiniestros.lstGestion}" rows="4"
+											paginator="true"
+											paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+											rowsPerPageTemplate="3,5,10,15"
+											style="font-family:Verdana; font-size: 10px;" editable="true">
+
+
+											<p:ajax event="rowEdit"
+												listener="#{ControladorSiniestros.onRowEditGestion}"
+												update="@this" />
+
+											<p:column headerText="Fecha Contacto">
+												<h:outputText value="#{gestbl.fecha_contacto}">
+													<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+												</h:outputText>
+											</p:column>
+
+											<p:column headerText="Gestiona">
+												<h:outputText value="#{gestbl.contacto}" />
+											</p:column>
+
+											<p:column headerText="Tipo">
+												<h:outputText value="#{gestbl.medio}" />
+											</p:column>
+
+											<p:column headerText="Descripción">
+												<p:cellEditor>
+													<f:facet name="output">
+														<h:outputText value="#{gestbl.instruccion}" />
+													</f:facet>
+													<f:facet name="input">
+														<p:inputText id="modelInput" value="#{gestbl.instruccion}"
+															style="width:100%" />
+													</f:facet>
+												</p:cellEditor>
+											</p:column>
+
+											<p:column headerText="Fecha Seguimiento">
+												<h:outputText value="#{gestbl.fecha_seguimiento}">
+													<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+												</h:outputText>
+											</p:column>
+
+											<p:column style="width:32px">
+												<p:rowEditor />
+											</p:column>
+										</p:dataTable>
+									</p:panel>
+								</p:row>
+							</h:panelGrid>
 						</p:tab>
 					</p:tabView>
 				</p:outputPanel>

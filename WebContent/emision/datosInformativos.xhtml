@@ -90,12 +90,12 @@
 			<f:selectItem itemLabel="RENOVACION" itemValue="9" />
 		</p:selectOneMenu>
 		<h:outputText value="# Renovación" />
-		<p:inputNumber id="numRenov" style="width:65px"
+		<p:inputText id="numRenov" style="width:65px"
 			value="#{ControladorEmision.lsnumRenova}"
 			disabled="#{ControladorEmision.flgActivaCotiza}">
 			<p:ajax listener="#{ControladorEmision.asignaNumRenova}"
 				event="change" />
-		</p:inputNumber>
+		</p:inputText>
 		<h:outputText value="Ejecutivo " />
 		<p:selectOneMenu id="listaEjecutivos"
 			value="#{ControladorEmision.codEjecutivo}" style="width:125px"
@@ -495,17 +495,17 @@
 								itemLabel="#{ciu.nm_ciudad}" itemValue="#{ciu.cd_ciudad}" />
 						</p:selectOneMenu>
 						<h:outputText value="Número Particular" />
-						<p:inputNumber id="impNumTelf"
-							value="#{ControladorEmision.telefono.telefono}"></p:inputNumber>
+						<p:inputText id="impNumTelf"
+							value="#{ControladorEmision.telefono.telefono}"></p:inputText>
 						<h:outputText value="Número Oficina" />
-						<p:inputNumber id="impNumTelfOfi"
-							value="#{ControladorEmision.telefono.telefono_oficina}"></p:inputNumber>
+						<p:inputText id="impNumTelfOfi"
+							value="#{ControladorEmision.telefono.telefono_oficina}"></p:inputText>
 						<h:outputText value="Extensión " />
-						<p:inputNumber id="impExtTelf"
-							value="#{ControladorEmision.telefono.ext}"></p:inputNumber>
+						<p:inputText id="impExtTelf"
+							value="#{ControladorEmision.telefono.ext}"></p:inputText>
 						<h:outputText value="Número Celular" />
-						<p:inputNumber id="impNumTelfCel"
-							value="#{ControladorEmision.telefono.telefono_celular}"></p:inputNumber>
+						<p:inputText id="impNumTelfCel"
+							value="#{ControladorEmision.telefono.telefono_celular}"></p:inputText>
 						<h:outputText value="Correo Personal " />
 						<p:inputText id="impCorreoP"
 							value="#{ControladorEmision.telefono.correo}"></p:inputText>
@@ -528,11 +528,11 @@
 						<p:inputText id="impNmConta"
 							value="#{ControladorEmision.contacto.nombre_contacto}"></p:inputText>
 						<h:outputText value="Número Teléfono" />
-						<p:inputNumber id="impNumTelfCont"
-							value="#{ControladorEmision.contacto.telefono_contacto}"></p:inputNumber>
+						<p:inputText id="impNumTelfCont"
+							value="#{ControladorEmision.contacto.telefono_contacto}"></p:inputText>
 						<h:outputText value="Número Celular" />
-						<p:inputNumber id="impNumCelCont"
-							value="#{ControladorEmision.contacto.celular_contacto}"></p:inputNumber>
+						<p:inputText id="impNumCelCont"
+							value="#{ControladorEmision.contacto.celular_contacto}"></p:inputText>
 						<h:outputText value="Correo  " />
 						<p:inputText id="impCorreoPCont"
 							value="#{ControladorEmision.contacto.mail_contacto}"></p:inputText>

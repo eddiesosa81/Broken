@@ -383,8 +383,8 @@
 						selection="#{ControladorAnexos.selectedUbicacionAnePend}"
 						rowKey="#{ubcAnex.cd_ubicacion}">
 						<f:facet name="header">
-			            Seleccione la Ubicación
-			        </f:facet>
+				            Seleccione la Ubicación
+				        </f:facet>
 						<p:ajax event="rowSelect"
 							listener="#{ControladorAnexos.onRowSelectUbcAneP}"
 							update="@this,frm_anexos:frmEmitePendAnexo:dtObjetoAnePend" />
@@ -401,11 +401,11 @@
 						selection="#{ControladorAnexos.selectedObjetoAnePend}"
 						rowKey="#{objP.cd_obj_cotizacion}">
 						<f:facet name="header">
-			            Seleccione el Objeto
-			        </f:facet>
+				            Seleccione el Objeto
+				        </f:facet>
 						<p:ajax event="rowSelect"
 							listener="#{ControladorAnexos.onRowSelectObjetoAneP}"
-							update="@this,frm_anexos:frmEmitePendAnexo:dtSubObjeAneP" />
+							update="@this,frm_anexos:frmEmitePendAnexo:dtSubObjeAneP,frm_anexos:frmEmitePendAnexo:dtCaractObj" />
 						<p:column headerText="Cod." style="width:40px;text-align:center">
 							<h:outputText value="#{objP.cd_obj_cotizacion}" />
 						</p:column>
@@ -429,8 +429,8 @@
 						selection="#{ControladorAnexos.selectedSubObjeAnePend}"
 						rowKey="#{subObjP.cd_subobj_cotizacion}">
 						<f:facet name="header">
-			           SubObjeto / Extra 
-			        </f:facet>
+				           SubObjeto / Extra 
+				        </f:facet>
 
 						<p:column headerText="Cod." style="width:40px;text-align:center">
 							<h:outputText value="#{subObjP.cd_subobj_cotizacion}" />
@@ -447,6 +447,114 @@
 						<p:column headerText="Prima">
 							<h:outputText value="#{subObjP.prima_subobjeto}" />
 						</p:column>
+					</p:dataTable>
+
+					<p:dataTable id="dtCaractObj" var="carObjP" scrollable="true"
+						scrollHeight="80" editable="true"
+						value="#{ControladorAnexos.caracteristicasObjetoCons}">
+						<f:facet name="header">
+				           Características
+				        </f:facet>
+						<p:ajax event="rowEdit" listener="#{ControladorAnexos.onRowEditCaract}"
+							update="@this" />
+
+						<p:column headerText="Placa">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{carObjP.placa}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{carObjP.placa}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Ramv">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{carObjP.ranv_cpn}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{carObjP.ranv_cpn}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Marca">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{carObjP.marca}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{carObjP.marca}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Modelo">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{carObjP.modelo}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{carObjP.modelo}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Color">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{carObjP.color}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{carObjP.color}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Motor">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{carObjP.no_de_motor}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{carObjP.no_de_motor}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Chasis">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{carObjP.no_de_chasis}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{carObjP.no_de_chasis}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Año">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{carObjP.anio_de_fabricacion}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{carObjP.anio_de_fabricacion}"
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="Endoso">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{carObjP.endoso}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputText value="#{carObjP.endoso}" style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+
+						<p:column style="width:6rem">
+							<p:rowEditor editTitle="Edit Row" cancelTitle="Cancel Edit"
+								saveTitle="Save Row" />
+						</p:column>
+
 					</p:dataTable>
 					<p:commandButton icon="ui-icon-disk" value="Editar"
 						process="@this,frm_anexos:frmEmitePendAnexo:dtCabAnexo,frm_anexos:frmEmitePendAnexo:dtAnexPendUbc,
@@ -475,10 +583,6 @@
 						actionListener="#{ControladorAnexos.eliminaAnexo}">
 					</p:commandButton>
 
-					<h:commandButton value="Salir" styleClass="ui-priority-primary"
-						style='width:70px; height:25px'
-						action="/Broken/index.xhtml?faces-redirect=true"
-						id="btnEmiteAnexoPendienteC" title="Salir Anexo Pendiente" />
 
 				</h:form>
 			</p:dialog>

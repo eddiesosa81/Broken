@@ -287,11 +287,11 @@
 							id="btnfrmPagAct"
 							update="frmActProv:FactAsegFrmP,frmActProv:iptFrmPrimTot,frmActProv:iptFrmPDerEmi,frmActProv:iptFrmSupBanco,
 					frmActProv:iptFrmSegCamp,frmActProv:iptFrmOtroVal,frmActProv:iptFrmIva,frmActProv:sbmAplicaIva,frmActProv:sbmCalculaIva,
-					frmActProv:iptFrmTotla,frmActProv:iptFrmCuotaIni,frmActProv:iptFrmNumPago"
+					frmActProv:iptFrmTotla,frmActProv:iptFrmCuotaIni,frmActProv:iptFrmNumPago,frmActProv:slomFrmPago"
 							title="Calcular"
 							process="@this,frmActProv:FactAsegFrmP,frmActProv:iptFrmPrimTot,frmActProv:iptFrmPDerEmi,frmActProv:iptFrmSupBanco,
 					frmActProv:iptFrmSegCamp,frmActProv:iptFrmOtroVal,frmActProv:iptFrmIva,frmActProv:sbmAplicaIva,frmActProv:sbmCalculaIva,
-					frmActProv:iptFrmTotla,frmActProv:iptFrmCuotaIni,frmActProv:iptFrmNumPago" />
+					frmActProv:iptFrmTotla,frmActProv:iptFrmCuotaIni,frmActProv:iptFrmNumPago,frmActProv:slomFrmPago" />
 					</p:row>
 					<h:outputText value="%Cuota Inicial: " />
 					<p:inputText value="#{ControladorAnexoProvisional.frmPagoCuotaIni}"
@@ -307,11 +307,111 @@
 					action="#{ControladorAnexoProvisional.guardaFormaPago}"
 					process="@this,frmActProv:FactAsegFrmP,frmActProv:iptFrmPrimTot,frmActProv:iptFrmPDerEmi,frmActProv:iptFrmSupBanco,
 					frmActProv:iptFrmSegCamp,frmActProv:iptFrmOtroVal,frmActProv:iptFrmIva,frmActProv:sbmAplicaIva,frmActProv:sbmCalculaIva,
+					frmActProv:iptFrmTotla,frmActProv:iptFrmCuotaIni,frmActProv:iptFrmNumPago,frmActProv:slomFrmPago"
+					update="frmActProv:FactAsegFrmP,frmActProv:iptFrmPrimTot,frmActProv:iptFrmPDerEmi,frmActProv:iptFrmSupBanco,
+					frmActProv:iptFrmSegCamp,frmActProv:iptFrmOtroVal,frmActProv:iptFrmIva,frmActProv:sbmAplicaIva,frmActProv:sbmCalculaIva,
+					frmActProv:iptFrmTotla,frmActProv:iptFrmCuotaIni,frmActProv:iptFrmNumPago,frmActProv:checkboxDT,
+					frmActProv:dtUbcTot,frmActProv:dtSubObjTot,frmActProv:dtFrmpFinal,frmActProv:dtDetFrmpFinal,frmActProv:slomFrmPago" />
+				<p:commandButton value="Salir" id="btnFrmPagoSalir"
+					icon="ui-icon-closethick" styleClass="ui-priority-primary"
+					action="#{ControladorAnexoProvisional.cerrarFrmPag}"
+					process="@this,frmActProv:FactAsegFrmP,frmActProv:iptFrmPrimTot,frmActProv:iptFrmPDerEmi,frmActProv:iptFrmSupBanco,
+					frmActProv:iptFrmSegCamp,frmActProv:iptFrmOtroVal,frmActProv:iptFrmIva,frmActProv:sbmAplicaIva,frmActProv:sbmCalculaIva,
 					frmActProv:iptFrmTotla,frmActProv:iptFrmCuotaIni,frmActProv:iptFrmNumPago"
 					update="frmActProv:FactAsegFrmP,frmActProv:iptFrmPrimTot,frmActProv:iptFrmPDerEmi,frmActProv:iptFrmSupBanco,
 					frmActProv:iptFrmSegCamp,frmActProv:iptFrmOtroVal,frmActProv:iptFrmIva,frmActProv:sbmAplicaIva,frmActProv:sbmCalculaIva,
 					frmActProv:iptFrmTotla,frmActProv:iptFrmCuotaIni,frmActProv:iptFrmNumPago,frmActProv:checkboxDT,
 					frmActProv:dtUbcTot,frmActProv:dtSubObjTot" />
+				
+				
+				<p:dataTable var="frmPg" value="#{ControladorAnexoProvisional.lstFrmPago}"
+					id="dtFrmpFinal" style="font-family:Verdana; font-size: 10px;">
+					<f:facet name="header">
+		            	Forma de Pago
+		        	</f:facet>
+					<p:column headerText="Pago"  style="width:60px;">
+						<h:outputText value="#{frmPg.num_alternativa_formaPago}" />
+					</p:column>
+					<p:column headerText="Prima Neta" style="width:60px;">
+						<h:outputText value="#{frmPg.total_prima_frmPago}" />
+					</p:column>
+					<p:column headerText="Super de Bancos" style="width:60px;">
+						<h:outputText value="#{frmPg.superBanco_forma_Pago}" />
+					</p:column>
+					<p:column headerText="Derechos de Emisión" style="width:60px;">
+						<h:outputText value="#{frmPg.derecho_Emision_formaPago}" />
+					</p:column>
+					<p:column headerText="Seguro Campesino" style="width:60px;">
+						<h:outputText value="#{frmPg.seguroCampesion_forma_Pago}" />
+					</p:column>
+					<p:column headerText="Otros" style="width:60px;">
+						<h:outputText value="#{frmPg.otro_valor_forma_Pago}" />
+					</p:column>
+					<p:column headerText="IVA" style="width:60px;">
+						<h:outputText value="#{frmPg.iva_Forma_Pago}" />
+					</p:column>
+					<p:column headerText="% Cuota Inicial" style="width:60px;">
+						<h:outputText value="#{frmPg.pct_cuota_Inicial_frmPago}" />
+					</p:column>
+					<p:column headerText="No.Cuotas" style="width:60px;">
+						<h:outputText value="#{frmPg.num_pago_formaPago}" />
+					</p:column>
+					<p:column headerText="Prima Total" style="width:60px;">
+						<h:outputText value="#{frmPg.total_Pago_FormaPago}" />
+					</p:column>
+				</p:dataTable>
+				<p:dataTable var="DetfrmPg"
+					value="#{ControladorAnexoProvisional.lstDetFrmPago}" id="dtDetFrmpFinal"
+					scrollable="true" scrollHeight="150"
+					style="font-family:Verdana; font-size: 10px;" editable="true">
+					<p:ajax event="rowEdit"
+						listener="#{ControladorAnexoProvisional.onRowEditDetFin}" update="@this" />
+					<f:facet name="header">
+			            Cuotas
+			        </f:facet>
+					<p:column headerText="Tipo">
+						<h:outputText value="#{DetfrmPg.tipo}" />
+					</p:column>
+					<p:column headerText="Valor">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{DetfrmPg.VALOR}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputNumber value="#{DetfrmPg.VALOR}"></p:inputNumber>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<p:column headerText="Num.Documento">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{DetfrmPg.FACTURA_ASEGURADORA}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{DetfrmPg.FACTURA_ASEGURADORA}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<p:column headerText="Fecha Vencimiento">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{DetfrmPg.FECHA_VENCIMIENTO_DATE}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</h:outputText>
+							</f:facet>
+							<f:facet name="input">
+								<p:calendar value="#{DetfrmPg.FECHA_VENCIMIENTO_DATE}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column style="width:32px">
+						<p:rowEditor />
+					</p:column>
+				</p:dataTable>
 			</p:dialog>
 		</h:form>
 	</ui:define>

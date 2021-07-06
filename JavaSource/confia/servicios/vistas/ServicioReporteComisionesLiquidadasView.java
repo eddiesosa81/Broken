@@ -44,8 +44,7 @@ public class ServicioReporteComisionesLiquidadasView {
 				+ " and to_char(cd_ramo) like '" + codRamo + "'" 
 				+ " and to_char(cd_subagente) like '"+ codSubagen + "'" 
 				+ " and to_char(cd_ejecutivo) like '" + codEjec + "'"
-				+ " and fc_emision_jul >= fechajuliana_func('" + fcDesde + "')"
-				+ " and fc_emision_jul <= fechajuliana_func('" + fcHasta + "')";
+				+ " and to_date(fecha_Factura_confia,'dd/mm/yyyy')  between '"+ fcDesde + "' and '"+ fcHasta + "'";
 		System.out.println("********************-----QUERY: " + sql);
 		Query q = em.createNativeQuery(sql, ReporteComisionesLiquidadasView.class);
 		return q.getResultList();

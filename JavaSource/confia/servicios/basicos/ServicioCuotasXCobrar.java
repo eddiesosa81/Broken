@@ -168,7 +168,7 @@ public class ServicioCuotasXCobrar {
 					+ cond + " cd_aseguradora like '" + aseguradoraCd + "'" + cond
 					+ " fechajuliana_func(to_char(fc_fin_vigencia,'dd/mm/yyyy')) >= fechajuliana_func('" + asFechaDesde + "') and "
 					+ " fechajuliana_func(to_char(fc_fin_vigencia,'dd/mm/yyyy')) <= fechajuliana_func('" + asFechaHasta
-					+ "') and facturacion_periodica = 1 order by cd_cotizacion , numero_pago";
+					+ "') and facturacion_periodica = 1 order by poliza , numero_pago";
 			System.out.println("Forma PAgo Mensualizado;"+sql);
 		} else {
 			if (clienteCd.equals("%")) {
@@ -178,7 +178,7 @@ public class ServicioCuotasXCobrar {
 							+ cond + " cd_aseguradora like '" + aseguradoraCd + "'" + cond
 							+ " fecha_vencimiento_Jul >= fechajuliana_func('" + asFechaDesde + "') and "
 							+ " fecha_vencimiento_Jul <= fechajuliana_func('" + asFechaHasta
-							+ "') order by cd_cotizacion , numero_pago";
+							+ "') order by poliza , numero_pago";
 			} else {
 				 sql = "select * from cuotasxcobrar_view where " + " cd_cliente = " + clienteCd + " " + cond
 							+ " poliza like '" + poliza + "'" + cond + " dfp_factura_aseguradora like '" + factura + "'" + cond
@@ -186,7 +186,7 @@ public class ServicioCuotasXCobrar {
 							+ cond + " cd_aseguradora like '" + aseguradoraCd + "'" + cond
 							+ " fecha_vencimiento_Jul >= fechajuliana_func('" + asFechaDesde + "') and "
 							+ " fecha_vencimiento_Jul <= fechajuliana_func('" + asFechaHasta
-							+ "') order by cd_cotizacion , numero_pago";
+							+ "') order by poliza , numero_pago";
 
 			}
 			

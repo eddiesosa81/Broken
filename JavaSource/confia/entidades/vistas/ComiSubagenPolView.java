@@ -58,9 +58,9 @@ public class ComiSubagenPolView {
 	@Column(name="total_prima")
 	private String total_prima;
 	@Column(name="pct_com_suba")
-	private String pct_com_suba;
+	private Double pct_com_suba;
 	@Column(name="val_com_suba")
-	private String val_com_suba;
+	private Double val_com_suba;
 	@Column(name="cd_comisuba_pol")
 	private String cd_comisuba_pol;
 	@Column(name="cedula_canal")
@@ -240,16 +240,17 @@ public class ComiSubagenPolView {
 	public void setTotal_prima(String total_prima) {
 		this.total_prima = total_prima;
 	}
-	public String getPct_com_suba() {
+	
+	public Double getPct_com_suba() {
 		return pct_com_suba;
 	}
-	public void setPct_com_suba(String pct_com_suba) {
+	public void setPct_com_suba(Double pct_com_suba) {
 		this.pct_com_suba = pct_com_suba;
 	}
-	public String getVal_com_suba() {
+	public Double getVal_com_suba() {
 		return val_com_suba;
 	}
-	public void setVal_com_suba(String val_com_suba) {
+	public void setVal_com_suba(Double val_com_suba) {
 		this.val_com_suba = val_com_suba;
 	}
 	public String getCd_comisuba_pol() {

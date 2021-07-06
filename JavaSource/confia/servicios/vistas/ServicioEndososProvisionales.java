@@ -17,7 +17,9 @@ public class ServicioEndososProvisionales {
 	@SuppressWarnings("unchecked")
 	public List<EndososProvisionalesView> endososProvisionalesCons(String codClie,String descRubro,String pol) {
 		List<EndososProvisionalesView> resultado;
-		String sql = "select * from ENDOSOS_PROVISIONALES_VIEW where DESC_RUBRO = '"+descRubro+"' and cd_cliente="+codClie+" and poliza = '"+pol+"'";
+		String sql = "select * from ENDOSOS_PROVISIONALES_VIEW where DESC_RUBRO = '"+descRubro
+				+"' and cd_cliente="+codClie
+				+" and poliza like '%"+pol+"%'";
 		System.out.println("SQL ->"+sql);
 		try {
 			Query query = em.createNativeQuery(sql, EndososProvisionalesView.class);

@@ -551,8 +551,8 @@
 		hideEffect="fade" widgetVar="wDlgDepreciacionPlan" closable="true">
 		<p:panelGrid columns="3">
 			<h:outputText value="Número de Años:"></h:outputText>
-			<p:inputNumber id="imptNumAnio"
-				value="#{ControladorPlanes.numAnioDepre}"></p:inputNumber>
+			<p:inputText id="imptNumAnio"
+				value="#{ControladorPlanes.numAnioDepre}"></p:inputText>
 			<p:commandButton icon="ui-icon-plus" value="Nuevo"
 				process="@this,frm_planes:imptNumAnio"
 				update="@this frm_planes:dtDeprePlan"

@@ -228,7 +228,7 @@ public class ControladorCobranzas {
 
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 		String dateInString = "01-01-2017";
-		String dateFinString = "01-01-2021";
+		String dateFinString = "01-01-2024";
 		todasCond = false;
 		sumaFormasPagos = 0.00;
 

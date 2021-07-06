@@ -1662,7 +1662,7 @@ public class ControladorEmisionMensualizado {
 						if (strgAux == null) {
 							strgAux = "S/N";
 						}
-						datosCaracteristicasVehiculos.setAnio_de_fabricacion(Integer.valueOf(strgAux));
+						datosCaracteristicasVehiculos.setAnio_de_fabricacion(strgAux);
 					} catch (Exception e) {
 						strgAux = "S/N";
 					}

@@ -18,18 +18,27 @@ import confia.entidades.basicos.Aseguradoras;
 import confia.entidades.basicos.Clientes;
 import confia.entidades.basicos.CuotasXCobrar;
 import confia.entidades.basicos.GrupoContratante;
+import confia.entidades.basicos.PagoDetallePago;
 import confia.entidades.basicos.Ramo;
+import confia.entidades.transaccionales.ComisionesPoliza;
 import confia.entidades.transaccionales.DetalleFormaPago;
 import confia.entidades.transaccionales.DetallePagos;
 import confia.entidades.transaccionales.Pagos;
+import confia.entidades.transaccionales.PreFactura;
+import confia.entidades.transaccionales.PreFacturaDetalle;
 import confia.servicios.basicos.ServicioAseguradoras;
 import confia.servicios.basicos.ServicioClientes;
 import confia.servicios.basicos.ServicioCuotasXCobrar;
 import confia.servicios.basicos.ServicioGrupoContratante;
 import confia.servicios.basicos.ServicioRamo;
+import confia.servicios.basicos.ServicioRubros;
+import confia.servicios.transaccionales.ServicioComisionesPoliza;
 import confia.servicios.transaccionales.ServicioDetalleFormaPago;
 import confia.servicios.transaccionales.ServicioDetallePagos;
 import confia.servicios.transaccionales.ServicioPagos;
+import confia.servicios.transaccionales.ServicioPreFactura;
+import confia.servicios.transaccionales.ServicioPreFacturaDetalle;
+import confia.servicios.vistas.ServicioPreFacturaDetalleView;
 
 @ManagedBean(name = "ControladorCobranzaMensualizado")
 @ViewScoped
@@ -38,6 +47,8 @@ public class ControladorCobranzaMensualizado {
 	private ServicioClientes srvClientes;
 	@EJB
 	private ServicioCuotasXCobrar srvCuotas;
+	@EJB
+	private ServicioRubros srvRubros;
 	@EJB
 	private ServicioRamo srvRamo;
 	@EJB
@@ -50,6 +61,13 @@ public class ControladorCobranzaMensualizado {
 	private ServicioDetalleFormaPago srvDetalleFormaPago;
 	@EJB
 	private ServicioDetallePagos srvDetallePagos;
+	@EJB
+	private ServicioPreFactura srvPreFactura;
+	@EJB
+	private ServicioComisionesPoliza srvComisionesPoliza;
+	@EJB
+	private ServicioPreFacturaDetalle srvPreFacturaDet;
+	
 
 	private Clientes datosCliente;
 	private String str_cliente;
@@ -282,6 +300,86 @@ public class ControladorCobranzaMensualizado {
 			srvDetallePagos.guardarDetallePago(detallePagos);
 			srvDetalleFormaPago.actualizaDetFormaPago(detFrmPago);
 		}
+		
+		// pago de la pre facturacion
+		
+		PreFactura prefac = new PreFactura();
+		prefac.setCd_compania(1);
+		prefac.setCd_aseguradora(asegAnt);
+		prefac.setFlg_factura(0);
+		prefac.setFlg_saldar_centavo(0);
+		
+		
+		Integer codPreFac = 0;
+		srvPreFactura.insertaPreFactura(prefac);
+		codPreFac = srvPreFactura.codigoMaxPreFactura();
+		prefac = new PreFactura();
+		prefac = srvPreFactura.recuperaPreFacturaPorCodigo(codPreFac);
+		Double valCom, valLiqCom, saldoCom, valLiqComAux = 0.0, saldoComAux = 0.0,valPReFac = 0.0;
+		
+		for (CuotasXCobrar cuotaAux : lstSel) {
+			DetalleFormaPago CuotasPolizaAux = new DetalleFormaPago();
+			CuotasPolizaAux = srvDetalleFormaPago.recuperaDetallexCdFrmPago(cuotaAux.getCd_det_forma_pago(),
+					cuotaAux.getCd_compania());
+			ComisionesPoliza comPol = new ComisionesPoliza(); 
+			comPol = srvComisionesPoliza.comisionesPolizaxCdDetFrmPag(cuotaAux.getCd_det_forma_pago());
+			
+			// realiza calculos de saldos
+			valCom = Double.valueOf(comPol.getVal_com_brk());
+			valLiqCom = Double.valueOf(comPol.getValorLiquidado());
+			saldoCom = Double.valueOf(comPol.getSaldo_com_brk());
+			
+			if (valLiqCom.equals(valCom)) {
+				valLiqComAux = 0.0;
+			} else {
+				valLiqComAux = valLiqCom;
+			}
+			System.out.println("VALOR COMISION:" + valCom);
+			System.out.println("VALOR LIQUIDADO:" + valLiqComAux);
+			System.out.println("VALOR SALDO:" + saldoComAux);
+
+			saldoComAux = saldoCom;
+			valLiqComAux = valLiqComAux + saldoComAux;
+			saldoComAux = valCom - valLiqComAux;
+
+			System.out.println("VALOR LIQUIDADO ACT:" + valLiqComAux);
+			System.out.println("VALOR SALDO ACT:" + saldoComAux);
+
+			PreFacturaDetalle detPreFac = new PreFacturaDetalle();
+			
+			detPreFac.setCd_compania(prefac.getCd_compania());
+			detPreFac.setCd_pre_factura(codPreFac);
+			detPreFac.setCd_cliente(Integer.valueOf(cuotaAux.getCd_cliente()));
+			detPreFac.setCd_ramo(Integer.valueOf(cuotaAux.getCd_ramo()));
+			detPreFac.setPoliza(cuotaAux.getPoliza());
+			detPreFac.setFactura(CuotasPolizaAux.getFACTURA_ASEGURADORA());
+			detPreFac.setTot_prima(Double.valueOf(comPol.getTotal_prima()));
+			detPreFac.setPct_com_broker(comPol.getPct_com_brk());
+			detPreFac.setVal_com_broker(saldoCom);
+			detPreFac.setSaldo_com_broker(saldoComAux);
+			valPReFac = valPReFac + saldoCom;
+			detPreFac.setCd_comision_poliza(comPol.getCd_comision_poliza());
+			srvPreFacturaDet.insertaPreFacturaDetalle(detPreFac);
+			// Actualiza flg Comision como facturada
+			ComisionesPoliza comAux = new ComisionesPoliza();
+			comAux = srvComisionesPoliza.comisionesPolizaxCod(comPol.getCd_comision_poliza());
+			comAux.setValorLiquidado(saldoComAux);
+			comAux.setFlg_pre_factura("1");
+			comAux.setSaldo_com_brk(saldoComAux);
+			srvComisionesPoliza.actualizaComisionesPoliza(comAux);
+		}
+		prefac.setVal_pre_factura(redondear(valPReFac));
+		String rubroAux = srvRubros.recuperaIva();
+		Double iva = Double.valueOf(rubroAux);
+		iva = iva / 100;
+		iva = redondear(iva);
+		System.out.println("IVA-->" + iva);
+		System.out.println("Valor-->" + valPReFac);
+		valPReFac = (valPReFac * iva) + valPReFac;
+		prefac.setVal_pre_iva(redondear(valPReFac));
+		prefac.setFlg_factura(0);
+		srvPreFactura.actualizaPreFactura(prefac);
+		
 		FacesContext fContextObj = FacesContext.getCurrentInstance();
 		fContextObj.addMessage(null, new FacesMessage("Advertencia", "Pago Exitoso"));
 

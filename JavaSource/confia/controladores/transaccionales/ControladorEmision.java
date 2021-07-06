@@ -417,10 +417,10 @@ public class ControladorEmision {
 	private String notasAdicionalesCarta;
 	private Rubros objCarta;
 
-	private Integer lsnumRenova;
+	private String lsnumRenova;
 
 	private String txtCd_rubroEdith;
-	private Integer lsnumRenovaEdit;
+	private String lsnumRenovaEdit;
 	private List<CaracteristicasVehiculos> lstCaractVeh;
 	private List<SubObjetoCotizacion> lstSubObjetoEdit;
 
@@ -452,7 +452,7 @@ public class ControladorEmision {
 	private Boolean flgCargaArchivoObj;
 
 	public ControladorEmision() {
-		lsnumRenova = 0;
+		lsnumRenova = "0";
 		Rubros objCarta = new Rubros();
 		lstRubrosCarta = new ArrayList<Rubros>();
 		lstContactoCarta = new ArrayList<Contacto>();
@@ -1051,7 +1051,7 @@ public class ControladorEmision {
 		fcHasta = fcHastaPol;
 
 		txtCd_rubro = String.valueOf(datosCotizacion.getCd_rubro());
-		lsnumRenova = datosCotizacion.getNum_renovaciones_cot();
+		lsnumRenova = String.valueOf(datosCotizacion.getNum_renovaciones_cot());
 		codEjecutivo = String.valueOf(ramCotAux.getCd_ejecutivo());
 		flgActivaCotiza = true;
 
@@ -1106,7 +1106,7 @@ public class ControladorEmision {
 	public void editaCotizacion() {
 		Integer numRow = 0;
 		txtCd_rubroEdith = null;
-		lsnumRenovaEdit = 0;
+		lsnumRenovaEdit = "0";
 		numRow = lstCotizacionPendienteSelec.size();
 		if (numRow <= 0) {
 			FacesContext context = FacesContext.getCurrentInstance();
@@ -1116,7 +1116,7 @@ public class ControladorEmision {
 		try {
 			lsnumRenovaEdit = lsnumRenova;
 		} catch (Exception e) {
-			lsnumRenovaEdit = 0;
+			lsnumRenovaEdit = "0";
 		}
 		PrimeFaces.current().executeScript("PF('editaCotiza').show();");
 	}
@@ -1218,7 +1218,7 @@ public class ControladorEmision {
 		afecAdicionalCob = false;
 		afecPrimaCob = false;
 		afecValAsegCob = false;
-		lsnumRenova = 0;
+		lsnumRenova = "0";
 		ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
 		try {
 			ctx.redirect("/Broken/index.jsf");
@@ -1354,7 +1354,7 @@ public class ControladorEmision {
 	public void asignaNumRenova() {
 		// numero de renovaciones
 		System.out.println("Numero Renovacion:" + lsnumRenova);
-		datosCotizacion.setNum_renovaciones_cot(lsnumRenova);
+		datosCotizacion.setNum_renovaciones_cot(Integer.valueOf(lsnumRenova));
 	}
 
 	public void asignaVigencia() {
@@ -1482,7 +1482,7 @@ public class ControladorEmision {
 			datosCotizacion.setUsrid(usrId);
 			// numero de renovaciones
 			System.out.println("Numero Renovacion:" + lsnumRenova);
-			datosCotizacion.setNum_renovaciones_cot(lsnumRenova);
+			datosCotizacion.setNum_renovaciones_cot(Integer.valueOf(lsnumRenova));
 
 			Integer cdCotMax = srvCotizacion.insertarCotizacion(datosCotizacion);
 			if (cdCotMax == 1) {
@@ -2470,7 +2470,7 @@ public class ControladorEmision {
 						if (strgAux == null) {
 							strgAux = "S/N";
 						}
-						datosCaracteristicasVehiculos.setAnio_de_fabricacion(Integer.valueOf(strgAux));
+						datosCaracteristicasVehiculos.setAnio_de_fabricacion(strgAux);
 					} catch (Exception e) {
 						strgAux = "S/N";
 					}
@@ -6050,11 +6050,12 @@ public class ControladorEmision {
 		this.calculaIva = calculaIva;
 	}
 
-	public Integer getLsnumRenova() {
+
+	public String getLsnumRenova() {
 		return lsnumRenova;
 	}
 
-	public void setLsnumRenova(Integer lsnumRenova) {
+	public void setLsnumRenova(String lsnumRenova) {
 		this.lsnumRenova = lsnumRenova;
 	}
 
@@ -6082,11 +6083,13 @@ public class ControladorEmision {
 		this.txtCd_rubroEdith = txtCd_rubroEdith;
 	}
 
-	public Integer getLsnumRenovaEdit() {
+
+
+	public String getLsnumRenovaEdit() {
 		return lsnumRenovaEdit;
 	}
 
-	public void setLsnumRenovaEdit(Integer lsnumRenovaEdit) {
+	public void setLsnumRenovaEdit(String lsnumRenovaEdit) {
 		this.lsnumRenovaEdit = lsnumRenovaEdit;
 	}
 

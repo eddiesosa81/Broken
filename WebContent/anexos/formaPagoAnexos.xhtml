@@ -26,6 +26,9 @@
 			<f:facet name="header">
 		            Forma de Pago
 		        </f:facet>
+		    <p:column headerText="Pago">
+				<h:outputText value="#{frmPg.num_alternativa_formaPago}" />
+			</p:column>
 			<p:column headerText="Prima Neta" style="width:60px;">
 				<h:outputText value="#{frmPg.total_prima_frmPago}" />
 			</p:column>

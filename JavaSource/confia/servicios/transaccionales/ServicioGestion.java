@@ -26,6 +26,21 @@ public class ServicioGestion {
 		 Query q = em.createNativeQuery(sql, Gestion.class);
 		 return q.getResultList();
 	}
+	@SuppressWarnings("unchecked")
+	public List<Gestion> recuperaGestionSiniestro(Integer cdSiniestro) {
+		String sql = "select * from gestion_tbl where CD_SINIESTRO = "+cdSiniestro+" order by fecha_contacto desc";
+		 System.out.println("********************-----QUERY: " + sql);
+		 Query q = em.createNativeQuery(sql, Gestion.class);
+		 return q.getResultList();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Gestion> recuperaGestionSiniesGen() {
+		String sql = "select * from gestion_tbl where tipo = 'SINIESTRO' order by fecha_contacto desc";
+		 System.out.println("********************-----QUERY: " + sql);
+		 Query q = em.createNativeQuery(sql, Gestion.class);
+		 return q.getResultList();
+	}
 	
 	public Integer insertarGestion(Gestion obj) {
 		try {
